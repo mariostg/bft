@@ -3,6 +3,7 @@ from django.urls import resolve
 from django.http import HttpRequest
 
 from costcenter.views import fund_page
+from costcenter.models import Fund
 
 
 class FundPageTest(TestCase):
@@ -17,3 +18,26 @@ class FundPageTest(TestCase):
         self.assertTrue(html.startswith("<html>"))
         self.assertIn("<title>Fund List</title>", html)
         self.assertTrue(html.endswith("</html>"))
+
+
+class FundModelTest(TestCase):
+    def test_can_save_and_retrieve_funds(self):
+        first_fund = Fund()
+        first_fund.fund = "C113"
+        first_fund.name = "National procurement"
+        first_fund.vote = "1"
+        first_fund.download = True
+        first_fund.save()
+
+        first_fund = Fund()
+        first_fund.fund = "X999"
+        first_fund.name = "Not an interesting fund"
+        first_fund.vote = "5"
+        first_fund.download = False
+        first_fund.save()
+
+        saved_funds = Fund.objects.all()
+        first_saved_fund = saved_funds[0]
+        second_saved_fund = saved_funds[1]
+        self.assertEqual("C113", first_saved_fund.fund)
+        self.assertEqual("X999", second_saved_fund.fund)
