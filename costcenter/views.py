@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 
 
 # Create your views here.
 def fund_page(request):
-    pass
+    return HttpResponse("<html><title>Fund List</title></html>")
