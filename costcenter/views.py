@@ -4,7 +4,8 @@ from .models import Fund
 
 
 def fund_page(request):
-    return HttpResponse("<html><title>Fund list</title></html>")
+    data = Fund.objects.all()
+    return render(request, "costcenter/fund-page.html", context={"data": data})
 
 
 def fund_new(request):

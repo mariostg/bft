@@ -6,7 +6,15 @@ from costcenter.views import fund_page
 from costcenter.models import Fund
 
 
+def strip_white_space(string: str):
+    return string.replace("\t", "").replace("\n", "")
+
+
 class FundPageTest(TestCase):
+    def test_use_fund_page_template(self):
+        response = self.client.get("/fund/fund_page/")
+        self.assertTemplateUsed(response, "costcenter/fund-page.html")
+
     def test_fund_url_resolved_to_fund_page_view(self):
         found = resolve("/fund/fund_page/")
         self.assertEqual(found.func, fund_page)
@@ -14,10 +22,10 @@ class FundPageTest(TestCase):
     def test_fund_page_returns_correct_html(self):
         request = HttpRequest()
         response = fund_page(request)
-        html = response.content.decode("utf8")
-        self.assertTrue(html.startswith("<html>"))
-        self.assertIn("<title>Fund List</title>", html)
-        self.assertTrue(html.endswith("</html>"))
+        html = strip_white_space(response.content.decode("utf8"))
+        # print(html)
+        self.assertTrue(html.startswith("<!DOCTYPE html>"))
+        self.assertIn("<caption>Funds</caption>", html)
 
 
 class FundModelTest(TestCase):

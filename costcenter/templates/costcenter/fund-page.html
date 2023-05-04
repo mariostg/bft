@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Fund List{% endblock title %}
+{% block content %}
+<main class="block block--centered">
+    <table>
+        <caption>Funds</caption>
+        <thead>
+            <tr>
+                <th>Fund</th>
+                <th>Name</th>
+                <th>Vote</th>
+                <th>Download</th>
+                <th colspan=2></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fund in funds %}
+            <tr>
+            <td>{{fund.fund}}</td><td>{{fund.name}}<td>{{fund.vote}}</td>
+            <td>{{fund.download}}</td>
+            {% if user.is_authenticated %}
+                <td>
+                    <a class='btn' href="{% url "update-fund" fund.id %}">Update</a>
+                </td>
+                <td>
+                    <a class='btn btn-delete' href="{% url "delete-fund" fund.id %}">Delete</a>
+                </td>
+            {% endif %}
+            </tr>
+            {% endfor %} 
+
+        </tbody>
+        {% if user.is_authenticated %}
+        <tfoot>
+            <tr><td colspan=6><a class='btn' href="{% url 'add-fund' %}">Add Fund</a></td></tr>
+        </tfoot>
+        {% endif %}
+    </table>
+</main>
+</body>
+</html>
+{% endblock content %}

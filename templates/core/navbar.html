@@ -1,0 +1,36 @@
+{% load static %}
+<header class="site-header">
+    <div class="site-header__logo">
+      <a href="/">
+        {% comment %} <img src="/images/logo.png" alt="Login System Logo" /> {% endcomment %}
+      </a>
+    </div>
+    <div class="site-header--title">
+      <h1>DGLEPM</h1>
+      <h3>Business Forecasting Tool</h3>
+    </div>
+  </header>
+
+  <nav class="site-nav">
+
+    {% comment %} <input type="checkbox" id="responsive-menu" />
+    <label for="responsive-menu" class="toggle-menu">
+      <span>Menu</span>
+      <div class="toggle-menu__lines"></div>
+    </label> {% endcomment %}
+
+    <div class="block block--spaced">
+      <a class="btn btn--link" href="/notes/">Notes</a>
+      <a class="btn btn--link" href="/dashboard/">Dashboard</a>
+      <a class="btn btn--link" href="/costcenters/">Cost Centers</a>
+      <a class="btn btn--link" href="/lineitems/">Line Items</a>
+      <a class="btn btn--link" href="/costcenters/forecastadjustments/">Forecast Adjustments</a>
+      {% if user.is_authenticated %}
+      <a class="btn btn--link" href="/users/account/">Account</a>
+      <a class="btn btn--link" href="/users/logout/" class="btn btn--sub">Logout</a>
+      {% else %}
+      <a class="btn btn--link" href="/users/login/">Login</a>
+
+      {% endif %}
+    </div>
+  </nav>
