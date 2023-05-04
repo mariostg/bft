@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import resolve
 from django.http import HttpRequest
-
+from django.db import IntegrityError
 from costcenter.views import fund_page
 from costcenter.models import Fund
 
@@ -41,3 +41,30 @@ class FundModelTest(TestCase):
         second_saved_fund = saved_funds[1]
         self.assertEqual("C113", first_saved_fund.fund)
         self.assertEqual("X999", second_saved_fund.fund)
+
+    def test_fund_cannot_be_saved_twice(self):
+        fund_1 = Fund()
+        fund_1.fund = "C113"
+        fund_1.name = "National procurement"
+        fund_1.vote = "1"
+        fund_1.download = True
+        fund_1.save()
+
+        fund_2 = Fund()
+        fund_2.fund = "C113"
+        fund_2.name = "Not an interesting fund"
+        fund_2.vote = "5"
+        fund_2.download = False
+        with self.assertRaises(IntegrityError):
+            fund_2.save()
+
+    def test_can_save_POST_request(self):
+        data = {"fund": "C113", "name": "National Procurement", "vote": "1"}
+        response = self.client.post("/fund/new/", data=data)
+        print(response)
+        # self.assertEqual(Fund.objects.count(), 1)
+        # new_fund = Fund.objects.first()
+        # self.assertEqual(new_fund.fund, "C113")
+
+        # self.assertIn('A new list item', response.content.decode())
+        # self.assertTemplateUsed(response, 'home.html')
