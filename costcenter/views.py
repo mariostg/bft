@@ -8,9 +8,9 @@ def fund_page(request):
     return render(request, "costcenter/fund-page.html", context={"data": data})
 
 
-def fund_new(request):
+def fund_add(request):
     if request.method == "POST":
         data = request.POST
         fund = Fund(**data)
         fund.save()
-    return HttpResponse("Visited fund_new view")
+    return render(request, "costcenter/fund-form.html", context={"data": ""})
