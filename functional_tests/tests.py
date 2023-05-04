@@ -16,9 +16,9 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.get("http://localhost:8000/fund/fund_page")
 
         # Mario notices the page title and header mention Funds list
-        self.assertIn("Fund list", self.browser.title)
-        header_text = self.browser.find_element(By.TAG_NAME, "h1")
-        self.assertIn("Fund list", header_text)
+        self.assertIn("Fund List", self.browser.title)
+        table_id = self.browser.find_element(By.ID, "fund-table").text
+        self.assertIn("Funds", table_id)
         self.fail("Finish the test!")
 
 
