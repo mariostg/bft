@@ -1,3 +1,4 @@
 -r requirement.txt
 
 selenium==4.9
+black=23.3

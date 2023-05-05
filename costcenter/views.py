@@ -1,6 +1,7 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, redirect
 
 from .models import Fund
+from .forms import FundForm
 
 
 def fund_page(request):
@@ -10,7 +11,13 @@ def fund_page(request):
 
 def fund_add(request):
     if request.method == "POST":
-        data = request.POST
-        fund = Fund(**data)
-        fund.save()
-    return render(request, "costcenter/fund-form.html", context={"data": ""})
+        form = FundForm(request.POST)
+        if form.is_valid():
+            fund = form.save(commit=False)
+            fund.fund = fund.fund.upper()
+            fund.save()
+            return redirect("fund-page")
+    else:
+        form = FundForm
+
+    return render(request, "costcenter/fund-form.html", {"form": form})
