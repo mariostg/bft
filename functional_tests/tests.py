@@ -45,9 +45,17 @@ class CostElementFundVisitorTest(StaticLiveServerTestCase):
         table_id = self.browser.find_element(By.ID, "fund-table").text
         self.assertIn("Funds", table_id)
 
+
+class CostElementFundTableTest(StaticLiveServerTestCase):
+    def setUp(self):
+        self.browser = WebDriver()
+
+    def tearDown(self):
+        self.browser.quit()
+
     def test_can_retreive_fund_list(self):
         # Mario needs to create a new fund.  Let's visite the home page
-        self.browser.get(f"{self.live_server_url}/fund/fund-page/")
+        self.browser.get(f"{self.live_server_url}/fund/table/")
 
         # Mario notices the page title and header mention Funds list
         self.assertIn("Fund List", self.browser.title)
