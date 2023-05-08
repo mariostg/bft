@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # apps
     "costcenter.apps.CostcenterConfig",
+    # dev
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
