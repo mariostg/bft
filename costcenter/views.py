@@ -21,3 +21,18 @@ def fund_add(request):
         form = FundForm
 
     return render(request, "costcenter/fund-form.html", {"form": form})
+
+
+def fund_update(request, pk):
+    fund = Fund.objects.get(id=pk)
+    form = FundForm(instance=fund)
+
+    if request.method == "POST":
+        form = FundForm(request.POST, instance=fund)
+        if form.is_valid():
+            fund = form.save(commit=False)
+            fund.fund = fund.fund.upper()
+            fund.save()
+            return redirect("funds")
+
+    return render(request, "costcenter/fund-form.html", {"form": form})
