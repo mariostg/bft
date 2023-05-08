@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 import time
 
 
-class CostElementFundVisitorTest(StaticLiveServerTestCase):
+class CostElementFundFormTest(StaticLiveServerTestCase):
     def setUp(self):
         self.browser = WebDriver()
 
