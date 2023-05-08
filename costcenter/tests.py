@@ -12,11 +12,11 @@ def strip_white_space(string: str):
 
 class FundPageTest(TestCase):
     def test_use_fund_page_template(self):
-        response = self.client.get("/fund/fund-page/")
-        self.assertTemplateUsed(response, "costcenter/fund-page.html")
+        response = self.client.get("/fund/table/")
+        self.assertTemplateUsed(response, "costcenter/fund-table.html")
 
     def test_fund_url_resolved_to_fund_page_view(self):
-        found = resolve("/fund/fund-page/")
+        found = resolve("/fund/table/")
         self.assertEqual(found.func, fund_page)
 
     def test_fund_page_returns_correct_html(self):

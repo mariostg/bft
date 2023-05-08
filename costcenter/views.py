@@ -6,7 +6,7 @@ from .forms import FundForm
 
 def fund_page(request):
     data = Fund.objects.all()
-    return render(request, "costcenter/fund-page.html", context={"data": data})
+    return render(request, "costcenter/fund-table.html", context={"data": data})
 
 
 def fund_add(request):
