@@ -95,3 +95,12 @@ class FundModelTest(TestCase):
         self.assertEqual("X999", f1.fund)
         self.assertEqual("New Name", f1.name)
         self.assertEqual(4, f1.vote)
+
+    def test_can_delete_fund(self):
+        f0 = Fund(**self.fund_c113)
+        f0.save()
+
+        f1 = Fund.objects.get(pk=f0.id)
+        f1.delete()
+
+        self.assertEqual(0, Fund.objects.count())
