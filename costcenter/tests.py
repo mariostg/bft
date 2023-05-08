@@ -29,6 +29,10 @@ class FundPageTest(TestCase):
 
 
 class FundModelTest(TestCase):
+    fund_c113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
+    fund_c523 = {"fund": "C523", "name": "Project National Procurement", "vote": "5"}
+    fund_X999 = {"fund": "X999", "name": "Undesired Fund", "vote": "1"}
+
     def test_can_save_and_retrieve_funds(self):
         first_fund = Fund()
         first_fund.fund = "C113"
@@ -76,3 +80,18 @@ class FundModelTest(TestCase):
 
         # self.assertIn('A new list item', response.content.decode())
         # self.assertTemplateUsed(response, 'home.html')
+
+    def test_can_update_fund_column_values(self):
+        f0 = Fund(**self.fund_c113)
+        f0.save()
+
+        f1 = Fund.objects.filter(fund="C113").first()
+        f1.fund = "X999"
+        f1.name = "New Name"
+        f1.vote = 4
+        f1.save()
+
+        f2 = Fund.objects.filter(pk=f1.pk).first()
+        self.assertEqual("X999", f1.fund)
+        self.assertEqual("New Name", f1.name)
+        self.assertEqual(4, f1.vote)
