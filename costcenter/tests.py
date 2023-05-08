@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import resolve
 from django.http import HttpRequest
 from django.db import IntegrityError
-from costcenter.views import fund_page
+from costcenter.views import fund_page, fund_add
 from costcenter.models import Fund
 
 
@@ -26,6 +26,24 @@ class FundPageTest(TestCase):
         # print(html)
         self.assertTrue(html.startswith("<!DOCTYPE html>"))
         self.assertIn("<caption>Funds</caption>", html)
+
+
+class FundCreatePageTest(TestCase):
+    def test_use_fund_form_template(self):
+        response = self.client.get("/fund/add/")
+        self.assertTemplateUsed(response, "costcenter/fund-form.html")
+
+    def test_fund_add_url_resolves_to_fund_form_view(self):
+        found = resolve("/fund/add/")
+        print(found)
+        self.assertEqual(found.func, fund_add)
+
+    def test_fund_create_returns_correct_html(self):
+        request = HttpRequest()
+        response = fund_add(request)
+        html = strip_white_space(response.content.decode("utf8"))
+        self.assertTrue(html.startswith("<!DOCTYPE html>"))
+        self.assertIn('<h1 class="form__header">Fund Entry Form</h1>', html)
 
 
 class FundModelTest(TestCase):
