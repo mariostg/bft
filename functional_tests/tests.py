@@ -19,7 +19,7 @@ class CostElementFundVisitorTest(StaticLiveServerTestCase):
         # Mario notices the page title and Form mention Create Fund
         self.assertIn("Fund Form", self.browser.title)
         form_header = self.browser.find_element(By.CLASS_NAME, "form__header").text
-        self.assertIn("Fund Form", form_header, "\nFund form not found")
+        self.assertIn("Fund Entry Form", form_header, "\nFund form not found")
 
     def test_can_input_and_save_fund(self):
         # Need to add a new fund, visit the fund form page
