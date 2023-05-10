@@ -65,6 +65,13 @@ class FundModelTest(TestCase):
     fund_c523 = {"fund": "C523", "name": "Project National Procurement", "vote": "5"}
     fund_X999 = {"fund": "X999", "name": "Undesired Fund", "vote": "1"}
 
+    def test_string_representation(self):
+        fund = Fund(fund="C113", name="NP Capital", vote=1)
+        self.assertEqual(str(fund), "C113 - NP Capital")
+
+    def test_verbose_name_plural(self):
+        self.assertEqual(str(Fund._meta.verbose_name_plural), "Funds")
+
     def test_can_save_and_retrieve_funds(self):
         first_fund = Fund()
         first_fund.fund = "C113"
