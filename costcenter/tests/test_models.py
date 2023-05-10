@@ -79,9 +79,9 @@ class FundModelTest(TestCase):
         f1.save()
 
         f2 = Fund.objects.filter(pk=f1.pk).first()
-        self.assertEqual("X999", f1.fund)
-        self.assertEqual("New Name", f1.name)
-        self.assertEqual(4, f1.vote)
+        self.assertEqual("X999", f2.fund)
+        self.assertEqual("New Name", f2.name)
+        self.assertEqual("4", f2.vote)
 
     def test_can_delete_fund(self):
         f0 = Fund(**self.fund_c113)
