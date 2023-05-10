@@ -3,7 +3,7 @@ from django.urls import resolve
 from django.http import HttpRequest
 from django.db import IntegrityError
 from costcenter.views import fund_page, fund_add, fund_update
-from costcenter.models import Fund
+from costcenter.models import Fund, Source
 
 
 def strip_white_space(string: str):
@@ -143,3 +143,12 @@ class FundModelTest(TestCase):
         f1.delete()
 
         self.assertEqual(0, Fund.objects.count())
+
+
+class SourceModelTest(TestCase):
+    def test_string_representation(self):
+        obj = Source(source="Bedroom")
+        self.assertEqual(str(obj), "Bedroom")
+
+    def test_verbose_name_plural(self):
+        self.assertEqual(str(Source._meta.verbose_name_plural), "Sources")

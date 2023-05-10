@@ -26,6 +26,13 @@ class Source(models.Model):
     def __str__(self):
         return f"{self.source}"
 
+    class Meta:
+        verbose_name_plural = "Sources"
+
+    def save(self, *args, **kwargs):
+        self.source = self.source.capitalize()
+        super(Source, self).save(*args, **kwargs)
+
 
 class FundCenter(models.Model):
     fundcenter = models.CharField(max_length=6, unique=True)
