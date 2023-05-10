@@ -5,3 +5,5 @@ geckodriver.log
 __pycache__
 *.pyc
 .vscode
+encumbrance.csv
+drmis_data/
