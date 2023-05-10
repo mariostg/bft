@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 import os
 from encumbrance.models import Encumbrance, EncumbranceImport
-from lineitems.models import LineItems
+from lineitems.models import LineItem
 from main.settings import BASE_DIR
 
 
