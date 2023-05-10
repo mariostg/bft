@@ -20,4 +20,24 @@ class Fund(models.Model):
 
 
 class CostCenter(models.Model):
-    pass
+    costcenter = models.CharField(max_length=6, unique=True)
+    shortname = models.CharField(max_length=35, blank=True, null=True)
+    fund = models.ForeignKey(Fund, on_delete=models.RESTRICT, default="")
+    source = models.ForeignKey(Source, on_delete=models.RESTRICT, default="")
+    isforecastable = models.BooleanField(default=False)
+    isupdatable = models.BooleanField(default=False)
+    note = models.TextField(null=True, blank=True)
+    parent = models.ForeignKey(
+        FundCenter,
+        on_delete=models.RESTRICT,
+        default="0",
+        related_name="children",
+    )
+
+    def __str__(self):
+        return f"{self.costcenter} - {self.shortname}"
+
+    def save(self, *args, **kwargs):
+        self.costcenter = self.costcenter.upper()
+        self.shortname = self.shortname.upper()
+        super().save(*args, **kwargs)
