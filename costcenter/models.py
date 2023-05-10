@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class Fund(models.Model):
@@ -17,6 +18,42 @@ class Fund(models.Model):
     def save(self, *args, **kwargs):
         self.fund = self.fund.upper()
         super(Fund, self).save(*args, **kwargs)
+
+
+class Source(models.Model):
+    source = models.CharField(max_length=24)
+
+    def __str__(self):
+        return f"{self.source}"
+
+
+class FundCenter(models.Model):
+    fundcenter = models.CharField(max_length=6, unique=True)
+    shortname = models.CharField(max_length=25, null=True, blank=True)
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.RESTRICT,
+        null=True,
+        blank=True,
+        default="",
+        related_name="parent_fc",
+    )
+
+    def __str__(self):
+        return f"{self.fundcenter} - {self.shortname}"
+
+    def validate_unique(self, exclude=None):
+        qs = FundCenter.objects.filter(fundcenter=self.fundcenter).exists()
+        if qs:
+            raise ValidationError("Fund center must be unique.")
+        else:
+            print("All good")
+
+    def save(self, *args, **kwargs):
+        self.validate_unique()
+        self.fundcenter = self.fundcenter.upper()
+        self.shortname = self.shortname.upper()
+        super(FundCenter, self).save(*args, **kwargs)
 
 
 class CostCenter(models.Model):
