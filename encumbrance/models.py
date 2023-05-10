@@ -12,7 +12,7 @@ import re
 import pandas as pd
 
 from main.settings import BASE_DIR
-from costcenters.models import CostCenter, Fund
+from costcenter.models import CostCenter, Fund
 
 
 class EncumbranceImport(models.Model):

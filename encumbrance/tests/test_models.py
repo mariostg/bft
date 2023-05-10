@@ -2,7 +2,7 @@ from django.test import TestCase
 
 import unittest
 from encumbrance.models import Encumbrance, EncumbranceImport
-from lineitems.models import LineItems
+
 import os
 from main.settings import BASE_DIR
 
@@ -83,11 +83,6 @@ class TestEncumbrance(TestCase):
         ]
         for line in lines:
             self.assertEqual(er.is_data_line(line["line"]), line["result"])
-
-    # def test_insert_new_lines(self):
-    #     imported_lines = EncumbranceImport.objects.all()
-    #     li = LineItems()
-    #     li.insert_new(imported_lines)
 
 
 if __name__ == "__main__":

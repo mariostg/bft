@@ -13,3 +13,7 @@ class Fund(models.Model):
     class Meta:
         ordering = ["-download", "fund"]
         verbose_name_plural = "Funds"
+
+
+class CostCenter(models.Model):
+    pass
