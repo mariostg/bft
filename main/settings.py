@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # apps
     "costcenter.apps.CostcenterConfig",
+    "lineitems.apps.LineItemConfig",
     "encumbrance.apps.EncumbranceConfig",
     # dev
     "django_extensions",
