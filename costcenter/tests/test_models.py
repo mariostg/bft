@@ -1,5 +1,10 @@
 from django.test import TestCase
-from costcenter.models import Fund, CostCenter, Source
+from costcenter.models import (
+    Fund,
+    CostCenter,
+    Source,
+    ForecastAdjustment,
+)
 from django.db import IntegrityError
 
 
@@ -95,3 +100,11 @@ class SourceModelTest(TestCase):
 
     def test_verbose_name_plural(self):
         self.assertEqual(str(Source._meta.verbose_name_plural), "Sources")
+
+
+class ForecastAdjustmentModelTest(TestCase):
+    def test_string_representation(self):
+        fund = Fund(fund="C113", name="NP", vote=1)
+        cc = CostCenter(costcenter="8484WA", shortname="Kitchen", fund=fund)
+        obj = ForecastAdjustment(costcenter=cc, fund=fund, amount=1000)
+        self.assertEqual(str(obj), "8484WA - Kitchen - C113 - NP - 1000")
