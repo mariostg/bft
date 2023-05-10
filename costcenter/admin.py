@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from costcenter.models import Fund, CostCenter
+
+admin.site.register(Fund)
+admin.site.register(CostCenter)
