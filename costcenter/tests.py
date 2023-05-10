@@ -74,7 +74,7 @@ class FundModelTest(TestCase):
 
     def test_can_save_and_retrieve_funds(self):
         first_fund = Fund()
-        first_fund.fund = "C113"
+        first_fund.fund = "c113"
         first_fund.name = "National procurement"
         first_fund.vote = "1"
         first_fund.download = True

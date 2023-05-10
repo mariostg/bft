@@ -14,6 +14,10 @@ class Fund(models.Model):
         ordering = ["-download", "fund"]
         verbose_name_plural = "Funds"
 
+    def save(self, *args, **kwargs):
+        self.fund = self.fund.upper()
+        super(Fund, self).save(*args, **kwargs)
+
 
 class CostCenter(models.Model):
     pass
