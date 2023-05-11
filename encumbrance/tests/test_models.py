@@ -12,9 +12,7 @@ class TestEncumbrance(TestCase):
     def setUpTestData(cls):
         cls.path = os.path.join(BASE_DIR, "drmis_data")
         print("PATH IS ", cls.path)
-        print(
-            "setUpTestData: Run once to set up non-modified data for all class methods."
-        )
+        print("setUpTestData: Run once to set up non-modified data for all class methods.")
 
     def test_find_fund_center_line_good(self):
         er = Encumbrance()
