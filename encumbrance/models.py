@@ -41,12 +41,14 @@ class EncumbranceImport(models.Model):
 class Encumbrance:
     COLUMNS = 22  # Includes empty columns at beginning and end of row
     CSVFILE = os.path.join(BASE_DIR, "drmis_data/encumbrance.csv")
+    DRMIS_DIR = os.path.join(BASE_DIR, "drmis_data")
     CSVFIELDS = "|docno|lineno|acctassno|spent|balance|workingplan|fundcenter|fund|costcenter|internalorder|doctype|enctype|linetext|predecessordocno|predecessorlineno|reference|gl|duedate|vendor|createdby|"
 
     def __init__(self, rawtextfile=None):
         locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
-        if rawtextfile and os.path.exists(rawtextfile):
-            self.rawtextfile = rawtextfile
+        filepath = os.path.join(self.DRMIS_DIR, rawtextfile)
+        if rawtextfile and os.path.exists(filepath):
+            self.rawtextfile = filepath
         else:
             self.rawtextfile = None
 
@@ -291,18 +293,22 @@ class Encumbrance:
         return cc_import.difference(cc)
 
     def run_all(self) -> bool:
-        with open(self.rawtextfile, encoding="windows-1252") as lines:
-            for line in lines:
-                if self.find_base_fy(line):
-                    self.data["fy"] = line.split("|")
-                if self.find_fund(line):
-                    self.data["fund"] = line.split("|")
-                if self.find_layout(line):
-                    self.data["layout"] = line.split("|")
-                if line == "":
-                    break
+        if self.rawtextfile:
+            with open(self.rawtextfile, encoding="windows-1252") as lines:
+                for line in lines:
+                    if self.find_base_fy(line):
+                        self.data["fy"] = line.split("|")
+                    if self.find_fund(line):
+                        self.data["fund"] = line.split("|")
+                    if self.find_layout(line):
+                        self.data["layout"] = line.split("|")
+                    if line == "":
+                        break
+        else:
+            return False
 
-        self.is_dnd_cost_center_report()
+        if not self.is_dnd_cost_center_report():
+            return False
         self.find_header_line()
         self.write_encumbrance_file_as_csv()
         missing_fund = self.missing_fund()

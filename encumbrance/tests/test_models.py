@@ -97,6 +97,10 @@ class TestEncumbrance(TestCase):
 
         self.assertIsNone(result_bad, "Must returns none when list is not good")
 
+    def test_run_all_stops_on_bad_cost_center_report(self):
+        er = Encumbrance("encumbrance_errors.txt")
+        self.assertFalse(er.run_all())
+
 
 if __name__ == "__main__":
     unittest.main()
