@@ -108,3 +108,6 @@ class ForecastAdjustmentModelTest(TestCase):
         cc = CostCenter(costcenter="8484WA", shortname="Kitchen", fund=fund)
         obj = ForecastAdjustment(costcenter=cc, fund=fund, amount=1000)
         self.assertEqual(str(obj), "8484WA - Kitchen - C113 - NP - 1000")
+
+    def test_verbose_name_plural(self):
+        self.assertEqual(str(ForecastAdjustment._meta.verbose_name_plural), "Forecast Adjustments")
