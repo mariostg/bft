@@ -174,7 +174,7 @@ class Encumbrance:
             print("File name was not found")
         return False
 
-    def line_to_csv(self, line):
+    def line_to_csv(self, line: str) -> list | None:
         csv = line.split("|")
         csv.pop()
         csv.pop(0)
