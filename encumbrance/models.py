@@ -281,13 +281,11 @@ class Encumbrance:
                 lineitem.save()
 
     def missing_fund(self):
-        # fund_import = set(EncumbranceImport.objects.all().values_list("fund", flat=True))
         fund_import = set(self.csv_get_unique_funds())
         fund = set(Fund.objects.all().values_list("fund", flat=True))
         return fund_import.difference(fund)
 
     def missing_costcenters(self):
-        # cc_import = set(EncumbranceImport.objects.all().values_list("costcenter", flat=True))
         cc_import = set(self.csv_get_unique_costcenters())
         cc = set(CostCenter.objects.all().values_list("costcenter", flat=True))
         return cc_import.difference(cc)
