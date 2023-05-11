@@ -183,7 +183,6 @@ class Encumbrance:
         if len(csv) == 20:
             return csv
         else:
-            print(csv)
             return None
 
     def is_data_line(self, line: str) -> bool:
