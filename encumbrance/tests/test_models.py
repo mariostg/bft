@@ -12,6 +12,9 @@ class TestEncumbrance(TestCase):
     def setUpTestData(cls):
         cls.path = os.path.join(BASE_DIR, "drmis_data")
 
+    def test_drmis_data_folder_exists(self):
+        self.assertTrue(os.path.exists(self.path), "Drmis data directory not found")
+
     def test_find_fund_center_line_good(self):
         er = Encumbrance()
         fc = er.find_fund("|Funds Center        |2184AA |")
