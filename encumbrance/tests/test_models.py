@@ -65,9 +65,13 @@ class TestEncumbrance(TestCase):
         er.clean_header(header)
         self.assertEqual(len(er.data["header"]), er.COLUMNS - 2)
 
-    def test_find_header_line(self):
-        fname = os.path.join(self.path, "encumbrance_P1a.txt")
-        er = Encumbrance(fname)
+    def test_find_header_line_returns_zero_on_failure(self):
+        er = Encumbrance("encumbrance_no_line_header.txt")
+        lineno = er.find_header_line()
+        self.assertEqual(lineno, 0)
+
+    def test_find_header_line_returns_non_zero_on_success(self):
+        er = Encumbrance("encumbrance_small.txt")
         lineno = er.find_header_line()
         self.assertGreater(lineno, 0)
 

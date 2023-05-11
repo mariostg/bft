@@ -139,7 +139,7 @@ class Encumbrance:
         """Attemps to find the row that contains the column header based on self.hint['header']
 
         Returns:
-            int: _description_
+            int: 0 if nothing found, line number otherwise.
         """
 
         lineno = 0
@@ -292,21 +292,23 @@ class Encumbrance:
         cc = set(CostCenter.objects.all().values_list("costcenter", flat=True))
         return cc_import.difference(cc)
 
-    def run_all(self) -> bool:
-        if self.rawtextfile:
-            with open(self.rawtextfile, encoding="windows-1252") as lines:
-                for line in lines:
-                    if self.find_base_fy(line):
-                        self.data["fy"] = line.split("|")
-                    if self.find_fund(line):
-                        self.data["fund"] = line.split("|")
-                    if self.find_layout(line):
-                        self.data["layout"] = line.split("|")
-                    if line == "":
-                        break
-        else:
+    def __set_data(self):
+        if not self.rawtextfile:
             return False
+        with open(self.rawtextfile, encoding="windows-1252") as lines:
+            for line in lines:
+                if self.find_base_fy(line):
+                    self.data["fy"] = line.split("|")
+                if self.find_fund(line):
+                    self.data["fund"] = line.split("|")
+                if self.find_layout(line):
+                    self.data["layout"] = line.split("|")
+                if line == "":
+                    break
 
+    def run_all(self) -> bool:
+        if not self.__set_data():
+            return False
         if not self.is_dnd_cost_center_report():
             return False
         self.find_header_line()
