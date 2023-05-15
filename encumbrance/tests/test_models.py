@@ -15,6 +15,14 @@ class TestEncumbrance(TestCase):
     def test_drmis_data_folder_exists(self):
         self.assertTrue(os.path.exists(self.path), "Drmis data directory not found")
 
+    def test_exception_raised_if_no_file_provided(self):
+        with self.assertRaises(ValueError):
+            Encumbrance()
+
+    def test_exception_raised_if_file_not_found(self):
+        with self.assertRaises(FileNotFoundError):
+            Encumbrance("Fakefile")
+
     def test_find_fund_center_line_good(self):
         er = Encumbrance("fakefile")
         fc = er.find_fund("|Funds Center        |2184AA |")
