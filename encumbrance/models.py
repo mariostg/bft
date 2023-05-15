@@ -29,8 +29,12 @@ class EncumbranceImport(models.Model):
     doctype = models.CharField(max_length=2, null=True, blank=True)
     enctype = models.CharField(max_length=21)
     linetext = models.CharField(max_length=50, null=True, blank=True, default="")
-    predecessordocno = models.CharField(max_length=20, null=True, blank=True, default="")
-    predecessorlineno = models.CharField(max_length=3, null=True, blank=True, default="")
+    predecessordocno = models.CharField(
+        max_length=20, null=True, blank=True, default=""
+    )
+    predecessorlineno = models.CharField(
+        max_length=3, null=True, blank=True, default=""
+    )
     reference = models.CharField(max_length=16, null=True, blank=True, default="")
     gl = models.CharField(max_length=5)
     duedate = models.DateField(null=True, blank=True)
@@ -208,7 +212,9 @@ class Encumbrance:
     def write_encumbrance_file_as_csv(self):
         lineno = 0
         skipped = 0
-        with open(self.rawtextfile, encoding="windows-1252") as lines, open(self.CSVFILE, "w") as recorder:
+        with open(self.rawtextfile, encoding="windows-1252") as lines, open(
+            self.CSVFILE, "w"
+        ) as recorder:
             writer = csv.writer(recorder, quoting=csv.QUOTE_ALL)
             header = self.line_to_csv(self.CSVFIELDS)
             writer.writerow(header)
