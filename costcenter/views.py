@@ -16,7 +16,7 @@ def fund_add(request):
             fund = form.save(commit=False)
             fund.fund = fund.fund.upper()
             fund.save()
-            return redirect("fund-page")
+            return redirect("fund-table")
     else:
         form = FundForm
 

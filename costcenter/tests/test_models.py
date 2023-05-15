@@ -59,14 +59,11 @@ class FundModelTest(TestCase):
 
     def test_can_save_POST_request(self):
         data = {"fund": "C113", "name": "National Procurement", "vote": "1"}
-        response = self.client.post("/fund/new/", data=data)
-        print(response)
-        # self.assertEqual(Fund.objects.count(), 1)
-        # new_fund = Fund.objects.first()
-        # self.assertEqual(new_fund.fund, "C113")
-
-        # self.assertIn('A new list item', response.content.decode())
-        # self.assertTemplateUsed(response, 'home.html')
+        response = self.client.post("/fund/add/", data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Fund.objects.count(), 1)
+        new_fund = Fund.objects.first()
+        self.assertEqual(new_fund.fund, "C113")
 
     def test_can_update_fund_column_values(self):
         f0 = Fund(**self.fund_c113)
