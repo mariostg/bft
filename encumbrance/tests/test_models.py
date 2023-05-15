@@ -113,7 +113,7 @@ class TestEncumbrance(TestCase):
         self.assertIsNone(result_bad, "Must returns none when list is not good")
 
     def test_run_all_stops_on_bad_cost_center_report(self):
-        er = Encumbrance(self.WRONGFC)
+        er = Encumbrance(self.GOODFILE)
         self.assertFalse(er.run_all())
 
 
