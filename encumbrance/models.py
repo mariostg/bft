@@ -303,7 +303,8 @@ class Encumbrance:
 
     def __set_data(self):
         if not self.rawtextfile:
-            return False
+            raise ValueError("Encumbrance report not defined.")
+
         with open(self.rawtextfile, encoding="windows-1252") as lines:
             for line in lines:
                 if self.find_base_fy(line):
@@ -315,27 +316,21 @@ class Encumbrance:
                 if line == "":
                     break
 
-    def run_all(self) -> bool:
-        if not self.__set_data():
-            return False
-        if not self.is_dnd_cost_center_report():
-            return False
+    def run_all(self):
+        self.__set_data()
+        self.is_dnd_cost_center_report()
         self.find_header_line()
         self.write_encumbrance_file_as_csv()
+
         missing_fund = self.missing_fund()
         if missing_fund:
-            print("There are missing funds:")
             for f in missing_fund:
-                print(f)
-            print("Operation aborted.")
-            return False
+                print(f"Missing fund {f}")
+            raise RuntimeError("There are missing funds, download aborted.")
+
         missing_cc = self.missing_costcenters()
         if missing_cc:
-            print("There are missing cost centers:")
             for cc in missing_cc:
-                print(cc)
-            print("Operation aborted.")
-            return False
+                print(f"Missing costcenter {cc}")
+            raise RuntimeError("There are missing cost centers, download aborted.")
         self.csv2table()
-
-        return True
