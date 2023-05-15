@@ -51,10 +51,14 @@ class Encumbrance:
     def __init__(self, rawtextfile=None):
         locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
         filepath = os.path.join(self.DRMIS_DIR, rawtextfile)
-        if rawtextfile and os.path.exists(filepath):
-            self.rawtextfile = filepath
-        else:
-            self.rawtextfile = None
+        if rawtextfile == None:
+            raise ValueError("No file name provided")
+            # raise ValueError(errno.ENODATA,os.strerror(errno.ENODATA,"No argument"))
+
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(f"{rawtextfile} was not found")
+
+        self.rawtextfile = filepath
 
         self.hint = {
             "fy": "|Base Fiscal Year",
