@@ -135,6 +135,4 @@ class ForecastAdjustmentModelTest(TestCase):
         self.assertEqual(str(obj), "8484WA - Kitchen - C113 - NP - 1000")
 
     def test_verbose_name_plural(self):
-        self.assertEqual(
-            str(ForecastAdjustment._meta.verbose_name_plural), "Forecast Adjustments"
-        )
+        self.assertEqual(str(ForecastAdjustment._meta.verbose_name_plural), "Forecast Adjustments")
