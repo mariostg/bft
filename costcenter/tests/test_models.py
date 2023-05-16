@@ -134,6 +134,18 @@ class SourceModelTest(TestCase):
         new_source = Source.objects.first()
         self.assertEqual(new_source.source, "Ternaire")
 
+    def test_can_update_source_column_values(self):
+        f0 = Source()
+        f0.source = "qwerty"
+        f0.save()
+
+        f1 = Source.objects.filter(source=f0.source).first()
+        f1.source = "secondary"
+        f1.save()
+
+        f2 = Source.objects.filter(pk=f1.pk).first()
+        self.assertEqual("SECONDARY", f2.source.upper())
+
 
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):
