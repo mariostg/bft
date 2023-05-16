@@ -12,11 +12,11 @@ def strip_white_space(string: str):
 
 class FundPageTest(TestCase):
     def test_use_fund_page_template(self):
-        response = self.client.get("/fund/table/")
+        response = self.client.get("/fund/fund-table/")
         self.assertTemplateUsed(response, "costcenter/fund-table.html")
 
     def test_fund_url_resolved_to_fund_page_view(self):
-        found = resolve("/fund/table/")
+        found = resolve("/fund/fund-table/")
         self.assertEqual(found.func, fund_page)
 
     def test_fund_page_returns_correct_html(self):
@@ -30,11 +30,11 @@ class FundPageTest(TestCase):
 
 class FundCreatePageTest(TestCase):
     def test_use_fund_form_template(self):
-        response = self.client.get("/fund/add/")
+        response = self.client.get("/fund/fund-add/")
         self.assertTemplateUsed(response, "costcenter/fund-form.html")
 
     def test_fund_add_url_resolves_to_fund_form_view(self):
-        found = resolve("/fund/add/")
+        found = resolve("/fund/fund-add/")
         print(found)
         self.assertEqual(found.func, fund_add)
 
@@ -50,11 +50,11 @@ class FundUpdatePageTest(TestCase):
     def test_use_fund_form_template(self):
         Fund.objects.create(fund="X333", name="Test fund update", vote="1")
         f = Fund.objects.get(fund="X333")
-        response = self.client.get(f"/fund/update/{f.pk}/")
+        response = self.client.get(f"/fund/fund-update/{f.pk}/")
         self.assertTemplateUsed(response, "costcenter/fund-form.html")
 
     def test_fund_update_url_resolves_to_fund_form_view(self):
         Fund.objects.create(fund="X111", name="Test fund update", vote="1")
         f = Fund.objects.get(fund="X111")
-        found = resolve(f"/fund/update/{f.pk}/")
+        found = resolve(f"/fund/fund-update/{f.pk}/")
         self.assertEqual(found.func, fund_update)
