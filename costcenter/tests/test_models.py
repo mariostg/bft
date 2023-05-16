@@ -59,7 +59,7 @@ class FundModelTest(TestCase):
 
     def test_can_save_POST_request(self):
         data = {"fund": "C113", "name": "National Procurement", "vote": "1"}
-        response = self.client.post("/fund/add/", data=data)
+        response = self.client.post("/fund/fund-add/", data=data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Fund.objects.count(), 1)
         new_fund = Fund.objects.first()
