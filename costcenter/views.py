@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
 from .models import Fund
-from .forms import FundForm
+from .forms import FundForm, SourceForm
 
 
 def fund_page(request):
@@ -36,3 +36,17 @@ def fund_update(request, pk):
             return redirect("funds")
 
     return render(request, "costcenter/fund-form.html", {"form": form})
+
+
+def source_add(request):
+    if request.method == "POST":
+        form = SourceForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.source = obj.source.upper()
+            obj.save()
+            return redirect("source-table")
+    else:
+        form = SourceForm
+
+    return render(request, "costcenter/source-form.html", {"form": form})
