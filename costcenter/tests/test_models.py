@@ -144,7 +144,7 @@ class SourceModelTest(TestCase):
         f1.save()
 
         f2 = Source.objects.filter(pk=f1.pk).first()
-        self.assertEqual("SECONDARY", f2.source.upper())
+        self.assertEqual("Secondary", f2.source)
 
 
 class ForecastAdjustmentModelTest(TestCase):
