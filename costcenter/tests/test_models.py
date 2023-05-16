@@ -126,6 +126,14 @@ class SourceModelTest(TestCase):
         with self.assertRaises(IntegrityError):
             source_2.save()
 
+    def test_can_save_POST_request(self):
+        data = {"source": "Ternaire"}
+        response = self.client.post("/source/add/", data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Source.objects.count(), 1)
+        new_source = Source.objects.first()
+        self.assertEqual(new_source.source, "Ternaire")
+
 
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):

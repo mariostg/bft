@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 import os
-from costcenter.models import Fund, CostCenter
+from costcenter.models import Fund, CostCenter, Source
 
 
 class Command(BaseCommand):
@@ -19,7 +19,7 @@ class Command(BaseCommand):
         if options["table"] == "fund":
             self.print_funds()
         if options["table"] == "source":
-            self.print_costcenters()
+            self.print_sources()
         if options["table"] == "costcenter":
             self.print_costcenters()
 
@@ -32,3 +32,8 @@ class Command(BaseCommand):
         obj = CostCenter.objects.all()
         for elem in obj:
             print(f"{elem.costcenter}\t{elem.name}")
+
+    def print_sources(self):
+        obj = Source.objects.all()
+        for elem in obj:
+            print(f"{elem.source}")
