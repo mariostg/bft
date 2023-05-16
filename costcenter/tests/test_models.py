@@ -98,6 +98,34 @@ class SourceModelTest(TestCase):
     def test_verbose_name_plural(self):
         self.assertEqual(str(Source._meta.verbose_name_plural), "Sources")
 
+    def test_can_save_and_retrieve_sources(self):
+        first_source = Source()
+        first_source.source = "Primary"
+        first_source.save()
+
+        first_source = Source()
+        first_source.source = "Secondary"
+        first_source.save()
+
+        saved_sources = Source.objects.all()
+        first_saved_source = saved_sources[0]
+        second_saved_source = saved_sources[1]
+        self.assertEqual("Primary", first_saved_source.source)
+        self.assertEqual("Secondary", second_saved_source.source)
+
+    def test_source_cannot_be_saved_twice(self):
+        Source.objects.all().delete()
+
+        source_1 = Source()
+        source_1.source = "Primary"
+        source_1.save()
+
+        source_2 = Source()
+        source_2.source = "Primary"
+
+        with self.assertRaises(IntegrityError):
+            source_2.save()
+
 
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):
