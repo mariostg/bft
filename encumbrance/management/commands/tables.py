@@ -16,8 +16,10 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        if options["table"] == "funds":
+        if options["table"] == "fund":
             self.print_funds()
+        if options["table"] == "source":
+            self.print_costcenters()
         if options["table"] == "costcenter":
             self.print_costcenters()
 
