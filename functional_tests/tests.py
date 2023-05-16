@@ -14,7 +14,7 @@ class CostElementFundFormTest(StaticLiveServerTestCase):
 
     def test_can_retreive_fund_form(self):
         # Need to add a new fund, visit the fund form page
-        self.browser.get(f"{self.live_server_url}/fund/add/")
+        self.browser.get(f"{self.live_server_url}/fund/fund-add/")
 
         # Mario notices the page title and Form mention Create Fund
         self.assertIn("Fund Form", self.browser.title)
@@ -23,7 +23,7 @@ class CostElementFundFormTest(StaticLiveServerTestCase):
 
     def test_can_input_and_save_fund(self):
         # Need to add a new fund, visit the fund form page
-        self.browser.get(f"{self.live_server_url}/fund/add/")
+        self.browser.get(f"{self.live_server_url}/fund/fund-add/")
 
         # input the fund information
         fundbox = self.browser.find_element(By.ID, "fund_fund")
@@ -55,7 +55,7 @@ class CostElementFundTableTest(StaticLiveServerTestCase):
 
     def test_can_retreive_fund_list(self):
         # Mario needs to create a new fund.  Let's visite the home page
-        self.browser.get(f"{self.live_server_url}/fund/table/")
+        self.browser.get(f"{self.live_server_url}/fund/fund-table/")
 
         # Mario notices the page title and header mention Funds list
         self.assertIn("Fund List", self.browser.title)
