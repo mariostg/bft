@@ -22,7 +22,7 @@ class Fund(models.Model):
 
 
 class Source(models.Model):
-    source = models.CharField(max_length=24)
+    source = models.CharField(max_length=24, unique=True)
 
     def __str__(self):
         return f"{self.source}"
