@@ -167,6 +167,8 @@ class SourceModelTest(TestCase):
 
 
 class FundCenterModelTest(TestCase):
+    fc_1111AA = {"fundcenter": "1111aa", "shortname": "bedroom", "parent": None}
+
     def test_string_representation(self):
         obj = FundCenter(fundcenter="1234aa", shortname="abcdef", parent=None)
         self.assertEqual("1234AA - ABCDEF", str(obj))
@@ -205,6 +207,26 @@ class FundCenterModelTest(TestCase):
         obj = FundCenter.objects.first()
         self.assertEqual(obj.fundcenter, "ZZZZ33")
         self.assertEqual(obj.shortname, "KITCHEN FC")
+
+    def test_can_update_fund_center_column_values(self):
+        f0 = FundCenter(**self.fc_1111AA)
+        f0.save()
+
+        f1 = FundCenter.objects.get(pk=f0.pk)
+        f1.fundcenter = "0000ff"
+        f1.save()
+
+        f2 = FundCenter.objects.get(pk=f1.pk)
+        self.assertEqual("0000FF", f2.fundcenter)
+
+    def test_can_delete_fund_center(self):
+        f0 = FundCenter(**self.fc_1111AA)
+        f0.save()
+
+        f1 = FundCenter.objects.get(pk=f0.id)
+        f1.delete()
+
+        self.assertEqual(0, Fund.objects.count())
 
     def test_set_parent_to_itself_not_allowed(self):
         fc1 = FundCenter()
