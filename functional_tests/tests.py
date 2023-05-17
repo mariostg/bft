@@ -117,3 +117,62 @@ class CostElementSourceTableTest(StaticLiveServerTestCase):
         self.assertIn("Sources", table_id)
         time.sleep(5)
         # self.fail("Finish the test!")
+
+
+class CostElementFundCenterTableTest(StaticLiveServerTestCase):
+    def setUp(self):
+        self.browser = WebDriver()
+
+    def tearDown(self):
+        self.browser.quit()
+
+    def test_can_retreive_fund_center_list(self):
+        # Mario needs to create a new fund.  Let's visite the home page
+        self.browser.get(f"{self.live_server_url}/fundcenter/fundcenter-table/")
+
+        # Mario notices the page title and header mention Funds list
+        self.assertIn("Fund Center Table", self.browser.title)
+        table_id = self.browser.find_element(By.ID, "fundcenter-table").text
+        self.assertIn("Fund Centers", table_id)
+        time.sleep(1)
+        # self.fail("Finish the test!")
+
+
+class CostElementFundCenterFormTest(StaticLiveServerTestCase):
+    def setUp(self):
+        self.browser = WebDriver()
+
+    def tearDown(self):
+        self.browser.quit()
+
+    def test_can_retreive_fund_center_form(self):
+        # Need to add a new fund, visit the fund form page
+        self.browser.get(f"{self.live_server_url}/fundcenter/fundcenter-add/")
+
+        # Mario notices the page title and Form mention Create Fund
+        self.assertIn("Fund Center Form", self.browser.title)
+        form_header = self.browser.find_element(By.CLASS_NAME, "form__header").text
+        self.assertIn(
+            "Fund Center Entry Form", form_header, "\nFund Center form not found"
+        )
+
+    def test_can_input_and_save_fund(self):
+        # Need to add a new fund, visit the fund form page
+        self.browser.get(f"{self.live_server_url}/fundcenter/fundcenter-add/")
+
+        # input the fund information
+        fundbox = self.browser.find_element(By.ID, "fundcenter_fundcenter")
+        fundbox.send_keys("0000rr")
+        fundbox.send_keys(Keys.TAB)
+        fundbox = self.browser.find_elecenterment(By.ID, "fundcenter_shortname")
+        fundbox.send_keys("kitchen")
+        fundbox.send_keys(Keys.TAB)
+        fundbox.send_keys(Keys.ENTER)
+
+    def test_fund_center_path_default_to_fund_center_page(self):
+        self.browser.get(f"{self.live_server_url}/fundcenter/fundcenter-table")
+
+        # Mario notices the page title and header mention Funds list
+        self.assertIn("Fund Center Table", self.browser.title)
+        table_id = self.browser.find_element(By.ID, "fundcenter-table").text
+        self.assertIn("Fund Centers", table_id)
