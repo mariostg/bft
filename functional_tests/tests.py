@@ -63,3 +63,22 @@ class CostElementFundTableTest(StaticLiveServerTestCase):
         self.assertIn("Funds", table_id)
         time.sleep(10)
         # self.fail("Finish the test!")
+
+
+class CostElementSourceTableTest(StaticLiveServerTestCase):
+    def setUp(self):
+        self.browser = WebDriver()
+
+    def tearDown(self):
+        self.browser.quit()
+
+    def test_can_retreive_source_list(self):
+        # Mario needs to create a new source.  Let's visite the home page
+        self.browser.get(f"{self.live_server_url}/source/source-table/")
+
+        # Mario notices the page title and header mention Sources list
+        self.assertIn("Source Table", self.browser.title)
+        table_id = self.browser.find_element(By.ID, "source-table").text
+        self.assertIn("Sources", table_id)
+        time.sleep(5)
+        # self.fail("Finish the test!")
