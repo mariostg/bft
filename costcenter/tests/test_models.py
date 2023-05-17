@@ -176,7 +176,7 @@ class FundCenterModelTest(TestCase):
 
     def test_can_save_and_retrieve_fund_centers(self):
         first_fc = FundCenter()
-        first_fc.fundcenter = "111kkk1aa"
+        first_fc.fundcenter = "1111aa"
         first_fc.shortname = "defgth"
         first_fc.parent = None
         first_fc.full_clean()
