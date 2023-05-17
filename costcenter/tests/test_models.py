@@ -41,6 +41,17 @@ class FundModelTest(TestCase):
         self.assertEqual("C113", first_saved_fund.fund)
         self.assertEqual("X999", second_saved_fund.fund)
 
+    def test_saved_fund_is_capitalized(self):
+        f = Fund()
+        f.fund = "c113"
+        f.name = "National procurement"
+        f.vote = "1"
+        f.download = True
+        f.save()
+
+        saved = Fund.objects.get(pk=f.pk)
+        self.assertEqual("C113", saved.fund)
+
     def test_fund_cannot_be_saved_twice(self):
         fund_1 = Fund()
         fund_1.fund = "C113"
@@ -112,6 +123,13 @@ class SourceModelTest(TestCase):
         second_saved_source = saved_sources[1]
         self.assertEqual("Primary", first_saved_source.source)
         self.assertEqual("Secondary", second_saved_source.source)
+
+    def test_saved_source_is_capitalized(self):
+        s = Source(source="my source")
+        s.save()
+
+        saved = Source.objects.get(pk=s.pk)
+        self.assertEqual("My source", saved.source)
 
     def test_source_cannot_be_saved_twice(self):
         Source.objects.all().delete()
