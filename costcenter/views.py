@@ -38,6 +38,15 @@ def fund_update(request, pk):
     return render(request, "costcenter/fund-form.html", {"form": form})
 
 
+def fund_delete(request, pk):
+    fund = Fund.objects.get(id=pk)
+    if request.method == "POST":
+        fund.delete()
+        return redirect("fund-table")
+    context = {"object": fund, "back": "fund-table"}
+    return render(request, "core/delete-object.html", context)
+
+
 def source_page(request):
     data = Source.objects.all()
     return render(request, "costcenter/source-table.html", context={"data": data})

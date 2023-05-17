@@ -8,6 +8,7 @@ urlpatterns += [
     path("fund-table/", views.fund_page, name="fund-table"),
     path("fund-add/", views.fund_add, name="fund-add"),
     path("fund-update/<int:pk>/", views.fund_update, name="fund-update"),
+    path("fund-delete/<int:pk>/", views.fund_delete, name="fund-delete"),
 ]
 
 urlpatterns += [
