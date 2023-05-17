@@ -65,6 +65,41 @@ class CostElementFundTableTest(StaticLiveServerTestCase):
         # self.fail("Finish the test!")
 
 
+class CostElementSourceFormTest(StaticLiveServerTestCase):
+    def setUp(self):
+        self.browser = WebDriver()
+
+    def tearDown(self):
+        self.browser.quit()
+
+    def test_can_retreive_source_form(self):
+        # Need to add a new fund, visit the fund form page
+        self.browser.get(f"{self.live_server_url}/source/source-add/")
+
+        # Mario notices the page title and Form mention Create Fund
+        self.assertIn("Source Form", self.browser.title)
+        form_header = self.browser.find_element(By.CLASS_NAME, "form__header").text
+        self.assertIn("Source Entry Form", form_header, "\nSource form not found")
+
+    def test_can_input_and_save_source(self):
+        # Need to add a new fund, visit the fund form page
+        self.browser.get(f"{self.live_server_url}/source/source-add/")
+
+        # input the fund information
+        fundbox = self.browser.find_element(By.ID, "id_source")
+        fundbox.send_keys("Kitchen")
+        fundbox.send_keys(Keys.TAB)
+        fundbox.send_keys(Keys.ENTER)
+
+    def test_source_path_default_to_source_page(self):
+        self.browser.get(f"{self.live_server_url}/source/source-table/")
+
+        # Mario notices the page title and header mention Funds list
+        self.assertIn("Source Table", self.browser.title)
+        table_id = self.browser.find_element(By.ID, "source-table").text
+        self.assertIn("Sources", table_id)
+
+
 class CostElementSourceTableTest(StaticLiveServerTestCase):
     def setUp(self):
         self.browser = WebDriver()
