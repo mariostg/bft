@@ -174,6 +174,17 @@ class FundCenterModelTest(TestCase):
     def test_verbose_name_plural(self):
         self.assertEqual("Fund Centers", str(FundCenter._meta.verbose_name_plural))
 
+    def test_can_save_and_retrieve_fund_centers(self):
+        first_fc = FundCenter()
+        first_fc.fundcenter = "111kkk1aa"
+        first_fc.shortname = "defgth"
+        first_fc.parent = None
+        first_fc.full_clean()
+        first_fc.save()
+
+        saved_fc = FundCenter.objects.get(pk=first_fc.pk)
+        self.assertEqual("1111AA", saved_fc.fundcenter)
+
 
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):
