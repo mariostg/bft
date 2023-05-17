@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Source Table{% endblock title %}
+{% block content %}
+<main class="block block--centered">
+    <table id='source-table'>
+        <caption>Sources</caption>
+        <thead>
+            <tr>
+                <th>Source</th>
+                {% if user.is_authenticated %}
+                <th colspan=2></th>
+                {% endif %} 
+            </tr>
+        </thead>
+        <tbody>
+            {% for source in sources %}
+            <tr>
+            <td>{{source.source}}</td>
+            {% if user.is_authenticated %}
+            <td>
+                <a class='btn' href="{% url "update-source" source.id %}">Update</a>
+            </td>
+            <td>
+                <a class='btn btn-delete' href="{% url "delete-source" source.id %}">Delete</a>
+            </td>
+            {% endif %}
+        </tr>
+            {% endfor %} 
+
+        </tbody>
+        <tfoot>
+            {% if user.is_authenticated %}
+            <tr><td colspan=5><a class='btn' href="{% url 'add-source' %}">Add Source</a></td></tr>
+            {% endif %}
+        </tfoot>
+    </table>
+</main>
+</body>
+</html>
+{% endblock content %}
