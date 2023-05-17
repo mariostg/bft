@@ -4,6 +4,7 @@ from costcenter.models import (
     CostCenter,
     Source,
     ForecastAdjustment,
+    FundCenter,
 )
 from django.db import IntegrityError
 
@@ -163,6 +164,15 @@ class SourceModelTest(TestCase):
 
         f2 = Source.objects.filter(pk=f1.pk).first()
         self.assertEqual("Secondary", f2.source)
+
+
+class FundCenterModelTest(TestCase):
+    def test_string_representation(self):
+        obj = FundCenter(fundcenter="1234aa", shortname="abcdef", parent=None)
+        self.assertEqual("1234AA - ABCDEF", str(obj))
+
+    def test_verbose_name_plural(self):
+        self.assertEqual("Fund Centers", str(FundCenter._meta.verbose_name_plural))
 
 
 class ForecastAdjustmentModelTest(TestCase):

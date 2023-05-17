@@ -48,7 +48,11 @@ class FundCenter(models.Model):
     )
 
     def __str__(self):
-        return f"{self.fundcenter} - {self.shortname}"
+        return f"{self.fundcenter.upper()} - {self.shortname.upper()}"
+
+    class Meta:
+        ordering = ["fundcenter"]
+        verbose_name_plural = "Fund Centers"
 
     def validate_unique(self, exclude=None):
         qs = FundCenter.objects.filter(fundcenter=self.fundcenter).exists()
