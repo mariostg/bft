@@ -185,6 +185,18 @@ class FundCenterModelTest(TestCase):
         saved_fc = FundCenter.objects.get(pk=first_fc.pk)
         self.assertEqual("1111AA", saved_fc.fundcenter)
 
+    def test_saved_fund_center_as_uppercase(self):
+        first_fc = FundCenter()
+        first_fc.fundcenter = "1111aa"
+        first_fc.shortname = "defgth"
+        first_fc.parent = None
+        first_fc.full_clean()
+        first_fc.save()
+
+        saved = FundCenter.objects.get(pk=first_fc.pk)
+        self.assertEqual("1111AA", saved.fundcenter)
+        self.assertEqual("DEFGTH", saved.shortname)
+
 
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):
