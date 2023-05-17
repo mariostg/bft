@@ -206,6 +206,18 @@ class FundCenterModelTest(TestCase):
         self.assertEqual(obj.fundcenter, "ZZZZ33")
         self.assertEqual(obj.shortname, "KITCHEN FC")
 
+    def test_set_parent_to_itself_not_allowed(self):
+        fc1 = FundCenter()
+        fc1.fundcenter = "1111aa"
+        fc1.shortname = "defgth"
+        fc1.parent = None
+        fc1.full_clean()
+        fc1.save()
+
+        fc1.parent = fc1
+        with self.assertRaises(IntegrityError):
+            fc1.save()
+
 
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):

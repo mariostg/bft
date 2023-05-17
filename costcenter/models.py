@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, IntegrityError
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
@@ -62,6 +62,8 @@ class FundCenter(models.Model):
             print("All good")
 
     def save(self, *args, **kwargs):
+        if self.parent and self.fundcenter == self.parent.fundcenter:
+            raise IntegrityError("Children Fund center cannot assign itself as parent")
         self.validate_unique()
         self.fundcenter = self.fundcenter.upper()
         self.shortname = self.shortname.upper()
