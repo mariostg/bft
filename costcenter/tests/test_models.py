@@ -197,6 +197,15 @@ class FundCenterModelTest(TestCase):
         self.assertEqual("1111AA", saved.fundcenter)
         self.assertEqual("DEFGTH", saved.shortname)
 
+    def test_can_save_POST_request(self):
+        data = {"fundcenter": "zzzz33", "shortname": "Kitchen FC", "parent": ""}
+        response = self.client.post("/fundcenter/fundcenter-add/", data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(FundCenter.objects.count(), 1)
+        obj = FundCenter.objects.first()
+        self.assertEqual(obj.fundcenter, "ZZZZ33")
+        self.assertEqual(obj.shortname, "KITCHEN FC")
+
 
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):
