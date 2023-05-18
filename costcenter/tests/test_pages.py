@@ -35,7 +35,6 @@ class FundCreatePageTest(TestCase):
 
     def test_fund_add_url_resolves_to_fund_form_view(self):
         found = resolve("/fund/fund-add/")
-        print(found)
         self.assertEqual(found.func, fund_add)
 
     def test_fund_create_returns_correct_html(self):
