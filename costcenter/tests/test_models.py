@@ -426,3 +426,27 @@ class ForecastAdjustmentModelTest(TestCase):
         self.assertEqual(
             str(ForecastAdjustment._meta.verbose_name_plural), "Forecast Adjustments"
         )
+
+    def test_can_save_and_retreive_forecast_adjustment(self):
+        fund = Fund(**FUND_C113)
+        fund.save()
+        source = Source(**SOURCE_1)
+        source.save()
+        parent = FundCenter(**FC_1111AA)
+        parent.save()
+        cc = CostCenter(**CC_1234FF)
+        cc.fund = fund
+        cc.source = source
+        cc.parent = parent
+        cc.full_clean()
+        cc.save()
+
+        fa = ForecastAdjustment()
+        fa.costcenter = cc
+        fa.fund = fund
+        fa.amount = 1000
+        fa.note = "Increase in demand"
+        fa.save()
+
+        f_saved = ForecastAdjustment.objects.get(pk=fa.pk)
+        self.assertEqual(fa.amount, f_saved.amount)
