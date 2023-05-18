@@ -245,6 +245,26 @@ class FundCenterModelTest(TestCase):
             fc1.save()
 
 
+class CostCenterModelTest(TestCase):
+    cc_1234FF = {
+        "costcenter": "1234ff",
+        "shortname": "Food and drink",
+        "fund": None,
+        "source": None,
+        "isforecastable": True,
+        "isupdatable": True,
+        "note": "A quick and short note for 1234FF",
+        "parent": None,
+    }
+
+    def test_string_representation(self):
+        obj = CostCenter(**self.cc_1234FF)
+        self.assertEqual("1234FF - Food and drink", str(obj))
+
+    def test_verbose_name_plural(self):
+        self.assertEqual("Cost Centers", str(CostCenter._meta.verbose_name_plural))
+
+
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):
         fund = Fund(fund="C113", name="NP", vote=1)

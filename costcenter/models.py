@@ -86,7 +86,11 @@ class CostCenter(models.Model):
     )
 
     def __str__(self):
-        return f"{self.costcenter} - {self.shortname}"
+        return f"{self.costcenter.upper()} - {self.shortname}"
+
+    class Meta:
+        ordering = ["costcenter"]
+        verbose_name_plural = "Cost Centers"
 
     def save(self, *args, **kwargs):
         self.costcenter = self.costcenter.upper()
