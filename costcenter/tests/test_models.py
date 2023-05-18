@@ -262,7 +262,6 @@ class FundCenterModelTest(TestCase):
 class CostCenterModelTest(TestCase):
     def test_string_representation(self):
         obj = CostCenter(**CC_1234FF)
-        print(obj)
         self.assertEqual("1234FF - Food and drink", str(obj))
 
     def test_verbose_name_plural(self):
