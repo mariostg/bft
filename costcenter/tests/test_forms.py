@@ -1,0 +1,38 @@
+from django.test import TestCase
+
+from costcenter.forms import FundForm
+
+
+class FundFormTest(TestCase):
+    def test_empty_form(self):
+        form = FundForm()
+        self.assertIn("fund", form.fields)
+        self.assertIn("name", form.fields)
+        self.assertIn("vote", form.fields)
+        self.assertIn("download", form.fields)
+
+        # test just one rendered field
+        self.assertInHTML(
+            '<input type="text" name="fund" maxlength="4" required id="id_fund">',
+            str(form),
+        )
+
+    def test_vote_not_1_or_5(self):
+        data = {"fund": "C113", "name": "NP", "vote": "6", "download": 1}
+        form = FundForm(data=data)
+
+        self.assertEqual(form.errors["vote"], ["Vote must be 1 or 5"])
+
+    def test_fund_starts_with_non_letter(self):
+        data = {"fund": "3113"}
+        form = FundForm(data=data)
+
+        self.assertEqual(form.errors["fund"], ["Fund must begin with a letter"])
+
+    def test_fund_is_not_4_characters_long(self):
+        data = {"fund": "c3456"}
+        form = FundForm(data=data)
+        msg = (
+            f"Ensure this value has at most 4 characters (it has {len(data['fund'])})."
+        )
+        self.assertEqual(form.errors["fund"], [msg])
