@@ -25,10 +25,6 @@ CC_1234FF = {
 
 
 class FundModelTest(TestCase):
-    fund_c113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
-    fund_c523 = {"fund": "C523", "name": "Project National Procurement", "vote": "5"}
-    fund_X999 = {"fund": "X999", "name": "Undesired Fund", "vote": "1"}
-
     def test_string_representation(self):
         fund = Fund(fund="C113", name="NP Capital", vote=1)
         self.assertEqual(str(fund), "C113 - NP Capital")
@@ -93,7 +89,7 @@ class FundModelTest(TestCase):
         self.assertEqual(new_fund.fund, "C113")
 
     def test_can_update_fund_column_values(self):
-        f0 = Fund(**self.fund_c113)
+        f0 = Fund(**FUND_C113)
         f0.save()
 
         f1 = Fund.objects.filter(fund="C113").first()
@@ -108,7 +104,7 @@ class FundModelTest(TestCase):
         self.assertEqual("4", f2.vote)
 
     def test_can_delete_fund(self):
-        f0 = Fund(**self.fund_c113)
+        f0 = Fund(**FUND_C113)
         f0.save()
 
         f1 = Fund.objects.get(pk=f0.id)
