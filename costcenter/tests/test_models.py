@@ -284,6 +284,26 @@ class CostCenterModelTest(TestCase):
         saved_cc = CostCenter.objects.get(pk=cc.pk)
         self.assertEqual(CC_1234FF["costcenter"].upper(), saved_cc.costcenter)
 
+    def test_saved_cost_center_as_uppercase(self):
+        fund = Fund(**FUND_C113)
+        fund.save()
+        source = Source(**SOURCE_1)
+        source.save()
+        parent = FundCenter(**FC_1111AA)
+        parent.save()
+        cc = CostCenter(**CC_1234FF)
+        cc.fund = fund
+        cc.source = source
+        cc.parent = parent
+        cc.costcenter = "1111aa"
+        cc.shortname = "should be uppercase"
+        cc.full_clean()
+        cc.save()
+
+        saved = CostCenter.objects.get(pk=cc.pk)
+        self.assertEqual(cc.costcenter.upper(), saved.costcenter)
+        self.assertEqual(cc.shortname.upper(), saved.shortname)
+
 
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):
