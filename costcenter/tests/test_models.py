@@ -345,6 +345,24 @@ class CostCenterModelTest(TestCase):
         f2 = CostCenter.objects.get(pk=f1.pk)
         self.assertEqual(f1.shortname.upper(), f2.shortname)
 
+    def test_can_delete_cost_center(self):
+        fund = Fund(**FUND_C113)
+        fund.save()
+        source = Source(**SOURCE_1)
+        source.save()
+        parent = FundCenter(**FC_1111AA)
+        parent.save()
+        f0 = CostCenter(**CC_1234FF)
+        f0.fund = fund
+        f0.source = source
+        f0.parent = parent
+        f0.save()
+
+        f1 = CostCenter.objects.get(pk=f0.pk)
+        f1.delete()
+
+        self.assertEqual(0, CostCenter.objects.count())
+
 
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):
