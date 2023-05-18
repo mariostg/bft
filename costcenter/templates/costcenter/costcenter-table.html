@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<header class='block'>
+    <h2>Cost Centers</h2>
+</header>
+<main class="block block--centered">
+        {% for elem in data  %}
+    <section class='summary'>
+        <div class='summary__header'>
+            <span>{{elem.parent}} - {{elem.costcenter}} - {{elem.shortname}}</span>
+            <span>{{elem.fund}}</span>
+            <span>{{elem.source}}</span>
+                <span class= {% if elem.isforecastable %} nofreeze> {%else%} freeze> Not{%endif%} Forecastable</span>
+                <span class= {% if elem.isupdatable %} nofreeze> {%else%} freeze> Not {%endif%} Updatable</span>
+                {% comment %} <a class='btn btn--link' href="{% url 'costcenter-lineitems' elem.costcenter %}">Lines</a> {% endcomment %}
+        </div>
+        <div class="summary__body">
+            {{elem.note}}
+        </div>
+        {% if user.is_authenticated %}
+        <div class="summary__footer">
+            <a class="btn" href="{% url 'costcenter-update' elem.id %}" >Edit</a>
+            <a class="btn btn-delete" href="#" >Delete</a >
+        </div>
+        {% endif %}
+    </section>
+    {% endfor %}
+
+</main>
+
+
+{% endblock content %}

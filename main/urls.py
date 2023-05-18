@@ -6,4 +6,5 @@ urlpatterns = [
     path("fund/", include("costcenter.urls")),
     path("source/", include("costcenter.urls")),
     path("fundcenter/", include("costcenter.urls")),
+    path("costcenter/", include("costcenter.urls")),
 ]

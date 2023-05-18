@@ -304,6 +304,27 @@ class CostCenterModelTest(TestCase):
         self.assertEqual(cc.costcenter.upper(), saved.costcenter)
         self.assertEqual(cc.shortname.upper(), saved.shortname)
 
+    def test_can_save_POST_request(self):
+        data = CC_1234FF.copy()
+        fund = Fund(**FUND_C113)
+        fund.save()
+        source = Source(**SOURCE_1)
+        source.save()
+        parent = FundCenter(**FC_1111AA)
+        parent.save()
+        data["fund"] = fund.pk
+        data["source"] = source.pk
+        data["parent"] = parent.pk
+        response = self.client.post("/costcenter/costcenter-add/", data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CostCenter.objects.count(), 1)
+        obj = CostCenter.objects.first()
+        self.assertEqual(CC_1234FF["costcenter"].upper(), obj.costcenter)
+        self.assertEqual(
+            CC_1234FF["shortname"].upper(),
+            obj.shortname,
+        )
+
 
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):

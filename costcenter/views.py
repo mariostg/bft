@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 
-from .models import Fund, Source, FundCenter
-from .forms import FundForm, SourceForm, FundCenterForm
+from .models import Fund, Source, FundCenter, CostCenter
+from .forms import FundForm, SourceForm, FundCenterForm, CostCenterForm
 
 
 def fund_page(request):
@@ -84,3 +84,36 @@ def fundcenter_add(request):
         form = FundCenterForm
 
     return render(request, "costcenter/fundcenter-form.html", {"form": form})
+
+
+def costcenter_page(request):
+    data = CostCenter.objects.all()
+    return render(request, "costcenter/costcenter-table.html", context={"data": data})
+
+
+def costcenter_add(request):
+    if request.method == "POST":
+        form = CostCenterForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.costcenter = obj.costcenter.upper()
+            obj.shortname = obj.shortname.upper()
+            obj.save()
+            return redirect("costcenter-table")
+    else:
+        form = CostCenterForm
+
+    return render(request, "costcenter/costcenter-form.html", {"form": form})
+
+
+def costcenter_update(request, pk):
+    costcenter = CostCenter.objects.get(id=pk)
+    form = CostCenterForm(instance=costcenter)
+
+    if request.method == "POST":
+        form = CostCenterForm(request.POST, instance=costcenter)
+        if form.is_valid():
+            form.save()
+            return redirect("costcenter-page")
+
+    return render(request, "costcenters/costcenter-form.html", {"form": form})

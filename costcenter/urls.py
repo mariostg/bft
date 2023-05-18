@@ -20,3 +20,11 @@ urlpatterns += [
     path("fundcenter-table/", views.fundcenter_page, name="fundcenter-table"),
     path("fundcenter-add/", views.fundcenter_add, name="fundcenter-add"),
 ]
+
+urlpatterns += [
+    path("costcenter-table/", views.costcenter_page, name="costcenter-table"),
+    path("costcenter-add/", views.costcenter_add, name="costcenter-add"),
+    path(
+        "costcenter-update/<int:pk>", views.costcenter_update, name="costcenter-update"
+    ),
+]

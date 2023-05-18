@@ -1,6 +1,6 @@
 from django import forms
 
-from costcenter.models import Fund, Source, FundCenter
+from costcenter.models import Fund, Source, FundCenter, CostCenter
 
 
 class FundForm(forms.ModelForm):
@@ -28,3 +28,21 @@ class FundCenterForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FundCenterForm, self).__init__(*args, **kwargs)
+
+
+class CostCenterForm(forms.ModelForm):
+    class Meta:
+        model = CostCenter
+        fields = [
+            "costcenter",
+            "shortname",
+            "fund",
+            "source",
+            "parent",
+            "isforecastable",
+            "isupdatable",
+            "note",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(CostCenterForm, self).__init__(*args, **kwargs)
