@@ -7,6 +7,7 @@ from costcenter.models import (
     FundCenter,
 )
 from django.db import IntegrityError
+from django.db.models import RestrictedError
 
 FUND_C113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
 SOURCE_1 = {"source": "Kitchen"}
@@ -115,6 +116,22 @@ class FundModelTest(TestCase):
 
         self.assertEqual(0, Fund.objects.count())
 
+    def test_delete_fund_with_cc_raises_restricted_error(self):
+        fund = Fund(**FUND_C113)
+        fund.save()
+        source = Source(**SOURCE_1)
+        source.save()
+        parent = FundCenter(**FC_1111AA)
+        parent.save()
+        f0 = CostCenter(**CC_1234FF)
+        f0.fund = fund
+        f0.source = source
+        f0.parent = parent
+        f0.save()
+
+        with self.assertRaises(RestrictedError):
+            fund.delete()
+
 
 class SourceModelTest(TestCase):
     def test_string_representation(self):
@@ -178,6 +195,22 @@ class SourceModelTest(TestCase):
 
         f2 = Source.objects.filter(pk=f1.pk).first()
         self.assertEqual("Secondary", f2.source)
+
+    def test_delete_Source_with_cc_raises_restricted_error(self):
+        fund = Fund(**FUND_C113)
+        fund.save()
+        source = Source(**SOURCE_1)
+        source.save()
+        parent = FundCenter(**FC_1111AA)
+        parent.save()
+        f0 = CostCenter(**CC_1234FF)
+        f0.fund = fund
+        f0.source = source
+        f0.parent = parent
+        f0.save()
+
+        with self.assertRaises(RestrictedError):
+            source.delete()
 
 
 class FundCenterModelTest(TestCase):
