@@ -363,6 +363,28 @@ class CostCenterModelTest(TestCase):
 
         self.assertEqual(0, CostCenter.objects.count())
 
+    def test_parent_cannot_be_cost_center(self):
+        fund = Fund(**FUND_C113)
+        fund.save()
+        source = Source(**SOURCE_1)
+        source.save()
+        parent = FundCenter(**FC_1111AA)
+        parent.save()
+
+        cc1 = CostCenter(**CC_1234FF)
+        cc1.fund = fund
+        cc1.source = source
+        cc1.parent = parent
+        cc1.save()
+
+        cc2 = CostCenter(**CC_1234FF)
+        cc2.costcenter = "1111aa"
+        cc2.fund = fund
+        cc2.source = source
+        with self.assertRaises(ValueError):
+            cc2.parent = cc1  # set a cost center as parent
+            cc2.save()
+
 
 class ForecastAdjustmentModelTest(TestCase):
     def test_string_representation(self):
