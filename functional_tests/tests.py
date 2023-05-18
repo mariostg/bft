@@ -61,7 +61,7 @@ class CostElementFundTableTest(StaticLiveServerTestCase):
         self.assertIn("Fund List", self.browser.title)
         table_id = self.browser.find_element(By.ID, "fund-table").text
         self.assertIn("Funds", table_id)
-        time.sleep(10)
+        time.sleep(1)
         # self.fail("Finish the test!")
 
 
