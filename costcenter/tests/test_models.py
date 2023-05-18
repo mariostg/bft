@@ -8,6 +8,20 @@ from costcenter.models import (
 )
 from django.db import IntegrityError
 
+FUND_C113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
+SOURCE_1 = {"source": "Kitchen"}
+FC_1111AA = {"fundcenter": "1111aa", "shortname": "bedroom", "parent": None}
+CC_1234FF = {
+    "costcenter": "1234ff",
+    "shortname": "Food and drink",
+    "fund": None,
+    "source": None,
+    "isforecastable": True,
+    "isupdatable": True,
+    "note": "A quick and short note for 1234FF",
+    "parent": None,
+}
+
 
 class FundModelTest(TestCase):
     fund_c113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
@@ -246,23 +260,30 @@ class FundCenterModelTest(TestCase):
 
 
 class CostCenterModelTest(TestCase):
-    cc_1234FF = {
-        "costcenter": "1234ff",
-        "shortname": "Food and drink",
-        "fund": None,
-        "source": None,
-        "isforecastable": True,
-        "isupdatable": True,
-        "note": "A quick and short note for 1234FF",
-        "parent": None,
-    }
-
     def test_string_representation(self):
-        obj = CostCenter(**self.cc_1234FF)
+        obj = CostCenter(**CC_1234FF)
+        print(obj)
         self.assertEqual("1234FF - Food and drink", str(obj))
 
     def test_verbose_name_plural(self):
         self.assertEqual("Cost Centers", str(CostCenter._meta.verbose_name_plural))
+
+    def test_can_save_and_retrieve_cost_centers(self):
+        fund = Fund(**FUND_C113)
+        fund.save()
+        source = Source(**SOURCE_1)
+        source.save()
+        parent = FundCenter(**FC_1111AA)
+        parent.save()
+        cc = CostCenter(**CC_1234FF)
+        cc.fund = fund
+        cc.source = source
+        cc.parent = parent
+        # cc.full_clean()
+        cc.save()
+
+        saved_cc = CostCenter.objects.get(pk=cc.pk)
+        self.assertEqual(CC_1234FF["costcenter"].upper(), saved_cc.costcenter)
 
 
 class ForecastAdjustmentModelTest(TestCase):
