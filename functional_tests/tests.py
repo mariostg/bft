@@ -161,10 +161,10 @@ class CostElementFundCenterFormTest(StaticLiveServerTestCase):
         self.browser.get(f"{self.live_server_url}/fundcenter/fundcenter-add/")
 
         # input the fund information
-        fundbox = self.browser.find_element(By.ID, "fundcenter_fundcenter")
+        fundbox = self.browser.find_element(By.ID, "id_fundcenter")
         fundbox.send_keys("0000rr")
         fundbox.send_keys(Keys.TAB)
-        fundbox = self.browser.find_elecenterment(By.ID, "fundcenter_shortname")
+        fundbox = self.browser.find_element(By.ID, "id_shortname")
         fundbox.send_keys("kitchen")
         fundbox.send_keys(Keys.TAB)
         fundbox.send_keys(Keys.ENTER)
