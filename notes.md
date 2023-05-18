@@ -15,3 +15,9 @@ Do this the following to populate some fund so uploadcsv does not complain of mi
     Fund.objects.create(fund="c523", name="Fund C523", vote=1)
 
 ---
+
+## Coverage
+
+    coverage run --omit='*/venv/*' manage.py test
+    coverage report
+    coverage html
