@@ -209,8 +209,8 @@ class FundCenterModelTest(TestCase):
         self.assertEqual(obj.shortname, "KITCHEN FC")
 
     # TODO
-    def test_can_delete_POST_request():
-        pass
+    # def test_can_delete_POST_request():
+    #    pass
 
     def test_can_update_fund_center_column_values(self):
         f0 = FundCenter(**self.fc_1111AA)
