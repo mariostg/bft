@@ -15,6 +15,7 @@ class Command(BaseCommand):
             self.set_fund()
             self.set_source()
             self.set_fund_center()
+            self.set_cost_center()
         else:
             print("This capability is only available when DEBUG is True")
 
@@ -57,3 +58,48 @@ class Command(BaseCommand):
             except FundCenter.DoesNotExist:
                 new_item = FundCenter.objects.create(**item)
                 print(f"Created Fund Center {new_item}")
+
+    def set_cost_center(self):
+        fund = Fund.objects.get(fund="C113")
+        source = Source.objects.get(source="Kitchen")
+        fc = FundCenter.objects.get(fundcenter="1111AB")
+        items = [
+            {
+                "costcenter": "8486B1",
+                "shortname": "Utensils",
+                "fund": fund,
+                "source": source,
+                "isforecastable": True,
+                "isupdatable": True,
+                "note": "",
+                "parent": fc,
+            },
+            {
+                "costcenter": "8486C1",
+                "shortname": "Food and drink",
+                "fund": fund,
+                "source": source,
+                "isforecastable": True,
+                "isupdatable": True,
+                "note": "A quick and short note for 1234FF",
+                "parent": fc,
+            },
+            {
+                "costcenter": "8486C2",
+                "shortname": "Basement Stuff",
+                "fund": fund,
+                "source": source,
+                "isforecastable": True,
+                "isupdatable": True,
+                "note": "",
+                "parent": fc,
+            },
+        ]
+        for item in items:
+            try:
+                found = CostCenter.objects.get(costcenter=item["costcenter"])
+                if found:
+                    print(f"Cost Center {found} exists")
+            except CostCenter.DoesNotExist:
+                new_item = CostCenter.objects.create(**item)
+                print(f"Created Cost Center {new_item}")
