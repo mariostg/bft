@@ -1,6 +1,6 @@
 import os
 from django.core.management.base import BaseCommand, CommandError
-from main.settings import BASE_DIR
+from main.settings import BASE_DIR, DEBUG
 
 from costcenter.models import Fund, Source, CostCenter, FundCenter
 
@@ -11,9 +11,12 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        self.set_fund()
-        self.set_source()
-        self.set_fund_center()
+        if DEBUG:
+            self.set_fund()
+            self.set_source()
+            self.set_fund_center()
+        else:
+            print("This capability is only available when DEBUG is True")
 
     def set_fund(self):
         items = [
