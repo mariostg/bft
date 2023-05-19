@@ -38,7 +38,5 @@ class FundFormTest(TestCase):
     def test_fund_is_not_4_characters_long(self):
         data = {"fund": "c3456"}
         form = FundForm(data=data)
-        msg = (
-            f"Ensure this value has at most 4 characters (it has {len(data['fund'])})."
-        )
+        msg = f"Ensure this value has at most 4 characters (it has {len(data['fund'])})."
         self.assertEqual(form.errors["fund"], [msg])
