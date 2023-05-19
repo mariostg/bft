@@ -13,6 +13,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.set_fund()
         self.set_source()
+        self.set_fund_center()
 
     def set_fund(self):
         items = [
@@ -40,3 +41,16 @@ class Command(BaseCommand):
             except:
                 new_item = Source.objects.create(**item)
                 print(f"Created Source {new_item}")
+
+    def set_fund_center(self):
+        items = [
+            {"fundcenter": "1111AA", "shortname": "bedroom", "parent": None},
+        ]
+        for item in items:
+            try:
+                found = FundCenter.objects.get(fundcenter=item["fundcenter"])
+                if found:
+                    print(f"Fund Center {found} exists")
+            except:
+                new_item = FundCenter.objects.create(**item)
+                print(f"Created Fund Center {new_item}")
