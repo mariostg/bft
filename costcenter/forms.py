@@ -12,7 +12,7 @@ class FundForm(forms.ModelForm):
         vote = self.cleaned_data["vote"]
         if not vote:
             return vote
-        if vote != "1" or vote != "5":
+        if vote != "1" and vote != "5":
             self.add_error("vote", "Vote must be 1 or 5")
         return vote
 
