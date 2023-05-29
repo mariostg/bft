@@ -335,18 +335,22 @@ class Encumbrance:
 
         with open(self.rawtextfile, encoding="windows-1252") as lines:
             for line in lines:
-                if self.find_base_fy(line):
-                    self.data["fy"] = line.split("|")
-                if self.find_fund_center(line):
-                    self.data["fc"] = line.split("|")
-                if self.find_layout(line):
-                    self.data["layout"] = line.split("|")
+                if self.data["fy"] == None:
+                    self.find_base_fy(line)
+                if self.data["fc"] == None:
+                    self.find_fund_center(line)
+                if self.data["layout"] == None:
+                    self.find_layout(line)
                 if line == "":
                     break
         return True
 
     def run_all(self):
-        self.__set_data()
+        if self.__set_data():
+            print(f"Fiscal Year : {self.data['fy']}")
+            print(f"Fund Center : {self.data['fc']}")
+            print(f"Report Layout : {self.data['layout']}")
+
         self.is_dnd_cost_center_report()
         self.find_header_line()
         self.write_encumbrance_file_as_csv()
