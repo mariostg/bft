@@ -321,16 +321,21 @@ class Encumbrance:
         self.is_dnd_cost_center_report()
         self.find_header_line()
         self.write_encumbrance_file_as_csv()
+        ok = True
 
         missing_fund = self.missing_fund()
         if missing_fund:
             for f in missing_fund:
                 print(f"Missing fund {f}")
-            raise RuntimeError("There are missing funds, download aborted.")
+            ok = False
 
         missing_cc = self.missing_costcenters()
         if missing_cc:
             for cc in missing_cc:
                 print(f"Missing costcenter {cc}")
-            raise RuntimeError("There are missing cost centers, download aborted.")
-        self.csv2table()
+            ok = False
+
+        if ok:
+            self.csv2table()
+        else:
+            print("Download did not complete.")
