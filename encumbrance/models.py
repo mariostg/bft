@@ -16,6 +16,12 @@ from costcenter.models import CostCenter, Fund
 
 
 class EncumbranceImport(models.Model):
+    """
+    EncumbranceImport class defines the model that represents the DND cost
+    center encumbrance report single line item.  Each line read from the
+    encumbrance report during the uploadcsv command must match this model
+    """
+
     docno = models.CharField(max_length=10)
     lineno = models.CharField(max_length=7)  # lineno : acctassno
     # acctassno = models.CharField(max_length=3, null=True, blank=True)
