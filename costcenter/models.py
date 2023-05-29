@@ -58,8 +58,6 @@ class FundCenter(models.Model):
         qs = FundCenter.objects.filter(fundcenter=self.fundcenter).exists()
         if qs:
             raise ValidationError("Fund center must be unique.")
-        else:
-            print("All good")
 
     def save(self, *args, **kwargs):
         if self.parent and self.fundcenter == self.parent.fundcenter:
@@ -103,7 +101,9 @@ class ForecastAdjustment(models.Model):
     fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     note = models.TextField(null=True, blank=True)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.RESTRICT)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.RESTRICT
+    )
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
 
