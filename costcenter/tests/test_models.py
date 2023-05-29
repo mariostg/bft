@@ -81,7 +81,12 @@ class FundModelTest(TestCase):
             fund_2.save()
 
     def test_can_save_POST_request(self):
-        data = {"fund": "C119", "name": "National Procurement", "vote": "1", "download": True}
+        data = {
+            "fund": "C113",
+            "name": "National Procurement",
+            "vote": "1",
+            "download": True,
+        }
         response = self.client.post("/fund/fund-add/", data=data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Fund.objects.count(), 1)
@@ -423,7 +428,9 @@ class ForecastAdjustmentModelTest(TestCase):
         self.assertEqual(str(obj), "8484WA - Kitchen - C113 - NP - 1000")
 
     def test_verbose_name_plural(self):
-        self.assertEqual(str(ForecastAdjustment._meta.verbose_name_plural), "Forecast Adjustments")
+        self.assertEqual(
+            str(ForecastAdjustment._meta.verbose_name_plural), "Forecast Adjustments"
+        )
 
     def test_can_save_and_retreive_forecast_adjustment(self):
         fund = Fund(**FUND_C113)
