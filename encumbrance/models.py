@@ -91,7 +91,7 @@ class Encumbrance:
             "column_count": 22,  # Expected number of columns un the DRMIS report
         }
 
-    def find_fund(self, line: str) -> str | None:
+    def find_fund_center(self, line: str) -> str | None:
         """Verify if whether or not a line contains the fund_center as defined in self.hint['fund_center'].
 
         Args:
@@ -329,7 +329,7 @@ class Encumbrance:
         cc = set(CostCenter.objects.all().values_list("costcenter", flat=True))
         return cc_import.difference(cc)
 
-    def __set_data(self):
+    def __set_data(self) -> bool:
         if not self.rawtextfile:
             raise ValueError("Encumbrance report not defined.")
 
@@ -337,12 +337,13 @@ class Encumbrance:
             for line in lines:
                 if self.find_base_fy(line):
                     self.data["fy"] = line.split("|")
-                if self.find_fund(line):
-                    self.data["fund"] = line.split("|")
+                if self.find_fund_center(line):
+                    self.data["fc"] = line.split("|")
                 if self.find_layout(line):
                     self.data["layout"] = line.split("|")
                 if line == "":
                     break
+        return True
 
     def run_all(self):
         self.__set_data()
