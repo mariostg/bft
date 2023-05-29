@@ -347,7 +347,7 @@ class Encumbrance:
                     break
         return True
 
-    def run_all(self):
+    def run_all(self) -> bool:
         if self.__set_data():
             print(f"Fiscal Year : {self.data['fy']}")
             print(f"Fund Center : {self.data['fc']}")
@@ -381,3 +381,4 @@ class Encumbrance:
             print(f"{linecount} lines have been written to Encumbrance import table")
         else:
             print("Download did not complete.")
+        return ok
