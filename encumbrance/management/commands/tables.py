@@ -31,7 +31,7 @@ class Command(BaseCommand):
     def print_costcenters(self):
         obj = CostCenter.objects.all()
         for elem in obj:
-            print(f"{elem.costcenter}\t{elem.name}")
+            print(f"{elem.costcenter}\t{elem.shortname}")
 
     def print_sources(self):
         obj = Source.objects.all()
