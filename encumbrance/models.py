@@ -233,7 +233,7 @@ class Encumbrance:
                         skipped += 1
                         print("Skipped lines:", skipped)
         if lineno > 0:
-            print(f"{lineno} have been written to {self.rawtextfile}")
+            print(f"{lineno} lines have been written to {self.CSVFILE}")
         else:
             print("CSV file has not been written.")
 
