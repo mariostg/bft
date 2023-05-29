@@ -36,3 +36,11 @@ class LineItem(models.Model):
     class Meta:
         ordering = ["-docno", "lineno"]
         verbose_name_plural = "Line Items"
+
+    def import_line(self):
+        """
+        import_line function relies on content of encumbrance_import.  It is
+        responsible to import new lines, update current ones and zero out lines
+        no longer in DRMIS
+        """
+        pass

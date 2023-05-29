@@ -31,7 +31,7 @@ class Command(BaseCommand):
                     "Encumbrance data has saved as csv and import raw table filled"
                 )
                 data = EncumbranceImport.objects.all()
-                li = LineItems()
+                li = LineItem()
                 li.import_lines(data)
         else:
             self.stdout.write(f"{rawtextfile} not found")
