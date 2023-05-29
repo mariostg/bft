@@ -49,6 +49,15 @@ class EncumbranceImport(models.Model):
 
 
 class Encumbrance:
+    """
+    Encumbrance class process the DND Cost Center encumbrance report.  It
+    creates a csv file and populate the table using EncumbranceImport class.
+
+    Raises:
+        ValueError: If no encumbrance file name is provided.
+        FileNotFoundError: If the encumbrance file is not found
+    """
+
     COLUMNS = 22  # Includes empty columns at beginning and end of row
     CSVFILE = os.path.join(BASE_DIR, "drmis_data/encumbrance.csv")
     DRMIS_DIR = os.path.join(BASE_DIR, "drmis_data")
@@ -190,6 +199,16 @@ class Encumbrance:
         return False
 
     def line_to_csv(self, line: str) -> list | None:
+        """
+        Split a line from the encumbrance report in a list
+
+        Args:
+            line (str): A line from the encumbrance report
+
+        Returns:
+            list | None: The list that contains the element from the string
+            containing the data from the line passed as argument.
+        """
         csv = line.split("|")
         csv.pop()
         csv.pop(0)
@@ -219,6 +238,9 @@ class Encumbrance:
         return False
 
     def write_encumbrance_file_as_csv(self):
+        """
+        Transform the encumbrance report raw file into a more useful CSV file.
+        """
         lineno = 0
         skipped = 0
         with open(self.rawtextfile, encoding="windows-1252") as lines, open(
