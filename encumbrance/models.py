@@ -242,7 +242,7 @@ class Encumbrance:
         Transform the encumbrance report raw file into a more useful CSV file.
         """
         lineno = 0
-        skipped = 0
+        lines_written = 0
         with open(self.rawtextfile, encoding="windows-1252") as lines, open(
             self.CSVFILE, "w"
         ) as recorder:
@@ -257,12 +257,13 @@ class Encumbrance:
                     data = self.line_to_csv(line)
                     if data:
                         writer.writerow(data)
-                    else:
-                        skipped += 1
-                        print("Skipped lines:", skipped)
-        if lineno > 0:
-            self.data["csv"] = lineno
-            return lineno
+
+        with open(self.CSVFILE, "rb") as f:
+            lines_written = sum(1 for _ in f)
+
+        if lines_written > 0:
+            self.data["csv"] = lines_written
+            return lines_written
         else:
             raise RuntimeError("CSV file has not been written.")
 
@@ -376,5 +377,7 @@ class Encumbrance:
 
         if ok:
             self.csv2table()
+            linecount = EncumbranceImport.objects.count()
+            print(f"{linecount} lines have been written to Encumbrance import table")
         else:
             print("Download did not complete.")
