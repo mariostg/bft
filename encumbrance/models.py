@@ -87,7 +87,7 @@ class Encumbrance:
             "fc": None,  # Fund center read on report header
             "header": [],  # Columns header values read on report
             "lineno": 0,  # Linenumber where first column header was found
-            # "csv": None,  # csv data resulting from parsing the report
+            "csv": 0,  # csv line count data resulting from parsing the report
             "column_count": 22,  # Expected number of columns un the DRMIS report
         }
 
@@ -237,7 +237,7 @@ class Encumbrance:
 
         return False
 
-    def write_encumbrance_file_as_csv(self):
+    def write_encumbrance_file_as_csv(self) -> int:
         """
         Transform the encumbrance report raw file into a more useful CSV file.
         """
@@ -261,9 +261,10 @@ class Encumbrance:
                         skipped += 1
                         print("Skipped lines:", skipped)
         if lineno > 0:
-            print(f"{lineno} lines have been written to {self.CSVFILE}")
+            self.data["csv"] = lineno
+            return lineno
         else:
-            print("CSV file has not been written.")
+            raise RuntimeError("CSV file has not been written.")
 
     def csv_get_unique_funds(self):
         df = pd.read_csv(self.CSVFILE, usecols=["fund"])
@@ -351,9 +352,14 @@ class Encumbrance:
             print(f"Fund Center : {self.data['fc']}")
             print(f"Report Layout : {self.data['layout']}")
 
-        self.is_dnd_cost_center_report()
-        self.find_header_line()
-        self.write_encumbrance_file_as_csv()
+        if self.is_dnd_cost_center_report():
+            print("We have a DND Cost center encumbrance report.")
+
+        if self.find_header_line() > 0:
+            print(f"Column headers found at line {self.data['lineno']}")
+
+        if self.write_encumbrance_file_as_csv() > 0:
+            print(f"{self.data['csv']} lines have been written to {self.CSVFILE}")
         ok = True
 
         missing_fund = self.missing_fund()
