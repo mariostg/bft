@@ -18,10 +18,9 @@ class FundFormTest(TestCase):
         )
 
     def test_filled_form(self):
-        data = {"fund": "C119", "name": "National Procurement", "vote": 6, "download": True}
+        data = {"fund": "C119", "name": "National Procurement", "vote": 1, "download": True}
         f = FundForm(data=data)
-        # self.assertTrue(f.is_valid())
-        print(f.errors)
+        self.assertTrue(f.is_valid())
 
     def test_vote_not_1_or_5(self):
         data = {"fund": "C113", "name": "NP", "vote": "6", "download": 1}
