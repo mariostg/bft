@@ -30,12 +30,12 @@ class TestEncumbrance(TestCase):
 
     def test_find_fund_center_line_good(self):
         er = Encumbrance(self.GOODFILE)
-        fc = er.find_fund("|Funds Center        |2184AA |")
+        fc = er.find_fund_center("|Funds Center        |2184AA |")
         self.assertEqual(fc, "2184AA")
 
     def test_find_fundcenter_line_bad(self):
         er = Encumbrance(self.WRONGFC)
-        fc = er.find_fund("Funds Center        |2184AA |")
+        fc = er.find_fund_center("Funds Center        |2184AA |")
         self.assertNotEqual(fc, "2184AA")
 
     def test_find_fy_line_good(self):
