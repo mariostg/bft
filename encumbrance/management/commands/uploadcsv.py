@@ -12,19 +12,19 @@ class Command(BaseCommand):
 
     help = "Import CSV Encumbrance report into Line item table."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "encumbrance-file",
+            type=str,
+            help="Encumbrance report full path",
+        )
+
     def handle(self, *args, **options):
         EncumbranceImport.objects.all().delete()
-
-        test_files = {
-            "tiny": "encumbrance_tiny.txt",
-            "small": "encumbrance_small.txt",
-            "large": "encumbrance_large.txt",
-            "full": "encumbrance_P1a.txt",
-        }
-
-        rawtextfile = os.path.join(BASE_DIR, "drmis_data", test_files["small"])
+        rawtextfile = options["encumbrance-file"]
 
         if os.path.exists(rawtextfile):
+            rawtextfile = os.path.realpath(rawtextfile)
             er = Encumbrance(rawtextfile)
             if er.run_all():
                 self.stdout.write(
