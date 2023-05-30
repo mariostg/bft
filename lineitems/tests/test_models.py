@@ -23,7 +23,9 @@ class LineItemModelTest(TestCase):
         filldata.handle()
         runner = Encumbrance("encumbrance_tiny.txt")
         runner.run_all()
+
         obj = LineItem()
         enc = EncumbranceImport.objects.first()
-        print(enc)
-        data = obj.insert_line_item(enc)
+        retval = obj.insert_line_item(enc)
+
+        self.assertEqual(1, retval)
