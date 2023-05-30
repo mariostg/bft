@@ -1,6 +1,8 @@
 from django.test import TestCase
 
 from lineitems.models import LineItem
+from encumbrance.models import EncumbranceImport, Encumbrance
+from encumbrance.management.commands import populate
 
 
 class LineItemModelTest(TestCase):
@@ -15,3 +17,13 @@ class LineItemModelTest(TestCase):
         obj = LineItem()
         c = obj._meta.get_fields()
         self.assertEqual(21, len(c))
+
+    def test_insert_line_item_from_encumbrance_line(self):
+        filldata = populate.Command()
+        filldata.handle()
+        runner = Encumbrance("encumbrance_tiny.txt")
+        runner.run_all()
+        obj = LineItem()
+        enc = EncumbranceImport.objects.first()
+        print(enc)
+        data = obj.insert_line_item(enc)

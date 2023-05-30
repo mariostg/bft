@@ -27,11 +27,8 @@ class Command(BaseCommand):
             rawtextfile = os.path.realpath(rawtextfile)
             er = Encumbrance(rawtextfile)
             if er.run_all():
-                self.stdout.write(
-                    "Encumbrance data has saved as csv and import raw table filled"
-                )
-                data = EncumbranceImport.objects.all()
+                self.stdout.write("Encumbrance data has saved as csv and import raw table filled")
                 li = LineItem()
-                li.import_lines(data)
+                li.import_lines()
         else:
             self.stdout.write(f"{rawtextfile} not found")

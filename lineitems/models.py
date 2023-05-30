@@ -1,6 +1,8 @@
 from django.db import models
 
 from costcenter.models import CostCenter
+from encumbrance.models import EncumbranceImport
+from django.forms.models import model_to_dict
 
 
 class LineItem(models.Model):
@@ -16,12 +18,8 @@ class LineItem(models.Model):
     doctype = models.CharField(max_length=2, null=True, blank=True)
     enctype = models.CharField(max_length=21)
     linetext = models.CharField(max_length=50, null=True, blank=True, default="")
-    predecessordocno = models.CharField(
-        max_length=20, null=True, blank=True, default=""
-    )
-    predecessorlineno = models.CharField(
-        max_length=3, null=True, blank=True, default=""
-    )
+    predecessordocno = models.CharField(max_length=20, null=True, blank=True, default="")
+    predecessorlineno = models.CharField(max_length=3, null=True, blank=True, default="")
     reference = models.CharField(max_length=16, null=True, blank=True, default="")
     gl = models.CharField(max_length=5)
     duedate = models.DateField(null=True, blank=True)
@@ -37,10 +35,27 @@ class LineItem(models.Model):
         ordering = ["-docno", "lineno"]
         verbose_name_plural = "Line Items"
 
-    def import_line(self):
+    def insert_line_item(self, ei: EncumbranceImport):
+        cc = CostCenter.objects.get(costcenter=ei.costcenter)
+        di = model_to_dict(ei)
+        di["costcenter"] = cc
+        del di["id"]
+        target = LineItem(**di)
+        target.save()
+        return target.id
+
+    def import_lines(self):
         """
         import_line function relies on content of encumbrance_import.  It is
         responsible to import new lines, update current ones and zero out lines
         no longer in DRMIS
         """
-        pass
+        encumbrance = EncumbranceImport.objects.all()
+
+        for e in encumbrance:
+            target = LineItem.objects.filter(docno=e.docno, lineno=e.lineno)
+            if target:
+                print("Update")
+                target.update(e)
+            else:
+                self.insert_line_item(e)
