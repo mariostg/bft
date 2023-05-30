@@ -29,3 +29,21 @@ class LineItemModelTest(TestCase):
         retval = obj.insert_line_item(enc)
 
         self.assertEqual(1, retval)
+
+    def test_update_line_item_from_encumbrance_line(self):
+        filldata = populate.Command()
+        filldata.handle()
+        runner = Encumbrance("encumbrance_tiny.txt")
+        runner.run_all()
+
+        obj = LineItem()
+        enc = EncumbranceImport.objects.first()
+        retval = obj.insert_line_item(enc)
+
+        enc.workingplan = enc.workingplan + 10000
+        enc.spent = enc.spent + 10000
+        enc.balance = enc.balance + 10000
+        li = LineItem.objects.get(pk=retval)
+        updated = obj.update_line_item(li, enc)
+
+        self.assertEqual(enc.workingplan, updated.workingplan)

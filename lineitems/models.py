@@ -44,6 +44,14 @@ class LineItem(models.Model):
         target.save()
         return target.id
 
+    def update_line_item(self, li: "LineItem", ei: EncumbranceImport):
+        li.spent = ei.spent
+        li.workingplan = ei.workingplan
+        li.balance = ei.balance
+        # TODO More to come
+        li.save()
+        return li
+
     def import_lines(self):
         """
         import_line function relies on content of encumbrance_import.  It is
@@ -55,7 +63,6 @@ class LineItem(models.Model):
         for e in encumbrance:
             target = LineItem.objects.filter(docno=e.docno, lineno=e.lineno)
             if target:
-                print("Update")
-                target.update(e)
+                self.update_line_item(target, e)
             else:
                 self.insert_line_item(e)
