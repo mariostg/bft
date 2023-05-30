@@ -45,13 +45,13 @@ class LineItem(models.Model):
         target.save()
         return target.id
 
-    def update_line_item(self, li: "Lineitem", ei: EncumbranceImport):
+    def update_line_item(self, li: "LineItem", ei: EncumbranceImport):
         li.spent = ei.spent
         li.workingplan = ei.workingplan
         li.balance = ei.balance
         li.status = "Updated"
         # TODO More to come
-        li.update()
+        li.save()
         return li
 
     def import_lines(self):
@@ -63,7 +63,7 @@ class LineItem(models.Model):
         encumbrance = EncumbranceImport.objects.all()
 
         for e in encumbrance:
-            target = LineItem.objects.filter(docno=e.docno, lineno=e.lineno)
+            target = LineItem.objects.get(docno=e.docno, lineno=e.lineno)
             if target:
                 self.update_line_item(target, e)
             else:
