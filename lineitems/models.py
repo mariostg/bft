@@ -41,15 +41,17 @@ class LineItem(models.Model):
         di["costcenter"] = cc
         del di["id"]
         target = LineItem(**di)
+        target.status = "New"
         target.save()
         return target.id
 
-    def update_line_item(self, li: "LineItem", ei: EncumbranceImport):
+    def update_line_item(self, li: "Lineitem", ei: EncumbranceImport):
         li.spent = ei.spent
         li.workingplan = ei.workingplan
         li.balance = ei.balance
+        li.status = "Updated"
         # TODO More to come
-        li.save()
+        li.update()
         return li
 
     def import_lines(self):
