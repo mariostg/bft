@@ -70,3 +70,21 @@ class LineItemModelTest(TestCase):
         orphan = li.get_orphan_lines()
         self.assertEqual(0, len(orphan))
         self.assertIsInstance(orphan, set)
+
+    def test_mark_line_orphan(self):
+        # bring lines in
+        li = LineItem()
+        li.import_lines()
+
+        li = LineItem.objects.first()
+        li.docno = "999999"  # To make it orphan.
+        li.lineno = "123"
+        li.save()
+
+        orphan = li.get_orphan_lines()
+        li.mark_orphan_lines(orphan)
+        li = LineItem.objects.get(docno="999999", lineno="123")
+        self.assertEqual(0, li.workingplan)
+        self.assertEqual(0, li.spent)
+        self.assertEqual(0, li.balance)
+        self.assertEqual("orphan", li.status)

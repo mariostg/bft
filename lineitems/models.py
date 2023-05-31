@@ -40,6 +40,20 @@ class LineItem(models.Model):
         enc = set(EncumbranceImport.objects.values_list("docno", "lineno"))
         return lines.difference(enc)
 
+    def mark_orphan_lines(self, orphans: set):
+        for o in orphans:
+            docno, lineno = o
+            try:
+                li = LineItem.objects.get(docno=docno, lineno=lineno)
+                li.spent = 0
+                li.workingplan = 0
+                li.balance = 0
+                li.status = "orphan"
+                li.save()
+            except LineItem.DoesNotExist:
+                print(f"LineItem {docno} - {lineno} does not exist")
+        # TODO need to set forecast too.
+
     def insert_line_item(self, ei: EncumbranceImport):
         cc = CostCenter.objects.get(costcenter=ei.costcenter)
         di = model_to_dict(ei)
@@ -65,8 +79,10 @@ class LineItem(models.Model):
         responsible to import new lines, update current ones and zero out lines
         no longer in DRMIS
         """
-        encumbrance = EncumbranceImport.objects.all()
+        orphan = self.get_orphan_lines()
+        self.mark_orphan_lines(orphan)
 
+        encumbrance = EncumbranceImport.objects.all()
         for e in encumbrance:
             try:
                 target = LineItem.objects.get(docno=e.docno, lineno=e.lineno)
