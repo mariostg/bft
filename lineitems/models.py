@@ -35,6 +35,11 @@ class LineItem(models.Model):
         ordering = ["-docno", "lineno"]
         verbose_name_plural = "Line Items"
 
+    def get_orphan_lines(self):
+        lines = set(LineItem.objects.values_list("docno", "lineno"))
+        enc = set(EncumbranceImport.objects.values_list("docno", "lineno"))
+        return lines.difference(enc)
+
     def insert_line_item(self, ei: EncumbranceImport):
         cc = CostCenter.objects.get(costcenter=ei.costcenter)
         di = model_to_dict(ei)

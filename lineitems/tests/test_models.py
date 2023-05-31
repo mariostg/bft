@@ -47,3 +47,24 @@ class LineItemModelTest(TestCase):
         updated = obj.update_line_item(li, enc)
 
         self.assertEqual(enc.workingplan, updated.workingplan)
+
+    def test_line_items_have_orphans(self):
+        # Get Encumbrance report
+        filldata = populate.Command()
+        filldata.handle()
+        runner = Encumbrance("encumbrance_tiny.txt")
+        runner.run_all()
+
+        # bring lines in
+        li = LineItem()
+        li.import_lines()
+
+        # alter a line to make it orphan
+        li = LineItem.objects.first()
+        li.docno = "999999"  # To make it orphan.
+        li.lineno = "123"
+        li.save()
+
+        # check it out
+        orphan = li.get_orphan_lines()
+        self.assertIn(("999999", "123"), orphan)
