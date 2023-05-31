@@ -6,13 +6,6 @@ from encumbrance.management.commands import populate
 
 
 class LineItemModelTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        filldata = populate.Command()
-        filldata.handle()
-        runner = Encumbrance("encumbrance_tiny.txt")
-        runner.run_all()
-
     def test_string_representation(self):
         str_repr = LineItem(docno="4510XX45", lineno="45", enctype="Purchase Order")
         self.assertEqual(str(str_repr), "Purchase Order 4510XX45-45")
@@ -24,6 +17,15 @@ class LineItemModelTest(TestCase):
         obj = LineItem()
         c = obj._meta.get_fields()
         self.assertEqual(21, len(c))
+
+
+class LineItemImportTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        filldata = populate.Command()
+        filldata.handle()
+        runner = Encumbrance("encumbrance_tiny.txt")
+        runner.run_all()
 
     def test_insert_line_item_from_encumbrance_line(self):
         obj = LineItem()
