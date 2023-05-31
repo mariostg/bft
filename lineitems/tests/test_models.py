@@ -6,6 +6,13 @@ from encumbrance.management.commands import populate
 
 
 class LineItemModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        filldata = populate.Command()
+        filldata.handle()
+        runner = Encumbrance("encumbrance_tiny.txt")
+        runner.run_all()
+
     def test_string_representation(self):
         str_repr = LineItem(docno="4510XX45", lineno="45", enctype="Purchase Order")
         self.assertEqual(str(str_repr), "Purchase Order 4510XX45-45")
@@ -19,11 +26,6 @@ class LineItemModelTest(TestCase):
         self.assertEqual(21, len(c))
 
     def test_insert_line_item_from_encumbrance_line(self):
-        filldata = populate.Command()
-        filldata.handle()
-        runner = Encumbrance("encumbrance_tiny.txt")
-        runner.run_all()
-
         obj = LineItem()
         enc = EncumbranceImport.objects.first()
         retval = obj.insert_line_item(enc)
@@ -31,11 +33,6 @@ class LineItemModelTest(TestCase):
         self.assertEqual(1, retval)
 
     def test_update_line_item_from_encumbrance_line(self):
-        filldata = populate.Command()
-        filldata.handle()
-        runner = Encumbrance("encumbrance_tiny.txt")
-        runner.run_all()
-
         obj = LineItem()
         enc = EncumbranceImport.objects.first()
         retval = obj.insert_line_item(enc)
@@ -49,12 +46,6 @@ class LineItemModelTest(TestCase):
         self.assertEqual(enc.workingplan, updated.workingplan)
 
     def test_line_items_have_orphans(self):
-        # Get Encumbrance report
-        filldata = populate.Command()
-        filldata.handle()
-        runner = Encumbrance("encumbrance_tiny.txt")
-        runner.run_all()
-
         # bring lines in
         li = LineItem()
         li.import_lines()
