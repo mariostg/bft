@@ -63,8 +63,8 @@ class LineItem(models.Model):
         encumbrance = EncumbranceImport.objects.all()
 
         for e in encumbrance:
-            target = LineItem.objects.get(docno=e.docno, lineno=e.lineno)
-            if target:
+            try:
+                target = LineItem.objects.get(docno=e.docno, lineno=e.lineno)
                 self.update_line_item(target, e)
-            else:
+            except LineItem.DoesNotExist:
                 self.insert_line_item(e)
