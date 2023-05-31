@@ -59,3 +59,12 @@ class LineItemModelTest(TestCase):
         # check it out
         orphan = li.get_orphan_lines()
         self.assertIn(("999999", "123"), orphan)
+
+    def test_line_items_no_orphans(self):
+        # bring lines in
+        li = LineItem()
+        li.import_lines()
+
+        # check it out
+        orphan = li.get_orphan_lines()
+        self.assertEqual(0, len(orphan))
