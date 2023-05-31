@@ -79,6 +79,9 @@ class LineItem(models.Model):
         responsible to import new lines, update current ones and zero out lines
         no longer in DRMIS
         """
+
+        LineItem.objects.all().update(status="old")
+
         orphan = self.get_orphan_lines()
         self.mark_orphan_lines(orphan)
 
