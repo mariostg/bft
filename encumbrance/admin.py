@@ -8,6 +8,7 @@ class EncumbranceAdmin(admin.ModelAdmin):
         "lineno",
         "fund",
         "costcenter",
+        "fundcenter",
         "doctype",
         "enctype",
         "spent",
