@@ -287,6 +287,7 @@ class Encumbrance:
                 print(f"Failed to convert {s} as date")
                 sys.exit()
 
+        EncumbranceImport.objects.all().delete()
         with open(self.CSVFILE) as file:
             next(file)  # skip the header row
             reader = csv.reader(file)
