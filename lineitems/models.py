@@ -85,6 +85,17 @@ class LineItem(models.Model):
         else:
             return None
 
+    def import_progress(self, status_type, msg):
+        """
+        Keeps a record of messages issued during import lines process.
+        """
+        if status_type not in ("info", "success", "warning", "error"):
+            status_type = "unknown"
+        if not self.status:
+            self.status = []
+
+        self.status.append((status_type, msg))
+
     def import_lines(self):
         """
         import_line function relies on content of encumbrance_import.  It is
@@ -92,7 +103,8 @@ class LineItem(models.Model):
         no longer in DRMIS
         """
 
-        LineItem.objects.all().update(status="old")
+        count = LineItem.objects.all().update(status="old")
+        self.import_progress("info", f"Set {count} lines to old.")
 
         orphan = self.get_orphan_lines()
         self.mark_orphan_lines(orphan)
