@@ -66,13 +66,24 @@ class LineItem(models.Model):
         return target.id
 
     def update_line_item(self, li: "LineItem", ei: EncumbranceImport):
-        li.spent = ei.spent
-        li.workingplan = ei.workingplan
-        li.balance = ei.balance
-        li.status = "Updated"
-        # TODO More to come
-        li.save()
-        return li
+        cc = None
+        try:
+            cc = CostCenter.objects.get(costcenter=ei.costcenter)
+        except CostCenter.DoesNotExist:
+            pass  # for now.
+
+        if cc:
+            li.costcenter = cc
+            li.fundcenter = ei.fundcenter
+            li.spent = ei.spent
+            li.workingplan = ei.workingplan
+            li.balance = ei.balance
+            li.status = "Updated"
+            # TODO More to come
+            li.save()
+            return li
+        else:
+            return None
 
     def import_lines(self):
         """

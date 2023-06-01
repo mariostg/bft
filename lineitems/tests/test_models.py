@@ -47,6 +47,18 @@ class LineItemImportTest(TestCase):
 
         self.assertEqual(enc.workingplan, updated.workingplan)
 
+    def test_update_line_item_bogus_cost_center(self):
+        obj = LineItem()
+        enc = EncumbranceImport.objects.first()
+        retval = obj.insert_line_item(enc)
+
+        li = LineItem.objects.get(pk=retval)
+        enc.costcenter = "QQQQ33"
+
+        updated = obj.update_line_item(li, enc)
+
+        self.assertEqual(None, updated)
+
     def test_line_items_have_orphans(self):
         # bring lines in
         li = LineItem()
