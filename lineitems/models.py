@@ -39,9 +39,12 @@ class LineItem(models.Model):
     def get_orphan_lines(self):
         lines = set(LineItem.objects.values_list("docno", "lineno"))
         enc = set(EncumbranceImport.objects.values_list("docno", "lineno"))
-        return lines.difference(enc)
+        orphans = lines.difference(enc)
+        self.import_progress("info", f"Found {len(orphans)} orphan lines.")
+        return orphans
 
     def mark_orphan_lines(self, orphans: set):
+        self.import_progress("info", "Begin marking orphan lines")
         for o in orphans:
             docno, lineno = o
             try:
@@ -52,7 +55,7 @@ class LineItem(models.Model):
                 li.status = "orphan"
                 li.save()
             except LineItem.DoesNotExist:
-                print(f"LineItem {docno} - {lineno} does not exist")
+                self.import_progress("error", f"LineItem {docno} - {lineno} does not exist")
         # TODO need to set forecast too.
 
     def insert_line_item(self, ei: EncumbranceImport):
@@ -96,6 +99,13 @@ class LineItem(models.Model):
 
         self.status.append((status_type, msg))
 
+    def display_import_progress(self):
+        if not self.status:
+            print("Nothing in download progress report.")
+        else:
+            for item in self.status:
+                print(f"[{item[0]}]: {item[1]}")
+
     def import_lines(self):
         """
         import_line function relies on content of encumbrance_import.  It is
@@ -110,6 +120,7 @@ class LineItem(models.Model):
         self.mark_orphan_lines(orphan)
 
         encumbrance = EncumbranceImport.objects.all()
+        self.import_progress("info", f"Retreived {encumbrance.count()} encumbrance lines.")
         for e in encumbrance:
             try:
                 target = LineItem.objects.get(docno=e.docno, lineno=e.lineno)
@@ -117,7 +128,10 @@ class LineItem(models.Model):
             except LineItem.DoesNotExist:
                 self.insert_line_item(e)
 
+        self.display_import_progress()
+
     def set_fund_center_integrity(self):
+        self.import_progress("info", "Fund center integrity check begins.")
         cc = CostCenter.objects.select_related()
         cc_set = set()
         for c in cc:
@@ -131,3 +145,4 @@ class LineItem(models.Model):
             if t in cc_set:
                 item.fcintegrity = True
                 item.save()
+        self.import_progress("info", "Fund center integrity check completed.")
