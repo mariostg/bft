@@ -10,6 +10,7 @@ class LineItemAdmin(admin.ModelAdmin):
         "enctype",
         "fund",
         "costcenter",
+        "fundcenter",
         "status",
         "fcintegrity",
         "spent",

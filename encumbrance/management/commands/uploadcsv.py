@@ -30,5 +30,6 @@ class Command(BaseCommand):
                 self.stdout.write("Encumbrance data has saved as csv and import raw table filled")
                 li = LineItem()
                 li.import_lines()
+                li.set_fund_center_integrity()
         else:
             self.stdout.write(f"{rawtextfile} not found")
