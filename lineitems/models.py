@@ -26,6 +26,7 @@ class LineItem(models.Model):
     vendor = models.CharField(max_length=50, null=True, blank=True)
     createdby = models.CharField(max_length=50, null=True, blank=True, default="")
     status = models.CharField(max_length=10, null=True, blank=True, default="")
+    fcintegrity = models.BooleanField(default=False)
 
     def __str__(self):
         text = f"{self.enctype} {self.docno}-{self.lineno}"
