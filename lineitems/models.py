@@ -128,8 +128,6 @@ class LineItem(models.Model):
             except LineItem.DoesNotExist:
                 self.insert_line_item(e)
 
-        self.display_import_progress()
-
     def set_fund_center_integrity(self):
         self.import_progress("info", "Fund center integrity check begins.")
         cc = CostCenter.objects.select_related()
