@@ -11,6 +11,7 @@ class LineItemAdmin(admin.ModelAdmin):
         "fund",
         "costcenter",
         "status",
+        "fcintegrity",
         "spent",
         "balance",
         "workingplan",

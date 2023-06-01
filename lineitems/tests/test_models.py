@@ -90,3 +90,23 @@ class LineItemImportTest(TestCase):
         self.assertEqual(0, li.spent)
         self.assertEqual(0, li.balance)
         self.assertEqual("orphan", li.status)
+
+
+class LineItemManagementTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        filldata = populate.Command()
+        filldata.handle()
+        runner = Encumbrance("encumbrance_tiny.txt")
+        runner.run_all()
+
+    def test_line_item_fund_center_wrong(self):
+        # bring lines in and assign a bogus fund center
+        li = LineItem()
+        li.import_lines()
+        li = LineItem.objects.first()
+        li.fundcenter = "xxxx11"
+        li.save()
+
+        li.set_fund_center_integrity()
+        self.assertEqual(1, LineItem.objects.filter(fcintegrity=False).count())

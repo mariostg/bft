@@ -93,3 +93,18 @@ class LineItem(models.Model):
                 self.update_line_item(target, e)
             except LineItem.DoesNotExist:
                 self.insert_line_item(e)
+
+    def set_fund_center_integrity(self):
+        cc = CostCenter.objects.select_related()
+        cc_set = set()
+        for c in cc:
+            cc_set.add((c.costcenter, c.parent.fundcenter))
+
+        li = LineItem.objects.select_related()
+        li.update(fcintegrity=False)
+
+        for item in li:
+            t = (item.costcenter.costcenter, item.fundcenter)
+            if t in cc_set:
+                item.fcintegrity = True
+                item.save()
