@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # apps
+    "bft.apps.BftConfig",
     "costcenter.apps.CostcenterConfig",
     "lineitems.apps.LineitemsConfig",
     "encumbrance.apps.EncumbranceConfig",
