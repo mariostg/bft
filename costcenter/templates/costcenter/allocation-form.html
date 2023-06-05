@@ -1,0 +1,34 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<main class="block block--centered">
+    <section class="form">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.management_form }}
+        {{ form.errors }}
+        {{ form.non_field_errors }}
+        {{ form.non_form_errors }}
+        <header class='form__header'>Cost Center Allocation</header>
+        <section class='form__fields'>
+            <label class='label' for="cost-element">Cost Center</label>{{form.costcenter}}
+            <label class='label' for="fund">Fund</label> {{form.fund}}
+            <label class='label' for="fy">Fiscal Year</label> {{form.fy}}
+            <label class='label' for="quarter">Quarter</label> {{form.quarter}} 
+            <label class='label' for="amount">Amount</label> {{form.amount}}
+                <label class='label' for="costelement-note">Note</label>
+                {{form.note}}
+        </section>
+
+            <div class="block block--spaced">
+                <button class="btn">Save</button>
+                <a href="{% url 'costcenter-allocation-table' %}" class="btn btn-back" href="#" >Back</a >
+            </div>
+        </form>
+        <footer class='form__footer'>Created on {{form.instance.created}}. Last edited by {{form.instance.owner}} on  {{form.instance.updated}}</footer>
+    </section>
+</main>
+</body>
+</html>
+
+{% endblock content %}

@@ -24,7 +24,10 @@ urlpatterns += [
 urlpatterns += [
     path("costcenter-table/", views.costcenter_page, name="costcenter-table"),
     path("costcenter-add/", views.costcenter_add, name="costcenter-add"),
-    path(
-        "costcenter-update/<int:pk>", views.costcenter_update, name="costcenter-update"
-    ),
+    path("costcenter-update/<int:pk>", views.costcenter_update, name="costcenter-update"),
+]
+
+urlpatterns += [
+    path("allocation-table/", views.allocation_page, name="costcenter-allocation-table"),
+    path("allocation-add/", views.allocation_add, name="costcenter-allocation-add"),
 ]

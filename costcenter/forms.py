@@ -1,6 +1,6 @@
 from django import forms
 
-from costcenter.models import Fund, Source, FundCenter, CostCenter
+from costcenter.models import Fund, Source, FundCenter, CostCenter, CostCenterAllocation
 
 
 class FundForm(forms.ModelForm):
@@ -64,3 +64,13 @@ class CostCenterForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CostCenterForm, self).__init__(*args, **kwargs)
+
+
+class CostCenterAllocationForm(forms.ModelForm):
+    class Meta:
+        model = CostCenterAllocation
+        readonly_fields = ("owner", "updated", "created")
+        fields = ["costcenter", "fund", "fy", "quarter", "amount", "note", "owner"]
+
+    def __init__(self, *args, **kwargs):
+        super(CostCenterAllocationForm, self).__init__(*args, **kwargs)

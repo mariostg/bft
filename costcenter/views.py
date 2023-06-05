@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-
-from .models import Fund, Source, FundCenter, CostCenter
-from .forms import FundForm, SourceForm, FundCenterForm, CostCenterForm
+from django.contrib import messages
+from .models import Fund, Source, FundCenter, CostCenter, CostCenterAllocation
+from .forms import FundForm, SourceForm, FundCenterForm, CostCenterForm, CostCenterAllocationForm
 
 
 def fund_page(request):
@@ -117,3 +117,24 @@ def costcenter_update(request, pk):
             return redirect("costcenter-page")
 
     return render(request, "costcenters/costcenter-form.html", {"form": form})
+
+
+def allocation_page(request):
+    data = CostCenterAllocation.objects.all()
+    if data.count() == 0:
+        messages.info(request, "There are no Allocations.")
+    return render(request, "costcenters/allocations-table.html", {"data": data})
+
+
+def allocation_add(request):
+    if request.method == "POST":
+        form = CostCenterAllocationForm(request.POST)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.user = request.user
+            form.save()
+            return redirect("costcenter-allocation-table")
+    else:
+        form = CostCenterAllocationForm
+
+    return render(request, "costcenter/allocation-form.html", {"form": form})

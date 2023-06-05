@@ -519,3 +519,14 @@ class CostCenterAllocationTest(TestCase):
 
         with self.assertRaises(InvalidFiscalYearException):
             allocation.save()
+
+    def test_can_save_POST_request(self):
+        fund = Fund.objects.first()
+        cc = CostCenter.objects.first()
+        self.data["fund"] = fund.id
+        self.data["costcenter"] = cc.id
+        response = self.client.post("/costcenter/allocation-add/", data=self.data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CostCenter.objects.count(), 1)
+        obj = CostCenterAllocation.objects.first()
+        self.assertEqual(self.data["amount"], obj.amount)
