@@ -513,7 +513,7 @@ class CostCenterAllocationTest(TestCase):
         with self.assertRaises(InvalidAllocationException):
             allocation.save()
 
-    def test_save_with_invalide_year(self):
+    def test_save_with_invalid_year(self):
         self.data["fy"] = 2200
         allocation = CostCenterAllocation(**self.data)
 
