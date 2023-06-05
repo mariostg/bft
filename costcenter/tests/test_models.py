@@ -489,5 +489,7 @@ class CostCenterAllocationTest(TestCase):
     def test_save_and_retreive_allocation(self):
         allocation = CostCenterAllocation(**self.data)
 
-        result = allocation.save()
-        print(result)
+        allocation.save()
+
+        saved = CostCenterAllocation.objects.get(id=1)
+        self.assertEqual(100, saved.amount)
