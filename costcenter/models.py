@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 
 from bft.conf import YEAR_CHOICES, QUARTERS
+from bft import exceptions
 
 
 class Fund(models.Model):
@@ -132,10 +133,15 @@ class Allocation(models.Model):
 
     def save(self):
         if self.quarter not in list(zip(*QUARTERS))[0]:
-            raise ValueError(f"Quarter {self.quarter} invalid")
+            raise exceptions.InvalidOptionException(
+                f"Quarter {self.quarter} invalid.  Must be one of {','.join([x[0] for x in QUARTERS])}"
+            )
         if self.amount < 0:
-            raise ValueError("Allocation less than 0 is invalid")
-
+            raise exceptions.InvalidAllocationException("Allocation less than 0 is invalid")
+        if self.fy not in [v[0] for v in YEAR_CHOICES]:
+            raise exceptions.InvalidOptionException(
+                f"Fiscal year {self.fy} invalid, must be one of {','.join([v[1] for v in YEAR_CHOICES])}"
+            )
         return super().save()
 
 

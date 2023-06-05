@@ -9,6 +9,11 @@ from costcenter.models import (
 )
 from django.db import IntegrityError
 from django.db.models import RestrictedError
+from bft.exceptions import (
+    InvalidAllocationException,
+    InvalidOptionException,
+    InvalidFiscalYearException,
+)
 
 FUND_C113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
 SOURCE_1 = {"source": "Kitchen"}
@@ -498,12 +503,19 @@ class CostCenterAllocationTest(TestCase):
         self.data["quarter"] = "Q5"
         allocation = CostCenterAllocation(**self.data)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidOptionException):
             allocation.save()
 
     def test_save_with_negative_allocation(self):
         self.data["amount"] = -1000
         allocation = CostCenterAllocation(**self.data)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidAllocationException):
+            allocation.save()
+
+    def test_save_with_invalide_year(self):
+        self.data["fy"] = 2200
+        allocation = CostCenterAllocation(**self.data)
+
+        with self.assertRaises(InvalidFiscalYearException):
             allocation.save()
