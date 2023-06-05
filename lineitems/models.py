@@ -37,6 +37,10 @@ class LineItem(models.Model):
         verbose_name_plural = "Line Items"
 
     def get_orphan_lines(self):
+        """
+        Compare the docno and lineno combination in both line item table and
+        encumbrance table.
+        """
         lines = set(LineItem.objects.values_list("docno", "lineno"))
         enc = set(EncumbranceImport.objects.values_list("docno", "lineno"))
         orphans = lines.difference(enc)
@@ -44,6 +48,9 @@ class LineItem(models.Model):
         return orphans
 
     def mark_orphan_lines(self, orphans: set):
+        """
+        Set the status of the line item to orphan.
+        """
         self.import_progress("info", "Begin marking orphan lines")
         for o in orphans:
             docno, lineno = o
@@ -59,6 +66,10 @@ class LineItem(models.Model):
         # TODO need to set forecast too.
 
     def insert_line_item(self, ei: EncumbranceImport):
+        """
+        Insert the encumbrance line in line item table.  Such line is set as new in the
+        status field.
+        """
         cc = CostCenter.objects.get(costcenter=ei.costcenter)
         di = model_to_dict(ei)
         di["costcenter"] = cc
@@ -69,6 +80,9 @@ class LineItem(models.Model):
         return target.id
 
     def update_line_item(self, li: "LineItem", ei: EncumbranceImport):
+        """
+        Update line items fields using values from encumbrance line.
+        """
         cc = None
         try:
             cc = CostCenter.objects.get(costcenter=ei.costcenter)
@@ -129,6 +143,12 @@ class LineItem(models.Model):
                 self.insert_line_item(e)
 
     def set_fund_center_integrity(self):
+        """
+        Compare all line items cost center - fund center pair with
+        cost center - fund center pair from cost center table.  When comparison
+        match for a given line, set its fcintegrity to True.  All fcintegrity are
+        set to False to start with.
+        """
         self.import_progress("info", "Fund center integrity check begins.")
         cc = CostCenter.objects.select_related()
         cc_set = set()

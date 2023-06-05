@@ -1,6 +1,9 @@
+from datetime import datetime
 from django.db import models, IntegrityError
 from django.core.exceptions import ValidationError
 from django.conf import settings
+
+from bft.conf import YEAR_CHOICES, QUARTERS
 
 
 class Fund(models.Model):
@@ -101,9 +104,7 @@ class ForecastAdjustment(models.Model):
     fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     note = models.TextField(null=True, blank=True)
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.RESTRICT
-    )
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.RESTRICT)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
 
@@ -113,3 +114,24 @@ class ForecastAdjustment(models.Model):
     class Meta:
         ordering = ["costcenter", "fund"]
         verbose_name_plural = "Forecast Adjustments"
+
+
+class Allocation(models.Model):
+    fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    fy = models.PositiveSmallIntegerField(choices=YEAR_CHOICES, default=datetime.now().year)
+    quarter = models.TextField(max_length=2, choices=QUARTERS, default="Q0")
+    note = models.TextField(null=True, blank=True)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.RESTRICT)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return f"{self.fund} - {self.amount}"
+
+
+class CostCenterAllocation(Allocation):
+    costcenter = models.ForeignKey(CostCenter, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return f"{self.costcenter} - {self.fund} - {self.amount}"
