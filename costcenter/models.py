@@ -139,7 +139,7 @@ class Allocation(models.Model):
         if self.amount < 0:
             raise exceptions.InvalidAllocationException("Allocation less than 0 is invalid")
         if self.fy not in [v[0] for v in YEAR_CHOICES]:
-            raise exceptions.InvalidOptionException(
+            raise exceptions.InvalidFiscalYearException(
                 f"Fiscal year {self.fy} invalid, must be one of {','.join([v[1] for v in YEAR_CHOICES])}"
             )
         return super().save()
