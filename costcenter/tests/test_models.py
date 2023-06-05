@@ -5,6 +5,7 @@ from costcenter.models import (
     Source,
     ForecastAdjustment,
     FundCenter,
+    CostCenterAllocation,
 )
 from django.db import IntegrityError
 from django.db.models import RestrictedError
@@ -428,9 +429,7 @@ class ForecastAdjustmentModelTest(TestCase):
         self.assertEqual(str(obj), "8484WA - Kitchen - C113 - NP - 1000")
 
     def test_verbose_name_plural(self):
-        self.assertEqual(
-            str(ForecastAdjustment._meta.verbose_name_plural), "Forecast Adjustments"
-        )
+        self.assertEqual(str(ForecastAdjustment._meta.verbose_name_plural), "Forecast Adjustments")
 
     def test_can_save_and_retreive_forecast_adjustment(self):
         fund = Fund(**FUND_C113)
@@ -455,3 +454,40 @@ class ForecastAdjustmentModelTest(TestCase):
 
         f_saved = ForecastAdjustment.objects.get(pk=fa.pk)
         self.assertEqual(fa.amount, f_saved.amount)
+
+
+class CostCenterAllocationTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        fund = Fund(**FUND_C113)
+        fund.save()
+        source = Source(**SOURCE_1)
+        source.save()
+        parent = FundCenter(**FC_1111AA)
+        parent.save()
+        cc = CostCenter(**CC_1234FF)
+        cc.fund = fund
+        cc.source = source
+        cc.parent = parent
+        cc.full_clean()
+        cc.save()
+        cls.data = {
+            "costcenter": cc,
+            "fund": fund,
+            "amount": 100,
+            "fy": 2024,
+            "quarter": "Q0",
+        }
+
+    def test_string_representation(self):
+        allocation = CostCenterAllocation(**self.data)
+        self.assertEqual(str(allocation), "1234FF - FOOD AND DRINK - C113 - National Procurement - 2024Q0 100")
+
+    def test_verbose_name_plural(self):
+        self.assertEqual(str(ForecastAdjustment._meta.verbose_name_plural), "Forecast Adjustments")
+
+    def test_save_and_retreive_allocation(self):
+        allocation = CostCenterAllocation(**self.data)
+
+        result = allocation.save()
+        print(result)

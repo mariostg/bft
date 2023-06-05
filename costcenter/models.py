@@ -134,4 +134,7 @@ class CostCenterAllocation(Allocation):
     costcenter = models.ForeignKey(CostCenter, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return f"{self.costcenter} - {self.fund} - {self.amount}"
+        return f"{self.costcenter} - {self.fund} - {self.fy}{self.quarter} {self.amount}"
+
+    class Meta:
+        verbose_name_plural = "Cost Center Allocations"
