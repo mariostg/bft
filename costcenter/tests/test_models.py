@@ -99,6 +99,19 @@ class FundModelTest(TestCase):
         new_fund = Fund.objects.first()
         self.assertEqual(new_fund.fund, "C113")
 
+    def test_can_delete_POST_request(self):
+        data = {
+            "fund": "C999",
+            "name": "National Procurement",
+            "vote": "1",
+            "download": True,
+        }
+        fund = Fund.objects.create(**data)
+
+        response = self.client.post(f"/fund/fund-delete/{fund.id}")
+        self.assertEqual(response.status_code, 302)
+        # TODO Continue this test and implement to other objects.
+
     def test_can_update_fund_column_values(self):
         f0 = Fund(**FUND_C113)
         f0.save()
