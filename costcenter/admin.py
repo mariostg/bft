@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from costcenter.models import Fund, CostCenter, Source, FundCenter
+from costcenter.models import (
+    Fund,
+    CostCenter,
+    Source,
+    FundCenter,
+    CostCenterAllocation,
+)
 
 
 class CostCenterAdmin(admin.ModelAdmin):
@@ -15,7 +21,12 @@ class FundAdmin(admin.ModelAdmin):
     list_display = ("fund", "vote", "name")
 
 
+class CostCenterAllocationAdmin(admin.ModelAdmin):
+    list_display = ("costcenter", "fund", "fy", "quarter", "amount", "owner", "note")
+
+
 admin.site.register(Fund, FundAdmin)
 admin.site.register(CostCenter, CostCenterAdmin)
 admin.site.register(Source)
 admin.site.register(FundCenter, FundCenterAdmin)
+admin.site.register(CostCenterAllocation, CostCenterAllocationAdmin)
