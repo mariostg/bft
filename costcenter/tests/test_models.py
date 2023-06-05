@@ -493,3 +493,17 @@ class CostCenterAllocationTest(TestCase):
 
         saved = CostCenterAllocation.objects.get(id=1)
         self.assertEqual(100, saved.amount)
+
+    def test_save_with_invalid_quarter(self):
+        self.data["quarter"] = "Q5"
+        allocation = CostCenterAllocation(**self.data)
+
+        with self.assertRaises(ValueError):
+            allocation.save()
+
+    def test_save_with_negative_allocation(self):
+        self.data["amount"] = -1000
+        allocation = CostCenterAllocation(**self.data)
+
+        with self.assertRaises(ValueError):
+            allocation.save()

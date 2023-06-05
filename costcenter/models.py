@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Iterable, Optional
 from django.db import models, IntegrityError
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -128,6 +129,14 @@ class Allocation(models.Model):
 
     def __str__(self):
         return f"{self.fund} - {self.amount}"
+
+    def save(self):
+        if self.quarter not in list(zip(*QUARTERS))[0]:
+            raise ValueError(f"Quarter {self.quarter} invalid")
+        if self.amount < 0:
+            raise ValueError("Allocation less than 0 is invalid")
+
+        return super().save()
 
 
 class CostCenterAllocation(Allocation):
