@@ -19,8 +19,8 @@
             <td>{{elem.fundcenter}}</td><td>{{elem.shortname}}<td>{{elem.parent}}</td>
             <td> <a class='btn' href="{% url "fundcenter-costcenters" elem.pk  %}">Cost centers</a></button> </td>
             {% if user.is_authenticated %}
-            <td> <a class='btn'href="{% url "update-fundcenter" elem.id %}">Update</a></button> </td>
-            <td> <a class='btn btn-delete' href="{% url "delete-fundcenter" elem.id %}">Delete</a></button> </td>
+            <td> <a class='btn'href="{% url "fundcenter-update" elem.id %}">Update</a></button> </td>
+            <td> <a class='btn btn-delete' href="{% url "fundcenter-delete" elem.id %}">Delete</a></button> </td>
             {% endif %}
         </tr>
             {% endfor %} 
@@ -28,7 +28,7 @@
         </tbody>
         {% if user.is_authenticated %}
         <tfoot>
-            <tr><td colspan=6><a class='btn' href="{% url 'add-fundcenter' %}">Add Fund Center</a></td></tr>
+            <tr><td colspan=6><a class='btn' href="{% url 'fundcenter-add' %}">Add Fund Center</a></td></tr>
         </tfoot>
         {% endif %}
     </table>

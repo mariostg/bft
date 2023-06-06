@@ -1,7 +1,21 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Fund, Source, FundCenter, CostCenter, CostCenterAllocation
-from .forms import FundForm, SourceForm, FundCenterForm, CostCenterForm, CostCenterAllocationForm
+from .models import (
+    Fund,
+    Source,
+    FundCenter,
+    CostCenter,
+    CostCenterAllocation,
+    ForecastAdjustment,
+)
+from .forms import (
+    FundForm,
+    SourceForm,
+    FundCenterForm,
+    CostCenterForm,
+    CostCenterAllocationForm,
+    ForecastadjustmentForm,
+)
 
 
 def fund_page(request):
@@ -138,3 +152,52 @@ def allocation_add(request):
         form = CostCenterAllocationForm
 
     return render(request, "costcenter/allocation-form.html", {"form": form})
+
+
+def forecast_adjustment_page(request):
+    data = ForecastAdjustment.objects.all()
+    if data.count() == 0:
+        messages.info(request, "There are no forecast adjustment.")
+    context = {"data": data}
+    return render(request, "costcenter/forecast-adjustment-table.html", context)
+
+
+# @login_required
+def forecast_adjustment_add(request):
+    if request.method == "POST":
+        form = ForecastadjustmentForm(request.POST)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.user = request.user
+            form.save()
+            return redirect("forecast-adjustment-table")
+    else:
+        form = ForecastadjustmentForm
+
+    return render(request, "costcenter/forecast-adjustment-form.html", {"form": form})
+
+
+# @login_required
+def forecast_adjustment_update(request, pk):
+    forecastadjustment = ForecastAdjustment.objects.get(id=pk)
+    form = ForecastadjustmentForm(instance=forecastadjustment)
+
+    if request.method == "POST":
+        form = ForecastadjustmentForm(request.POST, instance=forecastadjustment)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.owner = request.user
+            form.save()
+            return redirect("forecast-adjustment-page")
+
+    return render(request, "costcenter/forecast-adjustment-form.html", {"form": form})
+
+
+# @login_required
+def forecast_adjustment_delete(request, pk):
+    item = ForecastAdjustment.objects.get(id=pk)
+    if request.method == "POST":
+        item.delete()
+        return redirect("forecast-adjustment-table")
+    context = {"object": item, "back": "forecast-adjustment-table"}
+    return render(request, "core/delete_object.html", context)

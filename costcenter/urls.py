@@ -31,3 +31,8 @@ urlpatterns += [
     path("allocation-table/", views.allocation_page, name="costcenter-allocation-table"),
     path("allocation-add/", views.allocation_add, name="costcenter-allocation-add"),
 ]
+
+urlpatterns += [
+    path("forecast-adjustment-table", views.forecast_adjustment_page, name="forecast-adjustment-table"),
+    path("forecast-adjustment-add", views.forecast_adjustment_add, name="forecast-adjustment-add"),
+]

@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<main class="block block--centered">
+    <section class="form">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.management_form }}
+            {{ form.errors }}
+            {{ form.non_field_errors }}
+            {{ form.non_form_errors }}
+            <header class='form__header'>Forecast Adjustment</header>
+        <div class='form__fields'>
+            <label for="costcenter" class="label">Cost Element</label> {{form.costcenter}}
+            <label class="label" for="fund">Fund</label> {{form.fund}}
+            <label class="label" for="amount">Amount</label>{{form.amount}}
+            <label class="label" for="note">Note</label>{{form.note}} 
+        </div>
+            <div class="block block--spaced">
+                <button class="btn">Save</button>
+                <button class="btn btn-back">Back</button>
+            </div>
+        </form>
+        <footer class='form__footer'>Created on {{form.instance.created}}. Last edited by {{form.instance.owner}} on  {{form.instance.updated}}</footer>
+    </section>
+</main>
+</body>
+</html>
+
+{% endblock content %}

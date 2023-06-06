@@ -1,6 +1,13 @@
 from django import forms
 
-from costcenter.models import Fund, Source, FundCenter, CostCenter, CostCenterAllocation
+from costcenter.models import (
+    Fund,
+    Source,
+    FundCenter,
+    CostCenter,
+    CostCenterAllocation,
+    ForecastAdjustment,
+)
 
 
 class FundForm(forms.ModelForm):
@@ -74,3 +81,15 @@ class CostCenterAllocationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CostCenterAllocationForm, self).__init__(*args, **kwargs)
+
+
+class ForecastadjustmentForm(forms.ModelForm):
+    class Meta:
+        model = ForecastAdjustment
+        fields = ["costcenter", "fund", "amount", "note"]
+
+    def __init__(self, *args, **kwargs):
+        super(ForecastadjustmentForm, self).__init__(*args, **kwargs)
+
+        self.fields["note"] = forms.CharField(widget=forms.Textarea(attrs={"class": "input"}))
+        self.fields["amount"] = forms.CharField(widget=forms.TextInput(attrs={"class": "input"}))
