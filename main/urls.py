@@ -11,6 +11,7 @@ urlpatterns = [
     path("source/", include("costcenter.urls")),
     path("fundcenter/", include("costcenter.urls")),
     path("costcenter/", include("costcenter.urls")),
+    path("lineitem/", include("lineitems.urls")),
 ]
 
 

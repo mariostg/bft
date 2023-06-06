@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib import messages
 from costcenter.models import CostCenter
 from encumbrance.models import EncumbranceImport
 from django.forms.models import model_to_dict
@@ -164,3 +164,41 @@ class LineItem(models.Model):
                 item.fcintegrity = True
                 item.save()
         self.import_progress("info", "Fund center integrity check completed.")
+
+
+class LineForecast(models.Model):
+    forecastamount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    description = models.CharField(max_length=512, null=True, blank=True)
+    comment = models.CharField(max_length=512, null=True, blank=True)
+    deliverydate = models.DateField(null=True, blank=True)
+    delivered = models.BooleanField(default=False)
+    lineitem = models.OneToOneField(LineItem, on_delete=models.SET_NULL, related_name="fcst", null=True)
+    buyer = models.CharField(max_length=175, null=True, blank=True)  # PWGSC buyer
+    # TODO procurement_officer
+    updated = models.DateTimeField(auto_now=True, null=True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+    status = models.CharField(max_length=10, default="", blank=True, null=True)
+
+    def __str__(self):
+        text = f"{self.forecastamount} - {self.id} -  {self.lineitem.id}"
+        return str(text)
+
+    def validate(self, request, lineitem: LineItem) -> True:
+        print(f"working plan {lineitem.workingplan}, forecast {self.forecastamount}")
+        if lineitem.workingplan < self.forecastamount:
+            messages.warning(
+                request,
+                f"Forecast {self.forecastamount} cannot be higher than working plan {lineitem.workingplan}",
+            )
+            return False
+        if lineitem.spent > self.forecastamount:
+            messages.warning(
+                request,
+                f"Forecast {self.forecastamount} cannot be smaller than spent {lineitem.spent}",
+            )
+            return False
+
+    def save(self, *args, **kwargs):
+        # do_something before()
+        super.save(*args, **kwargs)
+        # do_something_after()

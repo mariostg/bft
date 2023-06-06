@@ -1,0 +1,83 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load humanize %}
+{% load lineitems_tags %}
+
+{% block title %}Line Items{% endblock title %}
+{% block content %}
+<main>
+
+{% include 'lineitems/lineitem-filter-form.html' %}
+
+<section class='lineitems'>
+    <h1>Line Items</h1>
+    {% if not data %}
+    <div>No lines associated to cost center</div>
+    {% endif %}
+
+{% include 'paginator.html' %}
+    
+{% for line in data  %}
+<article class="lineitem">
+    <div class='lineitem__header'> 
+        <div class='padded'>{{line.docno }} - {{line.lineno }} {{line.linetext|default:''}}</div>
+        
+        <div class=''>{{line.fundcenter}} - {{line.costcenter}} - {{line.fund}} : {{line.id}}:{{line.status}}</div> 
+    </div>
+    <div class='lineitem__part'>
+        <div class='padded'>{{line.doctype|default:"" }} {{line.enctype }}</div>
+        <div>Ref.: {{line.reference|default:"" }}</div>
+        <div>{% if line.duedate %} Due date: {{line.duedate}} {%endif%}</div>
+        <div>{% if line.createdby %}Creator: {{line.createdby}} {%endif%}</div>
+    </div>
+    <div class='lineitem__part'>
+        <div class='padded'>GL:{{line.gl}}</div>
+        <div>Vendor: {{line.vendor|default:"" }}</div>
+        <div>{% if line.predecessordocno%} Predecessor: {{line.predecessordocno|default:'' }} {{line.predecessorlineno|default:''}}{% endif %}</div>
+    </div>
+    <div class='lineitem__footer'>
+        <div class='padded'>Spent:{{line.spent|intcomma }}</div>
+        <div>Balance:{{line.balance|intcomma }}</div>
+        <div>Working Plan:{{line.workingplan|intcomma}}</div>
+   
+        {% if not line.fcst.id %} 
+            <a class='btn btn--link-small' href="{% url 'line-forecast-add' line.id%}">Create Forecast</a>
+        {% else %}
+            <div class="quarter 
+                {% if line.fcst.forecastamount < 0%}
+                    negative
+                {% elif line.fcst.forecastamount > line.workingplan%}
+                    hint hint-warning
+                {%endif%}"> 
+
+                Forecast:{{line.fcst.forecastamount|intcomma}}
+            </div>
+        </div>
+
+        <div class="lineitem__nav">
+            <div>Modify Forecast:</div>
+            <div>
+                {% if line.workingplan != line.fcst.forecastamount %}
+                <a class="btn btn--link-small" href="{% url 'update-line-forecast-to-wp' line.fcst.id %}">Set to WP</a>
+                {% endif %}
+
+                {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
+                <a class="btn btn--link-small" href="{% url 'update-line-forecast-zero' line.fcst.id %}">Set to 0</a>
+                {% endif %}
+
+                {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
+                <a class="btn btn--link-small btn-delete" 
+                    href="{% url 'delete-line-forecast' line.fcst.id %}" >Delete</a >
+                {% endif %}
+
+                <a class="btn btn--link-small" href="{% url 'update-line-forecast' line.fcst.id %}">More</a>
+                <a class="btn btn--link-small" href="{% url 'delete-line-item' line.id %}">Delete Line</a>
+            </div>
+        </div>
+        {% endif %}
+
+</article>
+{% endfor %}
+</section>
+</main>
+{% endblock content %}
