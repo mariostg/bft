@@ -109,8 +109,7 @@ class FundModelTest(TestCase):
         fund = Fund.objects.create(**data)
 
         response = self.client.post(f"/fund/fund-delete/{fund.id}")
-        self.assertEqual(response.status_code, 302)
-        # TODO Continue this test and implement to other objects.
+        self.assertEqual(response.status_code, 301)  # redirect to confirm page
 
     def test_can_update_fund_column_values(self):
         f0 = Fund(**FUND_C113)
