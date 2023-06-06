@@ -137,7 +137,7 @@ def allocation_page(request):
     data = CostCenterAllocation.objects.all()
     if data.count() == 0:
         messages.info(request, "There are no Allocations.")
-    return render(request, "costcenters/allocations-table.html", {"data": data})
+    return render(request, "costcenter/allocation-table.html", {"data": data})
 
 
 def allocation_add(request):

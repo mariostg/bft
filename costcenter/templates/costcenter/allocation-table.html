@@ -23,8 +23,8 @@
                     </div>
                     {% if user.is_authenticated %}
                     <div class="summary__footer">
-                        <a class="btn" href="{% url 'update-costcenter-allocation' item.pk%}">Edit</a>
-                        <a class="btn btn-delete" href="{% url 'delete-costcenter-allocation' item.pk %}" >Delete</a >
+                        <a class="btn" href="{% url 'costcenter-allocation-update' item.pk%}">Edit</a>
+                        <a class="btn btn-delete" href="{% url 'costcenter-allocation-delete' item.pk %}" >Delete</a >
                     </div>
                     {% endif %}
                 </section>
@@ -32,7 +32,7 @@
         </main>
         {% if user.is_authenticated %}
         <div class="block block--centered">
-            <a class='btn'  href="{% url 'add-costcenter-allocation' %}">Create Cost Center Allocation</a>
+            <a class='btn'  href="{% url 'costcenter-allocation-add' %}">Create Cost Center Allocation</a>
         </div>
         {% endif %}
     </body>
