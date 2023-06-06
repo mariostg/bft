@@ -1,0 +1,72 @@
+.merge {
+  grid-column: 1/-1; }
+
+.block {
+  padding: 1rem 1rem; }
+  .block--centered {
+    display: grid;
+    justify-content: center; }
+  .block--spaced {
+    display: flex;
+    justify-content: space-around; }
+
+.panel {
+  padding: 1rem 0; }
+
+.frame {
+  padding: 0 1rem; }
+
+.columns {
+  display: grid;
+  column-gap: 1.5rem;
+  padding: 2rem;
+  justify-items: center; }
+
+.rows {
+  display: flex;
+  align-items: center;
+  flex-direction: column; }
+
+.c2 {
+  grid-template-columns: 1fr 1fr; }
+
+.c3 {
+  grid-template-columns: repeat(3, 1fr); }
+
+.c4 {
+  grid-template-columns: repeat(4, 1fr); }
+
+.header {
+  background-color: #4b5544;
+  color: #bec6b8;
+  padding: 1.5rem 1rem; }
+  .header--logo {
+    max-width: 175px; }
+
+.site-header {
+  display: flex;
+  background-color: #4b5544;
+  color: #bec6b8;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 3rem; }
+  .site-header__logo {
+    max-width: 175px; }
+  .site-header__title {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    padding: 0 12rem; }
+
+.footnote {
+  text-align: right;
+  font-size: 1rem; }
+
+@use "../base/colors" as *;
+table caption {
+  font-size: 2.5rem;
+  background-color: #4b5544;
+  color: #f3f3f3; }
+
+table tbody.numbers {
+  text-align: right; }
