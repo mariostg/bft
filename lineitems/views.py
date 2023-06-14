@@ -2,12 +2,17 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.core.paginator import Paginator
+import logging
 from .models import LineItem, LineForecast
 from utils import searchlines
 from .forms import LineForecastForm, SearchLineItemForm
 
+logger = logging.getLogger("django")
+
 
 def lineitem_page(request):
+    logger.info("Visiting Line Item page as info")
+    print("%%%%%%%%%%%%%")
     lines, initial, query_string = searchlines.search_lines(request)
     paginator = Paginator(lines, 25)
     page_number = request.GET.get("page")

@@ -1,8 +1,12 @@
 from django.db import models
 from django.contrib import messages
+import logging
 from costcenter.models import CostCenter
 from encumbrance.models import EncumbranceImport
 from django.forms.models import model_to_dict
+
+
+logger = logging.getLogger("uploadcsv")
 
 
 class LineItem(models.Model):
@@ -44,14 +48,14 @@ class LineItem(models.Model):
         lines = set(LineItem.objects.values_list("docno", "lineno"))
         enc = set(EncumbranceImport.objects.values_list("docno", "lineno"))
         orphans = lines.difference(enc)
-        self.import_progress("info", f"Found {len(orphans)} orphan lines.")
+        logger.info(f"Found {len(orphans)} orphan lines.")
         return orphans
 
     def mark_orphan_lines(self, orphans: set):
         """
         Set the status of the line item to orphan.
         """
-        self.import_progress("info", "Begin marking orphan lines")
+        logger.info("Begin marking orphan lines")
         for o in orphans:
             docno, lineno = o
             try:
@@ -62,7 +66,7 @@ class LineItem(models.Model):
                 li.status = "orphan"
                 li.save()
             except LineItem.DoesNotExist:
-                self.import_progress("error", f"LineItem {docno} - {lineno} does not exist")
+                logger.info(f"LineItem {docno} - {lineno} does not exist")
         # TODO need to set forecast too.
 
     def insert_line_item(self, ei: EncumbranceImport):
@@ -102,24 +106,6 @@ class LineItem(models.Model):
         else:
             return None
 
-    def import_progress(self, status_type, msg):
-        """
-        Keeps a record of messages issued during import lines process.
-        """
-        if status_type not in ("info", "success", "warning", "error"):
-            status_type = "unknown"
-        if not self.status:
-            self.status = []
-
-        self.status.append((status_type, msg))
-
-    def display_import_progress(self):
-        if not self.status:
-            print("Nothing in download progress report.")
-        else:
-            for item in self.status:
-                print(f"[{item[0]}]: {item[1]}")
-
     def import_lines(self):
         """
         import_line function relies on content of encumbrance_import.  It is
@@ -128,13 +114,13 @@ class LineItem(models.Model):
         """
 
         count = LineItem.objects.all().update(status="old")
-        self.import_progress("info", f"Set {count} lines to old.")
+        logger.info(f"Set {count} lines to old.")
 
         orphan = self.get_orphan_lines()
         self.mark_orphan_lines(orphan)
 
         encumbrance = EncumbranceImport.objects.all()
-        self.import_progress("info", f"Retreived {encumbrance.count()} encumbrance lines.")
+        logger.info(f"Retreived {encumbrance.count()} encumbrance lines.")
         for e in encumbrance:
             try:
                 target = LineItem.objects.get(docno=e.docno, lineno=e.lineno)
@@ -149,7 +135,7 @@ class LineItem(models.Model):
         match for a given line, set its fcintegrity to True.  All fcintegrity are
         set to False to start with.
         """
-        self.import_progress("info", "Fund center integrity check begins.")
+        logger.info("Fund center integrity check begins.")
         cc = CostCenter.objects.select_related()
         cc_set = set()
         for c in cc:
@@ -163,7 +149,7 @@ class LineItem(models.Model):
             if t in cc_set:
                 item.fcintegrity = True
                 item.save()
-        self.import_progress("info", "Fund center integrity check completed.")
+        logger.info("Fund center integrity check completed.")
 
 
 class LineForecast(models.Model):

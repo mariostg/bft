@@ -31,6 +31,5 @@ class Command(BaseCommand):
                 li = LineItem()
                 li.import_lines()
                 li.set_fund_center_integrity()
-                li.display_import_progress()
         else:
             self.stdout.write(f"{rawtextfile} not found")

@@ -9,3 +9,6 @@ encumbrance.csv
 .coverage
 htmlcov/
 .DS_Store
+
+#log files
+*.log
