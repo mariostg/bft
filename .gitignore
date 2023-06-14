@@ -8,3 +8,4 @@ __pycache__
 encumbrance.csv
 .coverage
 htmlcov/
+.DS_Store
