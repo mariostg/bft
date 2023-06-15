@@ -352,7 +352,7 @@ class CostCenterModelTest(TestCase):
         cc.full_clean()
         cc.save()
 
-        saved = CostCenter.objects.get(pk=cc.pk)
+        saved = CostCenter.objects.cost_center(cc.costcenter)
         self.assertEqual(cc.costcenter.upper(), saved.costcenter)
         self.assertEqual(cc.shortname.upper(), saved.shortname)
 
@@ -394,7 +394,7 @@ class CostCenterModelTest(TestCase):
         f1.shortname = "new shortname"
         f1.save()
 
-        f2 = CostCenter.objects.get(pk=f1.pk)
+        f2 = CostCenter.objects.cost_center(f1.costcenter)
         self.assertEqual(f1.shortname.upper(), f2.shortname)
 
     def test_can_delete_cost_center(self):
@@ -410,7 +410,7 @@ class CostCenterModelTest(TestCase):
         f0.parent = parent
         f0.save()
 
-        f1 = CostCenter.objects.get(pk=f0.pk)
+        f1 = CostCenter.objects.cost_center(f0.costcenter)
         f1.delete()
 
         self.assertEqual(0, CostCenter.objects.count())
