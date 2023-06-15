@@ -71,7 +71,9 @@
                 {% endif %}
 
                 <a class="btn btn--link-small" href="{% url 'line-forecast-update' line.fcst.id %}">More</a>
+                {% if line.workingplan == 0 %}
                 <a class="btn btn--link-small" href="{% url 'line-item-delete' line.id %}">Delete Line</a>
+                {% endif %}
             </div>
         </div>
         {% endif %}
