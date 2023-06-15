@@ -9,3 +9,9 @@ class CostCenterPageTest(TestCase):
     def test_view_uses_correct_template(self):
         response = self.client.get("/costcenter/costcenter-table/")
         self.assertTemplateUsed(response, "costcenter/costcenter-table.html")
+
+
+class CostCenterUpdateTest(TestCase):
+    def test_url_is_good(self):
+        response = self.client.get("/costcenter/costcenter-update/1")
+        self.assertEqual(200, response.status_code)
