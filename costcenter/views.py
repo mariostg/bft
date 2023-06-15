@@ -121,7 +121,7 @@ def costcenter_add(request):
 
 
 def costcenter_update(request, pk):
-    costcenter = CostCenter.objects.get(id=pk)
+    costcenter = CostCenter.objects.pk(pk=pk)
     form = CostCenterForm(instance=costcenter)
 
     if request.method == "POST":
@@ -130,7 +130,7 @@ def costcenter_update(request, pk):
             form.save()
             return redirect("costcenter-page")
 
-    return render(request, "costcenters/costcenter-form.html", {"form": form})
+    return render(request, "costcenter/costcenter-form.html", {"form": form})
 
 
 def allocation_page(request):
