@@ -1,6 +1,4 @@
 from django.test import Client, TestCase
-from django.urls import reverse
-from encumbrance.models import EncumbranceImport, Encumbrance
 
 from encumbrance.management.commands.uploadcsv import Command
 import encumbrance.management.commands.populate as populate
@@ -34,4 +32,4 @@ class CostCenterLineItemTest(TestCase):
         c = Client()
         response = c.get("/lineitem/costcenter/8486B1/")
         self.assertEqual(200, response.status_code)
-        self.assertEqual(len(response.context["lines"]), 5)
+        self.assertEqual(len(response.context["data"]), 5)
