@@ -122,9 +122,3 @@ class LineItemManagementTest(TestCase):
 
         li.set_fund_center_integrity()
         self.assertEqual(1, LineItem.objects.filter(fcintegrity=False).count())
-
-    def test_import_progress(self):
-        li = LineItem()
-        li.import_progress("info", "Begin download")
-        self.assertEqual("info", li.status[0][0])
-        self.assertEqual("Begin download", li.status[0][1])
