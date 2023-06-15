@@ -73,6 +73,16 @@ class FundCenter(models.Model):
         super(FundCenter, self).save(*args, **kwargs)
 
 
+class CostCenterManager(models.Manager):
+    def cost_center(self, costcenter: str):
+        costcenter = costcenter.upper()
+        try:
+            cc = CostCenter.objects.get(costcenter=costcenter)
+        except CostCenter.DoesNotExist:
+            return None
+        return cc
+
+
 class CostCenter(models.Model):
     costcenter = models.CharField(max_length=6, unique=True)
     shortname = models.CharField(max_length=35, blank=True, null=True)
@@ -87,6 +97,8 @@ class CostCenter(models.Model):
         default="0",
         related_name="children",
     )
+
+    objects = CostCenterManager()
 
     def __str__(self):
         return f"{self.costcenter.upper()} - {self.shortname}"

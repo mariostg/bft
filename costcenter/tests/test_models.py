@@ -333,7 +333,7 @@ class CostCenterModelTest(TestCase):
         # cc.full_clean()
         cc.save()
 
-        saved_cc = CostCenter.objects.get(pk=cc.pk)
+        saved_cc = CostCenter.objects.cost_center(cc.costcenter)
         self.assertEqual(CC_1234FF["costcenter"].upper(), saved_cc.costcenter)
 
     def test_saved_cost_center_as_uppercase(self):
