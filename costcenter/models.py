@@ -82,6 +82,13 @@ class CostCenterManager(models.Manager):
             return None
         return cc
 
+    def pk(self, pk: int):
+        try:
+            cc = CostCenter.objects.get(pk=pk)
+        except CostCenter.DoesNotExist:
+            return None
+        return cc
+
 
 class CostCenter(models.Model):
     costcenter = models.CharField(max_length=6, unique=True)
