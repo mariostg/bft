@@ -58,20 +58,20 @@
             <div>Modify Forecast:</div>
             <div>
                 {% if line.workingplan != line.fcst.forecastamount %}
-                <a class="btn btn--link-small" href="{% url 'update-line-forecast-to-wp' line.fcst.id %}">Set to WP</a>
+                <a class="btn btn--link-small" href="{% url 'line-forecast-to-wp-update' line.fcst.id %}">Set to WP</a>
                 {% endif %}
 
                 {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
-                <a class="btn btn--link-small" href="{% url 'update-line-forecast-zero' line.fcst.id %}">Set to 0</a>
+                <a class="btn btn--link-small" href="{% url 'line-forecast-zero-update' line.fcst.id %}">Set to 0</a>
                 {% endif %}
 
                 {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
                 <a class="btn btn--link-small btn-delete" 
-                    href="{% url 'delete-line-forecast' line.fcst.id %}" >Delete</a >
+                    href="{% url 'line-forecast-delete' line.fcst.id %}" >Delete</a >
                 {% endif %}
 
-                <a class="btn btn--link-small" href="{% url 'update-line-forecast' line.fcst.id %}">More</a>
-                <a class="btn btn--link-small" href="{% url 'delete-line-item' line.id %}">Delete Line</a>
+                <a class="btn btn--link-small" href="{% url 'line-forecast-update' line.fcst.id %}">More</a>
+                <a class="btn btn--link-small" href="{% url 'line-item-delete' line.id %}">Delete Line</a>
             </div>
         </div>
         {% endif %}

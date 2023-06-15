@@ -39,7 +39,7 @@ def line_forecast_add(request, pk):
             else:
                 messages.success(request, "Forecast created")
             line_forecast.save()
-            return redirect("lineitem-table")
+            return redirect("lineitem-page")
     else:
         form = LineForecastForm()
     return render(
@@ -47,3 +47,78 @@ def line_forecast_add(request, pk):
         "lineitems/line-forecast-form.html",
         {"form": form, "lineitem": lineitem},
     )
+
+
+def line_forecast_update(request, pk):
+    data = get_object_or_404(LineForecast, pk=pk)
+    working_plan = data.lineitem.workingplan
+    spent = data.lineitem.spent
+    form = LineForecastForm(instance=data)
+    if request.method == "POST":
+        form = LineForecastForm(request.POST, instance=data)
+        if form.is_valid():
+            form = form.save(commit=False)
+            forecast_amount = form.forecastamount
+            if form.forecastamount < spent:
+                messages.warning(
+                    request,
+                    f"Forecast {forecast_amount}  cannot be lower than Spent {spent}. Forecast set to {spent}",
+                )
+                form.forecastamount = spent
+            elif form.forecastamount > working_plan:
+                messages.warning(
+                    request,
+                    f"Forecast {forecast_amount} cannot be higher than working plan {working_plan}.  Forecast set to {working_plan}.",
+                )
+                form.forecastamount = working_plan
+            else:
+                messages.success(request, "Forecast has been updated")
+                # form.owner = request.user
+            form.save()
+            return redirect("lineitem-page")
+
+    return render(request, "lineitems/line-forecast-form.html", {"form": form})
+
+
+def line_forecast_to_wp_update(request, pk):
+    if request.method == "GET":
+        target = LineForecast.objects.get(pk=pk)
+        target.forecastamount = target.lineitem.workingplan
+        target.save()
+        messages.info(request, "Forecast set to working plan amount")
+    return redirect("lineitem-page")
+
+
+def line_forecast_zero_update(request, pk):
+    if request.method == "GET":
+        target = LineForecast.objects.get(pk=pk)
+        if target.lineitem.spent > 0:
+            messages.warning(request, "Cannot set forecast to 0 when Spent is greater than 0")
+        else:
+            target.forecastamount = 0
+            target.save()
+            messages.success(request, "Forecast has been set to 0")
+    return redirect("lineitem-page")
+
+
+def line_forecast_delete(request, pk):
+    target = LineForecast.objects.get(pk=pk)
+
+    if request.method == "POST":
+        if target.lineitem.spent > 0:
+            messages.warning(request, "Cannot delete forecast when Spent is greater than 0")
+        else:
+            messages.success(request, "Forecast has been deleted")
+            target.delete()
+        return redirect("lineitem-page")
+    context = {"object": "Forecast for " + target.lineitem.linetext, "back": "lineitem-page"}
+    return render(request, "core/delete-object.html", context)
+
+
+def line_item_delete(request, pk):
+    target = LineItem.objects.get(pk=pk)
+    if target.createdby == request.user:
+        print(f"This is the current user {request.user}.  Owner is {target.createdby}")
+    else:
+        messages.warning(request, "Only owner can delete a line item.")
+    return redirect("lineitem-page")

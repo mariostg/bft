@@ -21,7 +21,7 @@
 
     <div class="block block--spaced">
       <a class="btn btn--link" href="{% url 'costcenter-table' %}">Cost Centers</a>
-      <a class="btn btn--link" href="{% url 'lineitems' %}">Line Items</a>
+      <a class="btn btn--link" href="{% url 'lineitem-page' %}">Line Items</a>
       <a class="btn btn--link" href="{% url 'forecast-adjustment-table' %}">Forecast Adjustments</a>
       {% if user.is_authenticated %}
       <a class="btn btn--link" href="/users/account/">Account</a>

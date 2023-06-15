@@ -184,7 +184,7 @@ class LineForecast(models.Model):
             )
             return False
 
-    def save(self, *args, **kwargs):
-        # do_something before()
-        super.save(*args, **kwargs)
-        # do_something_after()
+    # def save(self, *args, **kwargs):
+    # do_something before()
+    # super.save(*args, **kwargs)
+    # do_something_after()
