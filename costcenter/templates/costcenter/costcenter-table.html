@@ -13,7 +13,7 @@
             <span>{{elem.source}}</span>
                 <span class= {% if elem.isforecastable %} nofreeze> {%else%} freeze> Not{%endif%} Forecastable</span>
                 <span class= {% if elem.isupdatable %} nofreeze> {%else%} freeze> Not {%endif%} Updatable</span>
-                {% comment %} <a class='btn btn--link' href="{% url 'costcenter-lineitems' elem.costcenter %}">Lines</a> {% endcomment %}
+                <a class='btn btn--link' href="{% url 'costcenter-lineitems' elem.costcenter %}">Lines</a>
         </div>
         <div class="summary__body">
             {{elem.note}}

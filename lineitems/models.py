@@ -9,6 +9,16 @@ from django.forms.models import model_to_dict
 logger = logging.getLogger("uploadcsv")
 
 
+class LineItemManager(models.Manager):
+    def cost_center(self, costcenter: str):
+        costcenter = costcenter.upper()
+        try:
+            cc = CostCenter.objects.get(costcenter=costcenter)
+        except CostCenter.DoesNotExist:
+            return None
+        return self.filter(costcenter=cc)
+
+
 class LineItem(models.Model):
     docno = models.CharField(max_length=10)
     lineno = models.CharField(max_length=7)  # lineno : acctassno
@@ -31,6 +41,9 @@ class LineItem(models.Model):
     createdby = models.CharField(max_length=50, null=True, blank=True, default="")
     status = models.CharField(max_length=10, null=True, blank=True, default="")
     fcintegrity = models.BooleanField(default=False)
+
+    # lineitem = models.Manager()
+    objects = LineItemManager()
 
     def __str__(self):
         text = f"{self.enctype} {self.docno}-{self.lineno}"

@@ -2,7 +2,30 @@ from django.test import TestCase
 
 from lineitems.models import LineItem
 from encumbrance.models import EncumbranceImport, Encumbrance
-from encumbrance.management.commands import populate
+from encumbrance.management.commands.uploadcsv import Command
+import encumbrance.management.commands.populate as populate
+
+
+class LineItemManagerTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        print("Setting up")
+        filldata = populate.Command()
+        filldata.handle()
+        a = Command()
+        a.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+
+    def test_get_line_items_when_cost_center_exists(self):
+        from costcenter.models import CostCenter
+
+        li = LineItem.objects.cost_center("8486C1")
+        self.assertGreater(li.count(), 0)
+
+    def test_get_line_items_when_cost_center_not_exists(self):
+        from costcenter.models import CostCenter
+
+        li = LineItem.objects.cost_center("0000C1")
+        self.assertIsNone(li)
 
 
 class LineItemModelTest(TestCase):
@@ -16,7 +39,7 @@ class LineItemModelTest(TestCase):
     def test_number_of_fields(self):
         obj = LineItem()
         c = obj._meta.get_fields()
-        self.assertEqual(21, len(c))
+        self.assertEqual(23, len(c))
 
 
 class LineItemImportTest(TestCase):
