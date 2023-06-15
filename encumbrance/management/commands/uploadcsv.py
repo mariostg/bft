@@ -18,14 +18,14 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "encumbrance-file",
+            "encumbrancefile",
             type=str,
             help="Encumbrance report full path",
         )
 
     def handle(self, *args, **options):
         EncumbranceImport.objects.all().delete()
-        rawtextfile = options["encumbrance-file"]
+        rawtextfile = options["encumbrancefile"]
 
         if os.path.exists(rawtextfile):
             logger.info("-- BFT Download starts")
