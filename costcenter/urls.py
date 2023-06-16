@@ -14,8 +14,8 @@ urlpatterns += [
 urlpatterns += [
     path("source-table/", views.source_page, name="source-table"),
     path("source-add/", views.source_add, name="source-add"),
-    path("sources-update/<int:pk>/", views.source_update, name="source-update"),
-    path("sources-delete/<int:pk>", views.source_delete, name="source-delete"),
+    path("source-update/<int:pk>/", views.source_update, name="source-update"),
+    path("source-delete/<int:pk>", views.source_delete, name="source-delete"),
 ]
 
 urlpatterns += [
