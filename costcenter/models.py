@@ -76,6 +76,22 @@ class Source(models.Model):
     objects = SourceManager()
 
 
+class FundCenterManager(models.Manager):
+    def fundcenter(self, fundcenter: str):
+        try:
+            obj = FundCenter.objects.get(fundcenter__iexact=fundcenter)
+        except FundCenter.DoesNotExist:
+            return None
+        return obj
+
+    def pk(self, pk: int):
+        try:
+            obj = FundCenter.objects.get(pk=pk)
+        except FundCenter.DoesNotExist:
+            return None
+        return obj
+
+
 class FundCenter(models.Model):
     fundcenter = models.CharField(max_length=6, unique=True)
     shortname = models.CharField(max_length=25, null=True, blank=True)
@@ -87,6 +103,8 @@ class FundCenter(models.Model):
         default=None,
         related_name="parent_fc",
     )
+
+    objects = FundCenterManager()
 
     def __str__(self):
         return f"{self.fundcenter.upper()} - {self.shortname.upper()}"
