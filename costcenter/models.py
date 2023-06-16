@@ -26,6 +26,22 @@ class Fund(models.Model):
         super(Fund, self).save(*args, **kwargs)
 
 
+class SourceManager(models.Manager):
+    def source(self, source: str):
+        try:
+            obj = Source.objects.get(source__iexact=source)
+        except Source.DoesNotExist:
+            return None
+        return obj
+
+    def pk(self, pk: int):
+        try:
+            obj = Source.objects.get(pk=pk)
+        except Source.DoesNotExist:
+            return None
+        return obj
+
+
 class Source(models.Model):
     source = models.CharField(max_length=24, unique=True)
 
@@ -38,6 +54,8 @@ class Source(models.Model):
     def save(self, *args, **kwargs):
         self.source = self.source.capitalize()
         super(Source, self).save(*args, **kwargs)
+
+    objects = SourceManager()
 
 
 class FundCenter(models.Model):
