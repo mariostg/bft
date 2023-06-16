@@ -84,7 +84,7 @@ class FundCenter(models.Model):
         on_delete=models.RESTRICT,
         null=True,
         blank=True,
-        default="",
+        default=None,
         related_name="parent_fc",
     )
 
@@ -105,7 +105,8 @@ class FundCenter(models.Model):
             raise IntegrityError("Children Fund center cannot assign itself as parent")
         self.validate_unique()
         self.fundcenter = self.fundcenter.upper()
-        self.shortname = self.shortname.upper()
+        if self.shortname:
+            self.shortname = self.shortname.upper()
         super(FundCenter, self).save(*args, **kwargs)
 
 
