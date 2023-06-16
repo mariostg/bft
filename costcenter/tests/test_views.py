@@ -16,6 +16,20 @@ class CostCenterPageTest(TestCase):
         self.assertTemplateUsed(response, "costcenter/costcenter-table.html")
 
 
+class CostCenterAddTest(TestCase):
+    def test_url_is_good(self):
+        response = self.client.get("/costcenter/costcenter-add/")
+        self.assertEqual(200, response.status_code)
+
+    def test_url_by_name(self):
+        response = self.client.get(reverse("costcenter-add"))
+        self.assertEqual(200, response.status_code)
+
+    def test_view_uses_correct_template(self):
+        response = self.client.get(reverse("costcenter-add"))
+        self.assertTemplateUsed(response, "costcenter/costcenter-form.html")
+
+
 class CostCenterUpdateTest(TestCase):
     def test_url_is_good(self):
         response = self.client.get("/costcenter/costcenter-update/1")
