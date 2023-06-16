@@ -1,5 +1,22 @@
 from django.test import TestCase
-from costcenter.models import Source
+from costcenter.models import Source, Fund
+
+
+class FundManagerTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        obj = Fund.objects.create(fund="C111", name="Big fund", vote=1, download=True)
+        cls.pk = obj.pk
+
+    def test_get_by_name(self):
+        obj = Fund.objects.fund("C111")
+        print(obj)
+        self.assertEqual("C111", obj.fund)
+
+    def test_get_by_pk(self):
+        obj = Fund.objects.pk(self.pk)
+
+        self.assertEqual(obj.pk, self.pk)
 
 
 class SourceManagerTest(TestCase):

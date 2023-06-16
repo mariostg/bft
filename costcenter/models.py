@@ -8,6 +8,22 @@ from bft.conf import YEAR_CHOICES, QUARTERS
 from bft import exceptions
 
 
+class FundManager(models.Manager):
+    def fund(self, fund: str):
+        try:
+            obj = Fund.objects.get(fund__iexact=fund)
+        except Fund.DoesNotExist:
+            return None
+        return obj
+
+    def pk(self, pk: int):
+        try:
+            obj = Fund.objects.get(pk=pk)
+        except Fund.DoesNotExist:
+            return None
+        return obj
+
+
 class Fund(models.Model):
     fund = models.CharField(max_length=4, unique=True)
     name = models.CharField(max_length=30)
@@ -24,6 +40,8 @@ class Fund(models.Model):
     def save(self, *args, **kwargs):
         self.fund = self.fund.upper()
         super(Fund, self).save(*args, **kwargs)
+
+    objects = FundManager()
 
 
 class SourceManager(models.Manager):
