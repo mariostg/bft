@@ -30,6 +30,11 @@ class CostCenterUpdateTest(TestCase):
         self.assertTemplateUsed(response, "costcenter/costcenter-table.html")
 
 
+"""
+Testing Source urls and templates.
+"""
+
+
 class SourcePageTest(TestCase):
     def test_url_is_good(self):
         response = self.client.get("/costcenter/source-table/")
@@ -58,7 +63,29 @@ class SourceAddTest(TestCase):
         self.assertTemplateUsed(response, "costcenter/source-form.html")
 
 
-# class sourceUpdateTest(TestCase):
-#     def test_url_is_good(self):
-#         response = self.client.get("/costcenter/source-update/1/")
-#         self.assertEqual(200, response.status_code)
+class SourceUpdateTest(TestCase):
+    def test_url_is_good(self):
+        response = self.client.get("/costcenter/source-update/1/")
+        self.assertEqual(200, response.status_code)
+
+    def test_url_by_name(self):
+        response = self.client.get(reverse("source-update", args=[1]))
+        self.assertEqual(200, response.status_code)
+
+    def test_view_uses_correct_template(self):
+        response = self.client.get(reverse("source-update", args=[1]))
+        self.assertTemplateUsed(response, "costcenter/source-form.html")
+
+
+class SourceDeleteTest(TestCase):
+    def test_url_is_good(self):
+        response = self.client.get("/costcenter/source-delete/1/")
+        self.assertEqual(200, response.status_code)
+
+    def test_url_by_name(self):
+        response = self.client.get(reverse("source-delete", args=[1]))
+        self.assertEqual(200, response.status_code)
+
+    def test_view_uses_correct_template(self):
+        response = self.client.get(reverse("source-delete", args=[1]))
+        self.assertTemplateUsed(response, "core/delete-object.html")

@@ -81,7 +81,7 @@ def source_add(request):
 
 
 def source_update(request, pk):
-    source = Source.objects.get(id=pk)
+    source = Source.objects.pk(pk)
     form = SourceForm(instance=source)
 
     if request.method == "POST":
@@ -94,7 +94,7 @@ def source_update(request, pk):
 
 
 def source_delete(request, pk):
-    source = Source.objects.get(id=pk)
+    source = Source.objects.pk(pk)
     if request.method == "POST":
         source.delete()
         return redirect("source-table")
