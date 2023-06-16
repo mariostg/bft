@@ -171,7 +171,8 @@ class CostCenter(models.Model):
 
     def save(self, *args, **kwargs):
         self.costcenter = self.costcenter.upper()
-        self.shortname = self.shortname.upper()
+        if self.shortname:
+            self.shortname = self.shortname.upper()
         super().save(*args, **kwargs)
 
 

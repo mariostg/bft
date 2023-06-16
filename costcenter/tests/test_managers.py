@@ -2,6 +2,25 @@ from django.test import TestCase
 from costcenter.models import CostCenter, Fund, FundCenter, Source
 
 
+class CostCenterManagerTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        fc = FundCenter.objects.create(fundcenter="2184QQ", parent=None)
+        fund = Fund.objects.create(fund="C111", name="Big fund", vote=1, download=True)
+        s = Source.objects.create(source="La source")
+        obj = CostCenter.objects.create(costcenter="8486AA", fund=fund, parent=fc, source=s)
+        cls.pk = obj.pk
+
+    def test_get_by_costcenter(self):
+        obj = CostCenter.objects.cost_center("8486AA")
+        self.assertEqual("8486AA", obj.costcenter)
+
+    def test_get_by_pk(self):
+        obj = CostCenter.objects.pk(self.pk)
+
+        self.assertEqual(obj.pk, self.pk)
+
+
 class FundCenterManagerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
