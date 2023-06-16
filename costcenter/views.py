@@ -82,7 +82,12 @@ def source_add(request):
 
 def fundcenter_page(request):
     data = FundCenter.objects.all()
-    return render(request, "costcenter/fundcenter-table.html", context={"data": data})
+    return render(request, "costcenter/fundcenter-table.html", context={"fundcenters": data})
+
+
+def fundcenter_costcenters(request, pk):
+    data = CostCenter.objects.filter(parent=pk)
+    return render(request, "costcenter/costcenter-table.html", {"data": data})
 
 
 def fundcenter_add(request):
