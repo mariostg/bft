@@ -113,15 +113,9 @@ class FundCenter(models.Model):
         ordering = ["fundcenter"]
         verbose_name_plural = "Fund Centers"
 
-    def validate_unique(self, exclude=None):
-        qs = FundCenter.objects.filter(fundcenter=self.fundcenter).exists()
-        if qs:
-            raise ValidationError("Fund center must be unique.")
-
     def save(self, *args, **kwargs):
         if self.parent and self.fundcenter == self.parent.fundcenter:
             raise IntegrityError("Children Fund center cannot assign itself as parent")
-        self.validate_unique()
         self.fundcenter = self.fundcenter.upper()
         if self.shortname:
             self.shortname = self.shortname.upper()

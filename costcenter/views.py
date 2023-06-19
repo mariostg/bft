@@ -128,6 +128,30 @@ def fundcenter_add(request):
     return render(request, "costcenter/fundcenter-form.html", {"form": form})
 
 
+def fundcenter_update(request, pk):
+    fundcenter = FundCenter.objects.get(id=pk)
+    form = FundCenterForm(instance=fundcenter)
+
+    if request.method == "POST":
+        form = FundCenterForm(request.POST, instance=fundcenter)
+        if form.is_valid():
+            form.save()
+            # obj.fundcenter = obj.fundcenter.upper()
+            return redirect("fundcenter-table")
+        else:
+            print("NOT VALID")
+    return render(request, "costcenter/fundcenter-form.html", {"form": form})
+
+
+def fundcenter_delete(request, pk):
+    fundcenter = FundCenter.objects.get(id=pk)
+    if request.method == "POST":
+        fundcenter.delete()
+        return redirect("fundcenter-table")
+    context = {"object": fundcenter, "back": "fundcenter-table"}
+    return render(request, "core/delete-object.html", context)
+
+
 def costcenter_page(request):
     data = CostCenter.objects.all()
     return render(request, "costcenter/costcenter-table.html", context={"data": data})
