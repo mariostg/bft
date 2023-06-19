@@ -14,10 +14,12 @@ urlpatterns += [
 urlpatterns += [
     path("source-table/", views.source_page, name="source-table"),
     path("source-add/", views.source_add, name="source-add"),
-    path("source-update/<int:pk>", views.source_update, name="source-update"),
+    path("source-update/<int:pk>/", views.source_update, name="source-update"),
+    path("source-delete/<int:pk>/", views.source_delete, name="source-delete"),
 ]
 
 urlpatterns += [
+    path("fundcenter/<int:pk>/costcenters/", views.fundcenter_costcenters, name="fundcenter-costcenters"),
     path("fundcenter-table/", views.fundcenter_page, name="fundcenter-table"),
     path("fundcenter-add/", views.fundcenter_add, name="fundcenter-add"),
 ]

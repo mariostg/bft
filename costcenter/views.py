@@ -64,6 +64,7 @@ def fund_delete(request, pk):
 def source_page(request):
     data = Source.objects.all()
     return render(request, "costcenter/source-table.html", context={"sources": data})
+    return render(request, "costcenter/source-table.html", context={"sources": data})
 
 
 def source_add(request):
@@ -80,22 +81,36 @@ def source_add(request):
     return render(request, "costcenter/source-form.html", {"form": form})
 
 
-def update_source(request, pk):
-    source = Source.objects.get(id=pk)
+def source_update(request, pk):
+    source = Source.objects.pk(pk)
     form = SourceForm(instance=source)
 
     if request.method == "POST":
         form = SourceForm(request.POST, instance=source)
         if form.is_valid():
             form.save()
-            return redirect("sources")
+            return redirect("source-table")
 
-    return render(request, "costcenters/source_form.html", {"form": form})
+    return render(request, "costcenter/source-form.html", {"form": form})
+
+
+def source_delete(request, pk):
+    source = Source.objects.pk(pk)
+    if request.method == "POST":
+        source.delete()
+        return redirect("source-table")
+    context = {"object": source, "back": "source-table"}
+    return render(request, "core/delete-object.html", context)
 
 
 def fundcenter_page(request):
     data = FundCenter.objects.all()
-    return render(request, "costcenter/fundcenter-table.html", context={"data": data})
+    return render(request, "costcenter/fundcenter-table.html", context={"fundcenters": data})
+
+
+def fundcenter_costcenters(request, pk):
+    data = CostCenter.objects.filter(parent=pk)
+    return render(request, "costcenter/costcenter-table.html", {"data": data})
 
 
 def fundcenter_add(request):

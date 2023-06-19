@@ -8,6 +8,22 @@ from bft.conf import YEAR_CHOICES, QUARTERS
 from bft import exceptions
 
 
+class FundManager(models.Manager):
+    def fund(self, fund: str):
+        try:
+            obj = Fund.objects.get(fund__iexact=fund)
+        except Fund.DoesNotExist:
+            return None
+        return obj
+
+    def pk(self, pk: int):
+        try:
+            obj = Fund.objects.get(pk=pk)
+        except Fund.DoesNotExist:
+            return None
+        return obj
+
+
 class Fund(models.Model):
     fund = models.CharField(max_length=4, unique=True)
     name = models.CharField(max_length=30)
@@ -25,6 +41,24 @@ class Fund(models.Model):
         self.fund = self.fund.upper()
         super(Fund, self).save(*args, **kwargs)
 
+    objects = FundManager()
+
+
+class SourceManager(models.Manager):
+    def source(self, source: str):
+        try:
+            obj = Source.objects.get(source__iexact=source)
+        except Source.DoesNotExist:
+            return None
+        return obj
+
+    def pk(self, pk: int):
+        try:
+            obj = Source.objects.get(pk=pk)
+        except Source.DoesNotExist:
+            return None
+        return obj
+
 
 class Source(models.Model):
     source = models.CharField(max_length=24, unique=True)
@@ -39,6 +73,24 @@ class Source(models.Model):
         self.source = self.source.capitalize()
         super(Source, self).save(*args, **kwargs)
 
+    objects = SourceManager()
+
+
+class FundCenterManager(models.Manager):
+    def fundcenter(self, fundcenter: str):
+        try:
+            obj = FundCenter.objects.get(fundcenter__iexact=fundcenter)
+        except FundCenter.DoesNotExist:
+            return None
+        return obj
+
+    def pk(self, pk: int):
+        try:
+            obj = FundCenter.objects.get(pk=pk)
+        except FundCenter.DoesNotExist:
+            return None
+        return obj
+
 
 class FundCenter(models.Model):
     fundcenter = models.CharField(max_length=6, unique=True)
@@ -48,9 +100,11 @@ class FundCenter(models.Model):
         on_delete=models.RESTRICT,
         null=True,
         blank=True,
-        default="",
+        default=None,
         related_name="parent_fc",
     )
+
+    objects = FundCenterManager()
 
     def __str__(self):
         return f"{self.fundcenter.upper()} - {self.shortname.upper()}"
@@ -69,7 +123,8 @@ class FundCenter(models.Model):
             raise IntegrityError("Children Fund center cannot assign itself as parent")
         self.validate_unique()
         self.fundcenter = self.fundcenter.upper()
-        self.shortname = self.shortname.upper()
+        if self.shortname:
+            self.shortname = self.shortname.upper()
         super(FundCenter, self).save(*args, **kwargs)
 
 
@@ -116,7 +171,8 @@ class CostCenter(models.Model):
 
     def save(self, *args, **kwargs):
         self.costcenter = self.costcenter.upper()
-        self.shortname = self.shortname.upper()
+        if self.shortname:
+            self.shortname = self.shortname.upper()
         super().save(*args, **kwargs)
 
 
