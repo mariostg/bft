@@ -63,7 +63,7 @@ def fund_delete(request, pk):
 
 def source_page(request):
     data = Source.objects.all()
-    return render(request, "costcenter/source-table.html", context={"data": data})
+    return render(request, "costcenter/source-table.html", context={"sources": data})
 
 
 def source_add(request):
@@ -78,6 +78,19 @@ def source_add(request):
         form = SourceForm
 
     return render(request, "costcenter/source-form.html", {"form": form})
+
+
+def update_source(request, pk):
+    source = Source.objects.get(id=pk)
+    form = SourceForm(instance=source)
+
+    if request.method == "POST":
+        form = SourceForm(request.POST, instance=source)
+        if form.is_valid():
+            form.save()
+            return redirect("sources")
+
+    return render(request, "costcenters/source_form.html", {"form": form})
 
 
 def fundcenter_page(request):
