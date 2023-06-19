@@ -34,8 +34,14 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    path("allocation-table/", views.allocation_page, name="costcenter-allocation-table"),
-    path("allocation-add/", views.allocation_add, name="costcenter-allocation-add"),
+    path("costcenter-allocation-table/", views.costcenter_allocation_page, name="costcenter-allocation-table"),
+    path("costcenter-allocation-add/", views.costcenter_allocation_add, name="costcenter-allocation-add"),
+    path(
+        "costcenter-allocation-update/<int:pk>", views.costcenter_allocation_update, name="costcenter-allocation-update"
+    ),
+    path(
+        "costcenter-allocation-delete/<int:pk>", views.costcenter_allocation_delete, name="costcenter-allocation-delete"
+    ),
 ]
 
 urlpatterns += [

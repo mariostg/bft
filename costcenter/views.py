@@ -201,14 +201,14 @@ def costcenter_delete(request, pk):
     return render(request, "core/delete-object.html", context)
 
 
-def allocation_page(request):
+def costcenter_allocation_page(request):
     data = CostCenterAllocation.objects.all()
     if data.count() == 0:
         messages.info(request, "There are no Allocations.")
-    return render(request, "costcenter/allocation-table.html", {"data": data})
+    return render(request, "costcenter/costcenter-allocation-table.html", {"data": data})
 
 
-def allocation_add(request):
+def costcenter_allocation_add(request):
     if request.method == "POST":
         form = CostCenterAllocationForm(request.POST)
         if form.is_valid():
@@ -219,7 +219,31 @@ def allocation_add(request):
     else:
         form = CostCenterAllocationForm
 
-    return render(request, "costcenter/allocation-form.html", {"form": form})
+    return render(request, "costcenter/costcenter-allocation-form.html", {"form": form})
+
+
+def costcenter_allocation_update(request, pk):
+    data = CostCenterAllocation.objects.get(id=pk)
+    form = CostCenterAllocationForm(instance=data)
+
+    if request.method == "POST":
+        form = CostCenterAllocationForm(request.POST, instance=data)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.owner = request.user
+            form.save()
+            return redirect("costcenter-allocation-table")
+
+    return render(request, "costcenter/costcenter-allocation-form.html", {"form": form})
+
+
+def costcenter_allocation_delete(request, pk):
+    item = CostCenterAllocation.objects.get(id=pk)
+    if request.method == "POST":
+        item.delete()
+        return redirect("costcenter-allocation-table")
+    context = {"object": item, "back": "costcenter-allocation-table"}
+    return render(request, "core/delete-object.html", context)
 
 
 def forecast_adjustment_page(request):
