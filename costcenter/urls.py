@@ -30,6 +30,7 @@ urlpatterns += [
     path("costcenter-table/", views.costcenter_page, name="costcenter-table"),
     path("costcenter-add/", views.costcenter_add, name="costcenter-add"),
     path("costcenter-update/<int:pk>", views.costcenter_update, name="costcenter-update"),
+    path("costcenter-delete/<int:pk>", views.costcenter_delete, name="costcenter-delete"),
 ]
 
 urlpatterns += [

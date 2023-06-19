@@ -48,7 +48,7 @@ def fund_update(request, pk):
             fund = form.save(commit=False)
             fund.fund = fund.fund.upper()
             fund.save()
-            return redirect("funds")
+            return redirect("fund-table")
 
     return render(request, "costcenter/fund-form.html", {"form": form})
 
@@ -187,9 +187,18 @@ def costcenter_update(request, pk):
         form = CostCenterForm(request.POST, instance=costcenter)
         if form.is_valid():
             form.save()
-            return redirect("costcenter-page")
+            return redirect("costcenter-table")
 
     return render(request, "costcenter/costcenter-form.html", {"form": form})
+
+
+def costcenter_delete(request, pk):
+    costcenter = CostCenter.objects.get(id=pk)
+    if request.method == "POST":
+        costcenter.delete()
+        return redirect("costcenter-table")
+    context = {"object": costcenter, "back": "costcenter-table"}
+    return render(request, "core/delete-object.html", context)
 
 
 def allocation_page(request):
