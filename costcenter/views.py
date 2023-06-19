@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.db import IntegrityError
 from django.contrib import messages
 from .models import (
     Fund,
@@ -73,7 +74,11 @@ def source_add(request):
         if form.is_valid():
             obj = form.save(commit=False)
             obj.source = obj.source.upper()
-            obj.save()
+            try:
+                obj.save()
+            except IntegrityError:
+                messages.error(request, "Saving this record would create duplicate entry.")
+                return render(request, "costcenter/source-form.html", {"form": form})
             return redirect("source-table")
     else:
         form = SourceForm
