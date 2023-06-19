@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+    "django.forms",  # to use custom templates such as textarea.html
     # apps
     "bft.apps.BftConfig",
     "costcenter.apps.CostcenterConfig",
@@ -74,6 +75,9 @@ TEMPLATES = [
         },
     },
 ]
+
+# to use custom templates such as textarea.html
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "main.wsgi.application"
 

@@ -225,7 +225,6 @@ def costcenter_allocation_add(request):
 def costcenter_allocation_update(request, pk):
     data = CostCenterAllocation.objects.get(id=pk)
     form = CostCenterAllocationForm(instance=data)
-
     if request.method == "POST":
         form = CostCenterAllocationForm(request.POST, instance=data)
         if form.is_valid():
