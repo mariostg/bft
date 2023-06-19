@@ -72,10 +72,8 @@ def source_add(request):
     if request.method == "POST":
         form = SourceForm(request.POST)
         if form.is_valid():
-            obj = form.save(commit=False)
-            obj.source = obj.source.upper()
             try:
-                obj.save()
+                form.save()
             except IntegrityError:
                 messages.error(request, "Saving this record would create duplicate entry.")
                 return render(request, "costcenter/source-form.html", {"form": form})
