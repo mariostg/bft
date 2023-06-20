@@ -40,7 +40,10 @@
         <div>Balance:{{line.balance|intcomma }}</div>
         <div>Working Plan:{{line.workingplan|intcomma}}</div>
    
-        {% if not line.fcst.id %} 
+
+        {% if line.workingplan == 0 %}
+        <a class="btn btn--link-small btn-delete" href="{% url 'line-item-delete' line.id %}">Delete Line</a>
+        {% elif not line.fcst.id %} 
             <a class='btn btn--link-small' href="{% url 'line-forecast-add' line.id%}">Create Forecast</a>
         {% else %}
             <div class="quarter">
@@ -71,9 +74,6 @@
                 {% endif %}
 
                 <a class="btn btn--link-small" href="{% url 'line-forecast-update' line.fcst.id %}">More</a>
-                {% if line.workingplan == 0 %}
-                <a class="btn btn--link-small" href="{% url 'line-item-delete' line.id %}">Delete Line</a>
-                {% endif %}
             </div>
         </div>
         {% endif %}
