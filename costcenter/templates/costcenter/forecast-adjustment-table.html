@@ -22,8 +22,8 @@
 
         {% if user.is_authenticated %}
         <div class="summary__footer">
-            <a href='{% url "update-forecastadjustment" item.pk %}' class="btn">Edit</a>
-            <a class="btn btn-delete" href="{% url 'delete-forecastadjustment' item.pk %}" >Delete</a >
+            <a href='{% url "forecast-adjustment-update" item.pk %}' class="btn">Edit</a>
+            <a class="btn btn-delete" href="{% url 'forecast-adjustment-delete' item.pk %}" >Delete</a >
         </div>
         {% endif %}
     </section>

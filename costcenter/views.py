@@ -280,7 +280,7 @@ def forecast_adjustment_update(request, pk):
             form = form.save(commit=False)
             form.owner = request.user
             form.save()
-            return redirect("forecast-adjustment-page")
+            return redirect("forecast-adjustment-table")
 
     return render(request, "costcenter/forecast-adjustment-form.html", {"form": form})
 
