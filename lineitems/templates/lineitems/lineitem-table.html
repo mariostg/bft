@@ -9,7 +9,7 @@
 
 {% include 'lineitems/lineitem-filter-form.html' %}
 
-<section class='lineitems'>
+<section class='container lineitems'>
     <h1>Line Items</h1>
     {% if not data %}
     <div>No lines associated to cost center</div>
@@ -18,7 +18,7 @@
 {% include 'paginator.html' %}
     
 {% for line in data  %}
-<article class="lineitem">
+<article class="container lineitem">
     <div class='lineitem__header'> 
         <div class='padded'>{{line.docno }} - {{line.lineno }} {{line.linetext|default:''}}</div>
         
