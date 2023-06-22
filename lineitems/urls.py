@@ -5,9 +5,7 @@ urlpatterns = [
     path("", views.lineitem_page, name="lineitem-page"),
     path("lineitem/", views.lineitem_page, name="lineitem-page"),
     path("lineitem/delete/<int:pk>", views.line_item_delete, name="line-item-delete"),
-    re_path(
-        r"^costcenter/(?P<costcenter>[0-9]{4}[a-zA-Z0-9]{2})/$", views.costcenter_lineitems, name="costcenter-lineitems"
-    ),
+    path("costcenter/<str:costcenter>/", views.costcenter_lineitems, name="costcenter-lineitems"),
     path("line_forecast/update/<int:pk>", views.line_forecast_update, name="line-forecast-update"),
     path("line_forecast/wp/<int:pk>", views.line_forecast_to_wp_update, name="line-forecast-to-wp-update"),
     path("line_forecast/zero/<int:pk>", views.line_forecast_zero_update, name="line-forecast-zero-update"),

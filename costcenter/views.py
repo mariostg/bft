@@ -170,7 +170,8 @@ def costcenter_add(request):
         if form.is_valid():
             obj = form.save(commit=False)
             obj.costcenter = obj.costcenter.upper()
-            obj.shortname = obj.shortname.upper()
+            if obj.shortname:
+                obj.shortname = obj.shortname.upper()
             obj.save()
             return redirect("costcenter-table")
     else:
