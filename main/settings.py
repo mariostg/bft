@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "costcenter.apps.CostcenterConfig",
     "lineitems.apps.LineitemsConfig",
     "encumbrance.apps.EncumbranceConfig",
+    "reports.apps.ReportsConfig",
     # dev
     "django_extensions",
 ]

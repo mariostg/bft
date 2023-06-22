@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+{% load humanize %}
+{% block content %}
+{% include "paginator.html" %}
+<main class='block block--centered'>
+<table>
+<caption>Line Items Report</caption>
+<thead>
+    <tr>
+        <th>Fund Center</th>
+        <th>Cost Center</th>
+        <th>Fund</th>
+        <th>Doc. No</th>
+        <th>Doc. Type</th>
+        <th>Line Text</th>
+        <th>Forecast</th>
+        <th>Spent</th>
+        <th>Balance</th>
+        <th>Working Plan</th>
+        <th>Reference</th>
+        <th>Due Date</th>
+        <th>Vendor</th>
+        <th>Created By</th>
+    </tr>
+</thead>
+<tbody class='numbers'>
+        {% for d in data  %}
+        <tr>
+            <td>{{d.fundcenter}}</td>
+            <td>{{d.costcenter}}</td>
+            <td>{{d.fund}}</td>
+            <td>{{d.doc}}</td>
+            <td>{{d.enctype}} {% if d.doctype %}:{{d.doctype}}{% endif %}</td>
+            <td>{{d.linetext}}</td>
+            <td>{{d.fcst.forecastamount|floatformat:'0g'}}</td>
+            <td>{{d.spent|floatformat:'0g'}}</td>
+            <td>{{d.balance|floatformat:'0g'}}</td>
+            <td>{{d.workingplan|floatformat:'0g'}}</td>
+            <td>{{d.Reference}}</td>
+            <td>{{d.duedate}}</td>
+            <td>{{d.vendor}}</td>
+            <td>{{d.createdby}}</td>
+        </tr>
+        {% endfor %}
+</tbody>
+<tfoot><tr><td colspan='14'>&nbsp;</td></tr> </tfoot>
+</table>
+</main>
+{% endblock content %}
