@@ -7,13 +7,7 @@
         <header class='form__header'>Fund Entry Form</header>
     <form method="POST">
         {% csrf_token %}
-        {% for field in  form %}
-        {{field.errors}}
-        <div class='form__fields'>
-            {{field.label_tag}}
-            {{field}}
-        </div>
-        {% endfor %}
+        {% include 'core/form-fields.html'%}
 
         <div class="block block--spaced">
             <button class="btn">Save</button>

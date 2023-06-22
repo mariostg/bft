@@ -6,15 +6,7 @@
     <header class='form__header'>Fund Center Entry Form</header>
     <form method="POST">
         {% csrf_token %}
-        {{ form.management_form }}
-        {{ form.errors }}
-        {{ form.non_field_errors }}
-        {{ form.non_form_errors }}
-        <div class='form__fields'>
-            <label class='label' for="fund-center">Fund Center</label> {{form.fundcenter}}
-            <label class='label' for="short-name">Short Name</label> {{form.shortname}}
-            <label class='label' for="parent">Parent</label> {{form.parent}}
-        </div>
+        {% include 'core/form-fields.html'%}
         <div class="block block--centered">
             <button class="btn">Save</button>
         </div>
