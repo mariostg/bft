@@ -6,14 +6,18 @@
         <header class='form__header'>Source Entry Form</header>
         <form method="POST">
             {% csrf_token %}
+            {% for field in form %}
+            {{field.errors}}
             <div class='form__fields'>
-                <label for="source">Source</label>
-                {{form.source}}
+                {{field.label_tag}}
+                {{field}}
             </div>
+            {% endfor %}
             <div class="block block--spaced">
                 <button class="btn">Save</button>
                 <button class='btn btn-back'><a href="{% url 'source-table' %}" style='text-decoration:none;'>Go Back</a></button>
             </div>
+
         </form>
         <footer class='form__footer'>Last edited by Mario St-Gelais, 8 Feb 2022</footer>
 </section>
