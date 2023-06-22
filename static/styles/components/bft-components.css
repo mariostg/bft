@@ -293,19 +293,22 @@ textarea {
   background-color: #359e64;
   color: #f3f3f3;
 }
-
+.tag {
+  padding: 0 8px;
+  border-radius: 14px;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+  margin: 5px;
+}
 .nofreeze {
   color: #f3f3f3;
   background-color: #2196f3;
-  padding: 0 8px;
-  border-radius: 14px;
 }
 
 .freeze {
   color: #f3f3f3;
   background-color: #ff5722;
-  padding: 0 8px;
-  border-radius: 14px;
 }
 
 .status {
