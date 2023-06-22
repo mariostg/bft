@@ -15,7 +15,7 @@
         {% endfor %}
             <div class="block block--spaced">
                 <button class="btn">Save</button>
-                <button class="btn btn-back">Back</button>
+                <a class="btn btn-back" href={% url 'forecast-adjustment-table' %}>Back</a>
             </div>
         </form>
         <footer class='form__footer'>Created on {{form.instance.created}}. Last edited by {{form.instance.owner}} on  {{form.instance.updated}}</footer>
