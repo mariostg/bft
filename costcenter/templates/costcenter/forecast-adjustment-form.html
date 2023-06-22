@@ -5,22 +5,12 @@
     <section class="form">
         <form method="POST">
             {% csrf_token %}
-            {{ form.management_form }}
-            {{ form.errors }}
-            {{ form.non_field_errors }}
-            {{ form.non_form_errors }}
             <header class='form__header'>Forecast Adjustment</header>
-        <div class='form__fields'>
-            <label for="costcenter" class="label">Cost Element</label> {{form.costcenter}}
-            <label class="label" for="fund">Fund</label> {{form.fund}}
-            <label class="label" for="amount">Amount</label>{{form.amount}}
-            {{form.note.errors}}
-            <label class="label" for="note">Note</label>{{form.note}}
-        </div>
         {% for field in  form %}
+        {{field.errors}}
         <div class='form__fields'>
-            {{field.errors}}
-            {{field.label_tag}}{{field}}
+            {{field.label_tag}}
+            {{field}}
         </div>
         {% endfor %}
             <div class="block block--spaced">
