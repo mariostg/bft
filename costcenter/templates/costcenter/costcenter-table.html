@@ -8,7 +8,7 @@
         {% for elem in data  %}
     <section class='summary'>
         <div class='summary__header'>
-            <span>{{elem.parent}} - {{elem.costcenter}} - {{elem.shortname}}</span>
+            <span><strong>{{elem.costcenter}} </strong>- {{elem.shortname}} - {{elem.parent}}</span>
             <span>{{elem.fund}}</span>
             <span>{{elem.source}}</span>
                 <span class= {% if elem.isforecastable %} nofreeze> {%else%} freeze> Not{%endif%} Forecastable</span>
