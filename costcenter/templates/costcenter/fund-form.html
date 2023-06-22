@@ -7,22 +7,14 @@
         <header class='form__header'>Fund Entry Form</header>
     <form method="POST">
         {% csrf_token %}
-        {{ form.management_form }}
-        {{ form.errors }}
-        {{ form.non_field_errors }}
-        {{ form.non_form_errors }}
+        {% for field in  form %}
+        {{field.errors}}
         <div class='form__fields'>
-            <label for="fund">Fund</label>
-            {{form.fund}}
+            {{field.label_tag}}
+            {{field}}
         </div>
-        <div class='form__fields'>
-            <label for="name">Name</label>
-            {{form.name}}
-        </div>
-        <div class='form__fields'>
-            <label for="fund">Vote</label>
-            {{form.vote}}
-        </div>
+        {% endfor %}
+
         <div class="block block--spaced">
             <button class="btn">Save</button>
             <a class='btn btn-back' href="{% url 'fund-table' %}">Back</a>
