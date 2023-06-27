@@ -93,8 +93,8 @@ class FundCenterManager(models.Manager):
 
 
 class FundCenter(models.Model):
-    fundcenter = models.CharField(max_length=6, unique=True)
-    shortname = models.CharField(max_length=25, null=True, blank=True)
+    fundcenter = models.CharField("Fund Center", max_length=6, unique=True)
+    shortname = models.CharField("Short Name", max_length=25, null=True, blank=True)
     parent = models.ForeignKey(
         "self",
         on_delete=models.RESTRICT,
@@ -140,12 +140,12 @@ class CostCenterManager(models.Manager):
 
 
 class CostCenter(models.Model):
-    costcenter = models.CharField(max_length=6, unique=True)
-    shortname = models.CharField(max_length=35, blank=True, null=True)
+    costcenter = models.CharField("Cost Center", max_length=6, unique=True)
+    shortname = models.CharField("Short Name", max_length=35, blank=True, null=True)
     fund = models.ForeignKey(Fund, on_delete=models.RESTRICT, default="")
     source = models.ForeignKey(Source, on_delete=models.RESTRICT, default="")
-    isforecastable = models.BooleanField(default=False)
-    isupdatable = models.BooleanField(default=False)
+    isforecastable = models.BooleanField("Is Forecastable", default=False)
+    isupdatable = models.BooleanField("Is Updatable", default=False)
     note = models.TextField(null=True, blank=True)
     parent = models.ForeignKey(
         FundCenter,
@@ -171,7 +171,7 @@ class CostCenter(models.Model):
 
 
 class ForecastAdjustment(models.Model):
-    costcenter = models.ForeignKey(CostCenter, on_delete=models.CASCADE, null=True)
+    costcenter = models.ForeignKey(CostCenter, on_delete=models.CASCADE, null=True, verbose_name="Cost Center")
     fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     note = models.TextField(null=True, blank=True)
@@ -190,7 +190,7 @@ class ForecastAdjustment(models.Model):
 class Allocation(models.Model):
     fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    fy = models.PositiveSmallIntegerField(choices=YEAR_CHOICES, default=datetime.now().year)
+    fy = models.PositiveSmallIntegerField("Fiscal Year", choices=YEAR_CHOICES, default=datetime.now().year)
     quarter = models.TextField(max_length=2, choices=QUARTERS, default="Q0")
     note = models.TextField(null=True, blank=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.RESTRICT)
@@ -215,7 +215,7 @@ class Allocation(models.Model):
 
 
 class CostCenterAllocation(Allocation):
-    costcenter = models.ForeignKey(CostCenter, on_delete=models.CASCADE, null=True)
+    costcenter = models.ForeignKey(CostCenter, on_delete=models.CASCADE, null=True, verbose_name="Cost Center")
 
     def __str__(self):
         return f"{self.costcenter} - {self.fund} - {self.fy}{self.quarter} {self.amount}"
