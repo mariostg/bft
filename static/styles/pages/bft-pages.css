@@ -38,13 +38,12 @@ aside {
     }
 }
 .lineitems .lineitem__part:nth-child(2) {
+    background-color: aliceblue;
     display: grid;
     grid-template-columns: 1fr 1fr;
 }
 @media (min-width: 768px) {
     .lineitems .lineitem__part:nth-child(2) {
-        background-color: aliceblue;
-        display: grid;
         grid-template-columns: 1fr 1fr 1fr 1fr;
     }
 }
