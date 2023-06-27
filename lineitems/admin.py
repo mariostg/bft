@@ -20,5 +20,21 @@ class LineItemAdmin(admin.ModelAdmin):
     ]
 
 
+class LineForecastAdmin(admin.ModelAdmin):
+    list_display = (
+        "forecastamount",
+        "description",
+        "comment",
+        "deliverydate",
+        "delivered",
+        "lineitem",
+        "buyer",
+        "updated",
+        "created",
+        "status",
+    )
+
+
 # Register your models here.
 admin.site.register(models.LineItem, LineItemAdmin)
+admin.site.register(models.LineForecast, LineForecastAdmin)
