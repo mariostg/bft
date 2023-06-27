@@ -16,23 +16,15 @@
             {{ form.non_form_errors }}
 
             <div class="form__fields">
-                <label class="label" for="forecastamount">Forecast Amount</label>
-                {{form.forecastamount}}
-                
-                <label class="label" for="description">Description </label>
-                 {{form.description}}
-
-                <label class="label" for="comment">Comment </label>
-                {{form.comment}} 
-
-                <label class="label"> Delivery Date </label>
-                {{form.deliverydate}}
-                <label class="label"> Buyer </label>
-                {{form.buyer}}
-
+                {{form.forecastamount.label_tag}} {{form.forecastamount}}
+                {{form.description.label_tag}} {{form.description}}
+                {{form.comment.label_tag}} {{form.comment}} 
+                {{form.deliverydate.label_tag}} {{form.deliverydate}}
+                {{form.buyer.label_tag}} {{form.buyer}}
                 <label class="label checkbox-label">
                    {{form.delivered}}Delivered
                 </label>
+
                 <span>Parent ID {{form.lineitem}} </span>
                 <input type="hidden" value="{{form.lineitem}}">
             </div>

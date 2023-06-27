@@ -77,7 +77,7 @@ def line_forecast_update(request, pk):
             form.save()
             return redirect("lineitem-page")
 
-    return render(request, "lineitems/line-forecast-form.html", {"form": form})
+    return render(request, "lineitems/line-forecast-form.html", {"form": form, "lineitem": data.lineitem})
 
 
 def line_forecast_to_wp_update(request, pk):
