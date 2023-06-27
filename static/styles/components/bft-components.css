@@ -350,8 +350,8 @@ input[type="checkbox"] {
     margin: 0;
     font: inherit;
     color: currentColor;
-    width: 1.15em;
-    height: 1.15em;
+    width: 1.7em;
+    height: 1.7em;
     border: 0.15em solid currentColor;
     border-radius: 0.15em;
     transform: translateY(-0.075em);
@@ -369,7 +369,7 @@ input[type="checkbox"]::before {
 }
 
 input[type="checkbox"]:checked::before {
-    transform: scale(1);
+    transform: scale(1.4);
 }
 
 input[type="checkbox"] :focus {
