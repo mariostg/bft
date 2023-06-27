@@ -169,7 +169,7 @@ class LineForecast(models.Model):
     forecastamount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     description = models.CharField(max_length=512, null=True, blank=True)
     comment = models.CharField(max_length=512, null=True, blank=True)
-    deliverydate = models.DateField(null=True, blank=True)
+    deliverydate = models.DateField("Delivery Date", null=True, blank=True)
     delivered = models.BooleanField(default=False)
     lineitem = models.OneToOneField(LineItem, on_delete=models.SET_NULL, related_name="fcst", null=True)
     buyer = models.CharField(max_length=175, null=True, blank=True)  # PWGSC buyer
