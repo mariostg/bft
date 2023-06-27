@@ -87,3 +87,8 @@ aside {
     background-color: #f3f3f3;
     color: firebrick;
 }
+
+.hint-too-low {
+    background-color: yellow;
+    color: #000;
+}

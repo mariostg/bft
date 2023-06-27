@@ -46,14 +46,7 @@
         {% elif not line.fcst.id %} 
             <a class='btn btn--link-small' href="{% url 'line-forecast-add' line.id%}">Create Forecast</a>
         {% else %}
-            <div class="quarter">
-                {% if line.fcst.forecastamount < 0%}
-                    negative
-                {% elif line.fcst.forecastamount > line.workingplan%}
-                    hint hint-warning
-                {%endif%}
-
-                Forecast:{{line.fcst.forecastamount|intcomma}}
+            <div class="{% if line.fcst.forecastamount < 0%} hint-too-low {% elif line.fcst.forecastamount > line.workingplan %} hint-warning{% endif %}"> Forecast:{{line.fcst.forecastamount|intcomma}}
             </div>
         </div>
 
