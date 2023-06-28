@@ -12,3 +12,4 @@ htmlcov/
 
 #log files
 *.log
+jupyter/
