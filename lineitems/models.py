@@ -112,6 +112,7 @@ class LineItem(models.Model):
             li.spent = ei.spent
             li.workingplan = ei.workingplan
             li.balance = ei.balance
+            li.fund = ei.fund
             li.status = "Updated"
             # TODO More to come
             li.save()
