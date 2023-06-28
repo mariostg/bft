@@ -24,7 +24,6 @@ def bmt_screening_report(request):
     )
     report = utils.Report()
     table = report.cost_center_screening_report().to_html()
-    print(table)
     paginator = Paginator(data, 50)
     page_number = request.GET.get("page")
     context = {"data": paginator.get_page(page_number), "table": table}

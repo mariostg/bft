@@ -62,11 +62,13 @@ class Report:
         Returns:
             pd.DataFrame: A dataframe of cost center allocations.
         """
-        data = list(CostCenterAllocation.objects.all().values())
+        data = list(CostCenterAllocation.objects.all().values("costcenter__costcenter", "fund__fund", "amount", "fy"))
         columns = {
             "amount": "Allocation",
             "fy": "FY",
             "quarter": "Quarter",
+            "costcenter__costcenter": "Cost Center",
+            "fund__fund": "Fund",
         }
         df = pd.DataFrame(data).rename(columns=columns)
         return df
@@ -96,11 +98,9 @@ class Report:
         li_df = r.line_items()
         fcst_df = r.forecast()
         cc_df = r.cost_center()
-        allocation_df = r.cost_center_allocation()
 
         lifcst_df = pd.merge(li_df, fcst_df, how="left", on="lineitem_id")
         report = pd.merge(lifcst_df, cc_df, how="left", on="costcenter_id")
-        pprint.pprint(report)
         grouping = ["Fund Center", "Cost Center", "fund"]
         aggregation = {
             "Spent": "sum",
@@ -108,7 +108,10 @@ class Report:
             "Working Plan": "sum",
             "Forecast": "sum",
         }
-        # df = report.groupby(grouping).agg(aggregation).style.format("${0:>,.0f}")
-        df = report.groupby(grouping).agg(aggregation)
+        df = report.groupby(grouping).agg(aggregation)  # .style.format("${0:>,.0f}")
 
-        return df
+        allocation_df = r.cost_center_allocation()
+        allocation_agg = allocation_df.groupby(["Cost Center", "Fund"]).agg({"Allocation": "sum"})
+        final = pd.merge(df, allocation_agg, how="left", on=["Cost Center"]).style.format("${0:>,.0f}")
+
+        return final
