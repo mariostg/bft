@@ -86,14 +86,15 @@ class Report:
         return report
 
     def cost_center_screening_report(self) -> pd.DataFrame:
-        import pprint
-
         """Create a dataframe of merged line items, forecast and cost centers grouped as per <grouping>.
         Aggregation is done on fields Spent, Balance, Working Plan, Forecast and Allocation
 
         Returns:
             pd.DataFrame: _description_
         """
+
+        with_allocation = False
+
         r = Report()
         li_df = r.line_items()
         fcst_df = r.forecast()
@@ -108,10 +109,12 @@ class Report:
             "Working Plan": "sum",
             "Forecast": "sum",
         }
-        df = report.groupby(grouping).agg(aggregation)  # .style.format("${0:>,.0f}")
+        df = report.groupby(grouping).agg(aggregation)
 
-        allocation_df = r.cost_center_allocation()
-        allocation_agg = allocation_df.groupby(["Cost Center", "Fund"]).agg({"Allocation": "sum"})
-        final = pd.merge(df, allocation_agg, how="left", on=["Cost Center"]).style.format("${0:>,.0f}")
-
-        return final
+        if with_allocation == True:
+            allocation_df = r.cost_center_allocation()
+            allocation_agg = allocation_df.groupby(["Cost Center", "Fund"]).agg({"Allocation": "sum"})
+            final = pd.merge(df, allocation_agg, how="left", on=["Cost Center"]).style.format("${0:>,.0f}")
+            return final
+        else:
+            return df.style.format("${0:>,.0f}")
