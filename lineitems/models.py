@@ -180,7 +180,9 @@ class LineForecast(models.Model):
     status = models.CharField(max_length=10, default="", blank=True, null=True)
 
     def __str__(self):
-        text = f"{self.forecastamount} - {self.id} -  {self.lineitem.id}"
+        text = ""
+        if self.lineitem:
+            text = f"{self.forecastamount} - {self.id} -  {self.lineitem.id}"
         return str(text)
 
     def validate(self, request, lineitem: LineItem) -> True:
