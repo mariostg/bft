@@ -1,0 +1,10 @@
+{% extends 'core/base.html' %}
+{% load humanize %}
+{% block title %}Financial Structure Report{% endblock title %}
+{% block content %}
+{% include "paginator.html" %}
+<main class='block block--centered'>
+{{table|safe}}
+</main>
+
+{% endblock content %}

@@ -1,11 +1,11 @@
 from lineitems.models import LineItem, LineForecast
-from costcenter.models import CostCenter, CostCenterAllocation
+from costcenter.models import CostCenter, CostCenterAllocation, FundCenter
 from django.db.models import Sum
 import pandas as pd
 
 
 class Report:
-    def line_items(self) -> pd.DataFrame:
+    def line_item_dataframe(self) -> pd.DataFrame:
         """Prepare a pandas dataframe of the DRMIS line items.  Columns are renamed
         with a more friendly name.
 
@@ -24,7 +24,7 @@ class Report:
         )
         return df
 
-    def forecast(self) -> pd.DataFrame:
+    def forecast_dataframe(self) -> pd.DataFrame:
         """Prepare a pandas dataframe of the forecast line items.  Columns are renamed
         with a more friendly name.
 
@@ -39,24 +39,62 @@ class Report:
         )
         return df
 
-    def cost_center(self) -> pd.DataFrame:
+    def fund_center_dataframe(self) -> pd.DataFrame:
+        """Prepare a pandas dataframe of the fund centers as per financial structure.
+        Columns are renamed with a more friendly name.
+
+        Returns:
+            pd.DataFrame: A dataframe of fund centers.
+        """
+
+        data = list(FundCenter.objects.all().values())
+        df = pd.DataFrame(data).rename(
+            columns={
+                "id": "fundcenter_id",
+                "fundcenter": "Fund Center",
+                "shortname": "Fund Center Name",
+                "parent": "Parent",
+            }
+        )
+        return df
+
+    def cost_center_dataframe(self) -> pd.DataFrame:
         """Prepare a pandas dataframe of the cost centers as per financial structure.
         Columns are renamed with a more friendly name.
 
         Returns:
-            pd.DataFrame: A dataframe of cost center
+            pd.DataFrame: A dataframe of cost centers.
         """
         data = list(CostCenter.objects.all().values())
         df = pd.DataFrame(data).rename(
             columns={
                 "id": "costcenter_id",
                 "costcenter": "Cost Center",
-                "shortname": "Short Name",
+                "shortname": "Cost Center Name",
             }
         )
         return df
 
-    def cost_center_allocation(self) -> pd.DataFrame:
+    def line_item_detailed(self) -> pd.DataFrame:
+        """
+        Prepare a pandas dataframe of merged line items, forecast line items and cost center.
+
+        Returns:
+            pd.DataFrame : A dataframe of line items including forecast.
+        """
+        li_df = self.line_item_dataframe()
+        fcst_df = self.forecast_dataframe()
+        cc_df = self.cost_center_dataframe()
+
+        if len(fcst_df) > 0:
+            li_df = pd.merge(li_df, fcst_df, how="left", on="lineitem_id")
+        else:
+            li_df["Forecast"] = 0
+        li_df = pd.merge(li_df, cc_df, how="left", on="costcenter_id")
+
+        return li_df
+
+    def cost_center_allocation_dataframe(self) -> pd.DataFrame:
         """Prepare a pandas dataframe of the cost center allocations for the given FY and Quarter.
         Columns are renamed with a more friendly name.
 
@@ -96,13 +134,7 @@ class Report:
 
         with_allocation = False
 
-        r = Report()
-        li_df = r.line_items()
-        fcst_df = r.forecast()
-        cc_df = r.cost_center()
-
-        lifcst_df = pd.merge(li_df, fcst_df, how="left", on="lineitem_id")
-        report = pd.merge(lifcst_df, cc_df, how="left", on="costcenter_id")
+        li_df = self.line_item_detailed()
         grouping = ["Fund Center", "Cost Center", "Short Name", "fund"]
         aggregation = {
             "Spent": "sum",
@@ -110,12 +142,31 @@ class Report:
             "Working Plan": "sum",
             "Forecast": "sum",
         }
-        df = report.groupby(grouping).agg(aggregation)
+        df = li_df.groupby(grouping).agg(aggregation)
 
         if with_allocation == True:
-            allocation_df = r.cost_center_allocation()
+            allocation_df = self.cost_center_allocation_dataframe()
             allocation_agg = allocation_df.groupby(["Cost Center", "Fund"]).agg({"Allocation": "sum"})
             final = pd.merge(df, allocation_agg, how="left", on=["Cost Center"]).style.format("${0:>,.0f}")
             return final
         else:
             return df.style.format("${0:>,.0f}")
+
+    def financial_structure_report(self):
+        fc = self.fund_center_dataframe()
+        cc = self.cost_center_dataframe()
+        merged = pd.merge(fc, cc, how="left", left_on=["fundcenter_id"], right_on=["parent_id"])
+        merged.set_index(["Fund Center Name", "Fund Center", "Cost Center Name", "Cost Center"], inplace=True)
+        merged.drop(
+            [
+                "fundcenter_id",
+                "parent_id_x",
+                "costcenter_id",
+                "fund_id",
+                "source_id",
+                "parent_id_y",
+            ],
+            axis=1,
+            inplace=True,
+        )
+        return self.df_to_html(merged)

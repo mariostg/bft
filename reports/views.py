@@ -42,6 +42,11 @@ def line_items(request):
     return render(request, "lineitem-report.html", context)
 
 
+def financial_structure_report(request):
+    report = utils.Report()
+    return render(request, "financial-structure-report.html", {"table": report.financial_structure_report()})
+
+
 """
 Writes line item report to csv.
 """
