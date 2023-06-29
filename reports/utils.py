@@ -51,6 +51,7 @@ class Report:
             columns={
                 "id": "costcenter_id",
                 "costcenter": "Cost Center",
+                "shortname": "Short Name",
             }
         )
         return df
@@ -102,7 +103,7 @@ class Report:
 
         lifcst_df = pd.merge(li_df, fcst_df, how="left", on="lineitem_id")
         report = pd.merge(lifcst_df, cc_df, how="left", on="costcenter_id")
-        grouping = ["Fund Center", "Cost Center", "fund"]
+        grouping = ["Fund Center", "Cost Center", "Short Name", "fund"]
         aggregation = {
             "Spent": "sum",
             "Balance": "sum",
