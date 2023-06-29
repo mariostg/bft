@@ -21,7 +21,7 @@
 <article class="container lineitem">
     <div class='lineitem__header'> 
         <div class='padded'>{{line.docno }} - {{line.lineno }} {{line.linetext|default:''}}</div>
-        
+        {% if line.fcintegrity == False%} <div class="hint-warning">Fund center incoherent</div> {% endif %}
         <div class=''>{{line.fundcenter}} - {{line.costcenter}} - {{line.fund}} : {{line.id}}:{{line.status}}</div> 
     </div>
     <div class='lineitem__part'>
