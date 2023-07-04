@@ -95,6 +95,7 @@ class FundCenterManager(models.Manager):
 class FundCenter(models.Model):
     fundcenter = models.CharField("Fund Center", max_length=6, unique=True)
     shortname = models.CharField("Short Name", max_length=25, null=True, blank=True)
+    sequence = models.CharField("Sequence No", max_length=25, unique=True)
     parent = models.ForeignKey(
         "self",
         on_delete=models.RESTRICT,
@@ -107,7 +108,9 @@ class FundCenter(models.Model):
     objects = FundCenterManager()
 
     def __str__(self):
-        return f"{self.fundcenter.upper()} - {self.shortname.upper()}"
+        if self.fundcenter:
+            return f"{self.fundcenter.upper()} - {self.shortname.upper()}"
+        return ""
 
     class Meta:
         ordering = ["fundcenter"]
