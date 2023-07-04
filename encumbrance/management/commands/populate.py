@@ -12,6 +12,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if DEBUG:
+            CostCenter.objects.all().delete()
+            Source.objects.all().delete()
+            Fund.objects.all().delete()
+            FundCenter.objects.all().delete()
             self.set_fund()
             self.set_source()
             self.set_fund_center()
@@ -48,8 +52,15 @@ class Command(BaseCommand):
                 print(f"Created Source {new_item}")
 
     def set_fund_center(self):
+        # Create root FC
+        fc = {"fundcenter": "1111AA", "shortname": "root", "parent": None, "sequence": "1"}
+        new_item = FundCenter.objects.create(**fc)
+        root = FundCenter.objects.filter(fundcenter="1111AA").first()
+        print(f"Created Fund Center {root}")
+
         items = [
-            {"fundcenter": "1111AB", "shortname": "bedroom", "parent": None},
+            {"fundcenter": "1111AB", "shortname": "AB", "parent": root, "sequence": "1.1"},
+            {"fundcenter": "2222AA", "shortname": "AA", "parent": root, "sequence": "1.2"},
         ]
         for item in items:
             try:
