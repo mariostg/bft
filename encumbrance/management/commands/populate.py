@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from main.settings import BASE_DIR, DEBUG
 
 from costcenter.models import Fund, Source, CostCenter, FundCenter
+from lineitems.models import LineForecast, LineItem
 
 
 class Command(BaseCommand):
@@ -12,6 +13,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if DEBUG:
+            LineForecast.objects.all().delete()
+            LineItem.objects.all().delete()
             CostCenter.objects.all().delete()
             Source.objects.all().delete()
             Fund.objects.all().delete()
@@ -74,7 +77,8 @@ class Command(BaseCommand):
     def set_cost_center(self):
         fund = Fund.objects.get(fund="C113")
         source = Source.objects.get(source="Kitchen")
-        fc = FundCenter.objects.get(fundcenter="1111AB")
+        aa = FundCenter.objects.get(fundcenter="1111AA")
+        ab = FundCenter.objects.get(fundcenter="1111AB")
         items = [
             {
                 "costcenter": "8486B1",
@@ -84,7 +88,7 @@ class Command(BaseCommand):
                 "isforecastable": True,
                 "isupdatable": True,
                 "note": "",
-                "parent": fc,
+                "parent": aa,
             },
             {
                 "costcenter": "8486C1",
@@ -94,7 +98,7 @@ class Command(BaseCommand):
                 "isforecastable": True,
                 "isupdatable": True,
                 "note": "A quick and short note for 1234FF",
-                "parent": fc,
+                "parent": ab,
             },
             {
                 "costcenter": "8486C2",
@@ -104,7 +108,7 @@ class Command(BaseCommand):
                 "isforecastable": True,
                 "isupdatable": True,
                 "note": "",
-                "parent": fc,
+                "parent": ab,
             },
         ]
         for item in items:
