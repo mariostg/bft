@@ -63,7 +63,7 @@ class Command(BaseCommand):
 
         items = [
             {"fundcenter": "1111AB", "shortname": "AB", "parent": root, "sequence": "1.1"},
-            {"fundcenter": "2222AA", "shortname": "AA", "parent": root, "sequence": "1.2"},
+            {"fundcenter": "1111AC", "shortname": "AC", "parent": root, "sequence": "1.2"},
         ]
         for item in items:
             try:
@@ -77,8 +77,8 @@ class Command(BaseCommand):
     def set_cost_center(self):
         fund = Fund.objects.get(fund="C113")
         source = Source.objects.get(source="Kitchen")
-        aa = FundCenter.objects.get(fundcenter="1111AA")
         ab = FundCenter.objects.get(fundcenter="1111AB")
+        ac = FundCenter.objects.get(fundcenter="1111AC")
         items = [
             {
                 "costcenter": "8486B1",
@@ -88,7 +88,7 @@ class Command(BaseCommand):
                 "isforecastable": True,
                 "isupdatable": True,
                 "note": "",
-                "parent": aa,
+                "parent": ac,
             },
             {
                 "costcenter": "8486C1",
