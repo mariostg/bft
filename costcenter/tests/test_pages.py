@@ -4,10 +4,7 @@ from django.http import HttpRequest
 from django.db import IntegrityError
 from costcenter.views import fund_page, fund_add, fund_update
 from costcenter.models import Fund, Source
-
-
-def strip_white_space(string: str):
-    return string.replace("\t", "").replace("\n", "")
+from utils.string import strip_white_space
 
 
 class FundPageTest(TestCase):
@@ -42,7 +39,7 @@ class FundCreatePageTest(TestCase):
         response = fund_add(request)
         html = strip_white_space(response.content.decode("utf8"))
         self.assertTrue(html.startswith("<!DOCTYPE html>"))
-        self.assertIn('<h1 class="form__header">Fund Entry Form</h1>', html)
+        self.assertIn("<header class='form__header'>Fund Entry Form</header>", html)
 
 
 class FundUpdatePageTest(TestCase):
