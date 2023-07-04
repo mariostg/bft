@@ -92,6 +92,26 @@ class FundCenterManager(models.Manager):
         return obj
 
 
+class FinancialStructureManager(models.Manager):
+    def FundCenters(self, fundcenter=None, seqno=None):
+        try:
+            if fundcenter:
+                obj = FundCenter.objects.filter(fundcenter=fundcenter)
+            elif seqno:
+                obj = FundCenter.objects.filter(sequence_no__beginswith=seqno)
+            else:
+                obj = FundCenter.objects.all()
+        except exceptions.FundCenterExceptionError(fundcenter=fundcenter, seqno=seqno):
+            return None
+        return obj
+
+    def CostCenters(self):
+        pass
+
+    def all(self):
+        pass
+
+
 class FundCenter(models.Model):
     fundcenter = models.CharField("Fund Center", max_length=6, unique=True)
     shortname = models.CharField("Short Name", max_length=25, null=True, blank=True)

@@ -22,3 +22,16 @@ class LineItemsDoNotExistError(Exception):
 
     def __str__(self):
         return self.message
+
+
+class FundCenterExceptionError(Exception):
+    def __init__(self, fundcenter=None, seqno=None):
+        if fundcenter:
+            self.message = f"Failed to retreive Fund Centers with parent = {fundcenter}."
+        elif seqno:
+            self.message = f"Failed to retreive Fund Centers using sequence no {seqno}"
+        else:
+            self.message = "Failed to retreive Fund Centers"
+
+    def __str__(self):
+        return self.message

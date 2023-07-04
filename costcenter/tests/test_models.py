@@ -6,6 +6,7 @@ from costcenter.models import (
     ForecastAdjustment,
     FundCenter,
     CostCenterAllocation,
+    FinancialStructureManager,
 )
 from django.db import IntegrityError
 from django.db.models import RestrictedError
@@ -14,6 +15,8 @@ from bft.exceptions import (
     InvalidOptionException,
     InvalidFiscalYearException,
 )
+from costcenter.structure import Structure
+from encumbrance.management.commands import populate
 
 FUND_C113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
 SOURCE_1 = {"source": "Kitchen"}
@@ -242,10 +245,18 @@ class FundCenterModelTest(TestCase):
     def test_verbose_name_plural(self):
         self.assertEqual("Fund Centers", str(FundCenter._meta.verbose_name_plural))
 
+    def test_get_financial_structure(self):
+        pp = populate.Command()
+        pp.handle()
+        st = FinancialStructureManager()
+        st_data = st.FundCenters()
+        self.assertEqual(3, len(st_data))
+
     def test_can_save_and_retrieve_fund_centers(self):
         first_fc = FundCenter()
         first_fc.fundcenter = "1111aa"
         first_fc.shortname = "defgth"
+        first_fc.sequence = "1"
         first_fc.parent = None
         first_fc.full_clean()
         first_fc.save()
@@ -256,6 +267,7 @@ class FundCenterModelTest(TestCase):
     def test_save_without_shortname(self):
         first_fc = FundCenter()
         first_fc.fundcenter = "1111aa"
+        first_fc.sequence = "1"
         first_fc.parent = None
         first_fc.full_clean()
         first_fc.save()
@@ -267,6 +279,7 @@ class FundCenterModelTest(TestCase):
         first_fc = FundCenter()
         first_fc.fundcenter = "1111aa"
         first_fc.shortname = "defgth"
+        first_fc.sequence = "1"
         first_fc.full_clean()
         first_fc.save()
 
@@ -277,6 +290,7 @@ class FundCenterModelTest(TestCase):
         first_fc = FundCenter()
         first_fc.fundcenter = "1111aa"
         first_fc.shortname = "defgth"
+        first_fc.sequence = "1"
         first_fc.parent = None
         first_fc.full_clean()
         first_fc.save()
@@ -322,6 +336,7 @@ class FundCenterModelTest(TestCase):
         fc1 = FundCenter()
         fc1.fundcenter = "1111aa"
         fc1.shortname = "defgth"
+        fc1.sequence = "1"
         fc1.parent = None
         fc1.full_clean()
         fc1.save()
