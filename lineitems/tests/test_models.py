@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from lineitems.models import LineItem
+from lineitems.models import LineItem, LineForecast
 from encumbrance.models import EncumbranceImport, Encumbrance
 from encumbrance.management.commands.uploadcsv import Command
 import encumbrance.management.commands.populate as populate
@@ -145,3 +145,14 @@ class LineItemManagementTest(TestCase):
 
         li.set_fund_center_integrity()
         self.assertEqual(1, LineItem.objects.filter(fcintegrity=False).count())
+
+
+class LineForecastModelTest(TestCase):
+    def test_create_line_forecast(self):
+        LineForecast.objects.all().delete()
+        li = LineItem.objects.all().first()
+        data = {"forecastamount": 1000, "lineitem": li}
+        fcst = LineForecast(**data)
+        fcst.save()
+        saved = LineForecast.objects.all().count()
+        self.assertEqual(1, saved)
