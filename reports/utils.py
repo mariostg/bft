@@ -2,6 +2,7 @@ from lineitems.models import LineItem, LineForecast
 from costcenter.models import CostCenter, CostCenterAllocation, FundCenter
 from django.db.models import Sum
 import pandas as pd
+from bft.exceptions import LineItemsDoNotExistError
 
 
 class Report:
@@ -12,17 +13,20 @@ class Report:
         Returns:
             pd.DataFrame: A dataframe of DRMIS line items
         """
-        data = list(LineItem.objects.all().all().values())
-        df = pd.DataFrame(data).rename(
-            columns={
-                "id": "lineitem_id",
-                "balance": "Balance",
-                "workingplan": "Working Plan",
-                "fundcenter": "Fund Center",
-                "spent": "Spent",
-            }
-        )
-        return df
+        data = list(LineItem.objects.all().values())
+        if data:
+            df = pd.DataFrame(data).rename(
+                columns={
+                    "id": "lineitem_id",
+                    "balance": "Balance",
+                    "workingplan": "Working Plan",
+                    "fundcenter": "Fund Center",
+                    "spent": "Spent",
+                }
+            )
+            return df
+        else:
+            raise LineItemsDoNotExistError
 
     def forecast_dataframe(self) -> pd.DataFrame:
         """Prepare a pandas dataframe of the forecast line items.  Columns are renamed
