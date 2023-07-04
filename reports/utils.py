@@ -139,7 +139,7 @@ class Report:
         with_allocation = False
 
         li_df = self.line_item_detailed()
-        grouping = ["Fund Center", "Cost Center", "Short Name", "fund"]
+        grouping = ["Fund Center", "Cost Center", "Cost Center Name", "fund"]
         aggregation = {
             "Spent": "sum",
             "Balance": "sum",
