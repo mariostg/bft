@@ -23,6 +23,7 @@ class Command(BaseCommand):
         items = [
             {"fund": "C113", "name": "National Procurement", "vote": "1"},
             {"fund": "C116", "name": "Kitchen Procurement", "vote": "5"},
+            {"fund": "C523", "name": "Basement Procurement", "vote": "1"},
             {"fund": "CXXX", "name": "Bedroom Procurement", "vote": "1"},
         ]
         for item in items:
