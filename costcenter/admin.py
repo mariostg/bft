@@ -14,7 +14,7 @@ class CostCenterAdmin(admin.ModelAdmin):
 
 
 class FundCenterAdmin(admin.ModelAdmin):
-    list_display = ("fundcenter", "parent", "shortname")
+    list_display = ("fundcenter", "parent", "shortname", "sequence")
 
 
 class FundAdmin(admin.ModelAdmin):
