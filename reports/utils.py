@@ -27,7 +27,6 @@ class Report:
             return df
         else:
             return None
-            raise LineItemsDoNotExistError
 
     def forecast_dataframe(self) -> pd.DataFrame:
         """Prepare a pandas dataframe of the forecast line items.  Columns are renamed
@@ -89,7 +88,7 @@ class Report:
             pd.DataFrame : A dataframe of line items including forecast.
         """
         li_df = self.line_item_dataframe()
-        if li_df:
+        if len(li_df) > 0:
             fcst_df = self.forecast_dataframe()
             cc_df = self.cost_center_dataframe()
 
@@ -145,7 +144,7 @@ class Report:
         with_allocation = False
 
         li_df = self.line_item_detailed()
-        if not li_df:
+        if len(li_df) == 0:
             return None
         grouping = ["Fund Center", "Cost Center", "Cost Center Name", "fund"]
         aggregation = {
