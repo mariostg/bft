@@ -1,4 +1,5 @@
 import numpy as np
+from costcenter.models import FundCenterManager
 
 """
 This class serves for the management of organisation breakdown structure.
@@ -42,12 +43,14 @@ class Structure:
                 descendants.append(d)
         return descendants
 
-    def create_child(self, family: list, parent: str) -> str:
-        children = self.get_direct_descendants(family, parent)
+    def create_child(self, family: list, parent: str = None, seqno=None) -> str:
+        if parent:
+            seqno = FundCenterManager().fundcenter(parent).sequence
+        children = self.get_direct_descendants(family, seqno)
         if children == []:
-            new_born = parent + ".1"
+            new_born = seqno + ".1"
             family.append(new_born)
-            return parent + ".1"
+            return new_born
         splitted = [i.split(".") for i in children]
         splitted = np.array(splitted).astype(int)
         oldest = list(splitted.max(axis=0))

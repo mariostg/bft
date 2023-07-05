@@ -1,4 +1,8 @@
 import pytest
+import django
+
+django.setup()
+from costcenter.structure import Structure
 from costcenter.structure import Structure, ParentDoesNotExistError
 
 
@@ -49,9 +53,9 @@ class TestObs:
     def test_create_child(self):
         s = Structure()
         family = self.family["obs"]
-        child = s.create_child(family, "1.1")
+        child = s.create_child(family, seqno="1.1")
         assert "1.1.2" == child
-        child = s.create_child(family, "1.2.1")
+        child = s.create_child(family, seqno="1.2.1")
         assert "1.2.1.1" == child
         with pytest.raises(ParentDoesNotExistError):
-            child = s.create_child(family, "3")
+            child = s.create_child(family, seqno="3")
