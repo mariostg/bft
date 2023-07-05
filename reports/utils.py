@@ -26,6 +26,7 @@ class Report:
             )
             return df
         else:
+            return None
             raise LineItemsDoNotExistError
 
     def forecast_dataframe(self) -> pd.DataFrame:
@@ -88,14 +89,15 @@ class Report:
             pd.DataFrame : A dataframe of line items including forecast.
         """
         li_df = self.line_item_dataframe()
-        fcst_df = self.forecast_dataframe()
-        cc_df = self.cost_center_dataframe()
+        if li_df:
+            fcst_df = self.forecast_dataframe()
+            cc_df = self.cost_center_dataframe()
 
-        if len(fcst_df) > 0:
-            li_df = pd.merge(li_df, fcst_df, how="left", on="lineitem_id")
-        else:
-            li_df["Forecast"] = 0
-        li_df = pd.merge(li_df, cc_df, how="left", on="costcenter_id")
+            if len(fcst_df) > 0:
+                li_df = pd.merge(li_df, fcst_df, how="left", on="lineitem_id")
+            else:
+                li_df["Forecast"] = 0
+            li_df = pd.merge(li_df, cc_df, how="left", on="costcenter_id")
 
         return li_df
 
@@ -143,6 +145,8 @@ class Report:
         with_allocation = False
 
         li_df = self.line_item_detailed()
+        if not li_df:
+            return None
         grouping = ["Fund Center", "Cost Center", "Cost Center Name", "fund"]
         aggregation = {
             "Spent": "sum",
