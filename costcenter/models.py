@@ -115,7 +115,7 @@ class FinancialStructureManager(models.Manager):
 class FundCenter(models.Model):
     fundcenter = models.CharField("Fund Center", max_length=6, unique=True)
     shortname = models.CharField("Short Name", max_length=25, null=True, blank=True)
-    sequence = models.CharField("Sequence No", max_length=25, unique=True)
+    sequence = models.CharField("Sequence No", max_length=25, null=True)
     parent = models.ForeignKey(
         "self",
         on_delete=models.RESTRICT,

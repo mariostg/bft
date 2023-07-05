@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("costcenter", "0008_allocation_costcenterallocation"),
     ]
@@ -14,9 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="fundcenter",
             name="sequence",
-            field=models.CharField(
-                default=None, max_length=25, verbose_name="Sequence No"
-            ),
+            field=models.CharField(default=None, max_length=25, null=True, verbose_name="Sequence No"),
             preserve_default=False,
         ),
         migrations.AlterField(
@@ -40,9 +37,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="costcenter",
             name="costcenter",
-            field=models.CharField(
-                max_length=6, unique=True, verbose_name="Cost Center"
-            ),
+            field=models.CharField(max_length=6, unique=True, verbose_name="Cost Center"),
         ),
         migrations.AlterField(
             model_name="costcenter",
@@ -57,9 +52,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="costcenter",
             name="shortname",
-            field=models.CharField(
-                blank=True, max_length=35, null=True, verbose_name="Short Name"
-            ),
+            field=models.CharField(blank=True, max_length=35, null=True, verbose_name="Short Name"),
         ),
         migrations.AlterField(
             model_name="costcenterallocation",
@@ -84,9 +77,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="fundcenter",
             name="fundcenter",
-            field=models.CharField(
-                max_length=6, unique=True, verbose_name="Fund Center"
-            ),
+            field=models.CharField(max_length=6, unique=True, verbose_name="Fund Center"),
         ),
         migrations.AlterField(
             model_name="fundcenter",
@@ -103,8 +94,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="fundcenter",
             name="shortname",
-            field=models.CharField(
-                blank=True, max_length=25, null=True, verbose_name="Short Name"
-            ),
+            field=models.CharField(blank=True, max_length=25, null=True, verbose_name="Short Name"),
         ),
     ]
