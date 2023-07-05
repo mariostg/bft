@@ -93,12 +93,14 @@ class FundCenterManager(models.Manager):
 
 
 class FinancialStructureManager(models.Manager):
-    def FundCenters(self, fundcenter=None, seqno=None):
+    def FundCenters(self, fundcenter=None, seqno=None, fcid=None):
         try:
             if fundcenter:
                 obj = FundCenter.objects.filter(fundcenter=fundcenter)
             elif seqno:
                 obj = FundCenter.objects.filter(sequence_no__beginswith=seqno)
+            elif fcid:
+                obj = FundCenter.objects.filter(id=fcid)
             else:
                 obj = FundCenter.objects.all()
         except exceptions.FundCenterExceptionError(fundcenter=fundcenter, seqno=seqno):

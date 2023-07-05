@@ -8,6 +8,7 @@ from .models import (
     CostCenter,
     CostCenterAllocation,
     ForecastAdjustment,
+    FinancialStructureManager,
 )
 from .forms import (
     FundForm,
@@ -17,6 +18,7 @@ from .forms import (
     CostCenterAllocationForm,
     ForecastadjustmentForm,
 )
+from costcenter.structure import Structure
 
 
 def fund_page(request):
@@ -127,6 +129,10 @@ def fundcenter_add(request):
             obj = form.save(commit=False)
             obj.fundcenter = obj.fundcenter.upper()
             obj.shortname = obj.shortname.upper()
+
+            s = Structure()
+            tree_elements = [x.sequence for x in FinancialStructureManager().FundCenters()]
+            obj.sequence = s.create_child(tree_elements, parent=obj.parent.fundcenter)
             obj.save()
             return redirect("fundcenter-table")
     else:
