@@ -58,6 +58,7 @@ class Report:
                 "fundcenter": "Fund Center",
                 "shortname": "Fund Center Name",
                 "parent": "Parent",
+                "sequence": "Sequence No",
             }
         )
         return df
@@ -116,7 +117,7 @@ class Report:
         df = pd.DataFrame(data).rename(columns=columns)
         return df
 
-    def df_to_html(self, df: pd.DataFrame) -> str:
+    def df_to_html(self, df: pd.DataFrame, classname=None) -> str:
         """Create an html version of the dataframe provided.
 
         Args:
@@ -125,7 +126,10 @@ class Report:
         Returns:
             str: HTML string of a dataframe.
         """
-        report = df.to_html()
+        if classname:
+            report = df.style.set_table_attributes(f'class="{classname}"').to_html()
+        else:
+            report = df.to_html()
         return report
 
     def cost_center_screening_report(self) -> pd.DataFrame:
@@ -160,7 +164,9 @@ class Report:
         fc = self.fund_center_dataframe()
         cc = self.cost_center_dataframe()
         merged = pd.merge(fc, cc, how="left", left_on=["fundcenter_id"], right_on=["parent_id"])
-        merged.set_index(["Fund Center Name", "Fund Center", "Cost Center Name", "Cost Center"], inplace=True)
+        merged.set_index(
+            ["Sequence No", "Fund Center Name", "Fund Center", "Cost Center Name", "Cost Center"], inplace=True
+        )
         merged.drop(
             [
                 "fundcenter_id",
@@ -173,4 +179,5 @@ class Report:
             axis=1,
             inplace=True,
         )
-        return self.df_to_html(merged)
+        merged.sort_values(by=["Sequence No"], inplace=True)
+        return self.df_to_html(merged, classname="fin-structure")
