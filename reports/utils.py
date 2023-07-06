@@ -183,4 +183,11 @@ class Report:
             inplace=True,
         )
         merged.sort_values(by=["Sequence No"], inplace=True)
-        return self.df_to_html(merged, classname="fin-structure")
+
+        def indent(s):
+            return f"text-align:left;padding-left:{len(str(s))*4}px"
+
+        merged = merged.style.applymap_index(indent, level=0).set_table_attributes("class=fin-structure")
+
+        return merged.to_html(bold_rows=False)
+        # return self.df_to_html(merged)
