@@ -167,6 +167,7 @@ class Report:
         fc = self.fund_center_dataframe()
         cc = self.cost_center_dataframe()
         merged = pd.merge(fc, cc, how="left", left_on=["fundcenter_id"], right_on=["parent_id"])
+        merged = merged.fillna("")
         merged.set_index(
             ["Sequence No", "Fund Center Name", "Fund Center", "Cost Center Name", "Cost Center"], inplace=True
         )
