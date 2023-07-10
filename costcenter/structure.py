@@ -43,7 +43,20 @@ class Structure:
                 descendants.append(d)
         return descendants
 
-    def create_child(self, family: list, parent: str = None, seqno=None) -> str:
+    def create_child(self, family: list, parent: str = None, seqno:str=None) -> str:
+        """Create a new sequence number to be attributed to a cost center or a fund center.
+
+        Args:
+            family (list): A list of sequence no representing the members of the family 
+            where the child will be added'
+            parent (str, optional): A string representing the parent Fund Center. 
+            Defaults to None.
+            seqno (str, optional): A string representing the sequence number to be givent to the child. 
+            Defaults to None.
+
+        Returns:
+            str: The sequence number of the child.
+        """
         if parent:
             seqno = FundCenterManager().fundcenter(parent).sequence
         children = self.get_direct_descendants(family, seqno)
@@ -60,7 +73,6 @@ class Structure:
         new_born = ".".join(new_born)
         family.append(new_born)
         return new_born
-
 
 class ParentDoesNotExistError(Exception):
     def __init__(self, parent=None):

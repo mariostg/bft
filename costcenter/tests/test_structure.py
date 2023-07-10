@@ -2,8 +2,10 @@ import pytest
 import django
 
 django.setup()
+from costcenter.models import FinancialStructureManager
 from costcenter.structure import Structure
 from costcenter.structure import Structure, ParentDoesNotExistError
+from encumbrance.management.commands import populate
 
 
 class TestObs:
@@ -50,7 +52,7 @@ class TestObs:
         with pytest.raises(ParentDoesNotExistError):
             s.get_direct_descendants(family, parent)
 
-    def test_create_child(self):
+    def test_create_child_using_seqno(self):
         s = Structure()
         family = self.family["obs"]
         child = s.create_child(family, seqno="1.1")
@@ -59,3 +61,13 @@ class TestObs:
         assert "1.2.1.1" == child
         with pytest.raises(ParentDoesNotExistError):
             child = s.create_child(family, seqno="3")
+
+    def test_create_child_using_parent(self):
+        pp = populate.Command()
+        pp.handle()
+        parent_obj = FinancialStructureManager().FundCenters(fundcenter='1111AC').first()
+        tree_elements = [x.sequence for x in FinancialStructureManager().FundCenters()]
+        s = Structure()
+        new_seqno = s.create_child(tree_elements, parent_obj.fundcenter)
+        assert '1.2.1'==new_seqno
+        # print(new_tree_elements)

@@ -189,6 +189,8 @@ class Report:
             return f"text-align:left;padding-left:{len(str(s))*4}px"
 
         def set_row_class(r):
+            #TODO something to implement zebra rows in table
+            pass
             
         merged = merged.style.applymap_index(indent, level=0).set_table_attributes("class=fin-structure")
 
