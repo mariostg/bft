@@ -188,6 +188,8 @@ class Report:
         def indent(s):
             return f"text-align:left;padding-left:{len(str(s))*4}px"
 
+        def set_row_class(r):
+            
         merged = merged.style.applymap_index(indent, level=0).set_table_attributes("class=fin-structure")
 
         return merged.to_html(bold_rows=False)
