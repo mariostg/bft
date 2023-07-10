@@ -6,6 +6,7 @@ from costcenter.models import FinancialStructureManager
 from costcenter.structure import Structure
 from costcenter.structure import Structure, ParentDoesNotExistError
 from encumbrance.management.commands import populate
+from bft.exceptions import IncompatibleArgumentsError
 
 
 class TestObs:
@@ -52,6 +53,12 @@ class TestObs:
         with pytest.raises(ParentDoesNotExistError):
             s.get_direct_descendants(family, parent)
 
+    def test_create_child_using_parent_and_seqno(self):
+        s = Structure()
+        family = self.family["obs"]
+        with pytest.raises(IncompatibleArgumentsError):
+            s.create_child(family, parent="1111AA", seqno="1.1")
+
     def test_create_child_using_seqno(self):
         s = Structure()
         family = self.family["obs"]
@@ -65,9 +72,9 @@ class TestObs:
     def test_create_child_using_parent(self):
         pp = populate.Command()
         pp.handle()
-        parent_obj = FinancialStructureManager().FundCenters(fundcenter='1111AC').first()
+        parent_obj = FinancialStructureManager().FundCenters(fundcenter="1111AC").first()
         tree_elements = [x.sequence for x in FinancialStructureManager().FundCenters()]
         s = Structure()
         new_seqno = s.create_child(tree_elements, parent_obj.fundcenter)
-        assert '1.2.1'==new_seqno
+        assert "1.2.1" == new_seqno
         # print(new_tree_elements)

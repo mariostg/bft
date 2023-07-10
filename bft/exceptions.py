@@ -35,3 +35,10 @@ class FundCenterExceptionError(Exception):
 
     def __str__(self):
         return self.message
+
+class IncompatibleArgumentsError(Exception):
+    def __init__(self, fundcenter=None, seqno=None):
+        self.message=f"Fund center and seqno cannot be used at the same time.  You provided {fundcenter} and {seqno}"
+    
+    def __str__(self):
+        return self.message

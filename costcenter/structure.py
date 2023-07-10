@@ -1,6 +1,6 @@
 import numpy as np
 from costcenter.models import FundCenterManager
-
+from bft import exceptions
 """
 This class serves for the management of organisation breakdown structure.
 """
@@ -45,6 +45,7 @@ class Structure:
 
     def create_child(self, family: list, parent: str = None, seqno:str=None) -> str:
         """Create a new sequence number to be attributed to a cost center or a fund center.
+        Either parent or seqno is required, not both or Exception will be raised.
 
         Args:
             family (list): A list of sequence no representing the members of the family 
@@ -57,6 +58,8 @@ class Structure:
         Returns:
             str: The sequence number of the child.
         """
+        if parent and seqno:
+            raise exceptions.IncompatibleArgumentsError(fundcenter=parent, seqno=seqno)
         if parent:
             seqno = FundCenterManager().fundcenter(parent).sequence
         children = self.get_direct_descendants(family, seqno)
