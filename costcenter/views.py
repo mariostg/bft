@@ -131,8 +131,11 @@ def fundcenter_add(request):
             obj.shortname = obj.shortname.upper()
 
             s = Structure()
-            tree_elements = [x.sequence for x in FinancialStructureManager().FundCenters()]
-            obj.sequence = s.create_child(tree_elements, parent=obj.parent.fundcenter)
+            fsm = FinancialStructureManager()
+            # tree_elements = [x.sequence for x in fsm.FundCenters()]
+            print(obj.parent)
+            obj.sequence = fsm.set_parent(fundcenter_parent=obj.parent, fundcenter_child=obj)
+            # obj.sequence = s.create_child(tree_elements, parent=obj.parent.fundcenter)
             obj.save()
             return redirect("fundcenter-table")
     else:

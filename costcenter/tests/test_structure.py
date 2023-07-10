@@ -2,7 +2,7 @@ import pytest
 import django
 
 django.setup()
-from costcenter.models import FinancialStructureManager
+from costcenter.models import FinancialStructureManager, FundCenter
 from costcenter.structure import Structure
 from costcenter.structure import Structure, ParentDoesNotExistError
 from encumbrance.management.commands import populate
@@ -78,3 +78,22 @@ class TestObs:
         new_seqno = s.create_child(tree_elements, parent_obj.fundcenter)
         assert "1.2.1" == new_seqno
         # print(new_tree_elements)
+
+    def test_move_fundcenter_to_another_one(self):
+        # pp = populate.Command()
+        # pp.handle()
+        s = Structure()
+        tree_elements = [x.sequence for x in FinancialStructureManager().FundCenters()]
+
+        # create a fundcenter and assign it to 1.1
+        assert "1.1.1" not in tree_elements
+        parent = FundCenter.objects.get(sequence="1.1")
+        FundCenter.objects.create(fundcenter="3333WW", shortname="zz", parent=parent, sequence="1.1.1")
+        tree_elements = [x.sequence for x in FinancialStructureManager().FundCenters()]
+        assert "1.1.1" in tree_elements
+
+        # move fund center from 1.1 to 1.2
+        fsm = FinancialStructureManager()
+        fc = fsm.FundCenters(fundcenter="3333WW").first()
+        parent = fsm.FundCenters(fundcenter="1111AC").first()
+        fsm.set_parent(fundcenter_child=fc, fundcenter_parent=parent)

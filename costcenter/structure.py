@@ -1,6 +1,7 @@
 import numpy as np
-from costcenter.models import FundCenterManager
+
 from bft import exceptions
+
 """
 This class serves for the management of organisation breakdown structure.
 """
@@ -43,7 +44,9 @@ class Structure:
                 descendants.append(d)
         return descendants
 
-    def create_child(self, family: list, parent: str = None, seqno:str=None) -> str:
+    def create_child(self, family: list, parent: str = None, seqno: str = None) -> str:
+        from costcenter.models import FundCenterManager
+
         """Create a new sequence number to be attributed to a cost center or a fund center.
         Either parent or seqno is required, not both or Exception will be raised.
 
@@ -76,6 +79,7 @@ class Structure:
         new_born = ".".join(new_born)
         family.append(new_born)
         return new_born
+
 
 class ParentDoesNotExistError(Exception):
     def __init__(self, parent=None):

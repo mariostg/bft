@@ -7,6 +7,8 @@ from django.conf import settings
 from bft.conf import YEAR_CHOICES, QUARTERS
 from bft import exceptions
 
+from costcenter.structure import Structure
+
 
 class FundManager(models.Manager):
     def fund(self, fund: str):
@@ -98,7 +100,7 @@ class FinancialStructureManager(models.Manager):
             if fundcenter:
                 obj = FundCenter.objects.filter(fundcenter=fundcenter)
             elif seqno:
-                obj = FundCenter.objects.filter(sequence_no__beginswith=seqno)
+                obj = FundCenter.objects.filter(sequence__startswith=seqno)
             elif fcid:
                 obj = FundCenter.objects.filter(id=fcid)
             else:
@@ -106,6 +108,16 @@ class FinancialStructureManager(models.Manager):
         except exceptions.FundCenterExceptionError(fundcenter=fundcenter, seqno=seqno):
             return None
         return obj
+
+    def sequence_exists(self, seqno=None, fundcenter=None) -> bool:
+        if seqno:
+            return seqno in [x.sequence for x in self.FundCenters(seqno=seqno)]
+
+    def set_parent(self, fundcenter_child=None, fundcenter_parent=None):
+        s = Structure()
+        family = list(self.FundCenters(seqno=fundcenter_parent.sequence).values_list("sequence", flat=True))
+        new_seq = s.create_child(family, fundcenter_parent.fundcenter)
+        return new_seq
 
     def CostCenters(self):
         pass
