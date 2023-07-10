@@ -169,7 +169,7 @@ class Report:
         merged = pd.merge(fc, cc, how="left", left_on=["fundcenter_id"], right_on=["parent_id"])
         merged = merged.fillna("")
         merged.set_index(
-            ["Sequence No", "Fund Center Name", "Fund Center", "Cost Center Name", "Cost Center"], inplace=True
+            ["Sequence No", "Fund Center Name", "Fund Center",  "Cost Center","Cost Center Name",], inplace=True
         )
         merged.drop(
             [
