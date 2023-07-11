@@ -4,9 +4,8 @@ import django
 django.setup()
 from costcenter.models import FinancialStructureManager, FundCenter
 from costcenter.structure import Structure
-from costcenter.structure import Structure, ParentDoesNotExistError
 from encumbrance.management.commands import populate
-from bft.exceptions import IncompatibleArgumentsError
+from bft.exceptions import IncompatibleArgumentsError, ParentDoesNotExistError
 
 
 class TestObs:

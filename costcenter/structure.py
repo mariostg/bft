@@ -26,7 +26,7 @@ class Structure:
 
     def get_descendants(self, family, parent) -> list:
         if parent not in family:
-            raise ParentDoesNotExistError
+            raise exceptions.ParentDoesNotExistError
 
         descendants = []
         for d in family:
@@ -36,7 +36,7 @@ class Structure:
 
     def get_direct_descendants(self, family: list, parent: str) -> list:
         if parent not in family:
-            raise ParentDoesNotExistError
+            raise exceptions.ParentDoesNotExistError
 
         descendants = []
         for d in family:
@@ -79,11 +79,3 @@ class Structure:
         new_born = ".".join(new_born)
         family.append(new_born)
         return new_born
-
-
-class ParentDoesNotExistError(Exception):
-    def __init__(self, parent=None):
-        self.message = f"The parent specified: {parent} does not exist"
-
-    def __str__(self):
-        return self.message

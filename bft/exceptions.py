@@ -36,9 +36,18 @@ class FundCenterExceptionError(Exception):
     def __str__(self):
         return self.message
 
+
 class IncompatibleArgumentsError(Exception):
     def __init__(self, fundcenter=None, seqno=None):
-        self.message=f"Fund center and seqno cannot be used at the same time.  You provided {fundcenter} and {seqno}"
-    
+        self.message = f"Fund center and seqno cannot be used at the same time.  You provided {fundcenter} and {seqno}"
+
+    def __str__(self):
+        return self.message
+
+
+class ParentDoesNotExistError(Exception):
+    def __init__(self, parent=None):
+        self.message = f"The parent specified: {parent} does not exist"
+
     def __str__(self):
         return self.message
