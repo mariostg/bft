@@ -127,8 +127,6 @@ def fundcenter_add(request):
         form = FundCenterForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
-            obj.fundcenter = obj.fundcenter.upper()
-            obj.shortname = obj.shortname.upper()
 
             fsm = FinancialStructureManager()
             obj.sequence = fsm.set_parent(fundcenter_parent=obj.parent, fundcenter_child=obj)
