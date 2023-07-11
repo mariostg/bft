@@ -19,7 +19,6 @@ from .forms import (
     CostCenterAllocationForm,
     ForecastadjustmentForm,
 )
-from costcenter.structure import Structure
 
 
 def fund_page(request):
