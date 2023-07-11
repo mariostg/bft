@@ -6,3 +6,4 @@ django_extensions==3.2
 ipython==8.13.2
 coverage==7.2.5
 pytest==7.4.0
+pytest-django==4.5.2
