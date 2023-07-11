@@ -5,6 +5,7 @@ from .models import (
     Fund,
     Source,
     FundCenter,
+    FundCenterManager,
     CostCenter,
     CostCenterAllocation,
     ForecastAdjustment,
@@ -145,7 +146,13 @@ def fundcenter_update(request, pk):
     if request.method == "POST":
         form = FundCenterForm(request.POST, instance=fundcenter)
         if form.is_valid():
-            form.save()
+            obj = form.save(commit=False)
+            current = FundCenterManager().fundcenter(obj.fundcenter)
+            if obj.parent != current.parent:
+                # Need to change sequence given parent change
+                fsm = FinancialStructureManager()
+                obj.sequence = fsm.set_parent(fundcenter_parent=obj.parent, fundcenter_child=obj)
+                obj.save()
             return redirect("fundcenter-table")
         else:
             print("NOT VALID")
