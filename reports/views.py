@@ -23,7 +23,7 @@ def bmt_screening_report(request):
         .filter(balance__gt=0)
     )
     table = utils.Report().cost_center_screening_report()
-    if table == None:
+    if table.empty:
         context = None
     else:
         table = table.to_html()

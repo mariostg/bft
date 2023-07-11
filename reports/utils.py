@@ -26,7 +26,7 @@ class Report:
             )
             return df
         else:
-            return None
+            return pd.DataFrame({})
 
     def forecast_dataframe(self) -> pd.DataFrame:
         """Prepare a pandas dataframe of the forecast line items.  Columns are renamed
@@ -88,6 +88,8 @@ class Report:
             pd.DataFrame : A dataframe of line items including forecast.
         """
         li_df = self.line_item_dataframe()
+        if li_df.empty:
+            return li_df
         if len(li_df) > 0:
             fcst_df = self.forecast_dataframe()
             cc_df = self.cost_center_dataframe()
@@ -145,7 +147,7 @@ class Report:
 
         li_df = self.line_item_detailed()
         if len(li_df) == 0:
-            return None
+            return pd.DataFrame({})
         grouping = ["Fund Center", "Cost Center", "Cost Center Name", "fund"]
         aggregation = {
             "Spent": "sum",
@@ -169,7 +171,7 @@ class Report:
         merged = pd.merge(fc, cc, how="left", left_on=["fundcenter_id"], right_on=["parent_id"])
         merged = merged.fillna("")
         merged.set_index(
-            ["Sequence No", "Fund Center Name", "Fund Center",  "Cost Center","Cost Center Name",], inplace=True
+            ["Sequence No", "Fund Center Name", "Fund Center", "Cost Center", "Cost Center Name"], inplace=True
         )
         merged.drop(
             [
@@ -189,9 +191,9 @@ class Report:
             return f"text-align:left;padding-left:{len(str(s))*4}px"
 
         def set_row_class(r):
-            #TODO something to implement zebra rows in table
+            # TODO something to implement zebra rows in table
             pass
-            
+
         merged = merged.style.applymap_index(indent, level=0).set_table_attributes("class=fin-structure")
 
         return merged.to_html(bold_rows=False)
