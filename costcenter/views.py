@@ -130,12 +130,8 @@ def fundcenter_add(request):
             obj.fundcenter = obj.fundcenter.upper()
             obj.shortname = obj.shortname.upper()
 
-            s = Structure()
             fsm = FinancialStructureManager()
-            # tree_elements = [x.sequence for x in fsm.FundCenters()]
-            print(obj.parent)
             obj.sequence = fsm.set_parent(fundcenter_parent=obj.parent, fundcenter_child=obj)
-            # obj.sequence = s.create_child(tree_elements, parent=obj.parent.fundcenter)
             obj.save()
             return redirect("fundcenter-table")
     else:
@@ -152,7 +148,6 @@ def fundcenter_update(request, pk):
         form = FundCenterForm(request.POST, instance=fundcenter)
         if form.is_valid():
             form.save()
-            # obj.fundcenter = obj.fundcenter.upper()
             return redirect("fundcenter-table")
         else:
             print("NOT VALID")
