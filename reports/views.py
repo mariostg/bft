@@ -22,14 +22,10 @@ def bmt_screening_report(request):
         .order_by("fundcenter", "costcenter", "fund")
         .filter(balance__gt=0)
     )
-    table = utils.Report().cost_center_screening_report()
-    if table.empty:
-        context = None
-    else:
-        table = table.to_html()
-        paginator = Paginator(data, 50)
-        page_number = request.GET.get("page")
-        context = {"data": paginator.get_page(page_number), "table": table}
+    table = utils.Report().cost_center_screening_report().to_html()
+    paginator = Paginator(data, 50)
+    page_number = request.GET.get("page")
+    context = {"data": paginator.get_page(page_number), "table": table}
     return render(request, "bmt-screening-report.html", context)
 
 

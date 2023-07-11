@@ -144,10 +144,10 @@ class Report:
         """
 
         with_allocation = False
-
+        style_format = "${0:>,.0f}"
         li_df = self.line_item_detailed()
         if len(li_df) == 0:
-            return pd.DataFrame({})
+            return pd.DataFrame({}).style.format(style_format)
         grouping = ["Fund Center", "Cost Center", "Cost Center Name", "fund"]
         aggregation = {
             "Spent": "sum",
@@ -160,10 +160,10 @@ class Report:
         if with_allocation == True:
             allocation_df = self.cost_center_allocation_dataframe()
             allocation_agg = allocation_df.groupby(["Cost Center", "Fund"]).agg({"Allocation": "sum"})
-            final = pd.merge(df, allocation_agg, how="left", on=["Cost Center"]).style.format("${0:>,.0f}")
+            final = pd.merge(df, allocation_agg, how="left", on=["Cost Center"]).style.format(style_format)
             return final
         else:
-            return df.style.format("${0:>,.0f}")
+            return df.style.format(style_format)
 
     def financial_structure_report(self):
         fc = self.fund_center_dataframe()
