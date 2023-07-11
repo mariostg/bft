@@ -61,11 +61,25 @@ class Command(BaseCommand):
         root = FundCenter.objects.filter(fundcenter="1111AA").first()
         print(f"Created Fund Center {root}")
 
-        items = [
+        root_children = [
             {"fundcenter": "1111AB", "shortname": "AB", "parent": root, "sequence": "1.1"},
             {"fundcenter": "1111AC", "shortname": "AC", "parent": root, "sequence": "1.2"},
         ]
-        for item in items:
+        for item in root_children:
+            try:
+                found = FundCenter.objects.get(fundcenter=item["fundcenter"])
+                if found:
+                    print(f"Fund Center {found} exists")
+            except FundCenter.DoesNotExist:
+                new_item = FundCenter.objects.create(**item)
+                print(f"Created Fund Center {new_item}")
+
+        ab = FundCenter.objects.filter(fundcenter="1111AB").first()
+        ab_children = [
+            {"fundcenter": "2222BA", "shortname": "BA", "parent": ab, "sequence": "1.1.1"},
+            {"fundcenter": "2222BB", "shortname": "BB", "parent": ab, "sequence": "1.1.2"},
+        ]
+        for item in ab_children:
             try:
                 found = FundCenter.objects.get(fundcenter=item["fundcenter"])
                 if found:
