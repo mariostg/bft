@@ -1,5 +1,5 @@
 from lineitems.models import LineItem, LineForecast
-from costcenter.models import CostCenter, CostCenterAllocation, FundCenter
+from costcenter.models import CostCenter, CostCenterAllocation, FundCenter, ForecastAdjustment
 from django.db.models import Sum
 import pandas as pd
 from bft.exceptions import LineItemsDoNotExistError
@@ -119,6 +119,15 @@ class Report:
         }
         df = pd.DataFrame(data).rename(columns=columns)
         return df
+
+    def forecast_adjustment_dataframe(self) -> pd.DataFrame:
+        data = list(ForecastAdjustment.objects.all().values("costcenter__costcenter", "fund__fund", "amount"))
+        columns = {
+            "amount": "Forecast Adjustment",
+            "costcenter__costcenter": "Cost Center",
+            "fund__fund": "Fund",
+        }
+        return pd.DataFrame(data).rename(columns=columns)
 
     def df_to_html(self, df: pd.DataFrame, classname=None) -> str:
         """Create an html version of the dataframe provided.

@@ -1,6 +1,6 @@
 import pytest
 from reports.utils import Report
-from costcenter.models import CostCenterAllocation, Fund, CostCenterManager
+from costcenter.models import CostCenterAllocation, Fund, CostCenterManager, ForecastAdjustment
 from encumbrance.management.commands import populate, uploadcsv
 
 
@@ -85,6 +85,20 @@ class TestReports:
         alloc.save()
         r = Report()
         assert 1 == len(r.cost_center_allocation_dataframe())
+
+    def test_forecast_adjustment_empty(self):
+        r = Report()
+        assert True == r.forecast_adjustment_dataframe().empty
+
+    def test_forecast_adjustment(self):
+        hnd = populate.Command()
+        hnd.handle()
+        fund = Fund.objects.all().first()
+        costcenter = CostCenterManager().cost_center("8486b1")
+        ForecastAdjustment(fund=fund, costcenter=costcenter, amount=1000).save()
+        r = Report()
+
+        assert 1 == len(r.forecast_adjustment_dataframe())
 
     def test_cost_center_screening_report_empty(self):
         r = Report()
