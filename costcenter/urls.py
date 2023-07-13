@@ -48,5 +48,5 @@ urlpatterns += [
     path("forecast-adjustment-table", views.forecast_adjustment_page, name="forecast-adjustment-table"),
     path("forecast-adjustment-add", views.forecast_adjustment_add, name="forecast-adjustment-add"),
     path("forecast-adjustment-update/<int:pk>", views.forecast_adjustment_update, name="forecast-adjustment-update"),
-    path("forecast-adjustments-delete/<int:pk>", views.forecast_adjustment_update, name="forecast-adjustment-delete"),
+    path("forecast-adjustments-delete/<int:pk>", views.forecast_adjustment_delete, name="forecast-adjustment-delete"),
 ]

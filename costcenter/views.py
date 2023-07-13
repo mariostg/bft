@@ -300,4 +300,4 @@ def forecast_adjustment_delete(request, pk):
         item.delete()
         return redirect("forecast-adjustment-table")
     context = {"object": item, "back": "forecast-adjustment-table"}
-    return render(request, "core/delete_object.html", context)
+    return render(request, "core/delete-object.html", context)
