@@ -1,4 +1,21 @@
 from django.contrib import admin
 from .models import EncumbranceImport
 
-admin.site.register(EncumbranceImport)
+
+class EncumbranceAdmin(admin.ModelAdmin):
+    list_display = (
+        "docno",
+        "lineno",
+        "fund",
+        "costcenter",
+        "fundcenter",
+        "doctype",
+        "enctype",
+        "spent",
+        "balance",
+        "workingplan",
+        "linetext",
+    )
+
+
+admin.site.register(EncumbranceImport, EncumbranceAdmin)

@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+<main class="block block--centered">
+    <header class="block"><h2>Line Item Forecast</h2></header>
+    <section class="form">
+        <header class="form__header">{{lineitem.linetext}} [{{lineitem.docno}}-{{lineitem.lineno}}]</header>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.management_form }}
+            {{ form.errors }}
+            {{ form.non_field_errors }}
+            {{ form.non_form_errors }}
+
+            <div class="form__fields">
+                {{form.forecastamount.label_tag}} {{form.forecastamount}}
+                {{form.description.label_tag}} {{form.description}}
+                {{form.comment.label_tag}} {{form.comment}} 
+                {{form.deliverydate.label_tag}} {{form.deliverydate}}
+                {{form.buyer.label_tag}} {{form.buyer}}
+                {{form.delivered.label_tag}} {{form.delivered}}
+
+                <span>Parent ID {{form.lineitem}} </span>
+                <input type="hidden" value="{{form.lineitem}}">
+            </div>
+            <div class="block block--spaced">
+                <button class="btn">Save</button>
+                <button class="btn btn-back">Back</button>
+            </div>
+        </form>
+        <footer class="form__footer">Last edited by XXXXXXXX, {{form.created}}</footer>
+    </section>
+</main>
+
+{% endblock content %}

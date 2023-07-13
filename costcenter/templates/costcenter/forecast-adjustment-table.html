@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %}
+{% comment %} {% load static %} {% endcomment %}
+{% block content %}
+<header class='block'>
+    <h2>Forecast Ajustments</h2>
+</header>
+<main class="block block--centered">
+    {% for item in data %}
+    <section class='summary'>
+        <div class='summary__header'>
+            <span>2184BR - {{item.costcenter}}</span>
+            <span>{{item.fund}}</span>
+            <span>Ammo</span>
+        </div>
+        <div class="summary__body">
+            <span>{{item.amount}}</span>
+            <span>{{item.note}}</span>
+        </div>
+        <div class="footnote">
+            Created on {{item.created}}, Last updated by {{item.owner}} on {{item.updated}}
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="summary__footer">
+            <a href='{% url "forecast-adjustment-update" item.pk %}' class="btn">Edit</a>
+            <a class="btn btn-delete" href="{% url 'forecast-adjustment-delete' item.pk %}" >Delete</a >
+        </div>
+        {% endif %}
+    </section>
+    {%empty%}
+        <p>no forecast</p>
+    {% endfor %}
+</main>
+
+{% endblock content %}

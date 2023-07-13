@@ -21,10 +21,10 @@
             <td>{{fund.download}}</td>
             {% if user.is_authenticated %}
                 <td>
-                    <a class='btn' href="{% url "update-fund" fund.id %}">Update</a>
+                    <a class='btn' href="{% url "fund-update" fund.id %}">Update</a>
                 </td>
                 <td>
-                    <a class='btn btn-delete' href="{% url "delete-fund" fund.id %}">Delete</a>
+                    <a class='btn btn-delete' href="{% url "fund-delete" fund.id %}">Delete</a>
                 </td>
             {% endif %}
             </tr>
@@ -33,7 +33,7 @@
         </tbody>
         {% if user.is_authenticated %}
         <tfoot>
-            <tr><td colspan=6><a class='btn' href="{% url 'add-fund' %}">Add Fund</a></td></tr>
+            <tr><td colspan=6><a class='btn' href="{% url 'fund-add' %}">Add Fund</a></td></tr>
         </tfoot>
         {% endif %}
     </table>

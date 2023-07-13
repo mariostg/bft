@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Fund Center Table{% endblock title %}
+{% block content %}
+<main class="block block--centered">
+    <table id='fundcenter-table'>
+        <caption>Fund Centers</caption>
+        <thead>
+            <tr>
+                <th>FundCenter</th>
+                <th>Name</th>
+                <th>Parent</th>
+                <th colspan=3></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for elem in fundcenters %}
+            <tr>
+            <td>{{elem.fundcenter}}</td><td>{{elem.shortname}}<td>{{elem.parent}}</td>
+            <td> <a class='btn' href="{% url "fundcenter-costcenters" elem.pk  %}">Cost centers</a></button> </td>
+            {% if user.is_authenticated %}
+            <td> <a class='btn'href="{% url "fundcenter-update" elem.id %}">Update</a></button> </td>
+            <td> <a class='btn btn-delete' href="{% url "fundcenter-delete" elem.id %}">Delete</a></button> </td>
+            {% endif %}
+        </tr>
+            {% endfor %} 
+
+        </tbody>
+        {% if user.is_authenticated %}
+        <tfoot>
+            <tr><td colspan=6><a class='btn' href="{% url 'fundcenter-add' %}">Add Fund Center</a></td></tr>
+        </tfoot>
+        {% endif %}
+    </table>
+</main>
+</body>
+</html>
+{% endblock content %}

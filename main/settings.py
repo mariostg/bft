@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-wc@53&*i8q9*_w1)8-wy)e2%8!_-%o&7a(9(ac6og_5p!%so)x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["testserver", "127.0.0.1"]
 
 
 # Application definition
@@ -37,10 +37,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
+    "django.forms",  # to use custom templates such as textarea.html
     # apps
+    "bft.apps.BftConfig",
     "costcenter.apps.CostcenterConfig",
     "lineitems.apps.LineitemsConfig",
     "encumbrance.apps.EncumbranceConfig",
+    "reports.apps.ReportsConfig",
     # dev
     "django_extensions",
 ]
@@ -72,6 +76,9 @@ TEMPLATES = [
         },
     },
 ]
+
+# to use custom templates such as textarea.html
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "main.wsgi.application"
 
@@ -122,8 +129,52 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
+MEDIA_URL = "/images/"
 
+STATICFILES_DIRS = [BASE_DIR / "static"]
+MEDIA_ROOT = BASE_DIR / "static/images"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{asctime} {levelname} {module}.{funcName} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{asctime} {levelname} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "django.log",
+            "formatter": "verbose",
+        },
+        "file_uploadcsv": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "upload.log",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "uploadcsv": {
+            "handlers": ["file_uploadcsv"],
+            "level": "INFO",
+            "propagate": True,
+        },
+    },
+}

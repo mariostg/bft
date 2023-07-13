@@ -4,6 +4,10 @@ from encumbrance.models import Encumbrance, EncumbranceImport
 from lineitems.models import LineItem
 from main.settings import BASE_DIR
 
+import logging
+
+logger = logging.getLogger("uploadcsv")
+
 
 class Command(BaseCommand):
     """Import CSV Encumbrance report into Line item table.  encumbrance/drmis_data
@@ -12,26 +16,26 @@ class Command(BaseCommand):
 
     help = "Import CSV Encumbrance report into Line item table."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "encumbrancefile",
+            type=str,
+            help="Encumbrance report full path",
+        )
+
     def handle(self, *args, **options):
         EncumbranceImport.objects.all().delete()
-
-        test_files = {
-            "tiny": "encumbrance_tiny.txt",
-            "small": "encumbrance_small.txt",
-            "large": "encumbrance_large.txt",
-            "full": "encumbrance_P1a.txt",
-        }
-
-        rawtextfile = os.path.join(BASE_DIR, "drmis_data", test_files["small"])
+        rawtextfile = options["encumbrancefile"]
 
         if os.path.exists(rawtextfile):
+            logger.info("-- BFT Download starts")
+            rawtextfile = os.path.realpath(rawtextfile)
             er = Encumbrance(rawtextfile)
             if er.run_all():
-                self.stdout.write(
-                    "Encumbrance data has saved as csv and import raw table filled"
-                )
-                data = EncumbranceImport.objects.all()
-                li = LineItems()
-                li.import_lines(data)
+                logger.info("Encumbrance data saved as csv and import raw table filled")
+                li = LineItem()
+                li.import_lines()
+                li.set_fund_center_integrity()
+                logger.info("-- BFT dowload complete")
         else:
-            self.stdout.write(f"{rawtextfile} not found")
+            logger.warning(f"{rawtextfile} not found")

@@ -16,6 +16,12 @@ from costcenter.models import CostCenter, Fund
 
 
 class EncumbranceImport(models.Model):
+    """
+    EncumbranceImport class defines the model that represents the DND cost
+    center encumbrance report single line item.  Each line read from the
+    encumbrance report during the uploadcsv command must match this model
+    """
+
     docno = models.CharField(max_length=10)
     lineno = models.CharField(max_length=7)  # lineno : acctassno
     # acctassno = models.CharField(max_length=3, null=True, blank=True)
@@ -39,6 +45,15 @@ class EncumbranceImport(models.Model):
 
 
 class Encumbrance:
+    """
+    Encumbrance class process the DND Cost Center encumbrance report.  It
+    creates a csv file and populate the table using EncumbranceImport class.
+
+    Raises:
+        ValueError: If no encumbrance file name is provided.
+        FileNotFoundError: If the encumbrance file is not found
+    """
+
     COLUMNS = 22  # Includes empty columns at beginning and end of row
     CSVFILE = os.path.join(BASE_DIR, "drmis_data/encumbrance.csv")
     DRMIS_DIR = os.path.join(BASE_DIR, "drmis_data")
@@ -46,11 +61,14 @@ class Encumbrance:
 
     def __init__(self, rawtextfile=None):
         locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
+        if rawtextfile == None:
+            raise ValueError("No file name provided")
         filepath = os.path.join(self.DRMIS_DIR, rawtextfile)
-        if rawtextfile and os.path.exists(filepath):
-            self.rawtextfile = filepath
-        else:
-            self.rawtextfile = None
+
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(f"{rawtextfile} was not found")
+
+        self.rawtextfile = filepath
 
         self.hint = {
             "fy": "|Base Fiscal Year",
@@ -65,11 +83,11 @@ class Encumbrance:
             "fc": None,  # Fund center read on report header
             "header": [],  # Columns header values read on report
             "lineno": 0,  # Linenumber where first column header was found
-            # "csv": None,  # csv data resulting from parsing the report
+            "csv": 0,  # csv line count data resulting from parsing the report
             "column_count": 22,  # Expected number of columns un the DRMIS report
         }
 
-    def find_fund(self, line: str) -> str | None:
+    def find_fund_center(self, line: str) -> str | None:
         """Verify if whether or not a line contains the fund_center as defined in self.hint['fund_center'].
 
         Args:
@@ -139,7 +157,7 @@ class Encumbrance:
         """Attemps to find the row that contains the column header based on self.hint['header']
 
         Returns:
-            int: _description_
+            int: 0 if nothing found, line number otherwise.
         """
 
         lineno = 0
@@ -177,6 +195,16 @@ class Encumbrance:
         return False
 
     def line_to_csv(self, line: str) -> list | None:
+        """
+        Split a line from the encumbrance report in a list
+
+        Args:
+            line (str): A line from the encumbrance report
+
+        Returns:
+            list | None: The list that contains the element from the string
+            containing the data from the line passed as argument.
+        """
         csv = line.split("|")
         csv.pop()
         csv.pop(0)
@@ -205,9 +233,12 @@ class Encumbrance:
 
         return False
 
-    def write_encumbrance_file_as_csv(self):
+    def write_encumbrance_file_as_csv(self) -> int:
+        """
+        Transform the encumbrance report raw file into a more useful CSV file.
+        """
         lineno = 0
-        skipped = 0
+        lines_written = 0
         with open(self.rawtextfile, encoding="windows-1252") as lines, open(self.CSVFILE, "w") as recorder:
             writer = csv.writer(recorder, quoting=csv.QUOTE_ALL)
             header = self.line_to_csv(self.CSVFIELDS)
@@ -220,13 +251,15 @@ class Encumbrance:
                     data = self.line_to_csv(line)
                     if data:
                         writer.writerow(data)
-                    else:
-                        skipped += 1
-                        print("Skipped lines:", skipped)
-        if lineno > 0:
-            print(f"{lineno} have been written to {self.rawtextfile}")
+
+        with open(self.CSVFILE, "rb") as f:
+            lines_written = sum(1 for _ in f)
+
+        if lines_written > 0:
+            self.data["csv"] = lines_written
+            return lines_written
         else:
-            print("CSV file has not been written.")
+            raise RuntimeError("CSV file has not been written.")
 
     def csv_get_unique_funds(self):
         df = pd.read_csv(self.CSVFILE, usecols=["fund"])
@@ -254,6 +287,7 @@ class Encumbrance:
                 print(f"Failed to convert {s} as date")
                 sys.exit()
 
+        EncumbranceImport.objects.all().delete()
         with open(self.CSVFILE) as file:
             next(file)  # skip the header row
             reader = csv.reader(file)
@@ -292,39 +326,54 @@ class Encumbrance:
         cc = set(CostCenter.objects.all().values_list("costcenter", flat=True))
         return cc_import.difference(cc)
 
-    def run_all(self) -> bool:
-        if self.rawtextfile:
-            with open(self.rawtextfile, encoding="windows-1252") as lines:
-                for line in lines:
-                    if self.find_base_fy(line):
-                        self.data["fy"] = line.split("|")
-                    if self.find_fund(line):
-                        self.data["fund"] = line.split("|")
-                    if self.find_layout(line):
-                        self.data["layout"] = line.split("|")
-                    if line == "":
-                        break
-        else:
-            return False
+    def __set_data(self) -> bool:
+        if not self.rawtextfile:
+            raise ValueError("Encumbrance report not defined.")
 
-        if not self.is_dnd_cost_center_report():
-            return False
-        self.find_header_line()
-        self.write_encumbrance_file_as_csv()
+        with open(self.rawtextfile, encoding="windows-1252") as lines:
+            for line in lines:
+                if self.data["fy"] == None:
+                    self.find_base_fy(line)
+                if self.data["fc"] == None:
+                    self.find_fund_center(line)
+                if self.data["layout"] == None:
+                    self.find_layout(line)
+                if line == "":
+                    break
+        return True
+
+    def run_all(self) -> bool:
+        if self.__set_data():
+            print(f"Fiscal Year : {self.data['fy']}")
+            print(f"Fund Center : {self.data['fc']}")
+            print(f"Report Layout : {self.data['layout']}")
+
+        if self.is_dnd_cost_center_report():
+            print("We have a DND Cost center encumbrance report.")
+
+        if self.find_header_line() > 0:
+            print(f"Column headers found at line {self.data['lineno']}")
+
+        if self.write_encumbrance_file_as_csv() > 0:
+            print(f"{self.data['csv']} lines have been written to {self.CSVFILE}")
+        ok = True
+
         missing_fund = self.missing_fund()
         if missing_fund:
-            print("There are missing funds:")
             for f in missing_fund:
-                print(f)
-            print("Operation aborted.")
-            return False
+                print(f"Missing fund {f}")
+            ok = False
+
         missing_cc = self.missing_costcenters()
         if missing_cc:
-            print("There are missing cost centers:")
             for cc in missing_cc:
-                print(cc)
-            print("Operation aborted.")
-            return False
-        self.csv2table()
+                print(f"Missing costcenter {cc}")
+            ok = False
 
-        return True
+        if ok:
+            self.csv2table()
+            linecount = EncumbranceImport.objects.count()
+            print(f"{linecount} lines have been written to Encumbrance import table")
+        else:
+            print("Download did not complete.")
+        return ok

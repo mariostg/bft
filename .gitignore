@@ -6,3 +6,10 @@ __pycache__
 *.pyc
 .vscode
 encumbrance.csv
+.coverage
+htmlcov/
+.DS_Store
+
+#log files
+*.log
+jupyter/
