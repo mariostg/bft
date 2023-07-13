@@ -109,21 +109,38 @@ class Report:
         Returns:
             pd.DataFrame: A dataframe of cost center allocations.
         """
-        data = list(CostCenterAllocation.objects.all().values("costcenter__costcenter", "fund__fund", "amount", "fy"))
+        data = list(
+            CostCenterAllocation.objects.all().values(
+                "costcenter__parent__fundcenter",
+                "costcenter__costcenter",
+                "fund__fund",
+                "amount",
+                "fy",
+            )
+        )
         columns = {
             "amount": "Allocation",
             "fy": "FY",
             "quarter": "Quarter",
             "costcenter__costcenter": "Cost Center",
+            "costcenter__parent__fundcenter": "Fund Center",
             "fund__fund": "Fund",
         }
         df = pd.DataFrame(data).rename(columns=columns)
         return df
 
     def forecast_adjustment_dataframe(self) -> pd.DataFrame:
-        data = list(ForecastAdjustment.objects.all().values("costcenter__costcenter", "fund__fund", "amount"))
+        data = list(
+            ForecastAdjustment.objects.all().values(
+                "costcenter__parent__fundcenter",
+                "costcenter__costcenter",
+                "fund__fund",
+                "amount",
+            )
+        )
         columns = {
             "amount": "Forecast Adjustment",
+            "costcenter__parent__fundcenter": "Fund Center",
             "costcenter__costcenter": "Cost Center",
             "fund__fund": "Fund",
         }
@@ -165,17 +182,17 @@ class Report:
             "Forecast": "sum",
         }
         df = li_df.groupby(grouping).agg(aggregation)
-
+        column_grouping = ["Fund Center", "Cost Center", "Fund"]
         if with_allocation == True:
             allocation_df = self.cost_center_allocation_dataframe()
             if not allocation_df.empty:
-                allocation_agg = allocation_df.groupby(["Cost Center", "Fund"]).agg({"Allocation": "sum"})
-                df = pd.merge(df, allocation_agg, how="left", on=["Cost Center"])
+                allocation_agg = allocation_df.groupby(column_grouping).agg({"Allocation": "sum"})
+                df = pd.merge(df, allocation_agg, how="left", on=["Fund Center", "Cost Center"])
         if with_forecast_adjustment == True:
             fa = self.forecast_adjustment_dataframe()
             if not fa.empty:
-                fa_agg = fa.groupby(["Cost Center", "Fund"]).agg({"Forecast Adjustment": "sum"})
-                df = pd.merge(df, fa_agg, how="left", on=["Cost Center"])
+                fa_agg = fa.groupby(column_grouping).agg({"Forecast Adjustment": "sum"})
+                df = pd.merge(df, fa_agg, how="left", on=["Fund Center", "Cost Center"]).fillna(0)
                 df["Total Forecast"] = df["Forecast"] + df["Forecast Adjustment"]
         return df
 

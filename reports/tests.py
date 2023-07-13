@@ -86,6 +86,17 @@ class TestReports:
         r = Report()
         assert 1 == len(r.cost_center_allocation_dataframe())
 
+    def test_cost_center_allocation_dataframe_columns(self):
+        hnd = populate.Command()
+        hnd.handle()
+        fund = Fund.objects.all().first()
+        costcenter = CostCenterManager().cost_center("8486b1")
+        alloc = CostCenterAllocation(fund=fund, costcenter=costcenter, amount=1000)
+        alloc.save()
+        columns = Report().cost_center_allocation_dataframe().columns
+        for c in ["Fund Center", "Cost Center", "Fund", "Allocation", "FY"]:
+            assert c in columns
+
     def test_forecast_adjustment_dataframe_empty(self):
         r = Report()
         assert True == r.forecast_adjustment_dataframe().empty
