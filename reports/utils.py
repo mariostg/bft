@@ -152,7 +152,8 @@ class Report:
             pd.DataFrame: _description_
         """
 
-        with_allocation = False
+        with_allocation = True
+        with_forecast_adjustment = True
         li_df = self.line_item_detailed()
         if len(li_df) == 0:
             return pd.DataFrame({})
@@ -168,10 +169,13 @@ class Report:
         if with_allocation == True:
             allocation_df = self.cost_center_allocation_dataframe()
             allocation_agg = allocation_df.groupby(["Cost Center", "Fund"]).agg({"Allocation": "sum"})
-            final = pd.merge(df, allocation_agg, how="left", on=["Cost Center"])
-            return final
-        else:
-            return df
+            df = pd.merge(df, allocation_agg, how="left", on=["Cost Center"])
+        if with_forecast_adjustment == True:
+            fa = self.forecast_adjustment_dataframe()
+            fa_agg = fa.groupby(["Cost Center", "Fund"]).agg({"Forecast Adjustment": "sum"})
+            df = pd.merge(df, fa_agg, how="left", on=["Cost Center"])
+            df["Total Forecast"] = df["Forecast"] + df["Forecast Adjustment"]
+        return df
 
     def financial_structure_report(self):
         fc = self.fund_center_dataframe()

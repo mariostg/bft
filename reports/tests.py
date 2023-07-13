@@ -86,11 +86,11 @@ class TestReports:
         r = Report()
         assert 1 == len(r.cost_center_allocation_dataframe())
 
-    def test_forecast_adjustment_empty(self):
+    def test_forecast_adjustment_dataframe_empty(self):
         r = Report()
         assert True == r.forecast_adjustment_dataframe().empty
 
-    def test_forecast_adjustment(self):
+    def test_forecast_adjustment_dataframe(self):
         hnd = populate.Command()
         hnd.handle()
         fund = Fund.objects.all().first()
