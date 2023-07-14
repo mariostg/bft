@@ -221,6 +221,8 @@ class FundCenter(models.Model):
         verbose_name_plural = "Fund Centers"
 
     def save(self, *args, **kwargs):
+        if self.sequence == None and self.parent == None:
+            self.sequence = "1"
         if self.parent and self.fundcenter == self.parent.fundcenter:
             raise IntegrityError("Children Fund center cannot assign itself as parent")
         self.fundcenter = self.fundcenter.upper()

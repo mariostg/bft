@@ -126,11 +126,7 @@ def fundcenter_add(request):
     if request.method == "POST":
         form = FundCenterForm(request.POST)
         if form.is_valid():
-            obj = form.save(commit=False)
-
-            fsm = FinancialStructureManager()
-            obj.sequence = fsm.set_parent(fundcenter_parent=obj.parent, fundcenter_child=obj)
-            obj.save()
+            form.save()
             return redirect("fundcenter-table")
     else:
         form = FundCenterForm
