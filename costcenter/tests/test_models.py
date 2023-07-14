@@ -16,7 +16,6 @@ from bft.exceptions import (
     InvalidOptionException,
     InvalidFiscalYearException,
 )
-from costcenter.structure import Structure
 from encumbrance.management.commands import populate
 
 FUND_C113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
