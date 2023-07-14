@@ -92,6 +92,12 @@ class FundCenterManager(models.Manager):
             return None
         return obj
 
+    def sequence_exist(self, sequence):
+        return FundCenter.objects.filter(sequence=sequence).exists()
+
+    def fund_center_exist(self, fc):
+        return FundCenter.objects.filter(fundcenter=fc).exists()
+
 
 class FinancialStructureManager(models.Manager):
     def FundCenters(self, fundcenter=None, seqno=None, fcid=None):
@@ -199,7 +205,7 @@ class FinancialStructureManager(models.Manager):
 class FundCenter(models.Model):
     fundcenter = models.CharField("Fund Center", max_length=6, unique=True)
     shortname = models.CharField("Short Name", max_length=25, null=True, blank=True)
-    sequence = models.CharField("Sequence No", max_length=25, null=True)
+    sequence = models.CharField("Sequence No", max_length=25, null=True, unique=True)
     parent = models.ForeignKey(
         "self",
         on_delete=models.RESTRICT,
