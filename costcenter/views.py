@@ -126,7 +126,12 @@ def fundcenter_add(request):
     if request.method == "POST":
         form = FundCenterForm(request.POST)
         if form.is_valid():
-            form.save()
+            try:
+                form.save()
+            except (IntegrityError):
+                messages.warning(request, "Duplicate entry cannot be saved")
+                return render(request, "costcenter/fundcenter-form.html", {"form": form})
+
             return redirect("fundcenter-table")
     else:
         form = FundCenterForm
