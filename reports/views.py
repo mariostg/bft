@@ -14,20 +14,21 @@ from reports import utils
 def bmt_screening_report(request):
     style = "${0:>,.0f}"
     table = utils.Report().cost_center_screening_report()
-
+    columns = [
+        "Spent",
+        "Balance",
+        "Working Plan",
+        "Forecast",
+        "Forecast Adjustment",
+        "Total Forecast",
+        "Allocation",
+    ]
     table = utils.Report().pivot_table_w_subtotals(
         table,
-        aggvalues=[
-            "Spent",
-            "Balance",
-            "Working Plan",
-            "Forecast",
-            "Forecast Adjustment",
-            "Total Forecast",
-            "Allocation",
-        ],
+        aggvalues=columns,
         grouper=["Fund Center", "Cost Center", "Fund"],
     )
+    table.columns = columns
 
     context = {"table": table.style.format(style).to_html()}
     return render(request, "bmt-screening-report.html", context)
