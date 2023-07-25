@@ -29,7 +29,6 @@ def bmt_screening_report(request):
         grouper=["Fund Center", "Cost Center", "Fund"],
     )
 
-    page_number = request.GET.get("page")
     context = {"table": table.style.format(style).to_html()}
     return render(request, "bmt-screening-report.html", context)
 
