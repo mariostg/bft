@@ -50,7 +50,7 @@ def financial_structure_report(request):
     report = utils.Report()
     data = report.financial_structure_data()
     if not data.empty:
-        data = report.financial_structre_styler(data)
+        data = report.financial_structure_styler(data)
         data = data.to_html(bold_rows=False)
     else:
         messages.info(request, "No data")

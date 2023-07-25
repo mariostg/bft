@@ -221,7 +221,7 @@ class Report:
         return merged
         # return self.df_to_html(merged)
 
-    def financial_structre_styler(self, data: pd.DataFrame):
+    def financial_structure_styler(self, data: pd.DataFrame):
         def indent(s):
             return f"text-align:left;padding-left:{len(str(s))*4}px"
 
