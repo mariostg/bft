@@ -13,4 +13,4 @@ htmlcov/
 #log files
 *.log
 jupyter/
-scripts/quick-test.py
+# scripts/quick-test.py
