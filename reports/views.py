@@ -65,7 +65,7 @@ Writes line item report to csv.
 
 def csv_line_items(request):
     data = (
-        LineItems.objects.annotate(doc=Concat("docno", V("-"), "lineno"))
+        LineItem.objects.annotate(doc=Concat("docno", V("-"), "lineno"))
         .order_by("fundcenter", "costcenter", "fund", "docno", "lineno")
         .filter(balance__gt=0)
     )
