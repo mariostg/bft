@@ -1,9 +1,7 @@
 from lineitems.models import LineItem, LineForecast
 from costcenter.models import CostCenter, CostCenterAllocation, FundCenter, ForecastAdjustment
-from django.db.models import Sum
 import pandas as pd
 import numpy as np
-from bft.exceptions import LineItemsDoNotExistError
 
 
 class Report:
@@ -219,7 +217,6 @@ class Report:
         merged.sort_values(by=["Sequence No"], inplace=True)
 
         return merged
-        # return self.df_to_html(merged)
 
     def financial_structure_styler(self, data: pd.DataFrame):
         def indent(s):
