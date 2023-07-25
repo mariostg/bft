@@ -2,6 +2,7 @@ from lineitems.models import LineItem, LineForecast
 from costcenter.models import CostCenter, CostCenterAllocation, FundCenter, ForecastAdjustment
 from django.db.models import Sum
 import pandas as pd
+import numpy as np
 from bft.exceptions import LineItemsDoNotExistError
 
 
@@ -172,28 +173,25 @@ class Report:
         with_allocation = True
         with_forecast_adjustment = True
         li_df = self.line_item_detailed()
-        if len(li_df) == 0:
-            return pd.DataFrame({})
-        grouping = ["Fund Center", "Cost Center", "Cost Center Name", "fund"]
-        aggregation = {
-            "Spent": "sum",
-            "Balance": "sum",
-            "Working Plan": "sum",
-            "Forecast": "sum",
-        }
-        df = li_df.groupby(grouping).agg(aggregation)
-        column_grouping = ["Fund Center", "Cost Center", "Fund"]
-        if with_allocation == True:
-            allocation_df = self.cost_center_allocation_dataframe()
-            if not allocation_df.empty:
-                allocation_agg = allocation_df.groupby(column_grouping).agg({"Allocation": "sum"})
-                df = pd.merge(df, allocation_agg, how="left", on=["Fund Center", "Cost Center"])
-        if with_forecast_adjustment == True:
-            fa = self.forecast_adjustment_dataframe()
-            if not fa.empty:
-                fa_agg = fa.groupby(column_grouping).agg({"Forecast Adjustment": "sum"})
-                df = pd.merge(df, fa_agg, how="left", on=["Fund Center", "Cost Center"]).fillna(0)
-                df["Total Forecast"] = df["Forecast"] + df["Forecast Adjustment"]
+        li_df = li_df.rename(columns={"fund": "Fund"})
+        if len(li_df) > 0:
+            grouping = ["Fund Center", "Cost Center", "Fund"]
+            aggregation = ["Spent", "Balance", "Working Plan", "Forecast"]
+            df = pd.pivot_table(li_df, values=aggregation, index=grouping, aggfunc="sum")
+            column_grouping = ["Fund Center", "Cost Center", "Fund"]
+            if with_allocation == True:
+                allocation_df = self.cost_center_allocation_dataframe()
+                if not allocation_df.empty:
+                    allocation_agg = pd.pivot_table(
+                        allocation_df, values="Allocation", index=column_grouping, aggfunc=np.sum
+                    )
+                    df = pd.merge(df, allocation_agg, how="left", on=["Fund Center", "Cost Center", "Fund"])
+            if with_forecast_adjustment == True:
+                fa = self.forecast_adjustment_dataframe()
+                if not fa.empty:
+                    fa_agg = pd.pivot_table(fa, values="Forecast Adjustment", index=column_grouping, aggfunc=np.sum)
+                    df = pd.merge(df, fa_agg, how="left", on=["Fund Center", "Cost Center", "Fund"]).fillna(0)
+                    df["Total Forecast"] = df["Forecast"] + df["Forecast Adjustment"]
         return df
 
     def financial_structure_data(self) -> pd.DataFrame | None:
@@ -234,3 +232,34 @@ class Report:
         data = data.style.applymap_index(indent, level=0).set_table_attributes("class=fin-structure")
 
         return data
+
+    def pivot_table_w_subtotals(self, df: pd.DataFrame, aggvalues: list, grouper: list) -> pd.DataFrame:
+        """
+        Adds tabulated subtotals to pandas pivot tables with multiple hierarchical indices.
+
+        Args:
+        - df - dataframe used in pivot table
+        - aggvalues - list-like or scalar to aggregate
+        - grouper - ordered list of indices to aggregrate by
+        - fill_value - value used to in place of empty cells
+
+        Returns:
+        -flat table with data aggregrated and tabulated
+
+        """
+        tables = []
+        for indexnumber in range(len(grouper)):
+            n = indexnumber + 1
+            table = pd.pivot_table(
+                df,
+                values=aggvalues,
+                index=grouper[:n],
+                aggfunc=np.sum,
+                fill_value="",
+            ).reset_index()
+            for column in grouper[n:]:
+                table[column] = ""
+            tables.append(table)
+        concattable = pd.concat(tables).sort_index()
+        concattable = concattable.set_index(keys=grouper)
+        return concattable.sort_index(axis=0, ascending=True)

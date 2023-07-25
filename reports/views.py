@@ -12,22 +12,25 @@ from reports import utils
 
 
 def bmt_screening_report(request):
-    data = (
-        LineItem.objects.values("fundcenter", "costcenter", "fund")
-        .annotate(
-            spent=Sum("spent"),
-            wp=Sum("workingplan"),
-            balance=Sum("balance"),
-            fcst=Sum("fcst__forecastamount"),
-        )
-        .order_by("fundcenter", "costcenter", "fund")
-        .filter(balance__gt=0)
-    )
     style = "${0:>,.0f}"
-    table = utils.Report().cost_center_screening_report().style.format(style).to_html()
-    paginator = Paginator(data, 50)
+    table = utils.Report().cost_center_screening_report()
+
+    table = utils.Report().pivot_table_w_subtotals(
+        table,
+        aggvalues=[
+            "Spent",
+            "Balance",
+            "Working Plan",
+            "Forecast",
+            "Forecast Adjustment",
+            "Total Forecast",
+            "Allocation",
+        ],
+        grouper=["Fund Center", "Cost Center", "Fund"],
+    )
+
     page_number = request.GET.get("page")
-    context = {"data": paginator.get_page(page_number), "table": table}
+    context = {"table": table.style.format(style).to_html()}
     return render(request, "bmt-screening-report.html", context)
 
 
