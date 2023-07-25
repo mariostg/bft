@@ -33,9 +33,12 @@ def line_forecast_add(request, pk):
         if form.is_valid():
             line_forecast = form.save(commit=False)
             line_forecast.lineitem_id = pk  # LineItems(id=pk)
-            if line_forecast.validate(request, lineitem) == False:
-                form.forecastamount = lineitem.workingplan
-                messages.info(request, f"Forecast created with amount of {lineitem.workingplan}")
+            if line_forecast.above_working_plan(request, lineitem):
+                line_forecast.forecastamount = lineitem.workingplan
+                messages.info(request, f"Forecast above working plan, created with amount of {lineitem.workingplan}")
+            elif line_forecast.below_spent(request, lineitem):
+                line_forecast.forecastamount = lineitem.spent
+                messages.info(request, f"Forecast below spent, created with amount of {lineitem.spent}")
             else:
                 messages.success(request, "Forecast created")
             line_forecast.save()

@@ -185,20 +185,23 @@ class LineForecast(models.Model):
             text = f"{self.forecastamount} - {self.id} -  {self.lineitem.id}"
         return str(text)
 
-    def validate(self, request, lineitem: LineItem) -> True:
-        print(f"working plan {lineitem.workingplan}, forecast {self.forecastamount}")
-        if lineitem.workingplan < self.forecastamount:
-            messages.warning(
-                request,
-                f"Forecast {self.forecastamount} cannot be higher than working plan {lineitem.workingplan}",
-            )
-            return False
-        if lineitem.spent > self.forecastamount:
+    def below_spent(self, request, lineitem: LineItem) -> bool:
+        if self.forecastamount < lineitem.spent:
             messages.warning(
                 request,
                 f"Forecast {self.forecastamount} cannot be smaller than spent {lineitem.spent}",
             )
-            return False
+            return True
+        return False
+
+    def above_working_plan(self, request, lineitem: LineItem) -> bool:
+        if self.forecastamount > lineitem.workingplan:
+            messages.warning(
+                request,
+                f"Forecast {self.forecastamount} cannot be higher than working plan {lineitem.workingplan}",
+            )
+            return True
+        return False
 
     # def save(self, *args, **kwargs):
     # do_something before()
