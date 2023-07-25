@@ -196,9 +196,11 @@ class Report:
                 df["Total Forecast"] = df["Forecast"] + df["Forecast Adjustment"]
         return df
 
-    def financial_structure_report(self):
+    def financial_structure_data(self) -> pd.DataFrame | None:
         fc = self.fund_center_dataframe()
         cc = self.cost_center_dataframe()
+        if fc.empty or cc.empty:
+            return None
         merged = pd.merge(fc, cc, how="left", left_on=["fundcenter_id"], right_on=["parent_id"])
         merged = merged.fillna("")
         merged.set_index(
@@ -218,6 +220,10 @@ class Report:
         )
         merged.sort_values(by=["Sequence No"], inplace=True)
 
+        return merged
+        # return self.df_to_html(merged)
+
+    def financial_structre_styler(self, data: pd.DataFrame):
         def indent(s):
             return f"text-align:left;padding-left:{len(str(s))*4}px"
 
@@ -225,7 +231,6 @@ class Report:
             # TODO something to implement zebra rows in table
             pass
 
-        merged = merged.style.applymap_index(indent, level=0).set_table_attributes("class=fin-structure")
+        data = data.style.applymap_index(indent, level=0).set_table_attributes("class=fin-structure")
 
-        return merged.to_html(bold_rows=False)
-        # return self.df_to_html(merged)
+        return data

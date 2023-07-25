@@ -4,6 +4,7 @@ from django.db.models.functions import Concat
 from django.db.models import CharField, Value as V
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.contrib import messages
 import csv
 
 from lineitems.models import LineItem
@@ -44,7 +45,14 @@ def line_items(request):
 
 def financial_structure_report(request):
     report = utils.Report()
-    return render(request, "financial-structure-report.html", {"table": report.financial_structure_report()})
+    data = report.financial_structure_data()
+    if not data.empty:
+        data = report.financial_structre_styler(data)
+        data = data.to_html(bold_rows=False)
+    else:
+        messages.info(request, "No data")
+        data = ""
+    return render(request, "financial-structure-report.html", {"table": data})
 
 
 """

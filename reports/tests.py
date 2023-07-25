@@ -123,3 +123,18 @@ class TestReports:
 
         r = Report()
         print(r.cost_center_screening_report())
+
+    def test_financial_structure_data(self):
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+
+        r = Report()
+        data = r.financial_structure_data()
+        assert False == data.empty
+
+    def test_financial_structure_data_empty(self):
+        r = Report()
+        data = r.financial_structure_data()
+        assert None == data
