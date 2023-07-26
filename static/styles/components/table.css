@@ -2,22 +2,19 @@ table.fin-structure {
     text-align: left;
 }
 
-/* .fin-structure > tbody > tr > td,
-.fin-structure > tbody > tr > th {
-    background-color: lightgray;
-} */
-
 .fin-structure > tbody > tr {
     border-top: 1px solid;
 }
-/* 
-.fin-structure > tbody > tr:nth-child(odd) {
-    background-color: lightgray;
-} */
-tbody > tr.row-odd > th {
-    background-color: aqua;
-}
 
-#line-item-report > tbody > tr:nth-child(odd) {
+.fc-odd {
     background-color: #a3b09c;
+}
+.fc-even {
+    background-color: #899980;
+}
+.cc-odd {
+    background-color: #f5f5dc;
+}
+.cc-even {
+    background-color: #eaeab4;
 }
