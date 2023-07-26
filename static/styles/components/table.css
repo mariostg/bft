@@ -2,10 +2,10 @@ table.fin-structure {
     text-align: left;
 }
 
-.fin-structure > tbody > tr > td,
+/* .fin-structure > tbody > tr > td,
 .fin-structure > tbody > tr > th {
     background-color: lightgray;
-}
+} */
 
 .fin-structure > tbody > tr {
     border-top: 1px solid;

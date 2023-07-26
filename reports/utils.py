@@ -1,6 +1,7 @@
 from lineitems.models import LineItem, LineForecast
 from costcenter.models import CostCenter, CostCenterAllocation, FundCenter, ForecastAdjustment
 import pandas as pd
+from pandas.io.formats.style import Styler
 import numpy as np
 
 
@@ -192,6 +193,10 @@ class Report:
                     df["Total Forecast"] = df["Forecast"] + df["Forecast Adjustment"]
         return df
 
+    def styler_clean_table(self, data: pd.DataFrame):
+        """Clean up dataframe by stripping tag ids and format numbers."""
+        return Styler(data, uuid_len=0, cell_ids=False).format("${0:>,.0f}")
+
     def financial_structure_data(self) -> pd.DataFrame | None:
         fc = self.fund_center_dataframe()
         cc = self.cost_center_dataframe()
@@ -226,8 +231,15 @@ class Report:
             # TODO something to implement zebra rows in table
             pass
 
-        data = data.style.applymap_index(indent, level=0).set_table_attributes("class=fin-structure")
-
+        html = Styler(data, uuid_len=0, cell_ids=False)
+        table_style = [
+            {"selector": "tbody:nth-child(odd)", "props": "background-color:red"},
+        ]
+        data = (
+            html.applymap_index(indent, level=0)
+            .set_table_attributes("class=fin-structure")
+            .set_table_styles(table_style)
+        )
         return data
 
     def pivot_table_w_subtotals(self, df: pd.DataFrame, aggvalues: list, grouper: list) -> pd.DataFrame:
