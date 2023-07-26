@@ -6,7 +6,7 @@
     <div class="block block--centered">
         <a class='btn' href="{% url 'lineitem-csv'%}">Save as CSV</a> 
     </div>
-<table>
+<table id="line-item-report">
 <caption>Line Items Report</caption>
 <thead>
     <tr>
@@ -40,7 +40,7 @@
             <td>{{d.balance|floatformat:'0g'}}</td>
             <td>{{d.workingplan|floatformat:'0g'}}</td>
             <td>{{d.Reference}}</td>
-            <td>{{d.duedate}}</td>
+            <td>{{d.duedate|date:"Y-m-d"}}</td>
             <td>{{d.vendor}}</td>
             <td>{{d.createdby}}</td>
         </tr>

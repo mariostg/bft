@@ -17,3 +17,7 @@ table.fin-structure {
 tbody > tr.row-odd > th {
     background-color: aqua;
 }
+
+#line-item-report > tbody > tr:nth-child(odd) {
+    background-color: #a3b09c;
+}
