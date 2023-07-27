@@ -168,7 +168,7 @@ class Report:
         Returns:
             pd.DataFrame: _description_
         """
-
+        df = pd.DataFrame()
         with_allocation = True
         with_forecast_adjustment = True
         li_df = self.line_item_detailed()

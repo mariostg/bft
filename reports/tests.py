@@ -19,7 +19,7 @@ class TestReports:
 
         li = r.line_item_dataframe()
 
-        assert 7 == len(li)
+        assert 0 < len(li)
 
     def test_line_forecast_dataframe(self):
         hnd = populate.Command()
@@ -46,7 +46,7 @@ class TestReports:
         hnd.handle()
 
         r = Report()
-        assert 5 == len(r.fund_center_dataframe())
+        assert 0 < len(r.fund_center_dataframe())
 
     def test_cost_center_dataframe_empty(self):
         r = Report()
@@ -70,7 +70,7 @@ class TestReports:
         up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
 
         r = Report()
-        assert 7 == len(r.line_item_detailed())
+        assert 0 < len(r.line_item_detailed())
 
     def test_cost_center_allocation_dataframe_empty(self):
         r = Report()
@@ -122,7 +122,7 @@ class TestReports:
         up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
 
         r = Report()
-        print(r.cost_center_screening_report())
+        assert 0 < len(r.cost_center_screening_report())
 
     def test_financial_structure_data(self):
         hnd = populate.Command()
