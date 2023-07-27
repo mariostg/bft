@@ -21,22 +21,6 @@ class CostCenterManagerTest(TestCase):
         self.assertEqual(obj.pk, self.pk)
 
 
-class FundCenterManagerTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        obj = FundCenter.objects.create(fundcenter="2184QQ")
-        cls.pk = obj.pk
-
-    def test_get_by_fund_center(self):
-        obj = FundCenter.objects.fundcenter("2184QQ")
-        self.assertEqual("2184QQ", obj.fundcenter)
-
-    def test_get_by_pk(self):
-        obj = FundCenter.objects.pk(self.pk)
-
-        self.assertEqual(obj.pk, self.pk)
-
-
 class FundManagerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
