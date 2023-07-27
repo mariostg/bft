@@ -20,7 +20,7 @@ def bmt_screening_report(request):
         "Working Plan",
         "Forecast",
         "Forecast Adjustment",
-        "Total Forecast",
+        "Forecast Total",
         "Allocation",
     ]
     table = r.pivot_table_w_subtotals(
@@ -28,7 +28,6 @@ def bmt_screening_report(request):
         aggvalues=columns,
         grouper=["Fund Center", "Cost Center", "Fund"],
     )
-    table.columns = columns
     table = r.styler_clean_table(table)
     context = {"table": table.to_html()}
     return render(request, "bmt-screening-report.html", context)

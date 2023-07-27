@@ -190,7 +190,7 @@ class Report:
                 if not fa.empty:
                     fa_agg = pd.pivot_table(fa, values="Forecast Adjustment", index=column_grouping, aggfunc=np.sum)
                     df = pd.merge(df, fa_agg, how="left", on=["Fund Center", "Cost Center", "Fund"]).fillna(0)
-                    df["Total Forecast"] = df["Forecast"] + df["Forecast Adjustment"]
+                    df["Forecast Total"] = df["Forecast"] + df["Forecast Adjustment"]
         return df
 
     def styler_clean_table(self, data: pd.DataFrame):
