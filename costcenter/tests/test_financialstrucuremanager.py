@@ -4,23 +4,25 @@ from bft.exceptions import ParentDoesNotExistError, IncompatibleArgumentsError
 from encumbrance.management.commands import populate
 
 
+@pytest.mark.django_db
 class TestFinancialStructureManager:
-    fsm = FinancialStructureManager()
+    @pytest.fixture
+    def setup(self):
+        self.fsm = FinancialStructureManager()
 
-    def test_is_child_of_parent(self):
+    def test_is_child_of_parent(self, setup):
 
         assert True == self.fsm.is_child_of_parent("1", "1.1")
         assert True == self.fsm.is_child_of_parent("1.1", "1.1.1")
         assert False == self.fsm.is_child_of_parent("1.1", "1.1")
         assert False == self.fsm.is_child_of_parent("2.1", "2.1.1.1")
 
-    def test_is_descendant_of_parent(self):
+    def test_is_descendant_of_parent(self, setup):
         assert True == self.fsm.is_descendant_of_parent("1", "1.1.1")
         assert True == self.fsm.is_descendant_of_parent("1.1", "1.1.1")
         assert False == self.fsm.is_descendant_of_parent("1.1,1", "1.1")
 
-    @pytest.mark.django_db
-    def test_get_descendants(self):
+    def test_get_descendants(self, setup):
         pc = populate.Command()
         pc.handle()
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
@@ -34,8 +36,7 @@ class TestFinancialStructureManager:
         with pytest.raises(ParentDoesNotExistError):
             descendants = self.fsm.get_descendants(family, "3")
 
-    @pytest.mark.django_db
-    def test_get_direct_descendants(self):
+    def test_get_direct_descendants(self, setup):
         pc = populate.Command()
         pc.handle()
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
@@ -53,8 +54,7 @@ class TestFinancialStructureManager:
         with pytest.raises(ParentDoesNotExistError):
             self.fsm.get_direct_descendants(family, parent)
 
-    @pytest.mark.django_db
-    def test_create_child_using_parent_and_seqno(self):
+    def test_create_child_using_parent_and_seqno(self, setup):
         pc = populate.Command()
         pc.handle()
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
@@ -62,8 +62,7 @@ class TestFinancialStructureManager:
         with pytest.raises(IncompatibleArgumentsError):
             self.fsm.create_child(family, parent="1111AA", seqno="1.1")
 
-    @pytest.mark.django_db
-    def test_create_child_using_seqno(self):
+    def test_create_child_using_seqno(self, setup):
         pc = populate.Command()
         pc.handle()
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
@@ -77,8 +76,7 @@ class TestFinancialStructureManager:
         with pytest.raises(ParentDoesNotExistError):
             self.fsm.create_child(family, seqno="3")
 
-    @pytest.mark.django_db
-    def test_create_child_using_parent(self):
+    def test_create_child_using_parent(self, setup):
         pp = populate.Command()
         pp.handle()
         parent_obj = FinancialStructureManager().FundCenters(fundcenter="1111AC").first()
@@ -86,8 +84,7 @@ class TestFinancialStructureManager:
         new_seqno = self.fsm.create_child(family, parent_obj.fundcenter)
         assert "1.2.1" == new_seqno
 
-    @pytest.mark.django_db
-    def test_move_fundcenter_to_another_one(self):
+    def test_move_fundcenter_to_another_one(self, setup):
         pp = populate.Command()
         pp.handle()
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
@@ -107,8 +104,7 @@ class TestFinancialStructureManager:
         saved_fc = FundCenter.objects.get(fundcenter="3333WW")
         assert fc.sequence == saved_fc.sequence
 
-    @pytest.mark.django_db
-    def test_set_parent(self):
+    def test_set_parent(self, setup):
         pc = populate.Command()
         pc.handle()
 
