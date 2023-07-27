@@ -118,7 +118,7 @@ class FinancialStructureManager(models.Manager):
         if seqno:
             return seqno in [x.sequence for x in self.FundCenters(seqno=seqno)]
 
-    def set_parent(self, fundcenter_child=None, fundcenter_parent=None) -> str:
+    def set_parent(self, fundcenter_parent=None) -> str:
         """
         Create a sequence number by refering to the sequence numbers of the family.
         The sequence number created contains the parent sequence plus the portion of the child.

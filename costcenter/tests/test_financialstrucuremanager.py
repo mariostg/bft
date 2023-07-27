@@ -1,5 +1,5 @@
 import pytest
-from costcenter.models import FinancialStructureManager, FundCenter
+from costcenter.models import FinancialStructureManager, FundCenter, FundCenterManager
 from bft.exceptions import ParentDoesNotExistError, IncompatibleArgumentsError
 from encumbrance.management.commands import populate
 
@@ -100,6 +100,18 @@ class TestFinancialStructureManager:
         assert "1.1.1.1" in family
 
         # move fund center from 1.1.1 to 1.1.2
-        fc = self.fsm.FundCenters(fundcenter="3333WW").first()
+        fc = FundCenter.objects.filter(fundcenter="3333WW").first()
         parent = self.fsm.FundCenters(fundcenter="2222BB").first()
-        self.fsm.set_parent(fundcenter_child=fc, fundcenter_parent=parent)
+        fc.sequence = self.fsm.set_parent(fundcenter_parent=parent)
+        fc.save()
+        saved_fc = FundCenter.objects.get(fundcenter="3333WW")
+        assert fc.sequence == saved_fc.sequence
+
+    @pytest.mark.django_db
+    def test_set_parent(self):
+        pc = populate.Command()
+        pc.handle()
+
+        parent = self.fsm.FundCenters(fundcenter="2222BB").first()
+        p = self.fsm.set_parent(fundcenter_parent=parent)
+        assert "1.1.2.1" == p

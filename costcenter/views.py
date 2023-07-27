@@ -151,7 +151,7 @@ def fundcenter_update(request, pk):
             if obj.parent != current.parent:
                 # Need to change sequence given parent change
                 fsm = FinancialStructureManager()
-                obj.sequence = fsm.set_parent(fundcenter_parent=obj.parent, fundcenter_child=obj)
+                obj.sequence = fsm.set_parent(fundcenter_parent=obj.parent)
                 obj.save()
             return redirect("fundcenter-table")
         else:
