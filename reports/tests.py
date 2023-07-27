@@ -2,6 +2,7 @@ import pytest
 from reports.utils import Report
 from costcenter.models import CostCenterAllocation, Fund, CostCenterManager, ForecastAdjustment
 from encumbrance.management.commands import populate, uploadcsv
+import numpy as np
 
 
 @pytest.mark.django_db
@@ -45,8 +46,13 @@ class TestReports:
         hnd = populate.Command()
         hnd.handle()
 
-        r = Report()
-        assert 0 < len(r.fund_center_dataframe())
+        r = Report().fund_center_dataframe()
+
+        columns = np.array(r.columns)
+        expected_columns = np.array(["fundcenter_id", "Fund Center", "Fund Center Name", "Sequence No", "parent_id"])
+
+        match = (columns == expected_columns).all()
+        assert True == match
 
     def test_cost_center_dataframe_empty(self):
         r = Report()

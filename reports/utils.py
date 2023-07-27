@@ -61,6 +61,7 @@ class Report:
                 "sequence": "Sequence No",
             }
         )
+        df["parent_id"] = df["parent_id"].fillna(0).astype("int")
         return df
 
     def cost_center_dataframe(self) -> pd.DataFrame:
