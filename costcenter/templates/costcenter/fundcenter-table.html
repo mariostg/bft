@@ -7,6 +7,7 @@
         <caption>Fund Centers</caption>
         <thead>
             <tr>
+                <th>Seq. No</th>
                 <th>FundCenter</th>
                 <th>Name</th>
                 <th>Parent</th>
@@ -16,7 +17,7 @@
         <tbody>
             {% for elem in fundcenters %}
             <tr>
-            <td>{{elem.fundcenter}}</td><td>{{elem.shortname}}<td>{{elem.parent}}</td>
+            <td>{{elem.sequence}}</td><td>{{elem.fundcenter}}</td><td>{{elem.shortname}}<td>{{elem.parent}}</td>
             <td> <a class='btn' href="{% url "fundcenter-costcenters" elem.pk  %}">Cost centers</a></button> </td>
             {% if user.is_authenticated %}
             <td> <a class='btn'href="{% url "fundcenter-update" elem.id %}">Update</a></button> </td>
@@ -28,7 +29,7 @@
         </tbody>
         {% if user.is_authenticated %}
         <tfoot>
-            <tr><td colspan=6><a class='btn' href="{% url 'fundcenter-add' %}">Add Fund Center</a></td></tr>
+            <tr><td colspan=7><a class='btn' href="{% url 'fundcenter-add' %}">Add Fund Center</a></td></tr>
         </tfoot>
         {% endif %}
     </table>
