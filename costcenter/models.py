@@ -129,7 +129,8 @@ class FinancialStructureManager(models.Manager):
         Returns:
             str: A string the represents the child sequence number.
         """
-
+        if fundcenter_parent == None:
+            return "1"
         family = list(self.FundCenters(seqno=fundcenter_parent.sequence).values_list("sequence", flat=True))
         new_seq = self.create_child(family, fundcenter_parent.fundcenter)
         return new_seq

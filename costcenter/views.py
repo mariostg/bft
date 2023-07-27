@@ -152,7 +152,10 @@ def fundcenter_update(request, pk):
                 # Need to change sequence given parent change
                 fsm = FinancialStructureManager()
                 obj.sequence = fsm.set_parent(fundcenter_parent=obj.parent)
-                obj.save()
+                try:
+                    obj.save()
+                except IntegrityError:
+                    messages.error(request, "This action would create duplicate entry.")
             return redirect("fundcenter-table")
         else:
             print("NOT VALID")

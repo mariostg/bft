@@ -111,3 +111,10 @@ class TestFinancialStructureManager:
         parent = self.fsm.FundCenters(fundcenter="2222BB").first()
         p = self.fsm.set_parent(fundcenter_parent=parent)
         assert "1.1.2.1" == p
+
+    def test_set_parent_without_parent(self, setup):
+        pc = populate.Command()
+        pc.handle()
+
+        p = self.fsm.set_parent()
+        assert "1" == p
