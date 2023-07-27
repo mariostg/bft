@@ -129,7 +129,7 @@ def fundcenter_add(request):
             try:
                 form.save()
             except (IntegrityError):
-                messages.warning(request, "Duplicate entry cannot be saved")
+                messages.error(request, "Duplicate entry cannot be saved")
                 return render(request, "costcenter/fundcenter-form.html", {"form": form})
 
             return redirect("fundcenter-table")
@@ -155,7 +155,7 @@ def fundcenter_update(request, pk):
                 try:
                     obj.save()
                 except IntegrityError:
-                    messages.error(request, "This action would create duplicate entry.")
+                    messages.error(request, "Duplicate entry cannot be saved")
             return redirect("fundcenter-table")
         else:
             print("NOT VALID")
