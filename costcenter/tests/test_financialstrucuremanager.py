@@ -79,7 +79,7 @@ class TestFinancialStructureManager:
     def test_create_child_using_parent(self, setup):
         pp = populate.Command()
         pp.handle()
-        parent_obj = FinancialStructureManager().FundCenters(fundcenter="1111AC").first()
+        parent_obj = self.fsm.FundCenters(fundcenter="1111AC").first()
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
         new_seqno = self.fsm.create_child(family, parent_obj.fundcenter)
         assert "1.2.1" == new_seqno
