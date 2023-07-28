@@ -56,14 +56,14 @@ class Command(BaseCommand):
 
     def set_fund_center(self):
         # Create root FC
-        fc = {"fundcenter": "1111AA", "shortname": "root", "parent": None, "sequence": "1"}
+        fc = {"fundcenter": "1111AA", "shortname": "root", "parent": None}
         new_item = FundCenter.objects.create(**fc)
         root = FundCenter.objects.filter(fundcenter="1111AA").first()
-        print(f"Created Fund Center {root}")
+        print(f"Created Fund Center {root}, sequence {root.sequence}")
 
         root_children = [
-            {"fundcenter": "1111AB", "shortname": "AB", "parent": root, "sequence": "1.1"},
-            {"fundcenter": "1111AC", "shortname": "AC", "parent": root, "sequence": "1.2"},
+            {"fundcenter": "1111AB", "shortname": "AB", "parent": root},
+            {"fundcenter": "1111AC", "shortname": "AC", "parent": root},
         ]
         for item in root_children:
             try:
@@ -72,12 +72,12 @@ class Command(BaseCommand):
                     print(f"Fund Center {found} exists")
             except FundCenter.DoesNotExist:
                 new_item = FundCenter.objects.create(**item)
-                print(f"Created Fund Center {new_item}")
+                print(f"Created Fund Center {new_item}, sequence {new_item.sequence}")
 
         ab = FundCenter.objects.filter(fundcenter="1111AB").first()
         ab_children = [
-            {"fundcenter": "2222BA", "shortname": "BA", "parent": ab, "sequence": "1.1.1"},
-            {"fundcenter": "2222BB", "shortname": "BB", "parent": ab, "sequence": "1.1.2"},
+            {"fundcenter": "2222BA", "shortname": "BA", "parent": ab},
+            {"fundcenter": "2222BB", "shortname": "BB", "parent": ab},
         ]
         for item in ab_children:
             try:
