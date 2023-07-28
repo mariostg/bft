@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.db import IntegrityError
+from django.db.models import RestrictedError
 from django.contrib import messages
 from .models import (
     Fund,
@@ -126,9 +127,17 @@ def fundcenter_add(request):
     if request.method == "POST":
         form = FundCenterForm(request.POST)
         if form.is_valid():
+            obj = form.save(commit=False)
+            parent = FundCenterManager().fundcenter(obj)
+            fsm = FinancialStructureManager()
+            obj.sequence = fsm.set_parent(fundcenter_parent=parent)
+            print("#####")
+            print(obj.sequence)
+            print(obj.parent)
+            print("#####")
             try:
-                form.save()
-            except (IntegrityError):
+                obj.save()
+            except IntegrityError:
                 messages.error(request, "Duplicate entry cannot be saved")
                 return render(request, "costcenter/fundcenter-form.html", {"form": form})
 
@@ -165,7 +174,10 @@ def fundcenter_update(request, pk):
 def fundcenter_delete(request, pk):
     fundcenter = FundCenter.objects.get(id=pk)
     if request.method == "POST":
-        fundcenter.delete()
+        try:
+            fundcenter.delete()
+        except RestrictedError as e:
+            messages.error(request, e)
         return redirect("fundcenter-table")
     context = {"object": fundcenter, "back": "fundcenter-table"}
     return render(request, "core/delete-object.html", context)
