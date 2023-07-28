@@ -253,7 +253,6 @@ class FundCenterModelTest(TestCase):
         self.assertEqual(3, len(st_data))
 
     def test_create_subordinate_fund_center(self):
-        s = Structure()
         pp = populate.Command()
         pp.handle()
         st = FinancialStructureManager()
