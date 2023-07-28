@@ -609,7 +609,7 @@ class CostCenterAllocationTest(TestCase):
         cc = CostCenter.objects.first()
         self.data["fund"] = fund.id
         self.data["costcenter"] = cc.id
-        response = self.client.post("/costcenter/allocation-add/", data=self.data)
+        response = self.client.post("/costcenter/costcenter-allocation-add/", data=self.data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(CostCenter.objects.count(), 1)
         obj = CostCenterAllocation.objects.first()
