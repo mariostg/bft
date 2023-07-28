@@ -100,10 +100,10 @@ class FundCenterManager(models.Manager):
 
 
 class FinancialStructureManager(models.Manager):
-    def FundCenters(self, fundcenter=None, seqno=None, fcid=None):
+    def FundCenters(self, fundcenter: str = None, seqno: str = None, fcid: int = None):
         try:
             if fundcenter:
-                obj = FundCenter.objects.filter(fundcenter=fundcenter)
+                obj = FundCenter.objects.filter(fundcenter=fundcenter.upper())
             elif seqno:
                 obj = FundCenter.objects.filter(sequence__startswith=seqno)
             elif fcid:
