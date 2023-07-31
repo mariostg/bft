@@ -1,3 +1,4 @@
+import pytest
 from django.test import TestCase
 from costcenter.models import (
     Fund,
@@ -245,26 +246,29 @@ class FundCenterModelTest(TestCase):
     def test_verbose_name_plural(self):
         self.assertEqual("Fund Centers", str(FundCenter._meta.verbose_name_plural))
 
+    def test_create_fund_center_on_empy_db(self):
+        fc_1111AA = {"fundcenter": "1111aa", "shortname": "bedroom"}
+        fc = FundCenter.objects.create(**fc_1111AA)
+        assert "1" == fc.sequence
+
+    def test_create_fund_center_on_empy_db_and_a_child(self):
+        fc_1111AA = {"fundcenter": "1111aa", "shortname": "home"}
+        parent = FundCenter.objects.create(**fc_1111AA)
+
+        fsm = FinancialStructureManager()
+        child_sequence = fsm.set_parent(fundcenter_parent=parent)
+
+        assert "1.1" == child_sequence
+        fc_1111bb = {"fundcenter": "1111bb", "shortname": "bedroom", "parent": parent, "sequence": child_sequence}
+        child_fc = FundCenter.objects.create(**fc_1111bb)
+        assert "1.1" == child_fc.sequence
+
     def test_get_financial_structure(self):
         pp = populate.Command()
         pp.handle()
         st = FinancialStructureManager()
         st_data = st.FundCenters()
-        self.assertEqual(3, len(st_data))
-
-    def test_create_subordinate_fund_center(self):
-        pp = populate.Command()
-        pp.handle()
-        st = FinancialStructureManager()
-        family = st.FundCenters()
-        tree_elements = [x.sequence for x in family]
-        parent = "1"
-        leaf = s.create_child(tree_elements, parent)
-        fc = {"fundcenter": "1111AD", "shortname": "AD", "sequence": leaf}
-        FundCenter(**fc).save()
-
-        data = FundCenterManager().fundcenter("1111AD")
-        self.assertEqual("1.3", data.sequence)
+        self.assertEqual(5, len(st_data))
 
     def test_can_save_and_retrieve_fund_centers(self):
         first_fc = FundCenter()

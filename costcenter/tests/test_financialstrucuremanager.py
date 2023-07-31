@@ -76,6 +76,17 @@ class TestFinancialStructureManager:
         with pytest.raises(ParentDoesNotExistError):
             self.fsm.create_child(family, seqno="3")
 
+    def test_create_root_sequence(self, setup):
+        sequence = self.fsm.set_parent()
+        assert "1" == sequence
+
+    def test_create_child_of_root(self, setup):
+        pc = populate.Command()
+        pc.handle()
+        root = self.fsm.FundCenters(fundcenter="1111aa").first()
+        child = self.fsm.set_parent(root)
+        print(child)
+
     def test_create_child_using_parent(self, setup):
         pp = populate.Command()
         pp.handle()

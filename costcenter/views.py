@@ -128,13 +128,7 @@ def fundcenter_add(request):
         form = FundCenterForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
-            parent = FundCenterManager().fundcenter(obj)
-            fsm = FinancialStructureManager()
-            obj.sequence = fsm.set_parent(fundcenter_parent=parent)
-            print("#####")
-            print(obj.sequence)
-            print(obj.parent)
-            print("#####")
+            obj.sequence = FinancialStructureManager().set_parent(fundcenter_parent=obj.parent)
             try:
                 obj.save()
             except IntegrityError:

@@ -2,7 +2,7 @@ import os
 from django.core.management.base import BaseCommand, CommandError
 from main.settings import BASE_DIR, DEBUG
 
-from costcenter.models import Fund, Source, CostCenter, FundCenter
+from costcenter.models import Fund, Source, CostCenter, FundCenter, FinancialStructureManager
 from lineitems.models import LineForecast, LineItem
 
 
@@ -71,6 +71,7 @@ class Command(BaseCommand):
                 if found:
                     print(f"Fund Center {found} exists")
             except FundCenter.DoesNotExist:
+                item["sequence"] = FinancialStructureManager().set_parent(fundcenter_parent=root)
                 new_item = FundCenter.objects.create(**item)
                 print(f"Created Fund Center {new_item}, sequence {new_item.sequence}")
 
@@ -85,6 +86,7 @@ class Command(BaseCommand):
                 if found:
                     print(f"Fund Center {found} exists")
             except FundCenter.DoesNotExist:
+                item["sequence"] = FinancialStructureManager().set_parent(fundcenter_parent=ab)
                 new_item = FundCenter.objects.create(**item)
                 print(f"Created Fund Center {new_item}")
 
