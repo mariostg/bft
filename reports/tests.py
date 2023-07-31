@@ -7,6 +7,8 @@ import numpy as np
 
 @pytest.mark.django_db
 class TestReports:
+
+    # Line Items tests
     def test_line_item_dataframe_no_line_items(self):
         r = Report()
         assert True == r.line_item_dataframe().empty
@@ -38,33 +40,6 @@ class TestReports:
         li = r.forecast_dataframe()
         assert 1 == len(li)
 
-    def test_fund_center_dataframe_empty(self):
-        r = Report()
-        assert 0 == len(r.fund_center_dataframe())
-
-    def test_fund_center_dataframe(self):
-        hnd = populate.Command()
-        hnd.handle()
-
-        r = Report().fund_center_dataframe()
-
-        columns = np.array(r.columns)
-        expected_columns = np.array(["fundcenter_id", "Fund Center", "Fund Center Name", "Sequence No", "parent_id"])
-
-        match = (columns == expected_columns).all()
-        assert True == match
-
-    def test_cost_center_dataframe_empty(self):
-        r = Report()
-        assert 0 == len(r.cost_center_dataframe())
-
-    def test_cost_center_dataframe(self):
-        hnd = populate.Command()
-        hnd.handle()
-
-        r = Report()
-        assert 3 == len(r.cost_center_dataframe())
-
     def test_line_item_detailed_empty(self):
         r = Report()
         assert True == r.line_item_detailed().empty
@@ -77,6 +52,35 @@ class TestReports:
 
         r = Report()
         assert 0 < len(r.line_item_detailed())
+
+    def test_fund_center_dataframe_empty(self):
+        r = Report()
+        assert 0 == len(r.fund_center_dataframe())
+
+    # Fund Center Tests
+    def test_fund_center_dataframe(self):
+        hnd = populate.Command()
+        hnd.handle()
+
+        r = Report().fund_center_dataframe()
+
+        columns = np.array(r.columns)
+        expected_columns = np.array(["fundcenter_id", "Fund Center", "Fund Center Name", "Sequence No", "parent_id"])
+
+        match = (columns == expected_columns).all()
+        assert True == match
+
+    # Cost Center Tests
+    def test_cost_center_dataframe_empty(self):
+        r = Report()
+        assert 0 == len(r.cost_center_dataframe())
+
+    def test_cost_center_dataframe(self):
+        hnd = populate.Command()
+        hnd.handle()
+
+        r = Report()
+        assert 3 == len(r.cost_center_dataframe())
 
     def test_cost_center_allocation_dataframe_empty(self):
         r = Report()
@@ -103,6 +107,20 @@ class TestReports:
         for c in ["Fund Center", "Cost Center", "Fund", "Allocation", "FY"]:
             assert c in columns
 
+    def test_cost_center_screening_report_empty(self):
+        r = Report()
+        assert True == r.cost_center_screening_report().empty
+
+    def test_cost_center_screening_report(self):
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+
+        r = Report()
+        assert 0 < len(r.cost_center_screening_report())
+
+    # Forecast Adjustment Tests
     def test_forecast_adjustment_dataframe_empty(self):
         r = Report()
         assert True == r.forecast_adjustment_dataframe().empty
@@ -117,19 +135,7 @@ class TestReports:
 
         assert 1 == len(r.forecast_adjustment_dataframe())
 
-    def test_cost_center_screening_report_empty(self):
-        r = Report()
-        assert True == r.cost_center_screening_report().empty
-
-    def test_cost_center_screening_report(self):
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
-
-        r = Report()
-        assert 0 < len(r.cost_center_screening_report())
-
+    # Financial Structure Tests
     def test_financial_structure_data(self):
         hnd = populate.Command()
         hnd.handle()
