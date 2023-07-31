@@ -162,7 +162,7 @@ class Report:
             report = df.to_html()
         return report
 
-    def cost_center_screening_report(self) -> pd.DataFrame:
+    def cost_center_screening_report(self, with_allocation=True) -> pd.DataFrame:
         """Create a dataframe of merged line items, forecast and cost centers grouped as per <grouping>.
         Aggregation is done on fields Spent, Balance, Working Plan, Forecast and Allocation
 
@@ -170,7 +170,6 @@ class Report:
             pd.DataFrame: _description_
         """
         df = pd.DataFrame()
-        with_allocation = True
         with_forecast_adjustment = True
         li_df = self.line_item_detailed()
         li_df = li_df.rename(columns={"fund": "Fund"})
