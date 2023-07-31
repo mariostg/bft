@@ -165,6 +165,20 @@ class LineItem(models.Model):
                 item.save()
         logger.info("Fund center integrity check completed.")
 
+    def set_doctype(self):
+        logger.info("Set doctype begins")
+        types = [
+            {"enctype": "Funds Commitment", "doctype": "CO"},
+            {"enctype": "Funds Precommitment", "doctype": "PC"},
+            {"enctype": "Funds Reservation", "doctype": "FR"},
+            {"enctype": "Purchase Order", "doctype": "CO"},
+            {"enctype": "Purchase Requisitions", "doctype": "PC"},
+        ]
+        for t in types:
+            li = LineItem.objects.filter(enctype=t["enctype"]).update(doctype=t["doctype"])
+            logger.info(f"Set {li} lines to {t['doctype']}")
+        logger.info("Set doctype complete")
+
 
 class LineForecast(models.Model):
     forecastamount = models.DecimalField(max_digits=10, decimal_places=2, default=0)

@@ -36,6 +36,7 @@ class Command(BaseCommand):
                 li = LineItem()
                 li.import_lines()
                 li.set_fund_center_integrity()
+                li.set_doctype()
                 logger.info("-- BFT dowload complete")
         else:
             logger.warning(f"{rawtextfile} not found")
