@@ -50,7 +50,8 @@ class Report:
         Returns:
             pd.DataFrame: A dataframe of fund centers.
         """
-
+        if not FundCenter.objects.exists():
+            return pd.DataFrame()
         data = list(FundCenter.objects.all().values())
         df = pd.DataFrame(data).rename(
             columns={
