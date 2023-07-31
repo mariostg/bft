@@ -6,6 +6,21 @@ import numpy as np
 
 
 class Report:
+    COLUMN_GROUPING = [
+        "Fund Center",
+        "Cost Center",
+        "Fund",
+    ]
+    AGGREGATION_COLUMNS = [
+        "Spent",
+        "Balance",
+        "Working Plan",
+        "Forecast",
+        "CO",
+        "PC",
+        "FR",
+    ]
+
     def line_item_dataframe(self) -> pd.DataFrame:
         """Prepare a pandas dataframe of the DRMIS line items.  Columns are renamed
         with a more friendly name.
@@ -185,22 +200,22 @@ class Report:
         li_df = self.line_item_detailed()
         li_df = li_df.rename(columns={"fund": "Fund"})
         if len(li_df) > 0:
-            grouping = ["Fund Center", "Cost Center", "Fund"]
-            aggregation = ["Spent", "Balance", "Working Plan", "Forecast", "CO", "PC", "FR"]
+            grouping = self.COLUMN_GROUPING
+            aggregation = self.AGGREGATION_COLUMNS
             df = pd.pivot_table(li_df, values=aggregation, index=grouping, aggfunc="sum")
-            column_grouping = ["Fund Center", "Cost Center", "Fund"]
+            column_grouping = self.COLUMN_GROUPING
             if with_allocation == True:
                 allocation_df = self.cost_center_allocation_dataframe()
                 if not allocation_df.empty:
                     allocation_agg = pd.pivot_table(
                         allocation_df, values="Allocation", index=column_grouping, aggfunc=np.sum
                     )
-                    df = pd.merge(df, allocation_agg, how="left", on=["Fund Center", "Cost Center", "Fund"])
+                    df = pd.merge(df, allocation_agg, how="left", on=self.COLUMN_GROUPING)
             if with_forecast_adjustment == True:
                 fa = self.forecast_adjustment_dataframe()
                 if not fa.empty:
                     fa_agg = pd.pivot_table(fa, values="Forecast Adjustment", index=column_grouping, aggfunc=np.sum)
-                    df = pd.merge(df, fa_agg, how="left", on=["Fund Center", "Cost Center", "Fund"]).fillna(0)
+                    df = pd.merge(df, fa_agg, how="left", on=self.COLUMN_GROUPING).fillna(0)
                     df["Forecast Total"] = df["Forecast"] + df["Forecast Adjustment"]
         return df
 

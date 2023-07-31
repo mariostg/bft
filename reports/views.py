@@ -17,15 +17,7 @@ def bmt_screening_report(request):
     with_forecast_adjustment = False
     if LineItem.objects.exists():
         r = utils.Report()
-        columns = [
-            "Spent",
-            "Balance",
-            "Working Plan",
-            "Forecast",
-            "CO",
-            "PC",
-            "FR",
-        ]
+        columns = r.AGGREGATION_COLUMNS
         if CostCenterAllocation.objects.exists():
             columns.append("Allocation")
             with_allocation = True
@@ -39,7 +31,7 @@ def bmt_screening_report(request):
         table = r.pivot_table_w_subtotals(
             table,
             aggvalues=columns,
-            grouper=["Fund Center", "Cost Center", "Fund"],
+            grouper=r.COLUMN_GROUPING,
         )
         table = r.styler_clean_table(table)
         context = {"table": table.to_html()}
