@@ -22,6 +22,9 @@ def bmt_screening_report(request):
             "Balance",
             "Working Plan",
             "Forecast",
+            "CO",
+            "PC",
+            "FR",
         ]
         if CostCenterAllocation.objects.exists():
             columns.append("Allocation")

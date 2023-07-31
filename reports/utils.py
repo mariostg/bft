@@ -24,6 +24,9 @@ class Report:
                     "spent": "Spent",
                 }
             )
+            df["CO"] = np.where(df["doctype"] == "CO", df["Balance"], 0)
+            df["PC"] = np.where(df["doctype"] == "PC", df["Balance"], 0)
+            df["FR"] = np.where(df["doctype"] == "FR", df["Balance"], 0)
             return df
         else:
             return pd.DataFrame({})
@@ -183,7 +186,7 @@ class Report:
         li_df = li_df.rename(columns={"fund": "Fund"})
         if len(li_df) > 0:
             grouping = ["Fund Center", "Cost Center", "Fund"]
-            aggregation = ["Spent", "Balance", "Working Plan", "Forecast"]
+            aggregation = ["Spent", "Balance", "Working Plan", "Forecast", "CO", "PC", "FR"]
             df = pd.pivot_table(li_df, values=aggregation, index=grouping, aggfunc="sum")
             column_grouping = ["Fund Center", "Cost Center", "Fund"]
             if with_allocation == True:
