@@ -9,11 +9,12 @@ import csv
 
 from lineitems.models import LineItem
 from reports import utils
-from costcenter.models import CostCenterAllocation
+from costcenter.models import CostCenterAllocation, ForecastAdjustment
 
 
 def bmt_screening_report(request):
     with_allocation = False
+    with_forecast_adjustment = False
     if LineItem.objects.exists():
         r = utils.Report()
         columns = [
@@ -21,13 +22,17 @@ def bmt_screening_report(request):
             "Balance",
             "Working Plan",
             "Forecast",
-            "Forecast Adjustment",
-            "Forecast Total",
         ]
         if CostCenterAllocation.objects.exists():
             columns.append("Allocation")
             with_allocation = True
-        table = r.cost_center_screening_report(with_allocation=with_allocation)
+        if ForecastAdjustment.objects.exists():
+            columns.append("Forecast Adjustment")
+            columns.append("Forecast Total")
+            with_forecast_adjustment = True
+        table = r.cost_center_screening_report(
+            with_allocation=with_allocation, with_forecast_adjustment=with_forecast_adjustment
+        )
         table = r.pivot_table_w_subtotals(
             table,
             aggvalues=columns,
