@@ -74,6 +74,8 @@ class Report:
         Returns:
             pd.DataFrame: A dataframe of cost centers.
         """
+        if not CostCenter.objects.exists():
+            return pd.DataFrame()
         data = list(CostCenter.objects.all().values())
         df = pd.DataFrame(data).rename(
             columns={
@@ -113,6 +115,8 @@ class Report:
         Returns:
             pd.DataFrame: A dataframe of cost center allocations.
         """
+        if not CostCenterAllocation.objects.exists():
+            return pd.DataFrame()
         data = list(
             CostCenterAllocation.objects.all().values(
                 "costcenter__parent__fundcenter",
@@ -134,6 +138,8 @@ class Report:
         return df
 
     def forecast_adjustment_dataframe(self) -> pd.DataFrame:
+        if not ForecastAdjustment.objects.exists():
+            return pd.DataFrame()
         data = list(
             ForecastAdjustment.objects.all().values(
                 "costcenter__parent__fundcenter",
