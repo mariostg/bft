@@ -12,24 +12,25 @@ from reports import utils
 
 
 def bmt_screening_report(request):
-    r = utils.Report()
-    table = r.cost_center_screening_report()
-    columns = [
-        "Spent",
-        "Balance",
-        "Working Plan",
-        "Forecast",
-        "Forecast Adjustment",
-        "Forecast Total",
-        "Allocation",
-    ]
-    table = r.pivot_table_w_subtotals(
-        table,
-        aggvalues=columns,
-        grouper=["Fund Center", "Cost Center", "Fund"],
-    )
-    table = r.styler_clean_table(table)
-    context = {"table": table.to_html()}
+    if LineItem.objects.exists():
+        r = utils.Report()
+        table = r.cost_center_screening_report()
+        columns = [
+            "Spent",
+            "Balance",
+            "Working Plan",
+            "Forecast",
+            "Forecast Adjustment",
+            "Forecast Total",
+            "Allocation",
+        ]
+        table = r.pivot_table_w_subtotals(
+            table,
+            aggvalues=columns,
+            grouper=["Fund Center", "Cost Center", "Fund"],
+        )
+        table = r.styler_clean_table(table)
+        context = {"table": table.to_html()}
     return render(request, "bmt-screening-report.html", context)
 
 
