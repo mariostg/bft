@@ -35,6 +35,8 @@ class Report:
         Returns:
             pd.DataFrame: A dataframe of forecast lines
         """
+        if not LineForecast.objects.exists():
+            return pd.DataFrame()
         data = list(LineForecast.objects.all().values())
         df = pd.DataFrame(data).rename(
             columns={
