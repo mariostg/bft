@@ -230,12 +230,13 @@ textarea {
     resize: vertical;
 }
 
-.site-nav {
+.site-nav,
+.action-bar {
     background-color: #a3b09c;
 }
 
 .summary {
-    padding: 2rem 0.5rem 0 2rem;
+    padding: 1rem 0.5rem 0 1rem;
     max-width: 1200px;
     min-width: 900px;
 }

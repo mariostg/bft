@@ -1,11 +1,18 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<header class='block'>
-    <h2>Cost Centers</h2>
-</header>
 <main class="block block--centered">
-        {% for elem in data  %}
+    <header class='block'>
+        <h2>Cost Centers</h2>
+    </header>
+    {% if user.is_authenticated %}
+    <div class='block'>
+        <div class="action-bar block">
+            <a class='btn' href="{% url 'costcenter-add' %}">Add Cost Center</a>
+        </div>
+    </div>
+    {% endif %}
+    {% for elem in data  %}
     <section class='summary'>
         <div class='summary__header'>
             <span><strong>{{elem.costcenter}} </strong>- {{elem.shortname}} - {{elem.parent}}</span>
