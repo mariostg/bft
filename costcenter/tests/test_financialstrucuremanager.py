@@ -10,31 +10,30 @@ class TestFinancialStructureManager:
     def setup(self):
         self.fsm = FinancialStructureManager()
 
-    def test_is_child_of_parent(self, setup):
+    def test_is_sequence_child_of(self, setup):
+        assert True == self.fsm.is_sequence_child_of("1", "1.1")
+        assert True == self.fsm.is_sequence_child_of("1.1", "1.1.1")
+        assert False == self.fsm.is_sequence_child_of("1.1", "1.1")
+        assert False == self.fsm.is_sequence_child_of("2.1", "2.1.1.1")
 
-        assert True == self.fsm.is_child_of_parent("1", "1.1")
-        assert True == self.fsm.is_child_of_parent("1.1", "1.1.1")
-        assert False == self.fsm.is_child_of_parent("1.1", "1.1")
-        assert False == self.fsm.is_child_of_parent("2.1", "2.1.1.1")
+    def test_is_sequence_descendant_of(self, setup):
+        assert True == self.fsm.is_sequence_descendant_of("1", "1.1.1")
+        assert True == self.fsm.is_sequence_descendant_of("1.1", "1.1.1")
+        assert False == self.fsm.is_sequence_descendant_of("1.1,1", "1.1")
 
-    def test_is_descendant_of_parent(self, setup):
-        assert True == self.fsm.is_descendant_of_parent("1", "1.1.1")
-        assert True == self.fsm.is_descendant_of_parent("1.1", "1.1.1")
-        assert False == self.fsm.is_descendant_of_parent("1.1,1", "1.1")
-
-    def test_get_descendants(self, setup):
+    def test_get_sequence_descendants(self, setup):
         pc = populate.Command()
         pc.handle()
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
         print(family)
-        descendants = self.fsm.get_descendants(family, "1")
+        descendants = self.fsm.get_sequence_descendants(family, "1")
         assert 4 == len(descendants)
-        descendants = self.fsm.get_descendants(family, "1.1")
+        descendants = self.fsm.get_sequence_descendants(family, "1.1")
         assert 2 == len(descendants)
-        descendants = self.fsm.get_descendants(family, "1.2")
+        descendants = self.fsm.get_sequence_descendants(family, "1.2")
         assert 0 == len(descendants)
         with pytest.raises(ParentDoesNotExistError):
-            descendants = self.fsm.get_descendants(family, "3")
+            self.fsm.get_sequence_descendants(family, "3")
 
     def test_get_direct_descendants(self, setup):
         pc = populate.Command()

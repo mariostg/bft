@@ -139,29 +139,29 @@ class FinancialStructureManager(models.Manager):
         new_seq = self.create_child(family, fundcenter_parent.fundcenter)
         return new_seq
 
-    def is_descendant_of_parent(self, parent, child) -> bool:
-        if len(child) <= len(parent):
+    def is_sequence_descendant_of(self, seq_parent, seq_child) -> bool:
+        if len(seq_child) <= len(seq_parent):
             return False
-        for k, v in enumerate(parent):
-            if child[k] == v:
+        for k, v in enumerate(seq_parent):
+            if seq_child[k] == v:
                 continue
             else:
                 return False
         return True
 
-    def is_child_of_parent(self, parent, child) -> bool:
-        if len(child) - 2 != len(parent):
+    def is_sequence_child_of(self, seq_parent, seq_child) -> bool:
+        if len(seq_child) - 2 != len(seq_parent):
             return False
 
-        return self.is_descendant_of_parent(parent, child)
+        return self.is_sequence_descendant_of(seq_parent, seq_child)
 
-    def get_descendants(self, family, parent) -> list:
+    def get_sequence_descendants(self, family, parent) -> list:
         if parent not in family:
             raise exceptions.ParentDoesNotExistError
 
         descendants = []
         for d in family:
-            if self.is_descendant_of_parent(parent, d):
+            if self.is_sequence_descendant_of(parent, d):
                 descendants.append(d)
         return descendants
 
@@ -171,7 +171,7 @@ class FinancialStructureManager(models.Manager):
 
         descendants = []
         for d in family:
-            if self.is_child_of_parent(parent, d):
+            if self.is_sequence_child_of(parent, d):
                 descendants.append(d)
         return descendants
 
