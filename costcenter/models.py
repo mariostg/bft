@@ -92,6 +92,10 @@ class FundCenterManager(models.Manager):
             return None
         return obj
 
+    def get_sub_alloc(self, parent_alloc):
+        # TODO to be implemented
+        pass
+
     def sequence_exist(self, sequence):
         return FundCenter.objects.filter(sequence=sequence).exists()
 
@@ -327,7 +331,7 @@ class Allocation(models.Model):
     def __str__(self):
         return f"{self.fund} - {self.amount}"
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if self.quarter not in list(zip(*QUARTERS))[0]:
             raise exceptions.InvalidOptionException(
                 f"Quarter {self.quarter} invalid.  Must be one of {','.join([x[0] for x in QUARTERS])}"
@@ -338,7 +342,7 @@ class Allocation(models.Model):
             raise exceptions.InvalidFiscalYearException(
                 f"Fiscal year {self.fy} invalid, must be one of {','.join([v[1] for v in YEAR_CHOICES])}"
             )
-        return super().save()
+        return super().save(*args, **kwargs)
 
 
 class CostCenterAllocation(Allocation):
