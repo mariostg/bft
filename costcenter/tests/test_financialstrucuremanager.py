@@ -1,7 +1,7 @@
 import pytest
-from costcenter.models import FinancialStructureManager, FundCenter, FundCenterManager
+from costcenter.models import CostCenterManager, FinancialStructureManager, FundCenter, FundCenterManager
 from bft.exceptions import ParentDoesNotExistError, IncompatibleArgumentsError
-from encumbrance.management.commands import populate
+from encumbrance.management.commands import populate, uploadcsv
 
 
 @pytest.mark.django_db
@@ -9,6 +9,44 @@ class TestFinancialStructureManager:
     @pytest.fixture
     def setup(self):
         self.fsm = FinancialStructureManager()
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+
+    def test_cost_center_is_child_of(self, setup):
+        parent = FundCenterManager().fundcenter(fundcenter="1111AB")
+        child = CostCenterManager().cost_center(costcenter="8486C1")
+        assert True == self.fsm.is_child_of(parent, child)
+
+    def test_cost_center_is_not_child_of(self, setup):
+        parent = FundCenterManager().fundcenter(fundcenter="1111AB")
+        child = CostCenterManager().cost_center(costcenter="8486B1")
+        assert False == self.fsm.is_child_of(parent, child)
+
+    def test_fund_center_is_child_of(self, setup):
+        parent = FundCenterManager().fundcenter(fundcenter="1111AA")
+        child = FundCenterManager().fundcenter(fundcenter="1111AB")
+
+        assert True == self.fsm.is_child_of(parent, child)
+
+    def test_fund_center_is_not_child_of(self, setup):
+        parent = FundCenterManager().fundcenter(fundcenter="1111AB")
+        child = FundCenterManager().fundcenter(fundcenter="1111AC")
+
+        assert False == self.fsm.is_child_of(parent, child)
+
+    def test_fund_center_is_descendant_of(self, setup):
+        parent = FundCenterManager().fundcenter(fundcenter="1111AA")
+        child = FundCenterManager().fundcenter(fundcenter="2222BB")
+
+        assert True == self.fsm.is_descendant_of(parent, child)
+
+    def test_fund_center_is_not_descendant_of(self, setup):
+        parent = FundCenterManager().fundcenter(fundcenter="1111AC")
+        child = FundCenterManager().fundcenter(fundcenter="2222BB")
+
+        assert False == self.fsm.is_descendant_of(parent, child)
 
     def test_is_sequence_child_of(self, setup):
         assert True == self.fsm.is_sequence_child_of("1", "1.1")

@@ -118,6 +118,21 @@ class FinancialStructureManager(models.Manager):
             return None
         return obj
 
+    def is_child_of(self, parent: "FundCenter", child: "FundCenter | CostCenter") -> bool:
+        """Check if child object is a direct descendant of parent
+
+        Args:
+            parent (FundCenter): A fund center object.
+            child (FundCenter | CostCenter): A fund center or cost center object
+
+        Returns:
+            bool: True is child is direct descendant of parent.
+        """
+        return parent.fundcenter == child.parent.fundcenter
+
+    def is_descendant_of(self, parent: "FundCenter", child: "FundCenter | CostCenter") -> bool:
+        return self.is_sequence_descendant_of(parent.sequence, child.sequence)
+
     def sequence_exists(self, seqno=None, fundcenter=None) -> bool:
         if seqno:
             return seqno in [x.sequence for x in self.FundCenters(seqno=seqno)]
