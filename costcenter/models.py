@@ -78,7 +78,7 @@ class Source(models.Model):
 
 
 class FundCenterManager(models.Manager):
-    def fundcenter(self, fundcenter: str):
+    def fundcenter(self, fundcenter: str) -> "FundCenter | None":
         try:
             obj = FundCenter.objects.get(fundcenter__iexact=fundcenter)
         except FundCenter.DoesNotExist:
@@ -170,6 +170,12 @@ class FinancialStructureManager(models.Manager):
 
         return self.is_sequence_descendant_of(seq_parent, seq_child)
 
+    def get_fundcenter_direct_descendants(self, fundcenter: "FundCenter") -> list:
+        try:
+            return self.get_sequence_direct_descendants(fundcenter.sequence)
+        except AttributeError:
+            return []
+
     def get_sequence_descendants(self, family, parent) -> list:
         if parent not in family:
             raise exceptions.ParentDoesNotExistError
@@ -180,13 +186,14 @@ class FinancialStructureManager(models.Manager):
                 descendants.append(d)
         return descendants
 
-    def get_direct_descendants(self, family: list, parent: str) -> list:
-        if parent not in family:
+    def get_sequence_direct_descendants(self, seq_parent: str) -> list:
+        family = list(self.FundCenters().values_list("sequence", flat=True))
+        if seq_parent not in family:
             raise exceptions.ParentDoesNotExistError
 
         descendants = []
         for d in family:
-            if self.is_sequence_child_of(parent, d):
+            if self.is_sequence_child_of(seq_parent, d):
                 descendants.append(d)
         return descendants
 
@@ -211,7 +218,7 @@ class FinancialStructureManager(models.Manager):
             raise exceptions.IncompatibleArgumentsError(fundcenter=parent, seqno=seqno)
         if parent:
             seqno = FundCenterManager().fundcenter(parent).sequence
-        children = self.get_direct_descendants(family, seqno)
+        children = self.get_sequence_direct_descendants(seqno)
         if children == []:
             new_born = seqno + ".1"
             family.append(new_born)
