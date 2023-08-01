@@ -13,25 +13,13 @@ from costcenter.models import CostCenterAllocation, ForecastAdjustment
 
 
 def bmt_screening_report(request):
-    with_allocation = False
-    with_forecast_adjustment = False
     if LineItem.objects.exists():
         r = utils.Report()
-        columns = r.AGGREGATION_COLUMNS
-        if CostCenterAllocation.objects.exists():
-            columns.append("Allocation")
-            with_allocation = True
-        if ForecastAdjustment.objects.exists():
-            columns.append("Forecast Adjustment")
-            columns.append("Forecast Total")
-            with_forecast_adjustment = True
-        table = r.cost_center_screening_report(
-            with_allocation=with_allocation, with_forecast_adjustment=with_forecast_adjustment
-        )
+        table = r.cost_center_screening_report()
         table = r.pivot_table_w_subtotals(
             table,
-            aggvalues=columns,
-            grouper=r.COLUMN_GROUPING,
+            aggvalues=r.aggregation_columns,
+            grouper=r.column_grouping,
         )
         table = r.styler_clean_table(table)
         context = {"table": table.to_html()}

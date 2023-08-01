@@ -6,20 +6,29 @@ import numpy as np
 
 
 class Report:
-    COLUMN_GROUPING = [
-        "Fund Center",
-        "Cost Center",
-        "Fund",
-    ]
-    AGGREGATION_COLUMNS = [
-        "Spent",
-        "Balance",
-        "Working Plan",
-        "Forecast",
-        "CO",
-        "PC",
-        "FR",
-    ]
+    def __init__(self):
+        self.column_grouping = [
+            "Fund Center",
+            "Cost Center",
+            "Fund",
+        ]
+        self.aggregation_columns = [
+            "Spent",
+            "Balance",
+            "Working Plan",
+            "CO",
+            "PC",
+            "FR",
+            "Forecast",
+        ]
+        self.with_allocation = False
+        self.with_forecast_adjustment = False
+        if CostCenterAllocation.objects.exists():
+            self.with_allocation = True
+        if ForecastAdjustment.objects.exists():
+            # self.aggregation_columns.append("Forecast Adjustment")
+            # self.aggregation_columns.append("Forecast Total")
+            self.with_forecast_adjustment = True
 
     def line_item_dataframe(self) -> pd.DataFrame:
         """Prepare a pandas dataframe of the DRMIS line items.  Columns are renamed
@@ -189,7 +198,7 @@ class Report:
             report = df.to_html()
         return report
 
-    def cost_center_screening_report(self, with_allocation=True, with_forecast_adjustment=True) -> pd.DataFrame:
+    def cost_center_screening_report(self) -> pd.DataFrame:
         """Create a dataframe of merged line items, forecast and cost centers grouped as per <grouping>.
         Aggregation is done on fields Spent, Balance, Working Plan, Forecast and Allocation
 
@@ -200,22 +209,24 @@ class Report:
         li_df = self.line_item_detailed()
         li_df = li_df.rename(columns={"fund": "Fund"})
         if len(li_df) > 0:
-            grouping = self.COLUMN_GROUPING
-            aggregation = self.AGGREGATION_COLUMNS
-            df = pd.pivot_table(li_df, values=aggregation, index=grouping, aggfunc="sum")
-            column_grouping = self.COLUMN_GROUPING
-            if with_allocation == True:
+            df = pd.pivot_table(li_df, values=self.aggregation_columns, index=self.column_grouping, aggfunc="sum")
+            if self.with_allocation == True:
                 allocation_df = self.cost_center_allocation_dataframe()
                 if not allocation_df.empty:
+                    self.aggregation_columns.append("Allocation")
                     allocation_agg = pd.pivot_table(
-                        allocation_df, values="Allocation", index=column_grouping, aggfunc=np.sum
+                        allocation_df, values="Allocation", index=self.column_grouping, aggfunc=np.sum
                     )
-                    df = pd.merge(df, allocation_agg, how="left", on=self.COLUMN_GROUPING)
-            if with_forecast_adjustment == True:
+                    df = pd.merge(df, allocation_agg, how="left", on=self.column_grouping)
+            if self.with_forecast_adjustment == True:
                 fa = self.forecast_adjustment_dataframe()
                 if not fa.empty:
-                    fa_agg = pd.pivot_table(fa, values="Forecast Adjustment", index=column_grouping, aggfunc=np.sum)
-                    df = pd.merge(df, fa_agg, how="left", on=self.COLUMN_GROUPING).fillna(0)
+                    self.aggregation_columns.append("Forecast Adjustment")
+                    self.aggregation_columns.append("Forecast Total")
+                    fa_agg = pd.pivot_table(
+                        fa, values="Forecast Adjustment", index=self.column_grouping, aggfunc=np.sum
+                    )
+                    df = pd.merge(df, fa_agg, how="left", on=self.column_grouping).fillna(0)
                     df["Forecast Total"] = df["Forecast"] + df["Forecast Adjustment"]
         return df
 
@@ -292,6 +303,7 @@ class Report:
                 aggfunc=np.sum,
                 fill_value="",
             ).reset_index()
+            table = table.reindex(list(table.columns[:n]) + self.aggregation_columns, axis=1)
             for column in grouper[n:]:
                 table[column] = ""
             tables.append(table)
