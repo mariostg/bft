@@ -349,3 +349,13 @@ class CostCenterAllocation(Allocation):
 
     class Meta:
         verbose_name_plural = "Cost Center Allocations"
+
+
+class FundCenterAllocation(Allocation):
+    fundcenter = models.ForeignKey(FundCenter, on_delete=models.CASCADE, null=True, verbose_name="Fund Center")
+
+    def __str__(self):
+        return f"{self.fundcenter} - {self.fund} - {self.fy}{self.quarter} {self.amount}"
+
+    class Meta:
+        verbose_name_plural = "Fund Center Allocations"

@@ -9,6 +9,7 @@ from .models import (
     FundCenterManager,
     CostCenter,
     CostCenterAllocation,
+    FundCenterAllocation,
     ForecastAdjustment,
     FinancialStructureManager,
 )
@@ -16,6 +17,7 @@ from .forms import (
     FundForm,
     SourceForm,
     FundCenterForm,
+    FundCenterAllocationForm,
     CostCenterForm,
     CostCenterAllocationForm,
     ForecastadjustmentForm,
@@ -174,6 +176,50 @@ def fundcenter_delete(request, pk):
             messages.error(request, e)
         return redirect("fundcenter-table")
     context = {"object": fundcenter, "back": "fundcenter-table"}
+    return render(request, "core/delete-object.html", context)
+
+
+def fundcenter_allocation_page(request):
+    data = FundCenterAllocation.objects.all()
+    if data.count() == 0:
+        messages.info(request, "There are no Allocations.")
+    return render(request, "costcenter/fundcenter-allocation-table.html", {"data": data})
+
+
+def fundcenter_allocation_add(request):
+    if request.method == "POST":
+        form = FundCenterAllocationForm(request.POST)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.user = request.user
+            form.save()
+            return redirect("fundcenter-allocation-table")
+    else:
+        form = FundCenterAllocationForm
+
+    return render(request, "costcenter/fundcenter-allocation-form.html", {"form": form})
+
+
+def fundcenter_allocation_update(request, pk):
+    data = FundCenterAllocation.objects.get(id=pk)
+    form = FundCenterAllocationForm(instance=data)
+    if request.method == "POST":
+        form = FundCenterAllocationForm(request.POST, instance=data)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.owner = request.user
+            form.save()
+            return redirect("fundcenter-allocation-table")
+
+    return render(request, "costcenter/fundcenter-allocation-form.html", {"form": form})
+
+
+def fundcenter_allocation_delete(request, pk):
+    item = FundCenterAllocation.objects.get(id=pk)
+    if request.method == "POST":
+        item.delete()
+        return redirect("fundcenter-allocation-table")
+    context = {"object": item, "back": "fundcenter-allocation-table"}
     return render(request, "core/delete-object.html", context)
 
 

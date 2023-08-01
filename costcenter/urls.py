@@ -27,6 +27,17 @@ urlpatterns += [
 ]
 
 urlpatterns += [
+    path("fundcenter-allocation-table/", views.fundcenter_allocation_page, name="fundcenter-allocation-table"),
+    path("fundcenter-allocation-add/", views.fundcenter_allocation_add, name="fundcenter-allocation-add"),
+    path(
+        "fundcenter-allocation-update/<int:pk>", views.fundcenter_allocation_update, name="fundcenter-allocation-update"
+    ),
+    path(
+        "fundcenter-allocation-delete/<int:pk>", views.fundcenter_allocation_delete, name="fundcenter-allocation-delete"
+    ),
+]
+
+urlpatterns += [
     path("costcenter-table/", views.costcenter_page, name="costcenter-table"),
     path("costcenter-add/", views.costcenter_add, name="costcenter-add"),
     path("costcenter-update/<int:pk>", views.costcenter_update, name="costcenter-update"),

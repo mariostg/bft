@@ -6,6 +6,7 @@ from costcenter.models import (
     FundCenter,
     CostCenter,
     CostCenterAllocation,
+    FundCenterAllocation,
     ForecastAdjustment,
 )
 
@@ -53,6 +54,16 @@ class FundCenterForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FundCenterForm, self).__init__(*args, **kwargs)
+
+
+class FundCenterAllocationForm(forms.ModelForm):
+    class Meta:
+        model = FundCenterAllocation
+        readonly_fields = ("owner", "updated", "created")
+        fields = ["fundcenter", "fund", "fy", "quarter", "amount", "note", "owner"]
+
+    def __init__(self, *args, **kwargs):
+        super(FundCenterAllocationForm, self).__init__(*args, **kwargs)
 
 
 class CostCenterForm(forms.ModelForm):

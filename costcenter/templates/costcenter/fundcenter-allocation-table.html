@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<header class='header'>
+    <h2>Fund Centers Allocations</h2>
+</header>
+        <main class="columns">
+                {% for item in data %}
+                <section class='summary'>
+                    <div class='summary__header'>
+                        <span>{{item.fundcenter}}</span>
+                        <span>{{item.fund}}</span>
+                        <span>{{item.fy|stringformat:'s'}}</span>
+                        <span>{{item.quarter}}</span>
+                    </div>
+                    <div class="summary__body">
+                        <span>{{item.amount}}</span>
+                        <span>{{item.note}}</span>
+                    </div>
+                    <div class="footnote">
+                        <span></span>
+                        <span>Created on {{item.created}}, Last updated by {{item.owner}} on {{item.updated}}</span>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div class="summary__footer">
+                        <a class="btn" href="{% url 'fundcenter-allocation-update' item.pk%}">Edit</a>
+                        <a class="btn btn-delete" href="{% url 'fundcenter-allocation-delete' item.pk %}" >Delete</a >
+                    </div>
+                    {% endif %}
+                </section>
+                {% endfor %}
+        </main>
+        {% if user.is_authenticated %}
+        <div class="block block--centered">
+            <a class='btn'  href="{% url 'fundcenter-allocation-add' %}">Create Fund Center Allocation</a>
+        </div>
+        {% endif %}
+    </body>
+</html>
+
+{% endblock content %}
