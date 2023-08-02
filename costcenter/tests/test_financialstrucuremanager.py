@@ -73,6 +73,16 @@ class TestFinancialStructureManager:
         with pytest.raises(ParentDoesNotExistError):
             self.fsm.get_sequence_descendants(family, "3")
 
+    def test_get_fund_center_cost_centers(self, setup):
+        parent = FundCenterManager().fundcenter(fundcenter="1111AB")
+        cc = self.fsm.get_fund_center_cost_centers(parent)
+        assert 2 == cc.count()
+
+    def test_get_fund_center_cost_centers_none(self, setup):
+        parent = FundCenterManager().fundcenter(fundcenter="1111AA")
+        cc = self.fsm.get_fund_center_cost_centers(parent)
+        assert 0 == cc.count()
+
     def test_get_fund_center_direct_descendants(self, setup):
         parent = FundCenterManager().fundcenter(fundcenter="1111AA")
         descendants = self.fsm.get_fundcenter_direct_descendants(parent)

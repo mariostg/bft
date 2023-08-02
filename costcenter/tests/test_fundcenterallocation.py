@@ -1,6 +1,7 @@
 import pytest
 from costcenter.models import CostCenterAllocation, FundCenterManager, FundCenterAllocation, Fund, CostCenterManager
 from encumbrance.management.commands import populate, uploadcsv
+from django.db.models import Sum
 
 
 @pytest.mark.django_db
@@ -19,8 +20,8 @@ class TestFundCenterAllocation:
         a = FundCenterAllocation.objects.create(fundcenter=fc, amount=1000, fy=2023, quarter="Q1", fund=self.C113)
         assert 1 == a.id
 
-    def test_get_subordinate_allocation(self, setup):
-        fc = FundCenterManager().fundcenter("1111ab")
+    def test_get_costcenter_subordinate_allocation(self, setup):
+        fc = FundCenterManager().fundcenter("1111AB")
         fc_alloc = FundCenterAllocation.objects.create(
             fundcenter=fc, amount=1000, fy=2023, quarter="Q1", fund=self.C113
         )
@@ -32,4 +33,21 @@ class TestFundCenterAllocation:
         cc = CostCenterManager().cost_center(costcenter="8486C2")
         CostCenterAllocation.objects.create(costcenter=cc, amount=2000, fy=2023, quarter="Q1", fund=self.C113)
 
+        sub_alloc = CostCenterManager().get_sub_alloc(fc_alloc)
+        print(sub_alloc)
+
+    def test_get_fundcenter_subordinate_allocation(self, setup):
+        fc = FundCenterManager().fundcenter("1111AB")
+        fc_alloc = FundCenterAllocation.objects.create(
+            fundcenter=fc, amount=1000, fy=2023, quarter="Q1", fund=self.C113
+        )
+        assert 1 == fc_alloc.id
+
+        cc = FundCenterManager().fundcenter(fundcenter="2222BA")
+        FundCenterAllocation.objects.create(fundcenter=cc, amount=1000, fy=2023, quarter="Q1", fund=self.C113)
+
+        cc = FundCenterManager().fundcenter(fundcenter="2222BB")
+        FundCenterAllocation.objects.create(fundcenter=cc, amount=2000, fy=2023, quarter="Q1", fund=self.C113)
+
         sub_alloc = FundCenterManager().get_sub_alloc(fc_alloc)
+        assert 3000 == sub_alloc.aggregate(Sum("amount"))["amount__sum"]

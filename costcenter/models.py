@@ -92,9 +92,10 @@ class FundCenterManager(models.Manager):
             return None
         return obj
 
-    def get_sub_alloc(self, parent_alloc):
-        # TODO to be implemented
-        pass
+    def get_sub_alloc(self, parent_alloc: "FundCenterAllocation") -> "FundCenterAllocation":
+        seq = FinancialStructureManager().get_fundcenter_direct_descendants(parent_alloc.fundcenter)
+        dd = FundCenter.objects.filter(sequence__in=seq)
+        return FundCenterAllocation.objects.filter(fundcenter__in=dd)
 
     def sequence_exist(self, sequence):
         return FundCenter.objects.filter(sequence=sequence).exists()
@@ -175,6 +176,10 @@ class FinancialStructureManager(models.Manager):
             return self.get_sequence_direct_descendants(fundcenter.sequence)
         except AttributeError:
             return []
+
+    def get_fund_center_cost_centers(self, fundcenter: "FundCenter"):
+        cc = CostCenter.objects.filter(parent=fundcenter)
+        return cc
 
     def get_sequence_descendants(self, family, parent) -> list:
         if parent not in family:
@@ -290,6 +295,10 @@ class CostCenterManager(models.Manager):
         except CostCenter.DoesNotExist:
             return None
         return cc
+
+    def get_sub_alloc(self, parent_alloc: "FundCenterAllocation") -> "CostCenterAllocation":
+        cc = FinancialStructureManager().get_fund_center_cost_centers(parent_alloc.fundcenter)
+        return CostCenterAllocation.objects.filter(costcenter__in=cc)
 
 
 class CostCenter(models.Model):
