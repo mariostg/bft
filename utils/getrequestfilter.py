@@ -1,5 +1,5 @@
 from lineitems.models import LineItem
-from costcenter.models import FundCenterAllocation
+from costcenter.models import FundCenterAllocation, CostCenterAllocation
 
 """
 Search line items from GET request based on cost center, fund and document type.
@@ -103,8 +103,6 @@ def search_fund_center_allocations(request):
         data = data.filter(
             fund__fund__exact=fund,
         )
-        print("$$$$$$$$$$$$$")
-        print(data)
     if request.GET.get("fy"):
         fy = request.GET.get("fy").upper()
         query_terms.add(f"fy={fy}")
@@ -124,9 +122,47 @@ def search_fund_center_allocations(request):
         "fy": fy,
         "quarter": quarter,
     }
-    print("##########")
-    print(data)
-    print("##########")
+    if len(query_terms) > 0:
+        query_string = "&".join(query_terms)
+
+    return data, initial, query_string
+
+
+def search_cost_center_allocations(request):
+    costcenter = fund = fy = quarter = query_string = ""
+    data = CostCenterAllocation.objects.all()
+    query_terms = set()
+    if request.GET.get("costcenter"):
+        costcenter = request.GET.get("costcenter").upper()
+        query_terms.add(f"costcenter={costcenter}")
+        data = data.filter(
+            costcenter__costcenter__exact=costcenter,
+        )
+    if request.GET.get("fund"):
+        fund = request.GET.get("fund").upper()
+        query_terms.add(f"fund={fund}")
+        data = data.filter(
+            fund__fund__exact=fund,
+        )
+    if request.GET.get("fy"):
+        fy = request.GET.get("fy").upper()
+        query_terms.add(f"fy={fy}")
+        data = data.filter(
+            fy__exact=fy,
+        )
+    if request.GET.get("quarter"):
+        quarter = request.GET.get("quarter").upper()
+        query_terms.add(f"quarter={quarter}")
+        data = data.filter(
+            quarter__exact=quarter,
+        )
+
+    initial = {
+        "costcenter": costcenter,
+        "fund": fund,
+        "fy": fy,
+        "quarter": quarter,
+    }
     if len(query_terms) > 0:
         query_string = "&".join(query_terms)
 

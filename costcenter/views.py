@@ -22,6 +22,7 @@ from .forms import (
     CostCenterAllocationForm,
     ForecastadjustmentForm,
     SearchFundCenterAllocationForm,
+    SearchCostCenterAllocationForm,
 )
 from utils import getrequestfilter
 
@@ -279,10 +280,19 @@ def costcenter_delete(request, pk):
 
 
 def costcenter_allocation_page(request):
-    data = CostCenterAllocation.objects.all()
-    if data.count() == 0:
+    lines, initial, query_string = getrequestfilter.search_cost_center_allocations(request)
+    if lines.count() == 0:
         messages.info(request, "There are no Allocations.")
-    return render(request, "costcenter/costcenter-allocation-table.html", {"data": data})
+    # paginator = Paginator(lines, 25)
+    # page_number = request.GET.get("page")
+    form = SearchCostCenterAllocationForm(initial=initial)
+    context = {
+        "data": lines,
+        "form": form,
+        "initial": initial,
+        "query_string": query_string,
+    }
+    return render(request, "costcenter/costcenter-allocation-table.html", context)
 
 
 def costcenter_allocation_add(request):

@@ -120,3 +120,19 @@ class SearchFundCenterAllocationForm(forms.ModelForm):
             "fy",
             "quarter",
         )
+
+
+class SearchCostCenterAllocationForm(forms.ModelForm):
+    costcenter = forms.CharField(required=False)
+    fund = forms.CharField(required=False)
+    fy = forms.CharField(required=False)
+    quarter = forms.CharField(required=False)
+
+    class Meta:
+        model = CostCenterAllocation
+        fields = (
+            "costcenter",
+            "fund",
+            "fy",
+            "quarter",
+        )
