@@ -23,7 +23,7 @@ from .forms import (
     ForecastadjustmentForm,
     SearchFundCenterAllocationForm,
 )
-from utils import searchlines
+from utils import getrequestfilter
 
 
 def fund_page(request):
@@ -183,7 +183,7 @@ def fundcenter_delete(request, pk):
 
 def fundcenter_allocation_page(request):
 
-    lines, initial, query_string = searchlines.search_fund_center_allocations(request)
+    lines, initial, query_string = getrequestfilter.search_fund_center_allocations(request)
     if lines.count() == 0:
         messages.info(request, "There are no Allocations.")
     # paginator = Paginator(lines, 25)
