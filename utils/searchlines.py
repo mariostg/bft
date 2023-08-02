@@ -1,4 +1,5 @@
 from lineitems.models import LineItem
+from costcenter.models import FundCenterAllocation
 
 """
 Search line items from GET request based on cost center, fund and document type.
@@ -80,6 +81,52 @@ def search_lines(request):
         "has_workingplan": has_workingplan,
         "createdby": createdby,
     }
+    if len(query_terms) > 0:
+        query_string = "&".join(query_terms)
+
+    return data, initial, query_string
+
+
+def search_fund_center_allocations(request):
+    fundcenter = fund = fy = quarter = query_string = ""
+    data = FundCenterAllocation.objects.all()
+    query_terms = set()
+    if request.GET.get("fundcenter"):
+        fundcenter = request.GET.get("fundcenter").upper()
+        query_terms.add(f"fundcenter={fundcenter}")
+        data = data.filter(
+            fundcenter__fundcenter__exact=fundcenter,
+        )
+    if request.GET.get("fund"):
+        fund = request.GET.get("fund").upper()
+        query_terms.add(f"fund={fund}")
+        data = data.filter(
+            fund__fund__exact=fund,
+        )
+        print("$$$$$$$$$$$$$")
+        print(data)
+    if request.GET.get("fy"):
+        fy = request.GET.get("fy").upper()
+        query_terms.add(f"fy={fy}")
+        data = data.filter(
+            fy__exact=fy,
+        )
+    if request.GET.get("quarter"):
+        quarter = request.GET.get("quarter").upper()
+        query_terms.add(f"quarter={quarter}")
+        data = data.filter(
+            quarter__exact=quarter,
+        )
+
+    initial = {
+        "fundcenter": fundcenter,
+        "fund": fund,
+        "fy": fy,
+        "quarter": quarter,
+    }
+    print("##########")
+    print(data)
+    print("##########")
     if len(query_terms) > 0:
         query_string = "&".join(query_terms)
 

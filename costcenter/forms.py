@@ -104,3 +104,19 @@ class ForecastadjustmentForm(forms.ModelForm):
 
         self.fields["note"] = forms.CharField(widget=forms.Textarea(attrs={"class": "input"}))
         self.fields["amount"] = forms.CharField(widget=forms.TextInput(attrs={"class": "input"}))
+
+
+class SearchFundCenterAllocationForm(forms.ModelForm):
+    fundcenter = forms.CharField(required=False)
+    fund = forms.CharField(required=False)
+    fy = forms.CharField(required=False)
+    quarter = forms.CharField(required=False)
+
+    class Meta:
+        model = FundCenterAllocation
+        fields = (
+            "fundcenter",
+            "fund",
+            "fy",
+            "quarter",
+        )

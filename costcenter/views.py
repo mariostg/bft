@@ -21,7 +21,9 @@ from .forms import (
     CostCenterForm,
     CostCenterAllocationForm,
     ForecastadjustmentForm,
+    SearchFundCenterAllocationForm,
 )
+from utils import searchlines
 
 
 def fund_page(request):
@@ -180,10 +182,20 @@ def fundcenter_delete(request, pk):
 
 
 def fundcenter_allocation_page(request):
-    data = FundCenterAllocation.objects.all()
-    if data.count() == 0:
+
+    lines, initial, query_string = searchlines.search_fund_center_allocations(request)
+    if lines.count() == 0:
         messages.info(request, "There are no Allocations.")
-    return render(request, "costcenter/fundcenter-allocation-table.html", {"data": data})
+    # paginator = Paginator(lines, 25)
+    # page_number = request.GET.get("page")
+    form = SearchFundCenterAllocationForm(initial=initial)
+    context = {
+        "data": lines,
+        "form": form,
+        "initial": initial,
+        "query_string": query_string,
+    }
+    return render(request, "costcenter/fundcenter-allocation-table.html", context)
 
 
 def fundcenter_allocation_add(request):
