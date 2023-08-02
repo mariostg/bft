@@ -95,7 +95,12 @@ class FundCenterManager(models.Manager):
     def get_sub_alloc(self, parent_alloc: "FundCenterAllocation") -> "FundCenterAllocation":
         seq = FinancialStructureManager().get_fundcenter_direct_descendants(parent_alloc.fundcenter)
         dd = FundCenter.objects.filter(sequence__in=seq)
-        return FundCenterAllocation.objects.filter(fundcenter__in=dd)
+        return FundCenterAllocation.objects.filter(
+            fundcenter__in=dd,
+            fy=parent_alloc.fy,
+            fund=parent_alloc.fund,
+            quarter=parent_alloc.quarter,
+        )
 
     def sequence_exist(self, sequence):
         return FundCenter.objects.filter(sequence=sequence).exists()
@@ -298,7 +303,12 @@ class CostCenterManager(models.Manager):
 
     def get_sub_alloc(self, parent_alloc: "FundCenterAllocation") -> "CostCenterAllocation":
         cc = FinancialStructureManager().get_fund_center_cost_centers(parent_alloc.fundcenter)
-        return CostCenterAllocation.objects.filter(costcenter__in=cc)
+        return CostCenterAllocation.objects.filter(
+            costcenter__in=cc,
+            fy=parent_alloc.fy,
+            fund=parent_alloc.fund,
+            quarter=parent_alloc.quarter,
+        )
 
 
 class CostCenter(models.Model):
