@@ -12,7 +12,6 @@ logger = logging.getLogger("django")
 
 def lineitem_page(request):
     logger.info("Visiting Line Item page as info")
-    print("%%%%%%%%%%%%%")
     lines, initial, query_string = searchlines.search_lines(request)
     paginator = Paginator(lines, 25)
     page_number = request.GET.get("page")
