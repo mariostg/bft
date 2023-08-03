@@ -213,6 +213,21 @@ class FinancialStructureManager(models.Manager):
         return self.is_sequence_descendant_of(seq_parent, seq_child)
 
     def get_fundcenter_direct_descendants(self, fundcenter: "FundCenter") -> QuerySet | None:
+        """Create a QuerySet of fundcenters that are direct descendants of the fund center passed as argument.
+
+        Args:
+            fundcenter (FundCenter): A fund center object which the direct descendants are desired.
+
+        Returns:
+            QuerySet: Returns a QuerySet of FundCenter objects that are direct descendants.  Returns None if no descendants exists.
+        """
+        try:
+            seqno = self.get_sequence_direct_descendants(fundcenter.sequence)
+            return FundCenter.objects.filter(sequence__in=seqno)
+        except AttributeError:
+            return None
+
+    def get_fundcenter_descendants(self, fundcenter: "FundCenter") -> QuerySet | None:
         """Create a QuerySet of fundcenters that are descendants of the fund center passed as argument.
 
         Args:
@@ -222,8 +237,7 @@ class FinancialStructureManager(models.Manager):
             QuerySet: Returns a QuerySet of FundCenter objects that are descendants.  Returns None if no descendants exists.
         """
         try:
-            seqno = self.get_sequence_direct_descendants(fundcenter.sequence)
-            return FundCenter.objects.filter(sequence__in=seqno)
+            return FundCenter.objects.filter(sequence__startswith=fundcenter.sequence)
         except AttributeError:
             return None
 
