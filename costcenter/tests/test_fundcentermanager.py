@@ -1,5 +1,7 @@
 import pytest
 from costcenter.models import FundCenter, FundCenterManager
+from encumbrance.management.commands import populate
+import numpy as np
 
 
 @pytest.mark.django_db
@@ -34,3 +36,20 @@ class TestFundCenterManager:
     def test_get_by_pk(self, setup):
         obj = FundCenter.objects.pk(self.current.pk)
         assert obj.pk == self.current.pk
+
+    def test_fund_center_dataframe_empty(self):
+        r = FundCenter
+        assert 0 == len(r.objects.fund_center_dataframe())
+
+    # Fund Center Tests
+    def test_fund_center_dataframe(self):
+        hnd = populate.Command()
+        hnd.handle()
+
+        r = FundCenter.objects.fund_center_dataframe()
+
+        columns = np.array(r.columns)
+        expected_columns = np.array(["fundcenter_id", "Fund Center", "Fund Center Name", "Sequence No", "parent_id"])
+
+        match = (columns == expected_columns).all()
+        assert True == match

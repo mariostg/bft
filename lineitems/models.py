@@ -4,7 +4,8 @@ import logging
 from costcenter.models import CostCenter
 from encumbrance.models import EncumbranceImport
 from django.forms.models import model_to_dict
-
+import pandas as pd
+import numpy as np
 
 logger = logging.getLogger("uploadcsv")
 
@@ -17,6 +18,70 @@ class LineItemManager(models.Manager):
         except CostCenter.DoesNotExist:
             return None
         return self.filter(costcenter=cc)
+
+    def line_item_dataframe(self) -> pd.DataFrame:
+        """Prepare a pandas dataframe of the DRMIS line items.  Columns are renamed
+        with a more friendly name.
+
+        Returns:
+            pd.DataFrame: A dataframe of DRMIS line items
+        """
+        data = list(LineItem.objects.all().values())
+        if data:
+            df = pd.DataFrame(data).rename(
+                columns={
+                    "id": "lineitem_id",
+                    "balance": "Balance",
+                    "workingplan": "Working Plan",
+                    "fundcenter": "Fund Center",
+                    "spent": "Spent",
+                }
+            )
+            df["CO"] = np.where(df["doctype"] == "CO", df["Balance"], 0)
+            df["PC"] = np.where(df["doctype"] == "PC", df["Balance"], 0)
+            df["FR"] = np.where(df["doctype"] == "FR", df["Balance"], 0)
+            return df
+        else:
+            return pd.DataFrame({})
+
+    def line_item_detailed(self) -> pd.DataFrame:
+        """
+        Prepare a pandas dataframe of merged line items, forecast line items and cost center.
+
+        Returns:
+            pd.DataFrame : A dataframe of line items including forecast.
+        """
+        li_df = self.line_item_dataframe()
+        if li_df.empty:
+            return li_df
+        if len(li_df) > 0:
+            fcst_df = self.forecast_dataframe()
+            cc_df = CostCenter.objects.cost_center_dataframe()
+
+            if len(fcst_df) > 0:
+                li_df = pd.merge(li_df, fcst_df, how="left", on="lineitem_id")
+            else:
+                li_df["Forecast"] = 0
+            li_df = pd.merge(li_df, cc_df, how="left", on="costcenter_id")
+
+        return li_df
+
+    def forecast_dataframe(self) -> pd.DataFrame:
+        """Prepare a pandas dataframe of the forecast line items.  Columns are renamed
+        with a more friendly name.
+
+        Returns:
+            pd.DataFrame: A dataframe of forecast lines
+        """
+        if not LineForecast.objects.exists():
+            return pd.DataFrame()
+        data = list(LineForecast.objects.all().values())
+        df = pd.DataFrame(data).rename(
+            columns={
+                "forecastamount": "Forecast",
+            }
+        )
+        return df
 
 
 class LineItem(models.Model):

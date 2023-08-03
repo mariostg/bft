@@ -30,159 +30,6 @@ class Report:
             # self.aggregation_columns.append("Forecast Total")
             self.with_forecast_adjustment = True
 
-    def line_item_dataframe(self) -> pd.DataFrame:
-        """Prepare a pandas dataframe of the DRMIS line items.  Columns are renamed
-        with a more friendly name.
-
-        Returns:
-            pd.DataFrame: A dataframe of DRMIS line items
-        """
-        data = list(LineItem.objects.all().values())
-        if data:
-            df = pd.DataFrame(data).rename(
-                columns={
-                    "id": "lineitem_id",
-                    "balance": "Balance",
-                    "workingplan": "Working Plan",
-                    "fundcenter": "Fund Center",
-                    "spent": "Spent",
-                }
-            )
-            df["CO"] = np.where(df["doctype"] == "CO", df["Balance"], 0)
-            df["PC"] = np.where(df["doctype"] == "PC", df["Balance"], 0)
-            df["FR"] = np.where(df["doctype"] == "FR", df["Balance"], 0)
-            return df
-        else:
-            return pd.DataFrame({})
-
-    def forecast_dataframe(self) -> pd.DataFrame:
-        """Prepare a pandas dataframe of the forecast line items.  Columns are renamed
-        with a more friendly name.
-
-        Returns:
-            pd.DataFrame: A dataframe of forecast lines
-        """
-        if not LineForecast.objects.exists():
-            return pd.DataFrame()
-        data = list(LineForecast.objects.all().values())
-        df = pd.DataFrame(data).rename(
-            columns={
-                "forecastamount": "Forecast",
-            }
-        )
-        return df
-
-    def fund_center_dataframe(self) -> pd.DataFrame:
-        """Prepare a pandas dataframe of the fund centers as per financial structure.
-        Columns are renamed with a more friendly name.
-
-        Returns:
-            pd.DataFrame: A dataframe of fund centers.
-        """
-        if not FundCenter.objects.exists():
-            return pd.DataFrame()
-        data = list(FundCenter.objects.all().values())
-        df = pd.DataFrame(data).rename(
-            columns={
-                "id": "fundcenter_id",
-                "fundcenter": "Fund Center",
-                "shortname": "Fund Center Name",
-                "parent": "Parent",
-                "sequence": "Sequence No",
-            }
-        )
-        df["parent_id"] = df["parent_id"].fillna(0).astype("int")
-        return df
-
-    def cost_center_dataframe(self) -> pd.DataFrame:
-        """Prepare a pandas dataframe of the cost centers as per financial structure.
-        Columns are renamed with a more friendly name.
-
-        Returns:
-            pd.DataFrame: A dataframe of cost centers.
-        """
-        if not CostCenter.objects.exists():
-            return pd.DataFrame()
-        data = list(CostCenter.objects.all().values())
-        df = pd.DataFrame(data).rename(
-            columns={
-                "id": "costcenter_id",
-                "costcenter": "Cost Center",
-                "shortname": "Cost Center Name",
-            }
-        )
-        return df
-
-    def line_item_detailed(self) -> pd.DataFrame:
-        """
-        Prepare a pandas dataframe of merged line items, forecast line items and cost center.
-
-        Returns:
-            pd.DataFrame : A dataframe of line items including forecast.
-        """
-        li_df = self.line_item_dataframe()
-        if li_df.empty:
-            return li_df
-        if len(li_df) > 0:
-            fcst_df = self.forecast_dataframe()
-            cc_df = self.cost_center_dataframe()
-
-            if len(fcst_df) > 0:
-                li_df = pd.merge(li_df, fcst_df, how="left", on="lineitem_id")
-            else:
-                li_df["Forecast"] = 0
-            li_df = pd.merge(li_df, cc_df, how="left", on="costcenter_id")
-
-        return li_df
-
-    def cost_center_allocation_dataframe(self) -> pd.DataFrame:
-        """Prepare a pandas dataframe of the cost center allocations for the given FY and Quarter.
-        Columns are renamed with a more friendly name.
-
-        Returns:
-            pd.DataFrame: A dataframe of cost center allocations.
-        """
-        if not CostCenterAllocation.objects.exists():
-            return pd.DataFrame()
-        data = list(
-            CostCenterAllocation.objects.all().values(
-                "costcenter__parent__fundcenter",
-                "costcenter__costcenter",
-                "fund__fund",
-                "amount",
-                "fy",
-            )
-        )
-        columns = {
-            "amount": "Allocation",
-            "fy": "FY",
-            "quarter": "Quarter",
-            "costcenter__costcenter": "Cost Center",
-            "costcenter__parent__fundcenter": "Fund Center",
-            "fund__fund": "Fund",
-        }
-        df = pd.DataFrame(data).rename(columns=columns)
-        return df
-
-    def forecast_adjustment_dataframe(self) -> pd.DataFrame:
-        if not ForecastAdjustment.objects.exists():
-            return pd.DataFrame()
-        data = list(
-            ForecastAdjustment.objects.all().values(
-                "costcenter__parent__fundcenter",
-                "costcenter__costcenter",
-                "fund__fund",
-                "amount",
-            )
-        )
-        columns = {
-            "amount": "Forecast Adjustment",
-            "costcenter__parent__fundcenter": "Fund Center",
-            "costcenter__costcenter": "Cost Center",
-            "fund__fund": "Fund",
-        }
-        return pd.DataFrame(data).rename(columns=columns)
-
     def df_to_html(self, df: pd.DataFrame, classname=None) -> str:
         """Create an html version of the dataframe provided.
 
@@ -206,12 +53,12 @@ class Report:
             pd.DataFrame: _description_
         """
         df = pd.DataFrame()
-        li_df = self.line_item_detailed()
+        li_df = LineItem.objects.line_item_detailed()
         li_df = li_df.rename(columns={"fund": "Fund"})
         if len(li_df) > 0:
             df = pd.pivot_table(li_df, values=self.aggregation_columns, index=self.column_grouping, aggfunc="sum")
             if self.with_allocation == True:
-                allocation_df = self.cost_center_allocation_dataframe()
+                allocation_df = CostCenter.objects.cost_center_allocation_dataframe()
                 if not allocation_df.empty:
                     self.aggregation_columns.append("Allocation")
                     allocation_agg = pd.pivot_table(
@@ -219,7 +66,7 @@ class Report:
                     )
                     df = pd.merge(df, allocation_agg, how="left", on=self.column_grouping)
             if self.with_forecast_adjustment == True:
-                fa = self.forecast_adjustment_dataframe()
+                fa = CostCenter.objects.forecast_adjustment_dataframe()
                 if not fa.empty:
                     self.aggregation_columns.append("Forecast Adjustment")
                     self.aggregation_columns.append("Forecast Total")

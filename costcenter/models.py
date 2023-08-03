@@ -5,7 +5,7 @@ from django.db import models, IntegrityError
 from django.db.models import QuerySet
 from django.core.exceptions import ValidationError
 from django.conf import settings
-
+import pandas as pd
 from bft.conf import YEAR_CHOICES, QUARTERS
 from bft import exceptions
 
@@ -108,6 +108,28 @@ class FundCenterManager(models.Manager):
 
     def fund_center_exist(self, fc):
         return FundCenter.objects.filter(fundcenter=fc).exists()
+
+    def fund_center_dataframe(self) -> pd.DataFrame:
+        """Prepare a pandas dataframe of the fund centers as per financial structure.
+        Columns are renamed with a more friendly name.
+
+        Returns:
+            pd.DataFrame: A dataframe of fund centers.
+        """
+        if not FundCenter.objects.exists():
+            return pd.DataFrame()
+        data = list(FundCenter.objects.all().values())
+        df = pd.DataFrame(data).rename(
+            columns={
+                "id": "fundcenter_id",
+                "fundcenter": "Fund Center",
+                "shortname": "Fund Center Name",
+                "parent": "Parent",
+                "sequence": "Sequence No",
+            }
+        )
+        df["parent_id"] = df["parent_id"].fillna(0).astype("int")
+        return df
 
 
 class FinancialStructureManager(models.Manager):
@@ -378,6 +400,73 @@ class CostCenterManager(models.Manager):
             fund=parent_alloc.fund,
             quarter=parent_alloc.quarter,
         )
+
+    def cost_center_dataframe(self) -> pd.DataFrame:
+        """Prepare a pandas dataframe of the cost centers as per financial structure.
+        Columns are renamed with a more friendly name.
+
+        Returns:
+            pd.DataFrame: A dataframe of cost centers.
+        """
+        if not CostCenter.objects.exists():
+            return pd.DataFrame()
+        data = list(CostCenter.objects.all().values())
+        df = pd.DataFrame(data).rename(
+            columns={
+                "id": "costcenter_id",
+                "costcenter": "Cost Center",
+                "shortname": "Cost Center Name",
+            }
+        )
+        return df
+
+    def cost_center_allocation_dataframe(self) -> pd.DataFrame:
+        """Prepare a pandas dataframe of the cost center allocations for the given FY and Quarter.
+        Columns are renamed with a more friendly name.
+
+        Returns:
+            pd.DataFrame: A dataframe of cost center allocations.
+        """
+        if not CostCenterAllocation.objects.exists():
+            return pd.DataFrame()
+        data = list(
+            CostCenterAllocation.objects.all().values(
+                "costcenter__parent__fundcenter",
+                "costcenter__costcenter",
+                "fund__fund",
+                "amount",
+                "fy",
+            )
+        )
+        columns = {
+            "amount": "Allocation",
+            "fy": "FY",
+            "quarter": "Quarter",
+            "costcenter__costcenter": "Cost Center",
+            "costcenter__parent__fundcenter": "Fund Center",
+            "fund__fund": "Fund",
+        }
+        df = pd.DataFrame(data).rename(columns=columns)
+        return df
+
+    def forecast_adjustment_dataframe(self) -> pd.DataFrame:
+        if not ForecastAdjustment.objects.exists():
+            return pd.DataFrame()
+        data = list(
+            ForecastAdjustment.objects.all().values(
+                "costcenter__parent__fundcenter",
+                "costcenter__costcenter",
+                "fund__fund",
+                "amount",
+            )
+        )
+        columns = {
+            "amount": "Forecast Adjustment",
+            "costcenter__parent__fundcenter": "Fund Center",
+            "costcenter__costcenter": "Cost Center",
+            "fund__fund": "Fund",
+        }
+        return pd.DataFrame(data).rename(columns=columns)
 
 
 class CostCenter(models.Model):
