@@ -59,20 +59,6 @@ class TestFinancialStructureManager:
         assert True == self.fsm.is_sequence_descendant_of("1.1", "1.1.1")
         assert False == self.fsm.is_sequence_descendant_of("1.1,1", "1.1")
 
-    def test_get_sequence_descendants(self, setup):
-        pc = populate.Command()
-        pc.handle()
-        family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
-        print(family)
-        descendants = self.fsm.get_sequence_descendants(family, "1")
-        assert 4 == len(descendants)
-        descendants = self.fsm.get_sequence_descendants(family, "1.1")
-        assert 2 == len(descendants)
-        descendants = self.fsm.get_sequence_descendants(family, "1.2")
-        assert 0 == len(descendants)
-        with pytest.raises(ParentDoesNotExistError):
-            self.fsm.get_sequence_descendants(family, "3")
-
     def test_get_fund_center_cost_centers(self, setup):
         parent = FundCenterManager().fundcenter(fundcenter="1111AB")
         cc = self.fsm.get_fund_center_cost_centers(parent)
@@ -96,7 +82,7 @@ class TestFinancialStructureManager:
     def test_get_fund_center_direct_descendants_nonetype(self, setup):
         parent = FundCenterManager().fundcenter(fundcenter="2222ZZ")
         descendants = self.fsm.get_fundcenter_direct_descendants(parent)
-        assert 0 == len(descendants)
+        assert None == descendants
 
     def test_get_sequence_direct_descendants(self, setup):
         pc = populate.Command()

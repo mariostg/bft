@@ -2,6 +2,7 @@ from datetime import datetime
 import numpy as np
 from typing import Iterable, Optional
 from django.db import models, IntegrityError
+from django.db.models import QuerySet
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
@@ -137,9 +138,26 @@ class FinancialStructureManager(models.Manager):
         return parent.fundcenter == child.parent.fundcenter
 
     def is_descendant_of(self, parent: "FundCenter", child: "FundCenter | CostCenter") -> bool:
+        """Check if child is a direct descendant of parent.
+
+        Args:
+            parent (FundCenter): A Fund Center object which is potential parent.
+            child (FundCenter | CostCenter): A Fund Center or Cost Center object that could be a descendant.
+
+        Returns:
+            bool: Returns True if the child argument is a descendant of parent argument.
+        """
         return self.is_sequence_descendant_of(parent.sequence, child.sequence)
 
-    def sequence_exists(self, seqno=None, fundcenter=None) -> bool:
+    def sequence_exists(self, seqno: str = None) -> bool:
+        """Detrmine if the given sequence number exists in the system.
+
+        Args:
+            seqno (str, optional): A string representing a valid sequence number. Defaults to None.
+
+        Returns:
+            bool: Returns True if the sequence number exists in the system.
+        """
         if seqno:
             return seqno in [x.sequence for x in self.FundCenters(seqno=seqno)]
 
@@ -160,7 +178,16 @@ class FinancialStructureManager(models.Manager):
         new_seq = self.create_child(family, fundcenter_parent.fundcenter)
         return new_seq
 
-    def is_sequence_descendant_of(self, seq_parent, seq_child) -> bool:
+    def is_sequence_descendant_of(self, seq_parent: str, seq_child: str) -> bool:
+        """Compare two sequence numbers to determine if one is a descendant of the other.
+
+        Args:
+            seq_parent (str): The sequence number of the parent.
+            seq_child (str): The sequence number of the descendant.
+
+        Returns:
+            bool: Returns True if the child sequence number is contained in the parent sequence number.
+        """
         if len(seq_child) <= len(seq_parent):
             return False
         for k, v in enumerate(seq_parent):
@@ -170,33 +197,61 @@ class FinancialStructureManager(models.Manager):
                 return False
         return True
 
-    def is_sequence_child_of(self, seq_parent, seq_child) -> bool:
+    def is_sequence_child_of(self, seq_parent: str, seq_child: str) -> bool:
+        """Compare two sequence numbers to determine if one is a direct descendant of the other.
+
+        Args:
+            seq_parent (str): The sequence number of the parent.
+            seq_child (str): Teh sequence number of the child.
+
+        Returns:
+            bool: Returns True if the child sequence number is contained in the parent sequence number.
+        """
         if len(seq_child) - 2 != len(seq_parent):
             return False
 
         return self.is_sequence_descendant_of(seq_parent, seq_child)
 
-    def get_fundcenter_direct_descendants(self, fundcenter: "FundCenter") -> list:
-        try:
-            return self.get_sequence_direct_descendants(fundcenter.sequence)
-        except AttributeError:
-            return []
+    def get_fundcenter_direct_descendants(self, fundcenter: "FundCenter") -> QuerySet | None:
+        """Create a QuerySet of fundcenters that are descendants of the fund center passed as argument.
 
-    def get_fund_center_cost_centers(self, fundcenter: "FundCenter"):
+        Args:
+            fundcenter (FundCenter): A fund center object which the descendants are desired.
+
+        Returns:
+            QuerySet: Returns a QuerySet of FundCenter objects that are descendants.  Returns None if no descendants exists.
+        """
+        try:
+            seqno = self.get_sequence_direct_descendants(fundcenter.sequence)
+            return FundCenter.objects.filter(sequence__in=seqno)
+        except AttributeError:
+            return None
+
+    def get_fund_center_cost_centers(self, fundcenter: "FundCenter") -> QuerySet | None:
+        """Create a QuerySet of Cost Centers that are direct children of the given Fund Center.
+
+        Args:
+            fundcenter (FundCenter): A Fund Center object
+
+        Returns:
+            QuerySet | None: Returns a QuerySet of Cost Centers that are children.  Return None if there are no children.
+        """
         cc = CostCenter.objects.filter(parent=fundcenter)
         return cc
 
-    def get_sequence_descendants(self, family, parent) -> list:
-        if parent not in family:
-            raise exceptions.ParentDoesNotExistError
-
-        descendants = []
-        for d in family:
-            if self.is_sequence_descendant_of(parent, d):
-                descendants.append(d)
-        return descendants
-
     def get_sequence_direct_descendants(self, seq_parent: str) -> list:
+        """Provide a list of sequence numbers representing the direct descendants of
+        the given parent sequence number.
+
+        Args:
+            seq_parent (str): the sequence number of the parent.
+
+        Raises:
+            exceptions.ParentDoesNotExistError: Will be raised if the parent is not found in the list.
+
+        Returns:
+            list: A list of sequence numbers that are direct descendants of the parent.  The parent is not included in the returned list.
+        """
         family = list(self.FundCenters().values_list("sequence", flat=True))
         if seq_parent not in family:
             raise exceptions.ParentDoesNotExistError
