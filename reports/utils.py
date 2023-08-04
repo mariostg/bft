@@ -82,8 +82,8 @@ class Report:
         return Styler(data, uuid_len=0, cell_ids=False).format("${0:>,.0f}")
 
     def financial_structure_data(self) -> pd.DataFrame | None:
-        fc = self.fund_center_dataframe()
-        cc = self.cost_center_dataframe()
+        fc = FundCenter.objects.fund_center_dataframe()
+        cc = CostCenter.objects.cost_center_dataframe()
         if fc.empty or cc.empty:
             return None
         merged = pd.merge(fc, cc, how="left", left_on=["fundcenter_id"], right_on=["parent_id"])
