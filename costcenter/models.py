@@ -132,6 +132,44 @@ class FundCenterManager(models.Manager):
         df["parent_id"] = df["parent_id"].fillna(0).astype("int")
         return df
 
+    def allocation(self, fundcenter: "FundCenter|str" = None, fund: str = None, fy: int = None, quarter: str = None):
+        alloc = FundCenterAllocation.objects
+        if fundcenter:
+            if type(fundcenter) == str:
+                fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
+            alloc = alloc.filter(fundcenter=fundcenter)
+        if fund:
+            alloc = alloc.filter(fund=fund)
+        if fy:
+            alloc = alloc.filter(fy=fy)
+        if quarter:
+            alloc = alloc.filter(quarter=quarter)
+        return alloc
+
+    def allocation_dataframe(
+        self, fundcenter: "FundCenter|str" = None, fund: str = None, fy: int = None, quarter: str = None
+    ) -> pd.DataFrame:
+        if type(fundcenter) == str:
+            fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
+        data = list(
+            self.allocation(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter).values(
+                "fundcenter__fundcenter",
+                "fund__fund",
+                "amount",
+                "fy",
+                "quarter",
+            )
+        )
+        columns = {
+            "amount": "Allocation",
+            "fy": "FY",
+            "quarter": "Quarter",
+            "fundcenter__fundcenter": "Fund Center",
+            "fund__fund": "Fund",
+        }
+        df = pd.DataFrame(data).rename(columns=columns)
+        return df
+
 
 class FinancialStructureManager(models.Manager):
     def FundCenters(self, fundcenter: str = None, seqno: str = None, fcid: int = None):
@@ -147,6 +185,13 @@ class FinancialStructureManager(models.Manager):
         except exceptions.FundCenterExceptionError(fundcenter=fundcenter, seqno=seqno):
             return None
         return obj
+
+    def has_children(self, fundcenter: "FundCenter") -> int:
+        return (
+            FundCenter.objects.filter(sequence__startswith=fundcenter.sequence)
+            .exclude(sequence=fundcenter.sequence)
+            .count()
+        )
 
     def is_child_of(self, parent: "FundCenter", child: "FundCenter | CostCenter") -> bool:
         """Check if child object is a direct descendant of parent
@@ -421,17 +466,37 @@ class CostCenterManager(models.Manager):
         )
         return df
 
-    def cost_center_allocation_dataframe(self) -> pd.DataFrame:
+    def allocation(self, costcenter: "CostCenter|str" = None, fund: str = None, fy: int = None, quarter: str = None):
+        alloc = CostCenterAllocation.objects
+        if costcenter:
+            if type(costcenter) == str:
+                costcenter = CostCenter.objects.get(costcenter=costcenter)
+            alloc = alloc.filter(costcenter=costcenter)
+        if fund:
+            alloc = alloc.filter(fund=fund)
+        if fy:
+            alloc = alloc.filter(fy=fy)
+        if quarter:
+            alloc = alloc.filter(quarter=quarter)
+        return alloc
+
+    def allocation_dataframe(
+        self,
+        costcenter: "CostCenter|str" = None,
+        fund: str = None,
+        fy: int = None,
+        quarter: str = None,
+    ) -> pd.DataFrame:
         """Prepare a pandas dataframe of the cost center allocations for the given FY and Quarter.
         Columns are renamed with a more friendly name.
 
         Returns:
             pd.DataFrame: A dataframe of cost center allocations.
         """
-        if not CostCenterAllocation.objects.exists():
-            return pd.DataFrame()
+        if type(costcenter) == str:
+            costcenter = CostCenter.objects.get(costcenter=costcenter)
         data = list(
-            CostCenterAllocation.objects.all().values(
+            self.allocation(costcenter=costcenter, fund=fund, fy=fy, quarter=quarter).values(
                 "costcenter__parent__fundcenter",
                 "costcenter__costcenter",
                 "fund__fund",

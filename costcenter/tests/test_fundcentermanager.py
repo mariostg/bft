@@ -1,5 +1,5 @@
 import pytest
-from costcenter.models import FundCenter, FundCenterManager
+from costcenter.models import FundCenter, FundCenterManager, FundCenterAllocation, Fund
 from encumbrance.management.commands import populate
 import numpy as np
 
@@ -53,3 +53,32 @@ class TestFundCenterManager:
 
         match = (columns == expected_columns).all()
         assert True == match
+
+    def test_fund_center_allocation(self):
+        hnd = populate.Command()
+        hnd.handle()
+
+        FCM = FundCenterManager()
+        fc = FCM.fundcenter(fundcenter="1111aa")
+        fund = Fund.objects.get(fund="C113")
+        alloc = {"fundcenter": fc, "fund": fund, "fy": 2023, "quarter": "Q0", "amount": 1000}
+        FCA = FundCenterAllocation(**alloc)
+        FCA.save()
+
+        test_alloc = FCM.allocation(fundcenter="1111AA").first()
+        assert alloc["amount"] == test_alloc.amount
+
+    def test_fund_center_allocation_dataframe(self):
+        hnd = populate.Command()
+        hnd.handle()
+
+        FCM = FundCenterManager()
+        fc = FCM.fundcenter(fundcenter="1111aa")
+        fund = Fund.objects.get(fund="C113")
+        alloc = {"fundcenter": fc, "fund": fund, "fy": 2023, "quarter": "Q0", "amount": 1000}
+        FCA = FundCenterAllocation(**alloc)
+        FCA.save()
+
+        test_alloc = FCM.allocation_dataframe(fundcenter="1111AA")
+        print(test_alloc["Allocation"][0])
+        assert alloc["amount"] == test_alloc["Allocation"][0]

@@ -58,7 +58,7 @@ class Report:
         if len(li_df) > 0:
             df = pd.pivot_table(li_df, values=self.aggregation_columns, index=self.column_grouping, aggfunc="sum")
             if self.with_allocation == True:
-                allocation_df = CostCenter.objects.cost_center_allocation_dataframe()
+                allocation_df = CostCenter.objects.allocation_dataframe()
                 if not allocation_df.empty:
                     self.aggregation_columns.append("Allocation")
                     allocation_agg = pd.pivot_table(

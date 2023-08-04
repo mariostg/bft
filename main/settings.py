@@ -164,6 +164,10 @@ LOGGING = {
             "filename": BASE_DIR / "upload.log",
             "formatter": "simple",
         },
+        # "console": {
+        # "level": "DEBUG",
+        # "class": "logging.StreamHandler",
+        # },
     },
     "loggers": {
         "django": {
@@ -176,5 +180,9 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
+        # "django.db.backends": {
+        # "level": "DEBUG",
+        # "handlers": ["console"],
+        # },
     },
 }
