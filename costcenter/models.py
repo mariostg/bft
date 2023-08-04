@@ -80,6 +80,7 @@ class Source(models.Model):
 
 class FundCenterManager(models.Manager):
     def fundcenter(self, fundcenter: str) -> "FundCenter | None":
+        fundcenter = fundcenter.upper()
         try:
             obj = FundCenter.objects.get(fundcenter__iexact=fundcenter)
         except FundCenter.DoesNotExist:
