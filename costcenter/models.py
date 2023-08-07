@@ -447,7 +447,7 @@ class CostCenterManager(models.Manager):
             quarter=parent_alloc.quarter,
         )
 
-    def cost_center_dataframe(self) -> pd.DataFrame:
+    def cost_center_dataframe(self, data: QuerySet = None) -> pd.DataFrame:
         """Prepare a pandas dataframe of the cost centers as per financial structure.
         Columns are renamed with a more friendly name.
 
@@ -456,7 +456,10 @@ class CostCenterManager(models.Manager):
         """
         if not CostCenter.objects.exists():
             return pd.DataFrame()
-        data = list(CostCenter.objects.all().values())
+        if not data:
+            data = list(CostCenter.objects.all().values())
+        else:
+            data = list(data.values())
         df = pd.DataFrame(data).rename(
             columns={
                 "id": "costcenter_id",
@@ -533,6 +536,11 @@ class CostCenterManager(models.Manager):
             "fund__fund": "Fund",
         }
         return pd.DataFrame(data).rename(columns=columns)
+
+    def get_sibblings(self, parent: FundCenter | str):
+        if type(parent) == str:
+            parent = FundCenterManager().fundcenter(fundcenter=parent)
+        return CostCenter.objects.filter(parent=parent)
 
 
 class CostCenter(models.Model):
