@@ -104,24 +104,22 @@ class TestFinancialStructureManager:
     def test_create_child_using_parent_and_seqno(self, setup):
         pc = populate.Command()
         pc.handle()
-        family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
 
         with pytest.raises(IncompatibleArgumentsError):
-            self.fsm.create_child(family, parent="1111AA", seqno="1.1")
+            self.fsm.create_child(parent="1111AA", seqno="1.1")
 
     def test_create_child_using_seqno(self, setup):
         pc = populate.Command()
         pc.handle()
-        family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
 
-        child = self.fsm.create_child(family, seqno="1.1")
+        child = self.fsm.create_child(seqno="1.1")
         assert "1.1.3" == child
 
-        child = self.fsm.create_child(family, seqno="1.1.2")
+        child = self.fsm.create_child(seqno="1.1.2")
         assert "1.1.2.1" == child
 
         with pytest.raises(ParentDoesNotExistError):
-            self.fsm.create_child(family, seqno="3")
+            self.fsm.create_child(seqno="3")
 
     def test_create_root_sequence(self, setup):
         sequence = self.fsm.set_parent()
@@ -138,8 +136,7 @@ class TestFinancialStructureManager:
         pp = populate.Command()
         pp.handle()
         parent_obj = self.fsm.FundCenters(fundcenter="1111AC").first()
-        family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
-        new_seqno = self.fsm.create_child(family, parent_obj.fundcenter)
+        new_seqno = self.fsm.create_child(parent_obj.fundcenter)
         assert "1.2.1" == new_seqno
 
     def test_move_fundcenter_to_another_one(self, setup):

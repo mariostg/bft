@@ -242,8 +242,7 @@ class FinancialStructureManager(models.Manager):
         """
         if fundcenter_parent == None:
             return "1"
-        family = list(self.FundCenters(seqno=fundcenter_parent.sequence).values_list("sequence", flat=True))
-        new_seq = self.create_child(family, fundcenter_parent.fundcenter)
+        new_seq = self.create_child(fundcenter_parent.fundcenter)
         return new_seq
 
     def is_sequence_descendant_of(self, seq_parent: str, seq_child: str) -> bool:
@@ -344,7 +343,7 @@ class FinancialStructureManager(models.Manager):
                 descendants.append(d)
         return descendants
 
-    def create_child(self, family: list, parent: str = None, seqno: str = None) -> str:
+    def create_child(self, parent: str = None, seqno: str = None) -> str:
         from costcenter.models import FundCenterManager
 
         """Create a new sequence number to be attributed to a cost center or a fund center.
@@ -368,7 +367,6 @@ class FinancialStructureManager(models.Manager):
         children = self.get_sequence_direct_descendants(seqno)
         if children == []:
             new_born = seqno + ".1"
-            family.append(new_born)
             return new_born
         splitted = [i.split(".") for i in children]
         splitted = np.array(splitted).astype(int)
@@ -377,7 +375,6 @@ class FinancialStructureManager(models.Manager):
         new_born[-1] = int(new_born[-1]) + 1
         new_born = [str(i) for i in new_born]
         new_born = ".".join(new_born)
-        family.append(new_born)
         return new_born
 
     def CostCenters(self):
