@@ -13,6 +13,7 @@ from costcenter.models import CostCenterAllocation, ForecastAdjustment
 
 
 def bmt_screening_report(request):
+    context = {}
     if LineItem.objects.exists():
         r = utils.Report()
         table = r.cost_center_screening_report()
