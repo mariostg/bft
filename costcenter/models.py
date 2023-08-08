@@ -420,7 +420,7 @@ class FundCenter(models.Model):
 
 
 class CostCenterManager(models.Manager):
-    def cost_center(self, costcenter: str):
+    def cost_center(self, costcenter: str) -> "CostCenter|None":
         costcenter = costcenter.upper()
         try:
             cc = CostCenter.objects.get(costcenter=costcenter)
