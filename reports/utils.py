@@ -61,6 +61,9 @@ class Report:
                 "sequence": "Sequence No",
             }
         )
+        if df.empty:
+            return df
+
         df["parent_id"] = df["parent_id"].fillna(0).astype("int")
         return df
 
