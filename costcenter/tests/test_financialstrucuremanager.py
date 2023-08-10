@@ -1,5 +1,13 @@
 import pytest
-from costcenter.models import CostCenterManager, FinancialStructureManager, FundCenter, FundCenterManager
+from costcenter.models import (
+    CostCenterManager,
+    FinancialStructureManager,
+    FundCenter,
+    FundCenterManager,
+    FundManager,
+    SourceManager,
+    CostCenter,
+)
 from bft.exceptions import ParentDoesNotExistError, IncompatibleArgumentsError
 from encumbrance.management.commands import populate, uploadcsv
 
@@ -53,11 +61,19 @@ class TestFinancialStructureManager:
         assert True == self.fsm.is_sequence_child_of("1.1", "1.1.1")
         assert False == self.fsm.is_sequence_child_of("1.1", "1.1")
         assert False == self.fsm.is_sequence_child_of("2.1", "2.1.1.1")
+        assert True == self.fsm.is_sequence_child_of("2.1", "2.1.0.1")
 
     def test_is_sequence_descendant_of(self, setup):
+        assert False == self.fsm.is_sequence_descendant_of("1", "1")
         assert True == self.fsm.is_sequence_descendant_of("1", "1.1.1")
         assert True == self.fsm.is_sequence_descendant_of("1.1", "1.1.1")
         assert False == self.fsm.is_sequence_descendant_of("1.1,1", "1.1")
+        assert True == self.fsm.is_sequence_descendant_of("1.1.1", "1.1.1.0.1")
+        assert True == self.fsm.is_sequence_descendant_of("1.10", "1.10.1.1")
+        with pytest.raises(AttributeError):
+            self.fsm.is_sequence_descendant_of("1.0.", "1.0.1.1")
+        with pytest.raises(AttributeError):
+            self.fsm.is_sequence_descendant_of("1.0", "1.0.1.1")
 
     def test_get_fund_center_cost_centers(self, setup):
         parent = FundCenterManager().fundcenter(fundcenter="1111AB")
@@ -69,21 +85,6 @@ class TestFinancialStructureManager:
         cc = self.fsm.get_fund_center_cost_centers(parent)
         assert 0 == cc.count()
 
-    def test_get_fund_center_direct_descendants(self, setup):
-        parent = FundCenterManager().fundcenter(fundcenter="1111AA")
-        descendants = self.fsm.get_fundcenter_direct_descendants(parent)
-        assert 2 == len(descendants)
-
-    def test_get_fund_center_direct_descendants_empty(self, setup):
-        parent = FundCenterManager().fundcenter(fundcenter="2222BB")
-        descendants = self.fsm.get_fundcenter_direct_descendants(parent)
-        assert 0 == len(descendants)
-
-    def test_get_fund_center_direct_descendants_nonetype(self, setup):
-        parent = FundCenterManager().fundcenter(fundcenter="2222ZZ")
-        descendants = self.fsm.get_fundcenter_direct_descendants(parent)
-        assert None == descendants
-
     def test_get_sequence_direct_descendants(self, setup):
         pc = populate.Command()
         pc.handle()
@@ -92,34 +93,14 @@ class TestFinancialStructureManager:
         assert 2 == len(self.fsm.get_sequence_direct_descendants(parent))
 
         parent = "1.1"
-        assert 2 == len(self.fsm.get_sequence_direct_descendants(parent))
+        assert 4 == len(self.fsm.get_sequence_direct_descendants(parent))
 
         parent = "1.2"
-        assert 0 == len(self.fsm.get_sequence_direct_descendants(parent))
+        assert 1 == len(self.fsm.get_sequence_direct_descendants(parent))
 
         parent = "2"
         with pytest.raises(ParentDoesNotExistError):
             self.fsm.get_sequence_direct_descendants(parent)
-
-    def test_create_child_using_parent_and_seqno(self, setup):
-        pc = populate.Command()
-        pc.handle()
-
-        with pytest.raises(IncompatibleArgumentsError):
-            self.fsm.create_child(parent="1111AA", seqno="1.1")
-
-    def test_create_child_using_seqno(self, setup):
-        pc = populate.Command()
-        pc.handle()
-
-        child = self.fsm.create_child(seqno="1.1")
-        assert "1.1.3" == child
-
-        child = self.fsm.create_child(seqno="1.1.2")
-        assert "1.1.2.1" == child
-
-        with pytest.raises(ParentDoesNotExistError):
-            self.fsm.create_child(seqno="3")
 
     def test_create_root_sequence(self, setup):
         sequence = self.fsm.set_parent()
@@ -173,3 +154,33 @@ class TestFinancialStructureManager:
 
         p = self.fsm.set_parent()
         assert "1" == p
+
+    def test_set_parent_of_cost_center(self, setup):
+        pc = populate.Command()
+        pc.handle()
+
+        parent = FundCenterManager().fundcenter("2222BB")
+        cc = CostCenterManager().cost_center("8486B1")
+        p = self.fsm.set_parent(fundcenter_parent=parent, costcenter_child=True)
+        cc.sequence = p
+        cc.parent = parent
+        cc.save()
+        assert "1.1.2.0.1" == CostCenterManager().cost_center("8486B1").sequence
+        cc = CostCenterManager().cost_center("8486C1")
+        p = self.fsm.set_parent(fundcenter_parent=parent, costcenter_child=True)
+        cc.sequence = p
+        cc.parent = parent
+        cc.save()
+        assert "1.1.2.0.2" == CostCenterManager().cost_center("8486C1").sequence
+
+    def test_sequence_on_create_cost_center_under_level_2(self, setup):
+        pc = populate.Command()
+        pc.handle()
+
+        parent = FundCenterManager().fundcenter("2222BA")
+        fund = FundManager().fund("C113")
+        source = SourceManager().source("Kitchen")
+        cc = {"costcenter": "2222zz", "fund": fund, "source": source, "parent": parent}
+        cc["sequence"] = self.fsm.set_parent(parent, True)
+        costcenter = CostCenter.objects.create(**cc)
+        assert "1.1.1.0.1" == costcenter.sequence

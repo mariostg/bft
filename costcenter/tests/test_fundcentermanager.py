@@ -82,3 +82,22 @@ class TestFundCenterManager:
         test_alloc = FCM.allocation_dataframe(fundcenter="1111AA")
         print(test_alloc["Allocation"][0])
         assert alloc["amount"] == test_alloc["Allocation"][0]
+
+    def test_get_direct_descendants(self, setup):
+        hnd = populate.Command()
+        hnd.handle()
+        parent = FundCenterManager().fundcenter(fundcenter="1111AA")
+        descendants = FundCenterManager().get_direct_descendants(parent)
+        assert 2 == len(descendants)
+
+    def test_get_direct_descendants_empty(self, setup):
+        hnd = populate.Command()
+        hnd.handle()
+        parent = FundCenterManager().fundcenter(fundcenter="2222BB")
+        descendants = FundCenterManager().get_direct_descendants(parent)
+        assert 0 == len(descendants)
+
+    def test_get_direct_descendants_wrong_string(self, setup):
+        hnd = populate.Command()
+        hnd.handle()
+        assert None == FundCenterManager().get_direct_descendants("2222zz")

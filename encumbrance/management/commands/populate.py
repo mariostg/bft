@@ -95,6 +95,7 @@ class Command(BaseCommand):
         source = Source.objects.get(source="Kitchen")
         ab = FundCenter.objects.get(fundcenter="1111AB")
         ac = FundCenter.objects.get(fundcenter="1111AC")
+        FSM = FinancialStructureManager()
         items = [
             {
                 "costcenter": "8486B1",
@@ -133,5 +134,6 @@ class Command(BaseCommand):
                 if found:
                     print(f"Cost Center {found} exists")
             except CostCenter.DoesNotExist:
+                item["sequence"] = FSM.set_parent(item["parent"], item)
                 new_item = CostCenter.objects.create(**item)
                 print(f"Created Cost Center {new_item}")

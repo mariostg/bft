@@ -8,6 +8,7 @@ from .models import (
     FundCenter,
     FundCenterManager,
     CostCenter,
+    CostCenterManager,
     CostCenterAllocation,
     FundCenterAllocation,
     ForecastAdjustment,
@@ -246,6 +247,7 @@ def costcenter_add(request):
         form = CostCenterForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
+            obj.sequence = FinancialStructureManager().set_parent(fundcenter_parent=obj.parent, child=True)
             obj.costcenter = obj.costcenter.upper()
             if obj.shortname:
                 obj.shortname = obj.shortname.upper()
@@ -264,7 +266,16 @@ def costcenter_update(request, pk):
     if request.method == "POST":
         form = CostCenterForm(request.POST, instance=costcenter)
         if form.is_valid():
-            form.save()
+            obj = form.save(commit=False)
+            current = CostCenterManager().cost_center(obj.costcenter)
+            if obj.parent != current.parent:
+                # Need to change sequence given parent change
+                fsm = FinancialStructureManager()
+                obj.sequence = fsm.set_parent(fundcenter_parent=obj.parent, child=obj)
+            try:
+                obj.save()
+            except IntegrityError:
+                messages.error(request, "Duplicate entry cannot be saved")
             return redirect("costcenter-table")
 
     return render(request, "costcenter/costcenter-form.html", {"form": form})

@@ -95,7 +95,7 @@ class FundCenterManager(models.Manager):
         return obj
 
     def get_sub_alloc(self, parent_alloc: "FundCenterAllocation") -> "FundCenterAllocation":
-        seq = FinancialStructureManager().get_fundcenter_direct_descendants(parent_alloc.fundcenter)
+        seq = [s.sequence for s in self.get_direct_descendants(parent_alloc.fundcenter)]
         dd = FundCenter.objects.filter(sequence__in=seq)
         return FundCenterAllocation.objects.filter(
             fundcenter__in=dd,
@@ -150,7 +150,10 @@ class FundCenterManager(models.Manager):
         self, fundcenter: "FundCenter|str" = None, fund: str = None, fy: int = None, quarter: str = None
     ) -> pd.DataFrame:
         if type(fundcenter) == str:
-            fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
+            try:
+                fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
+            except FundCenter.DoesNotExist:
+                return pd.DataFrame()
         data = list(
             self.allocation(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter).values(
                 "fundcenter__fundcenter",
@@ -170,6 +173,30 @@ class FundCenterManager(models.Manager):
         df = pd.DataFrame(data).rename(columns=columns)
         return df
 
+    def get_direct_descendants(self, fundcenter: "FundCenter|str") -> list | None:
+        if type(fundcenter) == str:
+            try:
+                fundcenter = FundCenter.objects.get(fundcenter=fundcenter.upper())
+            except FundCenter.DoesNotExist:
+                return None
+        return self.get_fund_centers(fundcenter) + self.get_cost_centers(fundcenter)
+
+    def get_direct_descendants_dataframe(self, fundcenter: "FundCenter|str") -> list | None:
+        if type(fundcenter) == str:
+            try:
+                fundcenter = FundCenter.objects.get(fundcenter=fundcenter.upper())
+            except FundCenter.DoesNotExist:
+                return None
+        fc = pd.DataFrame(self.get_fund_centers(fundcenter))
+        cc = pd.DataFrame(self.get_cost_centers(fundcenter))
+        return pd.concat([fc, cc])
+
+    def get_fund_centers(self, parent: "FundCenter") -> list:
+        return list(FundCenter.objects.filter(parent=parent).values())
+
+    def get_cost_centers(self, parent: "FundCenter") -> list:
+        return list(CostCenter.objects.filter(parent=parent).values())
+
 
 class FinancialStructureManager(models.Manager):
     def FundCenters(self, fundcenter: str = None, seqno: str = None, fcid: int = None):
@@ -186,12 +213,29 @@ class FinancialStructureManager(models.Manager):
             return None
         return obj
 
-    def has_children(self, fundcenter: "FundCenter") -> int:
-        return (
-            FundCenter.objects.filter(sequence__startswith=fundcenter.sequence)
-            .exclude(sequence=fundcenter.sequence)
-            .count()
-        )
+    def has_children(self, fundcenter: "FundCenter|str") -> int:
+        if type(fundcenter) == str:
+            try:
+                fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
+            except FundCenter.DoesNotExist:
+                return 0
+        return self.has_cost_centers(fundcenter) + self.has_fund_centers(fundcenter)
+
+    def has_fund_centers(self, fundcenter: "FundCenter|str") -> int:
+        if type(fundcenter) == str:
+            try:
+                fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
+            except FundCenter.DoesNotExist:
+                return 0
+        return FundCenter.objects.filter(parent=fundcenter).count()
+
+    def has_cost_centers(self, fundcenter: "FundCenter|str") -> int:
+        if type(fundcenter) == str:
+            try:
+                fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
+            except FundCenter.DoesNotExist:
+                return 0
+        return CostCenter.objects.filter(parent=fundcenter).count()
 
     def is_child_of(self, parent: "FundCenter", child: "FundCenter | CostCenter") -> bool:
         """Check if child object is a direct descendant of parent
@@ -229,20 +273,21 @@ class FinancialStructureManager(models.Manager):
         if seqno:
             return seqno in [x.sequence for x in self.FundCenters(seqno=seqno)]
 
-    def set_parent(self, fundcenter_parent: "FundCenter" = None) -> str:
+    def set_parent(self, fundcenter_parent: "FundCenter" = None, costcenter_child: bool = False) -> str:
         """
         Create a sequence number by refering to the sequence numbers of the family of fundcenter_parent.
         The sequence number created contains the parent sequence plus the portion of the child.
 
         Args:
             fundcenter_parent (FundCenter, optional): The fund center that is the parent of the sub center that need a sequence number. Defaults to None.
+            costcenter_child (bool, optional): If parent is for cost center, costcenter_child must be True. This will affect the way the sequence number is created. Defaults to False.
 
         Returns:
             str: A string the represents the child sequence number.
         """
         if fundcenter_parent == None:
             return "1"
-        new_seq = self.create_child(fundcenter_parent.fundcenter)
+        new_seq = self.create_child(fundcenter_parent.fundcenter, costcenter_child)
         return new_seq
 
     def is_sequence_descendant_of(self, seq_parent: str, seq_child: str) -> bool:
@@ -255,14 +300,13 @@ class FinancialStructureManager(models.Manager):
         Returns:
             bool: Returns True if the child sequence number is contained in the parent sequence number.
         """
-        if len(seq_child) <= len(seq_parent):
+        if ".0." in seq_parent or seq_parent.endswith(".0"):
+            raise AttributeError("Parent connot contains .0. in sequence number")
+        if len(seq_child) == len(seq_parent):
             return False
-        for k, v in enumerate(seq_parent):
-            if seq_child[k] == v:
-                continue
-            else:
-                return False
-        return True
+        if seq_child.startswith(seq_parent):
+            return True
+        return False
 
     def is_sequence_child_of(self, seq_parent: str, seq_child: str) -> bool:
         """Compare two sequence numbers to determine if one is a direct descendant of the other.
@@ -274,25 +318,30 @@ class FinancialStructureManager(models.Manager):
         Returns:
             bool: Returns True if the child sequence number is contained in the parent sequence number.
         """
-        if len(seq_child) - 2 != len(seq_parent):
+
+        if not self.is_sequence_descendant_of(seq_parent, seq_child):
             return False
+        if ".0." not in seq_child and len(seq_child) - 2 == len(seq_parent):
+            return True
+        if ".0." in seq_child:
+            seq_child = seq_child.replace(".0.", ".")
+            return self.is_sequence_child_of(seq_parent, seq_child)
+        return False
 
-        return self.is_sequence_descendant_of(seq_parent, seq_child)
+    # def get_fundcenter_direct_descendants(self, fundcenter: "FundCenter") -> QuerySet | None:
+    #     """Create a QuerySet of fundcenters that are direct descendants of the fund center passed as argument.
 
-    def get_fundcenter_direct_descendants(self, fundcenter: "FundCenter") -> QuerySet | None:
-        """Create a QuerySet of fundcenters that are direct descendants of the fund center passed as argument.
+    #     Args:
+    #         fundcenter (FundCenter): A fund center object which the direct descendants are desired.
 
-        Args:
-            fundcenter (FundCenter): A fund center object which the direct descendants are desired.
-
-        Returns:
-            QuerySet: Returns a QuerySet of FundCenter objects that are direct descendants.  Returns None if no descendants exists.
-        """
-        try:
-            seqno = self.get_sequence_direct_descendants(fundcenter.sequence)
-            return FundCenter.objects.filter(sequence__in=seqno)
-        except AttributeError:
-            return None
+    #     Returns:
+    #         QuerySet: Returns a QuerySet of FundCenter objects that are direct descendants.  Returns None if no descendants exists.
+    #     """
+    #     try:
+    #         seqno = self.get_sequence_direct_descendants(fundcenter.sequence)
+    #         return FundCenter.objects.filter(sequence__in=seqno)
+    #     except AttributeError:
+    #         return None
 
     def get_fundcenter_descendants(self, fundcenter: "FundCenter") -> QuerySet | None:
         """Create a QuerySet of fundcenters that are descendants of the fund center passed as argument.
@@ -334,6 +383,9 @@ class FinancialStructureManager(models.Manager):
             list: A list of sequence numbers that are direct descendants of the parent.  The parent is not included in the returned list.
         """
         family = list(self.FundCenters().values_list("sequence", flat=True))
+        if CostCenter.objects.all().count():
+            cc_seq = list(CostCenter.objects.values_list("sequence", flat=True))
+            family = family + cc_seq
         if seq_parent not in family:
             raise exceptions.ParentDoesNotExistError
 
@@ -343,32 +395,34 @@ class FinancialStructureManager(models.Manager):
                 descendants.append(d)
         return descendants
 
-    def create_child(self, parent: str = None, seqno: str = None) -> str:
+    def create_child(self, parent: str = None, costcenter_child: bool = False) -> str:
         from costcenter.models import FundCenterManager
 
         """Create a new sequence number to be attributed to a cost center or a fund center.
-        Either parent or seqno is required, not both or Exception will be raised.
 
         Args:
             family (list): A list of sequence no representing the members of the family 
             where the child will be added'
             parent (str, optional): A string representing the parent Fund Center. 
             Defaults to None.
-            seqno (str, optional): A string representing the sequence number to be givent to the child. 
-            Defaults to None.
+            costcenter_child (bool, optional): If parent is for cost center, costcenter_child must be True. This will affect the way the sequence number is created. Defaults to False.
 
         Returns:
             str: The sequence number of the child.
         """
-        if parent and seqno:
-            raise exceptions.IncompatibleArgumentsError(fundcenter=parent, seqno=seqno)
-        if parent:
-            seqno = FundCenterManager().fundcenter(parent).sequence
-        children = self.get_sequence_direct_descendants(seqno)
+        FCM = FundCenterManager()
+        parent = FCM.fundcenter(parent)
+        if costcenter_child:
+            children = FCM.get_cost_centers(parent)
+        else:
+            children = FCM.get_fund_centers(parent)
         if children == []:
-            new_born = seqno + ".1"
+            suffix = ".0.1" if costcenter_child else ".1"
+            new_born = parent.sequence + suffix
             return new_born
-        splitted = [i.split(".") for i in children]
+        else:
+            pass
+        splitted = [i["sequence"].split(".") for i in children]
         splitted = np.array(splitted).astype(int)
         oldest = list(splitted.max(axis=0))
         new_born = oldest
@@ -502,6 +556,7 @@ class CostCenterManager(models.Manager):
                 "fund__fund",
                 "amount",
                 "fy",
+                "quarter",
             )
         )
         columns = {
@@ -548,6 +603,7 @@ class CostCenter(models.Model):
     isforecastable = models.BooleanField("Is Forecastable", default=False)
     isupdatable = models.BooleanField("Is Updatable", default=False)
     note = models.TextField(null=True, blank=True)
+    sequence = models.CharField("Sequence No", max_length=25, unique=True, default="")
     parent = models.ForeignKey(
         FundCenter,
         on_delete=models.RESTRICT,
