@@ -95,7 +95,7 @@ class FundCenterManager(models.Manager):
         return obj
 
     def get_sub_alloc(self, parent_alloc: "FundCenterAllocation") -> "FundCenterAllocation":
-        seq = [s.sequence for s in self.get_direct_descendants(parent_alloc.fundcenter)]
+        seq = [s["sequence"] for s in self.get_direct_descendants(parent_alloc.fundcenter)]
         dd = FundCenter.objects.filter(sequence__in=seq)
         return FundCenterAllocation.objects.filter(
             fundcenter__in=dd,
