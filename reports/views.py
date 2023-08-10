@@ -9,13 +9,13 @@ import csv
 
 from lineitems.models import LineItem
 from reports import utils
-from costcenter.models import CostCenterAllocation, ForecastAdjustment
+from costcenter.models import CostCenterAllocation, ForecastAdjustment, FundCenterAllocation
 
 
 def bmt_screening_report(request):
     context = {}
     if LineItem.objects.exists():
-        r = utils.Report()
+        r = utils.CostCenterScreeningReport()
         table = r.cost_center_screening_report()
         table = r.pivot_table_w_subtotals(
             table,
@@ -25,6 +25,15 @@ def bmt_screening_report(request):
         table = r.styler_clean_table(table)
         context = {"table": table.to_html()}
     return render(request, "bmt-screening-report.html", context)
+
+
+def allocation_status_report(request):
+    context = {}
+    if CostCenterAllocation.objects.exists() or FundCenterAllocation.objects.exists():
+        r = utils.AllocationReport()
+        df = r.allocation_status_dataframe()
+        context = {"table": df.to_html()}
+    return render(request, "allocation-status-report.html", context)
 
 
 def line_items(request):

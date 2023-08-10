@@ -1,11 +1,36 @@
 from lineitems.models import LineItem, LineForecast
-from costcenter.models import CostCenter, CostCenterAllocation, FundCenter, ForecastAdjustment
+from costcenter.models import (
+    CostCenter,
+    CostCenterManager,
+    CostCenterAllocation,
+    FundCenter,
+    FundCenterManager,
+    ForecastAdjustment,
+    FinancialStructureManager,
+)
 import pandas as pd
 from pandas.io.formats.style import Styler
 import numpy as np
 
 
 class Report:
+    def df_to_html(self, df: pd.DataFrame, classname=None) -> str:
+        """Create an html version of the dataframe provided.
+
+        Args:
+            df (pd.DataFrame): A dataframe to render as html
+
+        Returns:
+            str: HTML string of a dataframe.
+        """
+        if classname:
+            report = df.style.set_table_attributes(f'class="{classname}"').to_html()
+        else:
+            report = df.to_html()
+        return report
+
+
+class CostCenterScreeningReport(Report):
     def __init__(self):
         self.column_grouping = [
             "Fund Center",
@@ -29,21 +54,6 @@ class Report:
             # self.aggregation_columns.append("Forecast Adjustment")
             # self.aggregation_columns.append("Forecast Total")
             self.with_forecast_adjustment = True
-
-    def df_to_html(self, df: pd.DataFrame, classname=None) -> str:
-        """Create an html version of the dataframe provided.
-
-        Args:
-            df (pd.DataFrame): A dataframe to render as html
-
-        Returns:
-            str: HTML string of a dataframe.
-        """
-        if classname:
-            report = df.style.set_table_attributes(f'class="{classname}"').to_html()
-        else:
-            report = df.to_html()
-        return report
 
     def cost_center_screening_report(self) -> pd.DataFrame:
         """Create a dataframe of merged line items, forecast and cost centers grouped as per <grouping>.
@@ -157,3 +167,95 @@ class Report:
         concattable = pd.concat(tables).sort_index()
         concattable = concattable.set_index(keys=grouper)
         return concattable.sort_index(axis=0, ascending=True)
+
+
+class AllocationReport:
+    fsm = FinancialStructureManager()
+    fcm = FundCenterManager()
+    family_list = []
+
+    def _get_family_list(self, fc):
+        """Recursive function to build a dataframe of descendants of specified fund center.
+
+        Args:
+        fc (FundCenter): Fund center object to get all descendants
+        """
+        while True:
+            ct = self.fsm.has_children(fc)
+            if ct:
+                children = FundCenterManager().get_direct_descendants_dataframe(fc)
+                self.family_list.append(children)
+                if "fundcenter" in children:
+                    for fc in children["fundcenter"]:
+                        if type(fc) == str:
+                            self._get_family_list(fc)
+                break
+            else:
+                return
+
+    def allocation_status_dataframe(self) -> pd.DataFrame:
+        root = FundCenter.objects.filter(fundcenter="1111AA")
+        self.family_list = [pd.DataFrame(list(root.values()))]
+        self._get_family_list(root.first())
+        df_main = pd.concat(self.family_list).sort_values("sequence").fillna("")
+        print("====DF MAIN====\n", df_main)
+        df_main["Cost Element"] = df_main.fundcenter + df_main.costcenter
+        df_main.rename(columns={"fundcenter": "Fund Center", "costcenter": "Cost Center"}, inplace=True)
+        df_main.drop(
+            ["isforecastable", "isupdatable", "note", "source_id", "fund_id", "parent_id"],
+            axis=1,
+            inplace=True,
+        )
+
+        # FC Allocations
+        fc = list(filter(None, df_main["Fund Center"].to_list()))
+        alloc_fc = []
+        for f in fc:
+            alloc_fc.append(FundCenterManager().allocation_dataframe(fundcenter=f))
+        df_alloc_fc = pd.concat(alloc_fc)
+        # df_alloc_fc.rename(columns={"Fund Center": "Cost Element"}, inplace=True)
+        df_alloc_fc["Cost Element"] = df_alloc_fc["Fund Center"]
+        df_alloc_fc["Cost Center"] = ""
+        print("====FC ALLOC====\n", df_alloc_fc)
+
+        # CC Allocations
+        cc = list(filter(None, df_main["Cost Center"].to_list()))
+        alloc_cc = []
+        for f in cc:
+            alloc_cc.append(CostCenterManager().allocation_dataframe(costcenter=f))
+        df_alloc_cc = pd.concat(alloc_cc)
+        # df_alloc_cc.rename(columns={"Cost Center": "Cost Element"}, inplace=True)
+        df_alloc_cc["Cost Element"] = df_alloc_cc["Cost Center"]
+        print("====CC ALLOC====\n", df_alloc_cc)
+
+        # merge FC and CC allocation
+        df_alloc = pd.concat([df_alloc_cc, df_alloc_fc])
+        # print("===DF ALLOC===\n", df_alloc)
+
+        # Merge df_main with df_alloc and rearrange
+        df_main.drop(["Cost Center", "Fund Center"], inplace=True, axis=1)
+        df_main = pd.merge(
+            df_main,
+            df_alloc,
+            how="inner",
+            on=["Cost Element"],
+        )
+
+        df_main.sort_values("sequence", inplace=True)
+        df_main = df_main[
+            [
+                "sequence",
+                "Fund Center",
+                "Cost Center",
+                "shortname",
+                "Fund",
+                "Allocation",
+                "FY",
+                "Quarter",
+                "Cost Element",
+            ]
+        ]
+        df_main.fillna("", inplace=True)
+        df_main.set_index(["sequence", "Fund Center", "Cost Center", "Fund"], inplace=True)
+        print("====DF MAIN====\n", df_main)
+        return df_main
