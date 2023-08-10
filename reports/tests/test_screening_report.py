@@ -20,21 +20,6 @@ class TestReports:
         r = Report()
         assert 0 < len(r.cost_center_screening_report())
 
-    # Forecast Adjustment Tests
-    def test_forecast_adjustment_dataframe_empty(self):
-        r = Report()
-        assert True == r.forecast_adjustment_dataframe().empty
-
-    def test_forecast_adjustment_dataframe(self):
-        hnd = populate.Command()
-        hnd.handle()
-        fund = Fund.objects.all().first()
-        costcenter = CostCenterManager().cost_center("8486b1")
-        ForecastAdjustment(fund=fund, costcenter=costcenter, amount=1000).save()
-        r = Report()
-
-        assert 1 == len(r.forecast_adjustment_dataframe())
-
     # Financial Structure Tests
     def test_financial_structure_data(self):
         hnd = populate.Command()

@@ -1,5 +1,5 @@
 import pytest
-from costcenter.models import CostCenter, CostCenterManager, CostCenterAllocation, Fund
+from costcenter.models import CostCenter, CostCenterManager, CostCenterAllocation, Fund, ForecastAdjustment
 from encumbrance.management.commands import populate
 
 
@@ -57,3 +57,16 @@ class TestCostCenterManager:
         CCM = CostCenterManager()
         siblings = CCM.get_sibblings("1111AB")
         print(siblings)
+
+    # Forecast Adjustment Tests
+    def test_forecast_adjustment_dataframe_empty(self):
+        assert True == CostCenterManager().forecast_adjustment_dataframe().empty
+
+    def test_forecast_adjustment_dataframe(self):
+        hnd = populate.Command()
+        hnd.handle()
+        fund = Fund.objects.all().first()
+        costcenter = CostCenterManager().cost_center("8486b1")
+        ForecastAdjustment(fund=fund, costcenter=costcenter, amount=1000).save()
+
+        assert 1 == len(CostCenterManager().forecast_adjustment_dataframe())
