@@ -160,7 +160,7 @@ class CostCenterScreeningReport(Report):
                 aggfunc=np.sum,
                 fill_value="",
             ).reset_index()
-            table = table.reindex(list(table.columns[:n]) + self.aggregation_columns, axis=1)
+            table = table.reindex(list(table.columns[:n]) + aggvalues, axis=1)
             for column in grouper[n:]:
                 table[column] = ""
             tables.append(table)
