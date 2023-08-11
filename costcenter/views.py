@@ -267,7 +267,7 @@ def costcenter_update(request, pk):
         form = CostCenterForm(request.POST, instance=costcenter)
         if form.is_valid():
             obj = form.save(commit=False)
-            current = CostCenterManager().cost_center(obj.costcenter)
+            current = CostCenterManager().pk(obj.pk)
             if obj.parent != current.parent:
                 # Need to change sequence given parent change
                 fsm = FinancialStructureManager()
