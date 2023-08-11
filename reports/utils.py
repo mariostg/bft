@@ -210,22 +210,30 @@ class AllocationReport(Report):
         # FC Allocations
         fc = list(filter(None, df_main["Fund Center"].to_list()))
         alloc_fc = []
+        df_alloc_fc = pd.DataFrame()
         for f in fc:
-            alloc_fc.append(FundCenterManager().allocation_dataframe(fundcenter=f))
-        df_alloc_fc = pd.concat(alloc_fc)
-        # df_alloc_fc.rename(columns={"Fund Center": "Cost Element"}, inplace=True)
-        df_alloc_fc["Cost Element"] = df_alloc_fc["Fund Center"]
-        df_alloc_fc["Cost Center"] = ""
+            a = FundCenterManager().allocation_dataframe(fundcenter=f)
+            if not a.empty:
+                alloc_fc.append(a)
+        if len(alloc_fc) > 0:
+            df_alloc_fc = pd.concat(alloc_fc)
+            # df_alloc_fc.rename(columns={"Fund Center": "Cost Element"}, inplace=True)
+            df_alloc_fc["Cost Element"] = df_alloc_fc["Fund Center"]
+            df_alloc_fc["Cost Center"] = ""
         print("====FC ALLOC====\n", df_alloc_fc)
 
         # CC Allocations
         cc = list(filter(None, df_main["Cost Center"].to_list()))
         alloc_cc = []
+        df_alloc_cc = pd.DataFrame()
         for f in cc:
-            alloc_cc.append(CostCenterManager().allocation_dataframe(costcenter=f))
-        df_alloc_cc = pd.concat(alloc_cc)
-        # df_alloc_cc.rename(columns={"Cost Center": "Cost Element"}, inplace=True)
-        df_alloc_cc["Cost Element"] = df_alloc_cc["Cost Center"]
+            a = CostCenterManager().allocation_dataframe(costcenter=f)
+            if not a.empty:
+                alloc_cc.append(a)
+        if len(alloc_cc) > 0:
+            df_alloc_cc = pd.concat(alloc_cc)
+            # df_alloc_cc.rename(columns={"Cost Center": "Cost Element"}, inplace=True)
+            df_alloc_cc["Cost Element"] = df_alloc_cc["Cost Center"]
         print("====CC ALLOC====\n", df_alloc_cc)
 
         # merge FC and CC allocation
