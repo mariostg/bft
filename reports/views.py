@@ -32,6 +32,10 @@ def allocation_status_report(request):
     if CostCenterAllocation.objects.exists() or FundCenterAllocation.objects.exists():
         r = utils.AllocationReport()
         df = r.allocation_status_dataframe()
+        df["Allocation"] = df["Allocation"].astype(int)
+        df["FY"] = df["FY"].astype(str)
+        df = df.style.format(thousands=",")
+        # df = r.styler_clean_table(df)
         context = {"table": df.to_html()}
     return render(request, "allocation-status-report.html", context)
 
@@ -49,7 +53,7 @@ def line_items(request):
 
 
 def financial_structure_report(request):
-    report = utils.Report()
+    report = utils.CostCenterScreeningReport()
     data = report.financial_structure_data()
     if not data.empty:
         data = report.financial_structure_styler(data)

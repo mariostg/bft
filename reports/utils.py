@@ -29,6 +29,10 @@ class Report:
             report = df.to_html()
         return report
 
+    def styler_clean_table(self, data: pd.DataFrame):
+        """Clean up dataframe by stripping tag ids and format numbers."""
+        return Styler(data, uuid_len=0, cell_ids=False).format("${0:>,.0f}")
+
 
 class CostCenterScreeningReport(Report):
     def __init__(self):
@@ -86,10 +90,6 @@ class CostCenterScreeningReport(Report):
                     df = pd.merge(df, fa_agg, how="left", on=self.column_grouping).fillna(0)
                     df["Forecast Total"] = df["Forecast"] + df["Forecast Adjustment"]
         return df
-
-    def styler_clean_table(self, data: pd.DataFrame):
-        """Clean up dataframe by stripping tag ids and format numbers."""
-        return Styler(data, uuid_len=0, cell_ids=False).format("${0:>,.0f}")
 
     def financial_structure_data(self) -> pd.DataFrame | None:
         fc = FundCenter.objects.fund_center_dataframe()
@@ -169,7 +169,7 @@ class CostCenterScreeningReport(Report):
         return concattable.sort_index(axis=0, ascending=True)
 
 
-class AllocationReport:
+class AllocationReport(Report):
     fsm = FinancialStructureManager()
     fcm = FundCenterManager()
     family_list = []
