@@ -156,7 +156,7 @@ def fundcenter_update(request, pk):
         form = FundCenterForm(request.POST, instance=fundcenter)
         if form.is_valid():
             obj = form.save(commit=False)
-            current = FundCenterManager().fundcenter(obj.fundcenter)
+            current = FundCenterManager().pk(obj.pk)
             if obj.parent != current.parent:
                 # Need to change sequence given parent change
                 fsm = FinancialStructureManager()
