@@ -147,12 +147,17 @@ class FundCenterManager(models.Manager):
         return alloc
 
     def allocation_dataframe(
-        self, fundcenter: "FundCenter|str" = None, fund: str = None, fy: int = None, quarter: str = None
+        self, fundcenter: "FundCenter|str" = None, fund: "Fund|str" = None, fy: int = None, quarter: str = None
     ) -> pd.DataFrame:
         if type(fundcenter) == str:
             try:
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
             except FundCenter.DoesNotExist:
+                return pd.DataFrame()
+        if type(fund) == str:
+            try:
+                fund = Fund.objects.get(fund=fund)
+            except Fund.DoesNotExist:
                 return pd.DataFrame()
         data = list(
             self.allocation(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter).values(
@@ -522,7 +527,7 @@ class CostCenterManager(models.Manager):
     def allocation_dataframe(
         self,
         costcenter: "CostCenter|str" = None,
-        fund: str = None,
+        fund: "Fund|str" = None,
         fy: int = None,
         quarter: str = None,
     ) -> pd.DataFrame:
@@ -534,6 +539,18 @@ class CostCenterManager(models.Manager):
         """
         if type(costcenter) == str:
             costcenter = CostCenter.objects.get(costcenter=costcenter)
+
+        if type(costcenter) == str:
+            try:
+                costcenter = FundCenter.objects.get(costcenter=costcenter)
+            except CostCenter.DoesNotExist:
+                return pd.DataFrame()
+        if type(fund) == str:
+            try:
+                fund = Fund.objects.get(fund=fund)
+            except Fund.DoesNotExist:
+                return pd.DataFrame()
+
         data = list(
             self.allocation(costcenter=costcenter, fund=fund, fy=fy, quarter=quarter).values(
                 "costcenter__parent__fundcenter",

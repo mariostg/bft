@@ -5,12 +5,14 @@ from costcenter.models import (
     CostCenterAllocation,
     FundCenter,
     FundCenterManager,
+    FundManager,
     ForecastAdjustment,
     FinancialStructureManager,
 )
 import pandas as pd
 from pandas.io.formats.style import Styler
 import numpy as np
+import sys
 
 
 class Report:
@@ -173,6 +175,7 @@ class AllocationReport(Report):
     fsm = FinancialStructureManager()
     fcm = FundCenterManager()
     family_list = []
+    df_main = None
 
     def _get_family_list(self, fc):
         """Recursive function to build a dataframe of descendants of specified fund center.
@@ -193,52 +196,73 @@ class AllocationReport(Report):
             else:
                 return
 
-    def allocation_status_dataframe(self) -> pd.DataFrame:
-        root = FundCenter.objects.filter(fundcenter="1111AA")
+    def family_dataframe(
+        self,
+        root_fundcenter: str = None,
+        fund: str = None,
+    ) -> pd.DataFrame:
+        if root_fundcenter:
+            root_fundcenter = root_fundcenter.upper()
+        root = FundCenter.objects.filter(fundcenter=root_fundcenter)
+        fund = FundManager().fund(fund=fund)
         self.family_list = [pd.DataFrame(list(root.values()))]
         self._get_family_list(root.first())
         df_main = pd.concat(self.family_list).sort_values("sequence").fillna("")
-        print("====DF MAIN====\n", df_main)
-        df_main["Cost Element"] = df_main.fundcenter + df_main.costcenter
-        df_main.rename(columns={"fundcenter": "Fund Center", "costcenter": "Cost Center"}, inplace=True)
+        df_main["Cost Element"] = df_main.fundcenter + df_main.get("costcenter")
         df_main.drop(
             ["isforecastable", "isupdatable", "note", "source_id", "fund_id", "parent_id"],
             axis=1,
             inplace=True,
         )
+        df_main.rename(columns={"fundcenter": "Fund Center", "costcenter": "Cost Center"}, inplace=True)
 
-        # FC Allocations
+        return df_main
+
+    def fc_allocation_dataframe(self, df_main: pd.DataFrame, fund, fy, quarter) -> pd.DataFrame:
         fc = list(filter(None, df_main["Fund Center"].to_list()))
         alloc_fc = []
         df_alloc_fc = pd.DataFrame()
         for f in fc:
-            a = FundCenterManager().allocation_dataframe(fundcenter=f)
+            a = FundCenterManager().allocation_dataframe(f, fund, fy, quarter)
             if not a.empty:
                 alloc_fc.append(a)
         if len(alloc_fc) > 0:
             df_alloc_fc = pd.concat(alloc_fc)
-            # df_alloc_fc.rename(columns={"Fund Center": "Cost Element"}, inplace=True)
             df_alloc_fc["Cost Element"] = df_alloc_fc["Fund Center"]
             df_alloc_fc["Cost Center"] = ""
-        print("====FC ALLOC====\n", df_alloc_fc)
+        return df_alloc_fc
 
-        # CC Allocations
+    def cc_allocation_dataframe(self, df_main: pd.DataFrame, fund, fy, quarter) -> pd.DataFrame:
         cc = list(filter(None, df_main["Cost Center"].to_list()))
         alloc_cc = []
         df_alloc_cc = pd.DataFrame()
         for f in cc:
-            a = CostCenterManager().allocation_dataframe(costcenter=f)
+            a = CostCenterManager().allocation_dataframe(f, fund, fy, quarter)
             if not a.empty:
                 alloc_cc.append(a)
         if len(alloc_cc) > 0:
             df_alloc_cc = pd.concat(alloc_cc)
-            # df_alloc_cc.rename(columns={"Cost Center": "Cost Element"}, inplace=True)
             df_alloc_cc["Cost Element"] = df_alloc_cc["Cost Center"]
-        print("====CC ALLOC====\n", df_alloc_cc)
+        return df_alloc_cc
+
+    def allocation_status_dataframe(
+        self,
+        root_fundcenter: str = None,
+        fund: str = None,
+        fy: int = None,
+        quarter: int = None,
+    ) -> pd.DataFrame:
+
+        df_main = self.family_dataframe(root_fundcenter, fund)
+
+        # FC Allocations
+        df_alloc_fc = self.fc_allocation_dataframe(df_main, fund, fy, quarter)
+
+        # CC Allocations
+        df_alloc_cc = self.cc_allocation_dataframe(df_main, fund, fy, quarter)
 
         # merge FC and CC allocation
         df_alloc = pd.concat([df_alloc_cc, df_alloc_fc])
-        # print("===DF ALLOC===\n", df_alloc)
 
         # Merge df_main with df_alloc and rearrange
         df_main.drop(["Cost Center", "Fund Center"], inplace=True, axis=1)
@@ -265,5 +289,5 @@ class AllocationReport(Report):
         ]
         df_main.fillna("", inplace=True)
         df_main.set_index(["sequence", "Fund Center", "Cost Center", "Fund"], inplace=True)
-        print("====DF MAIN====\n", df_main)
+
         return df_main

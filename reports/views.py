@@ -27,11 +27,14 @@ def bmt_screening_report(request):
     return render(request, "bmt-screening-report.html", context)
 
 
-def allocation_status_report(request):
+def allocation_status_report(request, fundcenter, fund, fy, quarter):
     context = {}
+    fundcenter = fundcenter.upper()
+    fund = fund.upper()
+
     if CostCenterAllocation.objects.exists() or FundCenterAllocation.objects.exists():
         r = utils.AllocationReport()
-        df = r.allocation_status_dataframe()
+        df = r.allocation_status_dataframe(fundcenter, fund, fy, quarter)
         df["Allocation"] = df["Allocation"].astype(int)
         df["FY"] = df["FY"].astype(str)
         df = df.style.format(thousands=",")
