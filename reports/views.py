@@ -1,7 +1,6 @@
 from django.core.paginator import Paginator
-from django.db.models import Sum
 from django.db.models.functions import Concat
-from django.db.models import CharField, Value as V
+from django.db.models import Value as V
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib import messages

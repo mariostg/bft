@@ -1,4 +1,4 @@
-from lineitems.models import LineItem, LineForecast
+from lineitems.models import LineItem
 from costcenter.models import (
     CostCenter,
     CostCenterManager,
