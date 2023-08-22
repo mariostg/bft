@@ -117,9 +117,10 @@ class FundCenterManager(models.Manager):
         Returns:
             pd.DataFrame: A dataframe of fund centers.
         """
-        if not FundCenter.objects.exists():
+        _all = FundCenter.objects.all()
+        if not _all.exists():
             return pd.DataFrame()
-        data = list(FundCenter.objects.all().values())
+        data = list(_all.values())
         df = pd.DataFrame(data).rename(
             columns={
                 "id": "fundcenter_id",
