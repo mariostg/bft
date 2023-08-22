@@ -1,6 +1,7 @@
 from datetime import datetime
 import numpy as np
 from typing import Iterable, Optional
+from django.contrib import messages
 from django.db import models, IntegrityError
 from django.db.models import QuerySet
 from django.core.exceptions import ValidationError
@@ -24,6 +25,20 @@ class FundManager(models.Manager):
         except Fund.DoesNotExist:
             return None
         return obj
+
+    def exists(self, fund: str) -> bool:
+        return Fund.objects.filter(fund=fund).exists()
+
+    def get_request(self, request) -> str | None:
+        print(request)
+        fund = request.GET.get("fund")
+        if fund:
+            fund = fund.upper()
+            if not FundManager().exists(fund):
+                messages.info(request, "Fund specified does not exist.")
+            return fund
+        else:
+            return None
 
 
 class Fund(models.Model):
@@ -202,6 +217,19 @@ class FundCenterManager(models.Manager):
 
     def get_cost_centers(self, parent: "FundCenter") -> list:
         return list(CostCenter.objects.filter(parent=parent).values())
+
+    def exists(self, fundcenter: str) -> bool:
+        return FundCenter.objects.filter(fundcenter=fundcenter).exists()
+
+    def get_request(self, request) -> str | None:
+        fundcenter = request.GET.get("fundcenter")
+        if fundcenter:
+            fundcenter = fundcenter.upper()
+            if not FundCenterManager().exists(fundcenter):
+                messages.info(request, "Fund Center specified does not exist.")
+            return fundcenter
+        else:
+            return None
 
 
 class FinancialStructureManager(models.Manager):
