@@ -12,7 +12,6 @@ from costcenter.models import (
 import pandas as pd
 from pandas.io.formats.style import Styler
 import numpy as np
-import sys
 
 
 class Report:
@@ -263,6 +262,8 @@ class AllocationReport(Report):
 
         # merge FC and CC allocation
         df_alloc = pd.concat([df_alloc_cc, df_alloc_fc])
+        if df_alloc.empty:
+            return pd.DataFrame()
 
         # Merge df_main with df_alloc and rearrange
         df_main.drop(["Cost Center", "Fund Center"], inplace=True, axis=1)
@@ -272,7 +273,6 @@ class AllocationReport(Report):
             how="inner",
             on=["Cost Element"],
         )
-
         df_main.sort_values("sequence", inplace=True)
         df_main = df_main[
             [

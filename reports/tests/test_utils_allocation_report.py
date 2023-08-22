@@ -64,11 +64,23 @@ class TestUtilsAllocationReport:
         fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, self.quarter)
         assert 2 == len(fc_allocation_df)
 
+    def test_fc_allocation_dataframe_outside_quarter(self, setup):
+        r = AllocationReport()
+        family_df = r.family_dataframe()
+        fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, "Q3")
+        assert 0 == len(fc_allocation_df)
+
     def test_cc_allocation_dataframe(self, setup):
         r = AllocationReport()
         family_df = r.family_dataframe()
         cc_allocation_df = r.cc_allocation_dataframe(family_df, self.fund, self.fy, self.quarter)
         assert 1 == len(cc_allocation_df)
+
+    def test_cc_allocation_dataframe_outside_quarter(self, setup):
+        r = AllocationReport()
+        family_df = r.family_dataframe()
+        cc_allocation_df = r.cc_allocation_dataframe(family_df, self.fund, self.fy, "Q3")
+        assert 0 == len(cc_allocation_df)
 
     def test_allocation_status_report(self, setup):
 
@@ -77,3 +89,11 @@ class TestUtilsAllocationReport:
         data = r.allocation_status_dataframe(self.root_fundcenter, self.fund, self.fy, self.quarter)
         assert pd.DataFrame == type(data)
         assert 3 == len(data)
+
+    def test_allocation_status_report_outside_quarter(self, setup):
+
+        r = AllocationReport()
+
+        data = r.allocation_status_dataframe(self.root_fundcenter, self.fund, self.fy, "Q3")
+        assert pd.DataFrame == type(data)
+        assert 0 == len(data)

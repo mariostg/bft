@@ -9,7 +9,8 @@ import csv
 
 from lineitems.models import LineItem
 from reports import utils
-from costcenter.models import CostCenterAllocation, ForecastAdjustment, FundCenterAllocation
+from costcenter.models import CostCenterAllocation, FundManager, FundCenterAllocation, FundCenterManager
+from reports.forms import SearchAllocationAnalysisForm
 
 
 def bmt_screening_report(request):
@@ -27,19 +28,60 @@ def bmt_screening_report(request):
     return render(request, "bmt-screening-report.html", context)
 
 
-def allocation_status_report(request, fundcenter, fund, fy, quarter):
+def allocation_status_report(request):
+    fundcenter = fund = fy = quarter = ""
+    query_string = None  # Keep query_string in case paginator is required when more data is used.
+    query_terms = set()
     context = {}
-    fundcenter = fundcenter.upper()
-    fund = fund.upper()
+    table = None
 
-    if CostCenterAllocation.objects.exists() or FundCenterAllocation.objects.exists():
+    fundcenter = FundCenterManager().get_request(request)
+
+    fund = FundManager().get_request(request)
+
+    quarter = request.GET.get("quarter")
+    if quarter in ["0", "1", "2", "3", "4"]:
+        quarter = f"Q{quarter}"
+    if quarter in ["q0", "q1", "q2", "q3", "q4", "Q0", "Q1", "Q2", "Q3", "Q4"]:
+        quarter = quarter.upper()
+
+    fy = request.GET.get("fy")
+
+    if fundcenter and fund and fy and quarter:
+        query_terms.add(f"fundcenter={fundcenter}")
+        query_terms.add(f"fund={fund}")
+        query_terms.add(f"quarter={quarter}")
+        query_terms.add(f"fy={fy}")
+        if quarter not in ["Q0", "Q1", "Q2", "Q3", "Q4"]:
+            messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
+
+    initial = {
+        "fundcenter": fundcenter,
+        "fund": fund,
+        "fy": fy,
+        "quarter": quarter,
+    }
+    if len(query_terms) > 0:
+        query_string = "&".join(query_terms)
+
+    if query_string and (CostCenterAllocation.objects.exists() or FundCenterAllocation.objects.exists()):
         r = utils.AllocationReport()
         df = r.allocation_status_dataframe(fundcenter, fund, fy, quarter)
-        df["Allocation"] = df["Allocation"].astype(int)
-        df["FY"] = df["FY"].astype(str)
-        df = df.style.format(thousands=",")
-        # df = r.styler_clean_table(df)
-        context = {"table": df.to_html()}
+        if not df.empty:
+            df["Allocation"] = df["Allocation"].astype(int)
+            df["FY"] = df["FY"].astype(str)
+            df = df.style.format(thousands=",")
+            # df = r.styler_clean_table(df)
+            table = df.to_html()
+
+    form = form = SearchAllocationAnalysisForm(initial=initial)
+    context = {
+        "form": form,
+        "initial": initial,
+        "query_string": query_string,
+        "table": table,
+    }
+
     return render(request, "allocation-status-report.html", context)
 
 
