@@ -4,6 +4,7 @@ from main.settings import BASE_DIR, DEBUG
 
 from costcenter.models import Fund, Source, CostCenter, FundCenter, FinancialStructureManager
 from lineitems.models import LineForecast, LineItem
+from bft.models import BftStatus, BftStatusManager
 
 
 class Command(BaseCommand):
@@ -19,10 +20,12 @@ class Command(BaseCommand):
             Source.objects.all().delete()
             Fund.objects.all().delete()
             FundCenter.objects.all().delete()
+            BftStatus.objects.all().delete()
             self.set_fund()
             self.set_source()
             self.set_fund_center()
             self.set_cost_center()
+            self.set_bft_status()
         else:
             print("This capability is only available when DEBUG is True")
 
@@ -137,3 +140,20 @@ class Command(BaseCommand):
                 item["sequence"] = FSM.set_parent(item["parent"], item)
                 new_item = CostCenter.objects.create(**item)
                 print(f"Created Cost Center {new_item}")
+
+    def set_bft_status(self):
+        bs = BftStatus()
+        bs.status = "FY"
+        bs.value = 2023
+        bs.save()
+        bs = BftStatus()
+        bs.status = "QUARTER"
+        bs.value = "1"
+        bs.save()
+        bs = BftStatus()
+        bs.status = "PERIOD"
+        bs.value = "1"
+        bs.save()
+        print(f"Set FY to {BftStatusManager().fy()}")
+        print(f"Set Quarter to {BftStatusManager().quarter()}")
+        print(f"Set Period to {BftStatusManager().period()}")

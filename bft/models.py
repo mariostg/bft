@@ -5,8 +5,14 @@ from bft.conf import YEAR_CHOICES, QUARTERS, PERIODS, STATUS
 
 # Create your models here.
 class BftStatusManager(models.Manager):
-    def current(self):
-        status = BftStatus.objects.filter(Q(status="FY") | Q(status="QUARTER"))
+    def fy(self) -> str:
+        return BftStatus.objects.get(status="FY").value
+
+    def quarter(self) -> str:
+        return BftStatus.objects.get(status="QUARTER").value
+
+    def period(self) -> str:
+        return BftStatus.objects.get(status="PERIOD").value
 
 
 class BftStatus(models.Model):
@@ -34,3 +40,5 @@ class BftStatus(models.Model):
                 f"{self.value} is not a valid period.  Expected value is one of {(', ').join(map(str,period_ids))}"
             )
         super(BftStatus, self).save(*args, **kwargs)
+
+    current = BftStatusManager

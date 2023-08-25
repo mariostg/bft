@@ -11,18 +11,19 @@ class TestModelBftStatus:
     def test_save_entry(self):
         bs = BftStatus()
         bs.status = "FY"
-        bs.value = 2023
+        bs.value = "2023"
         bs.save()
         bs = BftStatus()
         bs.status = "QUARTER"
-        bs.value = 1
+        bs.value = "1"
         bs.save()
         bs = BftStatus()
         bs.status = "PERIOD"
-        bs.value = 1
+        bs.value = "1"
         bs.save()
 
         assert 3 == BftStatus.objects.all().count()
+        assert "2023" == BftStatus().current().fy()
 
     def test_save_quarter_with_invalid_value(self):
         bs = BftStatus()
