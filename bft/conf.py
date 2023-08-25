@@ -11,11 +11,11 @@ for r in range(first, last):
     YEAR_CHOICES.append((r, str(r)))
 
 QUARTERS = [
-    ("Q0", "Q0"),
-    ("Q1", "Q1"),
-    ("Q2", "Q2"),
-    ("Q3", "Q3"),
-    ("Q4", "Q4"),
+    (0, "Q0"),
+    (1, "Q1"),
+    (2, "Q2"),
+    (3, "Q3"),
+    (4, "Q4"),
 ]
 
 PERIODS = [

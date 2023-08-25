@@ -11,14 +11,37 @@ class TestModelBftStatus:
     def test_save_entry(self):
         bs = BftStatus()
         bs.status = "FY"
+        bs.value = 2023
         bs.save()
         bs = BftStatus()
         bs.status = "QUARTER"
+        bs.value = 1
+        bs.save()
+        bs = BftStatus()
+        bs.status = "PERIOD"
+        bs.value = 1
         bs.save()
 
-        assert 2 == BftStatus.objects.all().count()
+        assert 3 == BftStatus.objects.all().count()
 
-    def test_save_values_with_invalid_choices(self):
+    def test_save_quarter_with_invalid_value(self):
+        bs = BftStatus()
+        bs.status = "QUARTER"
+        bs.value = 5
+        with pytest.raises(ValueError, match="5 is not a valid period.  Expected value is one of 0, 1, 2, 3, 4"):
+            bs.save()
+
+    def test_save_period_with_invalid_value(self):
+        bs = BftStatus()
+        bs.status = "PERIOD"
+        bs.value = 15
+        with pytest.raises(
+            ValueError,
+            match="15 is not a valid period.  Expected value is one of 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14",
+        ):
+            bs.save()
+
+    def test_save_values_with_invalid_status(self):
         status = {"status": "Y", "value": 2023}
         with pytest.raises(AttributeError, match="Y not a valid status"):
             BftStatus(**status).save()
