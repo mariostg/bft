@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<div class="columns">
+    <div class='form'>
+        <div class="form__header"> BFT Status </div>
+        <div class="columns {% if user.is_authenticated %}c3{% else %}c2{% endif %}">
+                <p>FY</p>
+                <p>{{fy}}</p>
+                <a class='btn' href="{% url 'bft-fy-update' %}">Change FY</a>
+                <p>Quarter</p>
+                <p>{{quarter}}</p>
+                <a class='btn' href="{% url 'bft-quarter-update' %}">Change Quarter</a>
+            {% if user.is_authenticated %}
+                <p>Period</p>
+                <p>{{period}}</p>
+                <a class='btn' href="{% url 'bft-period-update' %}">Change Period</a>
+            {% endif %}
+        </div> 
+    </div>
+{% endblock content %}
