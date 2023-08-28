@@ -20,7 +20,7 @@ class TestUtilsAllocationReport:
     root_fundcenter = "1111AA"
     fund = "C113"
     fy = 2023
-    quarter = "Q1"
+    quarter = "1"
 
     @pytest.fixture
     def setup(self):
@@ -30,11 +30,11 @@ class TestUtilsAllocationReport:
         cc = self.ccm.cost_center("8486C2")
         _fund = FundManager().fund(self.fund)
 
-        FundCenterAllocation.objects.create(fundcenter=root_fc, amount=1000, fy=2023, quarter="Q1", fund=_fund)
+        FundCenterAllocation.objects.create(fundcenter=root_fc, amount=1000, fy=2023, quarter="1", fund=_fund)
         FundCenterAllocation.objects.create(
-            fundcenter=self.fcm.fundcenter("1111AC"), amount=500, fy=2023, quarter="Q1", fund=_fund
+            fundcenter=self.fcm.fundcenter("1111AC"), amount=500, fy=2023, quarter="1", fund=_fund
         )
-        CostCenterAllocation.objects.create(costcenter=cc, amount=250, fy=2023, quarter="Q1", fund=_fund)
+        CostCenterAllocation.objects.create(costcenter=cc, amount=250, fy=2023, quarter="1", fund=_fund)
 
     def test_we_have_fund_centers(self, setup):
         fc = self.fcm.fund_center_exist("2222BB")
