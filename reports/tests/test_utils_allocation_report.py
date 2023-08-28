@@ -1,6 +1,6 @@
 import pytest
 from reports.utils import AllocationReport
-from encumbrance.management.commands import populate
+from bft.management.commands import populate
 from costcenter.models import (
     FundCenterAllocation,
     FundManager,

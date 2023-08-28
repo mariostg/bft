@@ -1,6 +1,6 @@
 import pytest
 from costcenter.models import CostCenter, CostCenterManager, CostCenterAllocation, Fund, ForecastAdjustment
-from encumbrance.management.commands import populate
+from bft.management.commands import populate
 
 
 @pytest.mark.django_db

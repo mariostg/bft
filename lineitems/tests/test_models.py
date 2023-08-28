@@ -2,8 +2,8 @@ from django.test import TestCase
 
 from lineitems.models import LineItem, LineForecast
 from encumbrance.models import EncumbranceImport, Encumbrance
-from encumbrance.management.commands.uploadcsv import Command
-import encumbrance.management.commands.populate as populate
+from bft.management.commands.uploadcsv import Command
+import bft.management.commands.populate as populate
 
 
 class LineItemManagerTest(TestCase):

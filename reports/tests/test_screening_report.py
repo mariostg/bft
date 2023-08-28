@@ -1,7 +1,7 @@
 import pytest
 from reports.utils import CostCenterScreeningReport
 from costcenter.models import CostCenterAllocation, Fund, CostCenterManager, ForecastAdjustment
-from encumbrance.management.commands import populate, uploadcsv
+from bft.management.commands import populate, uploadcsv
 import numpy as np
 
 

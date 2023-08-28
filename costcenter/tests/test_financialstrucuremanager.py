@@ -9,7 +9,7 @@ from costcenter.models import (
     CostCenter,
 )
 from bft.exceptions import ParentDoesNotExistError, IncompatibleArgumentsError
-from encumbrance.management.commands import populate, uploadcsv
+from bft.management.commands import populate, uploadcsv
 
 
 @pytest.mark.django_db

@@ -1,6 +1,6 @@
 import pytest
 from costcenter.models import CostCenterAllocation, FundCenterManager, FundCenterAllocation, Fund, CostCenterManager
-from encumbrance.management.commands import populate, uploadcsv
+from bft.management.commands import populate, uploadcsv
 from django.db.models import Sum
 
 

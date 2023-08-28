@@ -17,7 +17,7 @@ from bft.exceptions import (
     InvalidOptionException,
     InvalidFiscalYearException,
 )
-from encumbrance.management.commands import populate
+from bft.management.commands import populate
 
 FUND_C113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
 SOURCE_1 = {"source": "Kitchen"}

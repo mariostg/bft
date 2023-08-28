@@ -1,6 +1,6 @@
 import pytest
 from lineitems.models import LineItem
-from encumbrance.management.commands import populate, uploadcsv
+from bft.management.commands import populate, uploadcsv
 
 
 @pytest.mark.django_db

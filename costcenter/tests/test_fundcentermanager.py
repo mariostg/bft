@@ -1,6 +1,6 @@
 import pytest
 from costcenter.models import FundCenter, FundCenterManager, FundCenterAllocation, Fund
-from encumbrance.management.commands import populate
+from bft.management.commands import populate
 import numpy as np
 
 
