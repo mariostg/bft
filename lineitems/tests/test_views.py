@@ -21,7 +21,8 @@ class CostCenterLineItemTest(TestCase):
     def test_url_is_bad(self):
         c = Client()
         response = c.get("/lineitem/costcenter/1111/")
-        self.assertEqual(404, response.status_code)
+        # self.assertEqual(404, response.status_code)
+        assert True == ("There appears to be no line items in 1111" in str(response.content))
 
     def test_view_uses_correct_template(self):
         response = self.client.get("/lineitem/costcenter/8486B1/")
