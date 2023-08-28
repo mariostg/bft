@@ -17,37 +17,33 @@ class TestFundCenterAllocation:
     def test_create_fund_center_allocation(self, setup):
 
         fc = FundCenterManager().fundcenter("1111ab")
-        a = FundCenterAllocation.objects.create(fundcenter=fc, amount=1000, fy=2023, quarter="Q1", fund=self.C113)
+        a = FundCenterAllocation.objects.create(fundcenter=fc, amount=1000, fy=2023, quarter="1", fund=self.C113)
         assert 1 == a.id
 
     def test_get_costcenter_subordinate_allocation(self, setup):
         fc = FundCenterManager().fundcenter("1111AB")
-        fc_alloc = FundCenterAllocation.objects.create(
-            fundcenter=fc, amount=1000, fy=2023, quarter="Q1", fund=self.C113
-        )
+        fc_alloc = FundCenterAllocation.objects.create(fundcenter=fc, amount=1000, fy=2023, quarter="1", fund=self.C113)
         assert 1 == fc_alloc.id
 
         cc = CostCenterManager().cost_center(costcenter="8486C1")
-        CostCenterAllocation.objects.create(costcenter=cc, amount=1000, fy=2023, quarter="Q1", fund=self.C113)
+        CostCenterAllocation.objects.create(costcenter=cc, amount=1000, fy=2023, quarter="1", fund=self.C113)
 
         cc = CostCenterManager().cost_center(costcenter="8486C2")
-        CostCenterAllocation.objects.create(costcenter=cc, amount=2000, fy=2023, quarter="Q1", fund=self.C113)
+        CostCenterAllocation.objects.create(costcenter=cc, amount=2000, fy=2023, quarter="1", fund=self.C113)
 
         sub_alloc = CostCenterManager().get_sub_alloc(fc_alloc)
         print(sub_alloc)
 
     def test_get_fundcenter_subordinate_allocation(self, setup):
         fc = FundCenterManager().fundcenter("1111AB")
-        fc_alloc = FundCenterAllocation.objects.create(
-            fundcenter=fc, amount=1000, fy=2023, quarter="Q1", fund=self.C113
-        )
+        fc_alloc = FundCenterAllocation.objects.create(fundcenter=fc, amount=1000, fy=2023, quarter="1", fund=self.C113)
         assert 1 == fc_alloc.id
 
         cc = FundCenterManager().fundcenter(fundcenter="2222BA")
-        FundCenterAllocation.objects.create(fundcenter=cc, amount=1000, fy=2023, quarter="Q1", fund=self.C113)
+        FundCenterAllocation.objects.create(fundcenter=cc, amount=1000, fy=2023, quarter="1", fund=self.C113)
 
         cc = FundCenterManager().fundcenter(fundcenter="2222BB")
-        FundCenterAllocation.objects.create(fundcenter=cc, amount=2000, fy=2023, quarter="Q1", fund=self.C113)
+        FundCenterAllocation.objects.create(fundcenter=cc, amount=2000, fy=2023, quarter="1", fund=self.C113)
 
         sub_alloc = FundCenterManager().get_sub_alloc(fc_alloc)
         assert 3000 == sub_alloc.aggregate(Sum("amount"))["amount__sum"]
