@@ -7,7 +7,7 @@ from reports.models import CostCenterMonthly
 class TestCostCenterMonthlyModel:
     m1 = {
         "fund": "C113",
-        "cost_center": "8486C1",
+        "costcenter": "8486C1",
         "source": "Army",
         "fy": "2023",
         "period": "1",
@@ -23,7 +23,7 @@ class TestCostCenterMonthlyModel:
     }
     duplicate = {
         "fund": "C113",
-        "cost_center": "8486C1",
+        "costcenter": "8486C1",
         "source": "Army",
         "fy": "2023",
         "period": "1",
