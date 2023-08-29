@@ -34,5 +34,18 @@ PERIODS = [
     ("13", "P13"),
     ("14", "P14"),
 ]
+PERIODKEYS, PERIODVALUES = zip(*PERIODS)
 
 STATUS = [("FY", "FY"), ("QUARTER", "QUARTER"), ("PERIOD", "PERIOD")]
+
+
+def is_period(p: str) -> bool:
+    """Utility function to determine if argument is an acceptable period
+
+    Args:
+        p (str): Period to verify
+
+    Returns:
+        bool: If p in an element of PERIODS, return True, false otherwise.
+    """
+    return str(p) in PERIODKEYS

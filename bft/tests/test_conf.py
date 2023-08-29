@@ -1,5 +1,6 @@
 import pytest
 from bft.conf import YEAR_CHOICES, QUARTERS, PERIODS, STATUS
+from bft import conf
 
 
 class TestConf:
@@ -24,3 +25,9 @@ class TestConf:
     def test_read_status(self):
         expected = ("FY", "FY"), ("QUARTER", "QUARTER"), ("PERIOD", "PERIOD")
         assert set(expected) == set(STATUS)
+
+    def test_period_in_range(self):
+        assert True == (conf.is_period(1))
+
+    def test_period_outside_range(self):
+        assert False == (conf.is_period(22))

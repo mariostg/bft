@@ -2,6 +2,7 @@ from datetime import datetime
 from django.db import models
 from django.db.models import Q
 from bft.conf import YEAR_CHOICES, QUARTERS, PERIODS, STATUS
+from bft import conf
 
 # Create your models here.
 class BftStatusManager(models.Manager):
@@ -35,7 +36,7 @@ class BftStatus(models.Model):
                 f"{self.value} is not a valid period.  Expected value is one of {(', ').join(map(str,quarter_ids))}"
             )
 
-        if self.status == "PERIOD" and self.value not in period_ids:
+        if self.status == "PERIOD" and not conf.is_period(self.value):
             raise ValueError(
                 f"{self.value} is not a valid period.  Expected value is one of {(', ').join(map(str,period_ids))}"
             )

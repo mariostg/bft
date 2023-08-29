@@ -1,5 +1,6 @@
 from django.db.models import Sum, Value, Q, QuerySet
 from bft.conf import PERIODS
+from bft import conf
 from lineitems.models import LineItem
 from costcenter.models import (
     CostCenter,
@@ -43,12 +44,11 @@ class CostCenterMonthlyReport:
         fy = str(fy)
         period = str(period)
         self.fy = fy
-        period_ids, _ = zip(*PERIODS)
-        if period in period_ids:
+        if conf.is_period(period):
             self.period = period
         else:
             raise ValueError(
-                f"{period} is not a valid period.  Expected value is one of {(', ').join(map(str,period_ids))}"
+                f"{period} is not a valid period.  Expected value is one of {(', ').join(map(str,conf.PERIODKEYS))}"
             )
 
     def sum_line_items(self) -> QuerySet:
