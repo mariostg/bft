@@ -2,7 +2,14 @@ import os
 from django.core.management.base import BaseCommand, CommandError
 from main.settings import BASE_DIR, DEBUG
 
-from costcenter.models import Fund, Source, CostCenter, FundCenter, FinancialStructureManager
+from costcenter.models import (
+    Fund,
+    Source,
+    CostCenter,
+    FundCenter,
+    FinancialStructureManager,
+    CostCenterAllocation,
+)
 from lineitems.models import LineForecast, LineItem
 from bft.models import BftStatus, BftStatusManager
 
@@ -21,11 +28,13 @@ class Command(BaseCommand):
             Fund.objects.all().delete()
             FundCenter.objects.all().delete()
             BftStatus.objects.all().delete()
+            CostCenterAllocation.objects.all().delete()
             self.set_fund()
             self.set_source()
             self.set_fund_center()
             self.set_cost_center()
             self.set_bft_status()
+            self.set_cost_center_allocation()
         else:
             print("This capability is only available when DEBUG is True")
 
@@ -157,3 +166,14 @@ class Command(BaseCommand):
         print(f"Set FY to {BftStatusManager().fy()}")
         print(f"Set Quarter to {BftStatusManager().quarter()}")
         print(f"Set Period to {BftStatusManager().period()}")
+
+    def set_cost_center_allocation(self):
+        fund = Fund.objects.fund("C113")
+        cc = CostCenter.objects.cost_center("8486B1")
+        a = CostCenterAllocation()
+        a.costcenter = cc
+        a.fund = fund
+        a.fy = 2023
+        a.quarter = "1"
+        a.amount = 1000
+        a.save()
