@@ -1,4 +1,4 @@
-from django.db.models import Sum, Value, Q, QuerySet
+from django.db.models import Sum, Value, Q, QuerySet, F
 from bft.conf import PERIODS
 from bft import conf
 from lineitems.models import LineItem
@@ -52,7 +52,7 @@ class CostCenterMonthlyReport:
             )
 
     def sum_line_items(self) -> QuerySet:
-        line_item_group = LineItem.objects.values("costcenter", "fund").annotate(
+        line_item_group = LineItem.objects.values("costcenter__costcenter", "fund").annotate(
             spent=Sum("spent"),
             commitment=Sum("balance", filter=Q(doctype="CO")),
             pre_commitment=Sum("balance", filter=Q(doctype="PC")),
@@ -62,8 +62,21 @@ class CostCenterMonthlyReport:
             fy=Value(self.fy),
             period=Value(self.period),
             source=Value(""),
+            costcenter=F("costcenter__costcenter"),
         )
-        return line_item_group
+        return line_item_group.values(
+            "spent",
+            "fund",
+            "commitment",
+            "pre_commitment",
+            "fund_reservation",
+            "balance",
+            "working_plan",
+            "fy",
+            "period",
+            "source",
+            "costcenter",
+        )
 
     def insert_line_items(self, lines: QuerySet) -> int:
         if len(lines) == 0:
