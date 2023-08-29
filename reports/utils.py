@@ -1,3 +1,5 @@
+from django.db.models import Sum, Value, Q, QuerySet
+from bft.conf import PERIODS
 from lineitems.models import LineItem
 from costcenter.models import (
     CostCenter,
@@ -9,6 +11,7 @@ from costcenter.models import (
     ForecastAdjustment,
     FinancialStructureManager,
 )
+from reports.models import CostCenterMonthly
 import pandas as pd
 from pandas.io.formats.style import Styler
 import numpy as np
@@ -33,6 +36,42 @@ class Report:
     def styler_clean_table(self, data: pd.DataFrame):
         """Clean up dataframe by stripping tag ids and format numbers."""
         return Styler(data, uuid_len=0, cell_ids=False).format("${0:>,.0f}")
+
+
+class CostCenterMonthlyReport:
+    def __init__(self, fy, period):
+        fy = str(fy)
+        period = str(period)
+        self.fy = fy
+        period_ids, _ = zip(*PERIODS)
+        if period in period_ids:
+            self.period = period
+        else:
+            raise ValueError(
+                f"{period} is not a valid period.  Expected value is one of {(', ').join(map(str,period_ids))}"
+            )
+
+    def sum_line_items(self) -> QuerySet:
+        line_item_group = LineItem.objects.values("costcenter", "fund").annotate(
+            spent=Sum("spent"),
+            commitment=Sum("balance", filter=Q(doctype="CO")),
+            pre_commitment=Sum("balance", filter=Q(doctype="PC")),
+            fund_reservation=Sum("balance", filter=Q(doctype="FR")),
+            balance=Sum("balance"),
+            working_plan=Sum("workingplan"),
+            fy=Value(self.fy),
+            period=Value(self.period),
+            source=Value(""),
+        )
+        return line_item_group
+
+    def insert_line_items(self, lines: QuerySet) -> int:
+        if len(lines) == 0:
+            print("THERE ARE NO LINES")
+            return 0
+        CostCenterMonthly.objects.filter(fy=self.fy, period=self.period).delete()
+        md = CostCenterMonthly.objects.bulk_create([CostCenterMonthly(**q) for q in lines])
+        return len(md)
 
 
 class CostCenterScreeningReport(Report):
