@@ -697,6 +697,8 @@ class Allocation(models.Model):
             raise exceptions.InvalidFiscalYearException(
                 f"Fiscal year {self.fy} invalid, must be one of {','.join([v[1] for v in YEAR_CHOICES])}"
             )
+        if not self.fund:
+            raise ValueError("Allocation cannot be saved without Fund")
         return super().save(*args, **kwargs)
 
 
@@ -705,6 +707,11 @@ class CostCenterAllocation(Allocation):
 
     def __str__(self):
         return f"{self.costcenter} - {self.fund} - {self.fy}{self.quarter} {self.amount}"
+
+    def save(self, *args, **kwargs):
+        if not self.costcenter:
+            raise ValueError("Allocation cannot be saved without Cost Center")
+        super(CostCenterAllocation, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = "Cost Center Allocations"
