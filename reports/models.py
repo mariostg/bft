@@ -15,11 +15,6 @@ class CostCenterMonthly(models.Model):
     fund_reservation = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
     working_plan = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    charges = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-
-    allocation = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    forecast = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
-    forecast_ajustment = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True)
 
     def __str__(self):
         s = ""

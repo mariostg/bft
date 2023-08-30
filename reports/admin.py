@@ -14,8 +14,6 @@ class CostCenterMonthlyAdmin(admin.ModelAdmin):
         "fund_reservation",
         "balance",
         "working_plan",
-        "allocation",
-        "forecast",
         "spent",
     )
 
