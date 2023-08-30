@@ -8,8 +8,10 @@ import csv
 
 from lineitems.models import LineItem
 from reports import utils
+
 from costcenter.models import CostCenterAllocation, FundManager, FundCenterAllocation, FundCenterManager
 from reports.forms import SearchAllocationAnalysisForm
+from bft.models import BftStatus
 
 
 def bmt_screening_report(request):
@@ -82,6 +84,13 @@ def allocation_status_report(request):
     }
 
     return render(request, "allocation-status-report.html", context)
+
+
+def costcenter_monthly_data(request):
+    s = BftStatus.current
+    r = utils.CostCenterMonthlyReport(fy=s.fy(), period=s.period())
+    df = r.dataframe()
+    return render(request, "costcenter-monthly-data.html", {"table": df.to_html()})
 
 
 def line_items(request):

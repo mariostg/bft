@@ -13,4 +13,5 @@ urlpatterns = [
     path("financial-structure/", views.financial_structure_report, name="financial-structure-report"),
     path("lineitems/", views.line_items, name="lineitem-report"),
     path("lineitems-csv/", views.csv_line_items, name="lineitem-csv"),
+    path("costcenter-monthly-data/", views.costcenter_monthly_data, name="costcenter-monthly-data"),
 ]
