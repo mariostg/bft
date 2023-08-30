@@ -13,8 +13,8 @@ class HomeView(TemplateView):
 def bft_status(request):
     status = BftStatus().current()
     fy = status.fy()
-    quarter = QUARTERS[0][int(status.quarter())]
-    period = PERIODS[0][int(status.period())]
+    quarter = QUARTERS[int(status.quarter())][1]
+    period = PERIODS[int(status.period()) - 1][1]
 
     return render(request, "bft/bft-status.html", {"fy": fy, "quarter": quarter, "period": period})
 
