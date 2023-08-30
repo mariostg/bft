@@ -95,8 +95,11 @@ class CostCenterMonthlyReport:
         monthly_df = pd.DataFrame(list(CostCenterMonthly.objects.filter(fy=self.fy, period=self.period).values()))
         monthly_df.rename(columns={"costcenter": "Cost Center", "fund": "Fund"}, inplace=True)
         alloc_df = CostCenterManager().allocation_dataframe(fy=self.fy, quarter=P2Q[self.period])
-        df = pd.merge(monthly_df, alloc_df, how="left", on=["Cost Center", "Fund"])
-        return df
+        if not alloc_df.empty:
+            monthly_df = pd.merge(monthly_df, alloc_df, how="left", on=["Cost Center", "Fund"])
+        else:
+            monthly_df["Allocation"] = 0
+        return monthly_df
 
 
 class CostCenterScreeningReport(Report):
