@@ -23,7 +23,7 @@ class TestModelBftStatus:
         bs.save()
 
         assert 3 == BftStatus.objects.all().count()
-        assert "2023" == BftStatus().current().fy()
+        assert "2023" == BftStatus.current.fy()
 
     def test_save_quarter_with_invalid_value(self):
         bs = BftStatus()

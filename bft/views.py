@@ -11,7 +11,7 @@ class HomeView(TemplateView):
 
 
 def bft_status(request):
-    status = BftStatus().current()
+    status = BftStatus.current
     fy = status.fy()
     quarter = QUARTERS[int(status.quarter())][1]
     period = PERIODS[int(status.period()) - 1][1]

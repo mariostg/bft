@@ -42,4 +42,5 @@ class BftStatus(models.Model):
             )
         super(BftStatus, self).save(*args, **kwargs)
 
-    current = BftStatusManager
+    objects = models.Manager()
+    current = BftStatusManager()
