@@ -6,14 +6,23 @@ from bft import conf
 
 # Create your models here.
 class BftStatusManager(models.Manager):
-    def fy(self) -> str:
-        return BftStatus.objects.get(status="FY").value
+    def fy(self) -> str | None:
+        try:
+            return BftStatus.objects.get(status="FY").value
+        except BftStatus.DoesNotExist:
+            return None
 
-    def quarter(self) -> str:
-        return BftStatus.objects.get(status="QUARTER").value
+    def quarter(self) -> str | None:
+        try:
+            return BftStatus.objects.get(status="QUARTER").value
+        except BftStatus.DoesNotExist:
+            return None
 
-    def period(self) -> str:
-        return BftStatus.objects.get(status="PERIOD").value
+    def period(self) -> str | None:
+        try:
+            return BftStatus.objects.get(status="PERIOD").value
+        except BftStatus.DoesNotExist:
+            return None
 
 
 class BftStatus(models.Model):

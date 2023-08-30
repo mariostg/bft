@@ -8,6 +8,15 @@ class TestModelBftStatus:
         b = BftStatus(status="FY", value=2023)
         assert "FY:2023" == str(b)
 
+    def test_no_fy(self):
+        assert None == BftStatus.current.fy()
+
+    def test_no_quarter(self):
+        assert None == BftStatus.current.quarter()
+
+    def test_no_period(self):
+        assert None == BftStatus.current.period()
+
     def test_save_entry(self):
         bs = BftStatus()
         bs.status = "FY"
