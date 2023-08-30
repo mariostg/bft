@@ -1,5 +1,5 @@
 from django.db.models import Sum, Value, Q, QuerySet, F
-from bft.conf import PERIODS
+from bft.conf import P2Q
 from bft import conf
 from lineitems.models import LineItem
 from costcenter.models import (
@@ -85,6 +85,18 @@ class CostCenterMonthlyReport:
         CostCenterMonthly.objects.filter(fy=self.fy, period=self.period).delete()
         md = CostCenterMonthly.objects.bulk_create([CostCenterMonthly(**q) for q in lines])
         return len(md)
+
+    def dataframe(self) -> pd.DataFrame:
+        """Create a pandas dataframe using CostCenterMonthly data as source for the given FY and period.
+
+        Returns:
+            pandas.DataFrame: dataframe containing cost center monthly data.
+        """
+        monthly_df = pd.DataFrame(list(CostCenterMonthly.objects.filter(fy=self.fy, period=self.period).values()))
+        monthly_df.rename(columns={"costcenter": "Cost Center", "fund": "Fund"}, inplace=True)
+        alloc_df = CostCenterManager().allocation_dataframe(fy=self.fy, quarter=P2Q[self.period])
+        df = pd.merge(monthly_df, alloc_df, how="left", on=["Cost Center", "Fund"])
+        return df
 
 
 class CostCenterScreeningReport(Report):
