@@ -92,9 +92,20 @@ class CostCenterMonthlyReport:
         Returns:
             pandas.DataFrame: dataframe containing cost center monthly data.
         """
-        monthly_df = pd.DataFrame(list(CostCenterMonthly.objects.filter(fy=self.fy, period=self.period).values()))
-        monthly_df.rename(columns={"costcenter": "Cost Center", "fund": "Fund"}, inplace=True)
+        fields = {}
+        for c in CostCenterMonthly._meta.get_fields():
+            fields[c.name] = c.verbose_name
+
+        monthly_df = pd.DataFrame(
+            list(CostCenterMonthly.objects.filter(fy=self.fy, period=self.period).values())
+        ).fillna(0)
+
+        for k in fields:
+            monthly_df.rename(columns={k: fields[k]}, inplace=True)
+
         alloc_df = CostCenterManager().allocation_dataframe(fy=self.fy, quarter=P2Q[self.period])
+        alloc_df.drop(["FY", "Quarter"], axis=1, inplace=True)
+        alloc_df["Allocation"].fillna(0, inplace=True)
         if not alloc_df.empty:
             monthly_df = pd.merge(monthly_df, alloc_df, how="left", on=["Cost Center", "Fund"])
         else:

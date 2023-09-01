@@ -11,6 +11,7 @@ from reports import utils
 
 from costcenter.models import CostCenterAllocation, FundManager, FundCenterAllocation, FundCenterManager
 from reports.forms import SearchAllocationAnalysisForm
+from reports.models import CostCenterMonthly
 from bft.models import BftStatus
 
 
@@ -90,6 +91,11 @@ def costcenter_monthly_data(request):
     s = BftStatus.current
     r = utils.CostCenterMonthlyReport(fy=s.fy(), period=s.period())
     df = r.dataframe()
+
+    for c in CostCenterMonthly._meta.get_fields():
+        if c.get_internal_type() == "DecimalField":
+            df[c.verbose_name] = df[c.verbose_name].astype(int)
+    df = df.style.format(thousands=",")
     return render(request, "costcenter-monthly-data.html", {"table": df.to_html()})
 
 
