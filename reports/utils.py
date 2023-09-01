@@ -110,6 +110,8 @@ class CostCenterMonthlyReport:
             monthly_df = pd.merge(monthly_df, alloc_df, how="left", on=["Cost Center", "Fund"])
         else:
             monthly_df["Allocation"] = 0
+        monthly_df["Allocation"].fillna(0, inplace=True)
+        monthly_df["Fund Center"].fillna("", inplace=True)
         return monthly_df
 
 
