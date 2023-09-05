@@ -3,7 +3,7 @@ from utils.dataframe import BFTDataFrame
 from bft.management.commands import populate, uploadcsv, monthlydata
 from reports.models import CostCenterMonthly
 from reports.utils import CostCenterMonthlyReport
-from costcenter.models import CostCenter, Fund
+from costcenter.models import CostCenter, FundCenter
 from lineitems.models import LineItem
 from django.db import models
 

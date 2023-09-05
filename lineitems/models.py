@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib import messages
 import logging
-from costcenter.models import CostCenter
+from costcenter.models import CostCenter, CostCenterManager
 from encumbrance.models import EncumbranceImport
 from django.forms.models import model_to_dict
 import pandas as pd
@@ -31,6 +31,7 @@ class LineItemManager(models.Manager):
             df = pd.DataFrame(data).rename(
                 columns={
                     "id": "lineitem_id",
+                    "costcenter_id": "Cost Center ID",
                     "balance": "Balance",
                     "workingplan": "Working Plan",
                     "fundcenter": "Fund Center",
@@ -56,13 +57,13 @@ class LineItemManager(models.Manager):
             return li_df
         if len(li_df) > 0:
             fcst_df = self.forecast_dataframe()
-            cc_df = CostCenter.objects.cost_center_dataframe()
+            cc_df = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
 
             if len(fcst_df) > 0:
                 li_df = pd.merge(li_df, fcst_df, how="left", on="lineitem_id")
             else:
                 li_df["Forecast"] = 0
-            li_df = pd.merge(li_df, cc_df, how="left", on="costcenter_id")
+            li_df = pd.merge(li_df, cc_df, how="left", on="Cost Center ID")
 
         return li_df
 

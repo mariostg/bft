@@ -25,6 +25,13 @@ class TestCostCenterManager:
         cc = CCM.get_sibblings("1111AB")
         assert 2 == len(CCM.cost_center_dataframe(cc))
 
+    def test_cost_center_dataframe_column_id(self):
+        hnd = populate.Command()
+        hnd.handle()
+
+        df = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
+        assert True == ("Cost Center ID" in df.columns)
+
     def test_allocation_dataframe_empty(self):
         r = CostCenterManager()
         assert True == r.allocation_dataframe().empty

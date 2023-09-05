@@ -209,7 +209,7 @@ class CostCenterScreeningReport(Report):
             [
                 "fundcenter_id",
                 "parent_id_x",
-                "costcenter_id",
+                "Cost Center ID",
                 "fund_id",
                 "source_id",
                 "parent_id_y",

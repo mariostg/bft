@@ -7,6 +7,7 @@ from django.conf import settings
 import pandas as pd
 from bft.conf import YEAR_CHOICES, QUARTERS
 from bft import exceptions
+from utils.dataframe import BFTDataFrame
 
 
 class FundManager(models.Manager):
@@ -144,6 +145,7 @@ class FundCenterManager(models.Manager):
             }
         )
         df["parent_id"] = df["parent_id"].fillna(0).astype("int")
+        # df = BFTDataFrame(FundCenter).build()
         return df
 
     def allocation(self, fundcenter: "FundCenter|str" = None, fund: str = None, fy: int = None, quarter: str = None):
@@ -515,7 +517,7 @@ class CostCenterManager(models.Manager):
             quarter=parent_alloc.quarter,
         )
 
-    def cost_center_dataframe(self, data: QuerySet = None) -> pd.DataFrame:
+    def cost_center_dataframe(self, data: QuerySet) -> pd.DataFrame:
         """Prepare a pandas dataframe of the cost centers as per financial structure.
         Columns are renamed with a more friendly name.
 
@@ -524,15 +526,10 @@ class CostCenterManager(models.Manager):
         """
         if not CostCenter.objects.exists():
             return pd.DataFrame()
-        if not data:
-            data = list(CostCenter.objects.all().values())
-        else:
-            data = list(data.values())
-        df = pd.DataFrame(data).rename(
+        df = BFTDataFrame(CostCenter).build(data)
+        df = pd.DataFrame(df).rename(
             columns={
-                "id": "costcenter_id",
-                "costcenter": "Cost Center",
-                "shortname": "Cost Center Name",
+                "ID": "Cost Center ID",
             }
         )
         return df
@@ -674,7 +671,7 @@ class Allocation(models.Model):
     fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     fy = models.PositiveSmallIntegerField("Fiscal Year", choices=YEAR_CHOICES, default=datetime.now().year)
-    quarter = models.TextField(max_length=2, choices=QUARTERS, default="Q0")
+    quarter = models.CharField(max_length=1, choices=QUARTERS, default="0")
     note = models.TextField(null=True, blank=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.RESTRICT)
     updated = models.DateTimeField(auto_now=True)
