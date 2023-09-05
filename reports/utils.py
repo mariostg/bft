@@ -91,7 +91,21 @@ class CostCenterMonthlyReport:
         """Create a pandas dataframe using CostCenterMonthly data as source for the given FY and period.
 
         Returns:
-            pandas.DataFrame: dataframe containing cost center monthly data.
+            pandas.DataFrame: dataframe containing cost center monthly data with the following columns :
+            "ID",
+            "Fund",
+            "Source",
+            "Cost Center",
+            "Fund Center",
+            "FY",
+            "Period",
+            "Spent",
+            "Commitment",
+            "Pre Commitment",
+            "Fund Reservation",
+            "Balance",
+            "Working Plan",
+            "Allocation"
         """
         monthly_df = BFTDataFrame(CostCenterMonthly)
         monthly_df = monthly_df.build(CostCenterMonthly.objects.filter(fy=self.fy, period=self.period))
