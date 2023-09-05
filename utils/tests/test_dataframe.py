@@ -40,9 +40,18 @@ class TestDataFrame:
         assert CostCenter.objects.all().count() == len(d.dataframe)
 
     def test_dataframe_fields_are_capitalized(self):
+        # Testing with 3 models, that should be more than enough.
         hnd = populate.Command()
         hnd.handle()
 
         d = BFTDataFrame(CostCenter)
+        for c in d.dataframe_fields:
+            assert d.dataframe_fields[c][0] == d.dataframe_fields[c][0].upper()
+
+        d = BFTDataFrame(FundCenter)
+        for c in d.dataframe_fields:
+            assert d.dataframe_fields[c][0] == d.dataframe_fields[c][0].upper()
+
+        d = BFTDataFrame(LineItem)
         for c in d.dataframe_fields:
             assert d.dataframe_fields[c][0] == d.dataframe_fields[c][0].upper()
