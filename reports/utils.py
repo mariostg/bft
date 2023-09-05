@@ -196,18 +196,18 @@ class CostCenterScreeningReport(Report):
         return df
 
     def financial_structure_dataframe(self) -> pd.DataFrame | None:
-        fc = FundCenter.objects.fund_center_dataframe()
-        cc = CostCenter.objects.cost_center_dataframe()
+        fc = FundCenterManager().fund_center_dataframe(FundCenter.objects.all())
+        cc = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
         if fc.empty or cc.empty:
             return None
-        merged = pd.merge(fc, cc, how="left", left_on=["fundcenter_id"], right_on=["parent_id"])
+        merged = pd.merge(fc, cc, how="left", left_on=["Fund Center ID"], right_on=["parent_id"])
+        print(merged)
         merged = merged.fillna("")
-        merged.set_index(
-            ["Sequence No", "Fund Center Name", "Fund Center", "Cost Center", "Cost Center Name"], inplace=True
-        )
+        # merged.set_index(["Sequence No", "Fund Center", "Cost Center", "Cost Center Name"], inplace=True)
+        merged.set_index(["Fund Center", "Cost Center"], inplace=True)
         merged.drop(
             [
-                "fundcenter_id",
+                "Fund Center ID",
                 "parent_id_x",
                 "Cost Center ID",
                 "fund_id",
@@ -217,7 +217,7 @@ class CostCenterScreeningReport(Report):
             axis=1,
             inplace=True,
         )
-        merged.sort_values(by=["Sequence No"], inplace=True)
+        # merged.sort_values(by=["Sequence No"], inplace=True)
 
         return merged
 

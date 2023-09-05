@@ -124,24 +124,19 @@ class FundCenterManager(models.Manager):
     def fund_center_exist(self, fc):
         return FundCenter.objects.filter(fundcenter=fc).exists()
 
-    def fund_center_dataframe(self) -> pd.DataFrame:
+    def fund_center_dataframe(self, data: QuerySet) -> pd.DataFrame:
         """Prepare a pandas dataframe of the fund centers as per financial structure.
         Columns are renamed with a more friendly name.
 
         Returns:
             pd.DataFrame: A dataframe of fund centers.
         """
-        _all = FundCenter.objects.all()
-        if not _all.exists():
-            return pd.DataFrame()
-        data = list(_all.values())
-        df = pd.DataFrame(data).rename(
+
+        df = BFTDataFrame(FundCenter).build(data)
+
+        df = df.rename(
             columns={
-                "id": "fundcenter_id",
-                "fundcenter": "Fund Center",
-                "shortname": "Fund Center Name",
-                "parent": "Parent",
-                "sequence": "Sequence No",
+                "ID": "Fund Center ID",
             }
         )
         df["parent_id"] = df["parent_id"].fillna(0).astype("int")
@@ -459,7 +454,7 @@ class FinancialStructureManager(models.Manager):
 
 class FundCenter(models.Model):
     fundcenter = models.CharField("Fund Center", max_length=6, unique=True)
-    shortname = models.CharField("Short Name", max_length=25, null=True, blank=True)
+    shortname = models.CharField("Fund Center Name", max_length=25, null=True, blank=True)
     sequence = models.CharField("Sequence No", max_length=25, unique=True, default="1")
     parent = models.ForeignKey(
         "self",
@@ -527,7 +522,7 @@ class CostCenterManager(models.Manager):
         if not CostCenter.objects.exists():
             return pd.DataFrame()
         df = BFTDataFrame(CostCenter).build(data)
-        df = pd.DataFrame(df).rename(
+        df = df.rename(
             columns={
                 "ID": "Cost Center ID",
             }
@@ -623,7 +618,7 @@ class CostCenterManager(models.Manager):
 
 class CostCenter(models.Model):
     costcenter = models.CharField("Cost Center", max_length=6, unique=True)
-    shortname = models.CharField("Short Name", max_length=35, blank=True, null=True)
+    shortname = models.CharField("Cost Center Name", max_length=35, blank=True, null=True)
     fund = models.ForeignKey(Fund, on_delete=models.RESTRICT, default="", verbose_name="Fund")
     source = models.ForeignKey(Source, on_delete=models.RESTRICT, default="", verbose_name="Source")
     isforecastable = models.BooleanField("Is Forecastable", default=False)
