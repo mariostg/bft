@@ -13,6 +13,7 @@ from costcenter.models import (
     FinancialStructureManager,
 )
 from reports.models import CostCenterMonthly
+from utils.dataframe import BFTDataFrame
 import pandas as pd
 from pandas.io.formats.style import Styler
 import numpy as np
@@ -92,16 +93,8 @@ class CostCenterMonthlyReport:
         Returns:
             pandas.DataFrame: dataframe containing cost center monthly data.
         """
-        fields = {}
-        for c in CostCenterMonthly._meta.get_fields():
-            fields[c.name] = c.verbose_name
-
-        monthly_df = pd.DataFrame(
-            list(CostCenterMonthly.objects.filter(fy=self.fy, period=self.period).values())
-        ).fillna(0)
-
-        for k in fields:
-            monthly_df.rename(columns={k: fields[k]}, inplace=True)
+        monthly_df = BFTDataFrame(CostCenterMonthly)
+        monthly_df = monthly_df.build(CostCenterMonthly.objects.filter(fy=self.fy, period=self.period))
 
         alloc_df = CostCenterManager().allocation_dataframe(fy=self.fy, quarter=P2Q[self.period])
         alloc_df.drop(["FY", "Quarter"], axis=1, inplace=True)
@@ -112,7 +105,23 @@ class CostCenterMonthlyReport:
             monthly_df["Allocation"] = 0
         monthly_df["Allocation"].fillna(0, inplace=True)
         monthly_df["Fund Center"].fillna("", inplace=True)
-        return monthly_df
+        columns = [
+            "ID",
+            "Fund",
+            "Source",
+            "Cost Center",
+            "Fund Center",
+            "FY",
+            "Period",
+            "Spent",
+            "Commitment",
+            "Pre Commitment",
+            "Fund Reservation",
+            "Balance",
+            "Working Plan",
+            "Allocation",
+        ]
+        return monthly_df[columns]
 
 
 class CostCenterScreeningReport(Report):

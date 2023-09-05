@@ -627,17 +627,14 @@ class CostCenterManager(models.Manager):
 class CostCenter(models.Model):
     costcenter = models.CharField("Cost Center", max_length=6, unique=True)
     shortname = models.CharField("Short Name", max_length=35, blank=True, null=True)
-    fund = models.ForeignKey(Fund, on_delete=models.RESTRICT, default="")
-    source = models.ForeignKey(Source, on_delete=models.RESTRICT, default="")
+    fund = models.ForeignKey(Fund, on_delete=models.RESTRICT, default="", verbose_name="Fund")
+    source = models.ForeignKey(Source, on_delete=models.RESTRICT, default="", verbose_name="Source")
     isforecastable = models.BooleanField("Is Forecastable", default=False)
     isupdatable = models.BooleanField("Is Updatable", default=False)
     note = models.TextField(null=True, blank=True)
     sequence = models.CharField("Sequence No", max_length=25, unique=True, default="")
     parent = models.ForeignKey(
-        FundCenter,
-        on_delete=models.RESTRICT,
-        default="0",
-        related_name="children",
+        FundCenter, on_delete=models.RESTRICT, default="0", related_name="children", verbose_name="Parent"
     )
 
     objects = CostCenterManager()
