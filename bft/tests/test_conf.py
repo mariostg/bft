@@ -8,7 +8,7 @@ class TestConf:
         q = QUARTERS
 
         assert 5 == len(q)
-        assert 0 == q[0][0]
+        assert "0" == q[0][0]
 
     def test_read_years(self):
         y = YEAR_CHOICES
