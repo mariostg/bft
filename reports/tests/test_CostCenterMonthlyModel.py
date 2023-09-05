@@ -17,9 +17,6 @@ class TestCostCenterMonthlyModel:
         "fund_reservation": 200,
         "balance": 5000,
         "working_plan": 4000,
-        "charges": -400,
-        "allocation": 1000,
-        "forecast": 6000,
     }
     duplicate = {
         "fund": "C113",
@@ -33,9 +30,6 @@ class TestCostCenterMonthlyModel:
         "fund_reservation": 200,
         "balance": 5000,
         "working_plan": 4000,
-        "charges": -400,
-        "allocation": 1000,
-        "forecast": 6000,
     }
 
     @pytest.fixture
