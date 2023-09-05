@@ -203,8 +203,9 @@ class CostCenterScreeningReport(Report):
         merged = pd.merge(fc, cc, how="left", left_on=["Fund Center ID"], right_on=["parent_id"])
         print(merged)
         merged = merged.fillna("")
-        # merged.set_index(["Sequence No", "Fund Center", "Cost Center", "Cost Center Name"], inplace=True)
-        merged.set_index(["Fund Center", "Cost Center"], inplace=True)
+        merged.set_index(
+            ["FC Sequence No", "Fund Center", "Fund Center Name", "Cost Center", "Cost Center Name"], inplace=True
+        )
         merged.drop(
             [
                 "Fund Center ID",
