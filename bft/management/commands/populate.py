@@ -4,9 +4,12 @@ from main.settings import BASE_DIR, DEBUG
 
 from costcenter.models import (
     Fund,
+    FundManager,
     Source,
     CostCenter,
     FundCenter,
+    FundCenterManager,
+    FundCenterAllocation,
     FinancialStructureManager,
     CostCenterAllocation,
 )
@@ -29,12 +32,14 @@ class Command(BaseCommand):
             FundCenter.objects.all().delete()
             BftStatus.objects.all().delete()
             CostCenterAllocation.objects.all().delete()
+            FundCenterAllocation.objects.all().delete()
             self.set_fund()
             self.set_source()
             self.set_fund_center()
             self.set_cost_center()
             self.set_bft_status()
             self.set_cost_center_allocation()
+            self.set_fund_center_allocation()
         else:
             print("This capability is only available when DEBUG is True")
 
@@ -167,13 +172,28 @@ class Command(BaseCommand):
         print(f"Set Quarter to {BftStatusManager().quarter()}")
         print(f"Set Period to {BftStatusManager().period()}")
 
+    def set_fund_center_allocation(self):
+        root_fundcenter = "1111AA"
+        fy = 2023
+        quarter = "1"
+
+        root_fc = FundCenterManager().fundcenter(root_fundcenter)
+        fund = FundManager().fund("C113")
+
+        a = FundCenterAllocation.objects.create(fundcenter=root_fc, amount=1000, fy=fy, quarter=quarter, fund=fund)
+        print("Created Allocation", a)
+        a = FundCenterAllocation.objects.create(
+            fundcenter=FundCenterManager().fundcenter("1111AC"), amount=500, fy=fy, quarter=quarter, fund=fund
+        )
+        print("Created Allocation", a)
+
     def set_cost_center_allocation(self):
         fund = Fund.objects.fund("C113")
+
         cc = CostCenter.objects.cost_center("8486B1")
-        a = CostCenterAllocation()
-        a.costcenter = cc
-        a.fund = fund
-        a.fy = 2023
-        a.quarter = "1"
-        a.amount = 1000
-        a.save()
+        a = CostCenterAllocation.objects.create(costcenter=cc, fund=fund, fy=2023, quarter="1", amount=1000)
+        print("Created Allocation", a)
+
+        cc = CostCenter.objects.cost_center("8486C2")
+        a = CostCenterAllocation.objects.create(costcenter=cc, fund=fund, fy=2023, quarter="1", amount=250)
+        print("Created Allocation", a)
