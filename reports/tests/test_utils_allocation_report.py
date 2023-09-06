@@ -77,7 +77,6 @@ class TestUtilsAllocationReport:
     def test_allocation_status_report(self, setup):
 
         r = AllocationReport()
-
         data = r.allocation_status_dataframe(self.root_fundcenter, self.fund, self.fy, self.quarter)
         assert pd.DataFrame == type(data)
         assert 4 == len(data)

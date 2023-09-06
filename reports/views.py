@@ -37,25 +37,22 @@ def allocation_status_report(request):
     context = {}
     table = None
 
-    fundcenter = FundCenterManager().get_request(request)
+    if len(request.GET):
+        try:
+            fundcenter = FundCenterManager().get_request(request)
+            fund = FundManager().get_request(request)
+            quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
+            fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        except (TypeError, ValueError) as error:
+            messages.warning(request, f"{error}, You have provided invalid request.")
 
-    fund = FundManager().get_request(request)
-
-    quarter = request.GET.get("quarter")
-    if quarter in ["0", "1", "2", "3", "4"]:
-        quarter = f"Q{quarter}"
-    if quarter in ["q0", "q1", "q2", "q3", "q4", "Q0", "Q1", "Q2", "Q3", "Q4"]:
-        quarter = quarter.upper()
-
-    fy = request.GET.get("fy")
-
-    if fundcenter and fund and fy and quarter:
-        query_terms.add(f"fundcenter={fundcenter}")
-        query_terms.add(f"fund={fund}")
-        query_terms.add(f"quarter={quarter}")
-        query_terms.add(f"fy={fy}")
-        if quarter not in ["Q0", "Q1", "Q2", "Q3", "Q4"]:
+        if quarter not in [0, 1, 2, 3, 4]:
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
+        if fundcenter and fund and fy:
+            query_terms.add(f"fundcenter={fundcenter}")
+            query_terms.add(f"fund={fund}")
+            query_terms.add(f"quarter={quarter}")
+            query_terms.add(f"fy={fy}")
 
     initial = {
         "fundcenter": fundcenter,
@@ -66,9 +63,11 @@ def allocation_status_report(request):
     if len(query_terms) > 0:
         query_string = "&".join(query_terms)
 
+    print("QUERY TERMS\n\n", query_terms)
+    print("INITIAL\n\n", initial)
     if query_string and (CostCenterAllocation.objects.exists() or FundCenterAllocation.objects.exists()):
         r = utils.AllocationReport()
-        df = r.allocation_status_dataframe(fundcenter, fund, fy, quarter)
+        df = r.allocation_status_dataframe(fundcenter, fund, fy, int(quarter))
         if not df.empty:
             df["Allocation"] = df["Allocation"].astype(int)
             df["FY"] = df["FY"].astype(str)
@@ -83,7 +82,6 @@ def allocation_status_report(request):
         "query_string": query_string,
         "table": table,
     }
-
     return render(request, "allocation-status-report.html", context)
 
 

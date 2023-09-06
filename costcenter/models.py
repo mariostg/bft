@@ -146,28 +146,28 @@ class FundCenterManager(models.Manager):
     def allocation(self, fundcenter: "FundCenter|str" = None, fund: str = None, fy: int = None, quarter: str = None):
         alloc = FundCenterAllocation.objects
         if fundcenter:
-            if type(fundcenter) == str:
+            if isinstance(fundcenter, str):
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
             alloc = alloc.filter(fundcenter=fundcenter)
         if fund:
             alloc = alloc.filter(fund=fund)
         if fy:
             alloc = alloc.filter(fy=fy)
-        if quarter:
+        if quarter in [0, 1, 2, 3, 4]:
             alloc = alloc.filter(quarter=quarter)
         return alloc
 
     def allocation_dataframe(
         self, fundcenter: "FundCenter|str" = None, fund: "Fund|str" = None, fy: int = None, quarter: str = None
     ) -> pd.DataFrame:
-        if type(fundcenter) == str:
+        if isinstance(fundcenter, str):
             try:
-                fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
+                fundcenter = FundCenter.objects.get(fundcenter=fundcenter.upper())
             except FundCenter.DoesNotExist:
                 return pd.DataFrame()
-        if type(fund) == str:
+        if isinstance(fund, str):
             try:
-                fund = Fund.objects.get(fund=fund)
+                fund = Fund.objects.get(fund=fund.upper())
             except Fund.DoesNotExist:
                 return pd.DataFrame()
         data = list(
@@ -190,7 +190,7 @@ class FundCenterManager(models.Manager):
         return df
 
     def get_direct_descendants(self, fundcenter: "FundCenter|str") -> list | None:
-        if type(fundcenter) == str:
+        if isinstance(fundcenter, str):
             try:
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter.upper())
             except FundCenter.DoesNotExist:
@@ -198,7 +198,7 @@ class FundCenterManager(models.Manager):
         return self.get_fund_centers(fundcenter) + self.get_cost_centers(fundcenter)
 
     def get_direct_descendants_dataframe(self, fundcenter: "FundCenter|str") -> list | None:
-        if type(fundcenter) == str:
+        if isinstance(fundcenter, str):
             try:
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter.upper())
             except FundCenter.DoesNotExist:
@@ -529,17 +529,21 @@ class CostCenterManager(models.Manager):
         )
         return df
 
-    def allocation(self, costcenter: "CostCenter|str" = None, fund: str = None, fy: int = None, quarter: str = None):
+    def allocation(
+        self, costcenter: "CostCenter|str" = None, fund: Fund | str = None, fy: int = None, quarter: int = None
+    ):
         alloc = CostCenterAllocation.objects
         if costcenter:
-            if type(costcenter) == str:
-                costcenter = CostCenter.objects.get(costcenter=costcenter)
+            if isinstance(costcenter, str):
+                costcenter = CostCenter.objects.get(costcenter=costcenter.upper())
             alloc = alloc.filter(costcenter=costcenter)
         if fund:
+            if isinstance(fund, str):
+                fund = Fund.objects.get(fund=fund.upper())
             alloc = alloc.filter(fund=fund)
         if fy:
             alloc = alloc.filter(fy=fy)
-        if quarter:
+        if quarter in [0, 1, 2, 3, 4]:
             alloc = alloc.filter(quarter=quarter)
         return alloc
 
@@ -556,17 +560,14 @@ class CostCenterManager(models.Manager):
         Returns:
             pd.DataFrame: A dataframe of cost center allocations.
         """
-        if type(costcenter) == str:
-            costcenter = CostCenter.objects.get(costcenter=costcenter)
-
-        if type(costcenter) == str:
+        if isinstance(costcenter, str):
             try:
-                costcenter = FundCenter.objects.get(costcenter=costcenter)
+                costcenter = CostCenter.objects.get(costcenter=costcenter.upper())
             except CostCenter.DoesNotExist:
                 return pd.DataFrame()
-        if type(fund) == str:
+        if isinstance(fund, str):
             try:
-                fund = Fund.objects.get(fund=fund)
+                fund = Fund.objects.get(fund=fund.upper())
             except Fund.DoesNotExist:
                 return pd.DataFrame()
 

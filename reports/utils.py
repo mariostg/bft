@@ -6,6 +6,7 @@ from costcenter.models import (
     CostCenter,
     CostCenterManager,
     CostCenterAllocation,
+    Fund,
     FundCenter,
     FundCenterManager,
     FundManager,
@@ -321,7 +322,7 @@ class AllocationReport(Report):
 
         return df_main
 
-    def fc_allocation_dataframe(self, df_main: pd.DataFrame, fund, fy, quarter) -> pd.DataFrame:
+    def fc_allocation_dataframe(self, df_main: pd.DataFrame, fund: Fund | str, fy: int, quarter: int) -> pd.DataFrame:
         fc = list(filter(None, df_main["Fund Center"].to_list()))
         alloc_fc = []
         df_alloc_fc = pd.DataFrame()
@@ -335,7 +336,7 @@ class AllocationReport(Report):
             df_alloc_fc["Cost Center"] = ""
         return df_alloc_fc
 
-    def cc_allocation_dataframe(self, df_main: pd.DataFrame, fund, fy, quarter) -> pd.DataFrame:
+    def cc_allocation_dataframe(self, df_main: pd.DataFrame, fund: Fund | str, fy: int, quarter: int) -> pd.DataFrame:
         cc = list(filter(None, df_main["Cost Center"].to_list()))
         alloc_cc = []
         df_alloc_cc = pd.DataFrame()
@@ -355,7 +356,6 @@ class AllocationReport(Report):
         fy: int = None,
         quarter: int = None,
     ) -> pd.DataFrame:
-
         df_main = self.family_dataframe(root_fundcenter, fund)
 
         # FC Allocations
@@ -393,5 +393,5 @@ class AllocationReport(Report):
         ]
         df_main.fillna("", inplace=True)
         df_main.set_index(["sequence", "Fund Center", "Cost Center", "Fund"], inplace=True)
-
+        print(df_main)
         return df_main
