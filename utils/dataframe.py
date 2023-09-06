@@ -14,7 +14,7 @@ class BFTDataFrame(pd.DataFrame):
         self.django_model = django_model
         self.dataframe_fields = {}
         self.concrete_fields = django_model._meta.concrete_fields
-
+        self.has_data = django_model.objects.exists()
         for c in self.concrete_fields:
             if c.name == c.verbose_name:
                 self.dataframe_fields[c.name] = c.name.capitalize()
@@ -34,6 +34,8 @@ class BFTDataFrame(pd.DataFrame):
                     print((f"Failed to change type for {c}"))
 
     def build(self, model_data: QuerySet = None, rename_columns=True, set_dtype=True) -> pd.DataFrame:
+        if not self.has_data:
+            return pd.DataFrame()
         if not model_data:
             model_data = self.django_model.objects.all()
         self.dataframe = pd.DataFrame(list(model_data.values()))

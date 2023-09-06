@@ -54,3 +54,9 @@ class TestCostCenterMonthlyReport:
         lines = []
         inserted = cm.insert_line_items(lines)
         assert 0 == inserted
+
+    def test_dataframe_model_empty(self):
+        r = CostCenterMonthlyReport(fy=2023, period=1)
+        df = r.dataframe()
+
+        assert True == df.empty

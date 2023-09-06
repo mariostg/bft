@@ -15,8 +15,7 @@ class TestDataFrame:
 
     def test_cost_center_model_fields(self):
         d = BFTDataFrame(CostCenter)
-        print(d.model_fields)
-        assert 0 < len(d.model_fields)
+        assert 0 < len(d.concrete_fields)
 
     def test_dataframe_with_queryset(self):
         hnd = populate.Command()
