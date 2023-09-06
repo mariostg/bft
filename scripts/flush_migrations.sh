@@ -1,37 +1,21 @@
-BASEDIR=`pwd`
-cd "$BASEDIR/.."
-BASEDIR=`pwd`
+find . -path "*/costcenter/migrations/*.py" -not -name "__init__.py" -delete -print
+find . -path "*/costcenter/migrations/*.pyc"  -delete -print
 
-#  cd '.allocations'
-#  find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
-#  find . -path "*/migrations/*.pyc"  -delete
-#  cd ../bft
-#  find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
-#  find . -path "*/migrations/*.pyc"  -delete
-#  cd ../dashboard
-#  find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
-#  find . -path "*/migrations/*.pyc"  -delete
-#  cd ../reports
-#  find . -path "*/migrations/*.py" -not -name "__init__.py" -delete
-#  find . -path "*/migrations/*.pyc"  -delete
+find . -path "*/bft/migrations/*.py" -not -name "__init__.py" -delete -print
+find . -path "*/bft/migrations/*.pyc"  -delete -print
 
-cd "${BASEDIR}/lineitems"
-find . -path "*/migrations/*.py" -not -name "__init__.py" -delete -print
-find . -path "*/migrations/*.pyc"  -delete -print
+find . -path "*/encumbrance/migrations/*.py" -not -name "__init__.py" -delete -print
+find . -path "*/encumbrance/migrations/*.pyc"  -delete -print
 
-cd "${BASEDIR}/encumbrance"
-find . -path "*/migrations/*.py" -not -name "__init__.py" -delete -print
-find . -path "*/migrations/*.pyc"  -delete -print
+find . -path "*/lineitems/migrations/*.py" -not -name "__init__.py" -delete -print
+find . -path "*/lineitems/migrations/*.pyc"  -delete -print
 
-cd "${BASEDIR}/costcenter"
-find . -path "*/migrations/*.py" -not -name "__init__.py" -delete -print
-find . -path "*/migrations/*.pyc" -delete -print
+find . -path "*/reports/migrations/*.py" -not -name "__init__.py" -delete -print
+find . -path "*/reports/migrations/*.pyc" -delete -print
 
-cd "$BASEDIR"
-echo `pwd`
 if [ -f "db.sqlite3" ]; then
-    rm -v "db.sqlite3"
+    mv "db.sqlite3" "db.sqlite3.bak"
 else
-    echo "No database file deletes"
+    echo "No database file"
 fi
 
