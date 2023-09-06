@@ -729,3 +729,14 @@ class FundCenterAllocation(Allocation):
 
     class Meta:
         verbose_name_plural = "Fund Center Allocations"
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "fund",
+                    "fundcenter",
+                    "quarter",
+                    "fy",
+                ),
+                name="unique_fund_center_allocation",
+            )
+        ]

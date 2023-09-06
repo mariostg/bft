@@ -208,6 +208,9 @@ def fundcenter_allocation_add(request):
             form.user = request.user
             form.save()
             return redirect("fundcenter-allocation-table")
+        else:
+            err = form.errors.get_json_data()["__all__"][0]["message"]
+            messages.warning(request, err)
     else:
         form = FundCenterAllocationForm
 
@@ -224,7 +227,9 @@ def fundcenter_allocation_update(request, pk):
             form.owner = request.user
             form.save()
             return redirect("fundcenter-allocation-table")
-
+        else:
+            err = form.errors.get_json_data()["__all__"][0]["message"]
+            messages.warning(request, err)
     return render(request, "costcenter/fundcenter-allocation-form.html", {"form": form})
 
 
@@ -333,7 +338,9 @@ def costcenter_allocation_update(request, pk):
             form.owner = request.user
             form.save()
             return redirect("costcenter-allocation-table")
-
+        else:
+            err = form.errors.get_json_data()["__all__"][0]["message"]
+            messages.warning(request, err)
     return render(request, "costcenter/costcenter-allocation-form.html", {"form": form})
 
 
