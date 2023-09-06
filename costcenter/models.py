@@ -673,6 +673,9 @@ class Allocation(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
 
+    class Meta:
+        abstract = True
+
     def __str__(self):
         return f"{self.fund} - {self.amount}"
 
@@ -705,6 +708,17 @@ class CostCenterAllocation(Allocation):
 
     class Meta:
         verbose_name_plural = "Cost Center Allocations"
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "fund",
+                    "costcenter",
+                    "quarter",
+                    "fy",
+                ),
+                name="unique_cost_center_allocation",
+            )
+        ]
 
 
 class FundCenterAllocation(Allocation):
