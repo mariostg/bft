@@ -26,24 +26,16 @@ class TestUtilsAllocationReport:
     def setup(self):
         hnd = populate.Command()
         hnd.handle()
-        root_fc = self.fcm.fundcenter(self.root_fundcenter)
-        cc = self.ccm.cost_center("8486C2")
-        _fund = FundManager().fund(self.fund)
-
-        FundCenterAllocation.objects.create(fundcenter=root_fc, amount=1000, fy=2023, quarter="1", fund=_fund)
-        FundCenterAllocation.objects.create(
-            fundcenter=self.fcm.fundcenter("1111AC"), amount=500, fy=2023, quarter="1", fund=_fund
-        )
-        CostCenterAllocation.objects.create(costcenter=cc, amount=250, fy=2023, quarter="1", fund=_fund)
 
     def test_we_have_fund_centers(self, setup):
         fc = self.fcm.fund_center_exist("2222BB")
         assert True == fc
 
-        d = CostCenterAllocation.objects.all()
-        assert len(d) > 0
-        d = FundCenterAllocation.objects.all()
-        assert len(d) > 0
+    def test_we_have_fund_fc_allocation(self, setup):
+        assert 2 == FundCenterAllocation.objects.count()
+
+    def test_we_have_fund_cc_allocation(self, setup):
+        assert 2 == CostCenterAllocation.objects.count()
 
     def test_family_list(self, setup):
         r = AllocationReport()
@@ -74,7 +66,7 @@ class TestUtilsAllocationReport:
         r = AllocationReport()
         family_df = r.family_dataframe()
         cc_allocation_df = r.cc_allocation_dataframe(family_df, self.fund, self.fy, self.quarter)
-        assert 1 == len(cc_allocation_df)
+        assert 2 == len(cc_allocation_df)
 
     def test_cc_allocation_dataframe_outside_quarter(self, setup):
         r = AllocationReport()
@@ -88,7 +80,7 @@ class TestUtilsAllocationReport:
 
         data = r.allocation_status_dataframe(self.root_fundcenter, self.fund, self.fy, self.quarter)
         assert pd.DataFrame == type(data)
-        assert 3 == len(data)
+        assert 4 == len(data)
 
     def test_allocation_status_report_outside_quarter(self, setup):
 
