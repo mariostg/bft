@@ -199,6 +199,7 @@ class CostCenterScreeningReport(Report):
         return df
 
     def financial_structure_dataframe(self) -> pd.DataFrame | None:
+        x = FundCenter.objects.all()
         fc = FundCenterManager().fund_center_dataframe(FundCenter.objects.all())
         cc = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
         if fc.empty or cc.empty:

@@ -59,7 +59,7 @@ class TestUtilsAllocationReport:
     def test_fc_allocation_dataframe_outside_quarter(self, setup):
         r = AllocationReport()
         family_df = r.family_dataframe()
-        fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, "Q3")
+        fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, 4)
         assert 0 == len(fc_allocation_df)
 
     def test_cc_allocation_dataframe(self, setup):
@@ -71,7 +71,7 @@ class TestUtilsAllocationReport:
     def test_cc_allocation_dataframe_outside_quarter(self, setup):
         r = AllocationReport()
         family_df = r.family_dataframe()
-        cc_allocation_df = r.cc_allocation_dataframe(family_df, self.fund, self.fy, "Q3")
+        cc_allocation_df = r.cc_allocation_dataframe(family_df, self.fund, self.fy, 4)
         assert 0 == len(cc_allocation_df)
 
     def test_allocation_status_report(self, setup):
@@ -85,6 +85,6 @@ class TestUtilsAllocationReport:
 
         r = AllocationReport()
 
-        data = r.allocation_status_dataframe(self.root_fundcenter, self.fund, self.fy, "Q3")
+        data = r.allocation_status_dataframe(self.root_fundcenter, self.fund, self.fy, 4)
         assert pd.DataFrame == type(data)
         assert 0 == len(data)

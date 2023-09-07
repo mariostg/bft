@@ -131,7 +131,8 @@ class FundCenterManager(models.Manager):
         Returns:
             pd.DataFrame: A dataframe of fund centers.
         """
-
+        if not data.count():
+            return pd.DataFrame()
         df = BFTDataFrame(FundCenter).build(data)
 
         df = df.rename(
