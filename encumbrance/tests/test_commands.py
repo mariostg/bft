@@ -2,7 +2,7 @@ from django.test import TestCase
 from io import StringIO
 from django.core.management import call_command
 from bft.management.commands.tables import Command
-import unittest
+from bft.management.commands import uploadcsv
 
 
 class TestCostCenterParentAnalysis(TestCase):
@@ -13,8 +13,9 @@ class TestCostCenterParentAnalysis(TestCase):
     @classmethod
     def setUpTestData(cls):
         print("Setting up")
+
         a = uploadcsv.Command()
-        a.handle()
+        a.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
 
     def test_is_true(self):
         self.assertTrue(True)

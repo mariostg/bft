@@ -64,7 +64,7 @@ class TestEncumbrance(TestCase):
         self.assertTrue(ok)
 
     def test_is_not_dnd_cost_center_report(self):
-        fname = os.path.join(self.path, "encumbrance_errors_in_file.txt")
+        fname = os.path.join(self.path, "encumbrance_errors.txt")
         er = Encumbrance(fname)
         ok = er.is_dnd_cost_center_report()
         self.assertFalse(ok)
