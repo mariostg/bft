@@ -1,8 +1,10 @@
 import pytest
-from django.test import TestCase
+
 from costcenter.models import (
     Fund,
+    FundManager,
     CostCenter,
+    CostCenterManager,
     Source,
     ForecastAdjustment,
     FundCenter,
@@ -12,12 +14,13 @@ from costcenter.models import (
 )
 from django.db import IntegrityError
 from django.db.models import RestrictedError
+from django.test import Client
 from bft.exceptions import (
     InvalidAllocationException,
     InvalidOptionException,
     InvalidFiscalYearException,
 )
-from bft.management.commands import populate
+from bft.management.commands import populate, uploadcsv
 
 FUND_C113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
 SOURCE_1 = {"source": "Kitchen"}
@@ -34,13 +37,14 @@ CC_1234FF = {
 }
 
 
-class FundModelTest(TestCase):
+@pytest.mark.django_db
+class TestFundModel:
     def test_string_representation(self):
         fund = Fund(fund="C113", name="NP Capital", vote=1)
-        self.assertEqual(str(fund), "C113 - NP Capital")
+        assert str(fund) == "C113 - NP Capital"
 
     def test_verbose_name_plural(self):
-        self.assertEqual(str(Fund._meta.verbose_name_plural), "Funds")
+        assert str(Fund._meta.verbose_name_plural) == "Funds"
 
     def test_can_save_and_retrieve_funds(self):
         first_fund = Fund()
@@ -60,8 +64,8 @@ class FundModelTest(TestCase):
         saved_funds = Fund.objects.all()
         first_saved_fund = saved_funds[0]
         second_saved_fund = saved_funds[1]
-        self.assertEqual("C113", first_saved_fund.fund)
-        self.assertEqual("X999", second_saved_fund.fund)
+        assert "C113" == first_saved_fund.fund
+        assert "X999" == second_saved_fund.fund
 
     def test_saved_fund_is_capitalized(self):
         f = Fund()
@@ -72,7 +76,7 @@ class FundModelTest(TestCase):
         f.save()
 
         saved = Fund.objects.get(pk=f.pk)
-        self.assertEqual("C113", saved.fund)
+        assert "C113" == saved.fund
 
     def test_fund_cannot_be_saved_twice(self):
         fund_1 = Fund()
@@ -87,7 +91,7 @@ class FundModelTest(TestCase):
         fund_2.name = "Not an interesting fund"
         fund_2.vote = "5"
         fund_2.download = False
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             fund_2.save()
 
     def test_can_save_POST_request(self):
@@ -97,11 +101,13 @@ class FundModelTest(TestCase):
             "vote": "1",
             "download": True,
         }
-        response = self.client.post("/fund/fund-add/", data=data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Fund.objects.count(), 1)
+
+        c = Client()
+        response = c.post("/fund/fund-add/", data=data)
+        assert response.status_code == 302
+        assert Fund.objects.count() == 1
         new_fund = Fund.objects.first()
-        self.assertEqual(new_fund.fund, "C113")
+        assert new_fund.fund == "C113"
 
     def test_can_delete_POST_request(self):
         data = {
@@ -112,8 +118,9 @@ class FundModelTest(TestCase):
         }
         fund = Fund.objects.create(**data)
 
-        response = self.client.post(f"/fund/fund-delete/{fund.id}")
-        self.assertEqual(response.status_code, 301)  # redirect to confirm page
+        c = Client()
+        response = c.post(f"/fund/fund-delete/{fund.id}")
+        assert response.status_code == 301  # redirect to confirm page
 
     def test_can_update_fund_column_values(self):
         f0 = Fund(**FUND_C113)
@@ -126,9 +133,9 @@ class FundModelTest(TestCase):
         f1.save()
 
         f2 = Fund.objects.filter(pk=f1.pk).first()
-        self.assertEqual("X999", f2.fund)
-        self.assertEqual("New Name", f2.name)
-        self.assertEqual("4", f2.vote)
+        assert "X999" == f2.fund
+        assert "New Name" == f2.name
+        assert "4" == f2.vote
 
     def test_can_delete_fund(self):
         f0 = Fund(**FUND_C113)
@@ -137,7 +144,7 @@ class FundModelTest(TestCase):
         f1 = Fund.objects.get(pk=f0.id)
         f1.delete()
 
-        self.assertEqual(0, Fund.objects.count())
+        assert 0 == Fund.objects.count()
 
     def test_delete_fund_with_cc_raises_restricted_error(self):
         fund = Fund(**FUND_C113)
@@ -152,17 +159,18 @@ class FundModelTest(TestCase):
         f0.parent = parent
         f0.save()
 
-        with self.assertRaises(RestrictedError):
+        with pytest.raises(RestrictedError):
             fund.delete()
 
 
-class SourceModelTest(TestCase):
+@pytest.mark.django_db
+class TestSourceModel:
     def test_string_representation(self):
         obj = Source(source="Bedroom")
-        self.assertEqual(str(obj), "Bedroom")
+        assert str(obj) == "Bedroom"
 
     def test_verbose_name_plural(self):
-        self.assertEqual(str(Source._meta.verbose_name_plural), "Sources")
+        assert str(Source._meta.verbose_name_plural) == "Sources"
 
     def test_can_save_and_retrieve_sources(self):
         first_source = Source()
@@ -176,15 +184,15 @@ class SourceModelTest(TestCase):
         saved_sources = Source.objects.all()
         first_saved_source = saved_sources[0]
         second_saved_source = saved_sources[1]
-        self.assertEqual("Primary", first_saved_source.source)
-        self.assertEqual("Secondary", second_saved_source.source)
+        assert "Primary" == first_saved_source.source
+        assert "Secondary" == second_saved_source.source
 
     def test_saved_source_is_capitalized(self):
         s = Source(source="my source")
         s.save()
 
         saved = Source.objects.get(pk=s.pk)
-        self.assertEqual("My source", saved.source)
+        assert "My source" == saved.source
 
     def test_source_cannot_be_saved_twice(self):
         Source.objects.all().delete()
@@ -196,16 +204,16 @@ class SourceModelTest(TestCase):
         source_2 = Source()
         source_2.source = "Primary"
 
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             source_2.save()
 
     def test_can_save_POST_request(self):
         data = {"source": "Ternaire"}
-        response = self.client.post("/source/source-add/", data=data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Source.objects.count(), 1)
+        response = Client().post("/source/source-add/", data=data)
+        assert response.status_code == 302
+        assert Source.objects.count() == 1
         new_source = Source.objects.first()
-        self.assertEqual(new_source.source, "Ternaire")
+        assert new_source.source == "Ternaire"
 
     def test_can_update_source_column_values(self):
         f0 = Source()
@@ -217,7 +225,7 @@ class SourceModelTest(TestCase):
         f1.save()
 
         f2 = Source.objects.filter(pk=f1.pk).first()
-        self.assertEqual("Secondary", f2.source)
+        assert "Secondary" == f2.source
 
     def test_delete_Source_with_cc_raises_restricted_error(self):
         fund = Fund(**FUND_C113)
@@ -232,19 +240,20 @@ class SourceModelTest(TestCase):
         f0.parent = parent
         f0.save()
 
-        with self.assertRaises(RestrictedError):
+        with pytest.raises(RestrictedError):
             source.delete()
 
 
-class FundCenterModelTest(TestCase):
+@pytest.mark.django_db
+class TestFundCenterModel:
     fc_1111AA = {"fundcenter": "1111aa", "shortname": "bedroom", "parent": None}
 
     def test_string_representation(self):
         obj = FundCenter(fundcenter="1234aa", shortname="abcdef", parent=None)
-        self.assertEqual("1234AA - ABCDEF", str(obj))
+        assert "1234AA - ABCDEF" == str(obj)
 
     def test_verbose_name_plural(self):
-        self.assertEqual("Fund Centers", str(FundCenter._meta.verbose_name_plural))
+        assert "Fund Centers" == str(FundCenter._meta.verbose_name_plural)
 
     def test_create_fund_center_on_empy_db(self):
         fc_1111AA = {"fundcenter": "1111aa", "shortname": "bedroom"}
@@ -268,7 +277,7 @@ class FundCenterModelTest(TestCase):
         pp.handle()
         st = FinancialStructureManager()
         st_data = st.FundCenters()
-        self.assertEqual(5, len(st_data))
+        assert 5 == len(st_data)
 
     def test_can_save_and_retrieve_fund_centers(self):
         first_fc = FundCenter()
@@ -280,7 +289,7 @@ class FundCenterModelTest(TestCase):
         first_fc.save()
 
         saved_fc = FundCenter.objects.get(pk=first_fc.pk)
-        self.assertEqual("1111AA", saved_fc.fundcenter)
+        assert "1111AA" == saved_fc.fundcenter
 
     def test_can_save_without_sequence_and_without_parent(self):
         fc = {"fundcenter": "1111aa", "shortname": "defgh"}
@@ -288,8 +297,8 @@ class FundCenterModelTest(TestCase):
         first_fc.save()
 
         saved_fc = FundCenter.objects.get(pk=first_fc.pk)
-        self.assertEqual("1111AA", saved_fc.fundcenter)
-        self.assertEqual("1", saved_fc.sequence)
+        assert "1111AA" == saved_fc.fundcenter
+        assert "1" == saved_fc.sequence
 
     def test_save_duplicate_root_sequence(self):
         fc = {"fundcenter": "1111aa", "shortname": "defgh"}
@@ -297,8 +306,8 @@ class FundCenterModelTest(TestCase):
         first_fc.save()
 
         saved_fc = FundCenter.objects.get(pk=first_fc.pk)
-        self.assertEqual("1111AA", saved_fc.fundcenter)
-        self.assertEqual("1", saved_fc.sequence)
+        assert "1111AA" == saved_fc.fundcenter
+        assert "1" == saved_fc.sequence
 
         fc = {"fundcenter": "1111ab", "shortname": "defgh"}
         second_fc = FundCenter(**fc)
@@ -314,7 +323,7 @@ class FundCenterModelTest(TestCase):
         first_fc.save()
 
         saved_fc = FundCenter.objects.get(pk=first_fc.pk)
-        self.assertEqual("1111AA", saved_fc.fundcenter)
+        assert "1111AA" == saved_fc.fundcenter
 
     def test_save_without_parent(self):
         first_fc = FundCenter()
@@ -325,7 +334,7 @@ class FundCenterModelTest(TestCase):
         first_fc.save()
 
         saved_fc = FundCenter.objects.get(pk=first_fc.pk)
-        self.assertEqual("1111AA", saved_fc.fundcenter)
+        assert "1111AA" == saved_fc.fundcenter
 
     def test_saved_fund_center_as_uppercase(self):
         first_fc = FundCenter()
@@ -337,17 +346,17 @@ class FundCenterModelTest(TestCase):
         first_fc.save()
 
         saved = FundCenter.objects.get(pk=first_fc.pk)
-        self.assertEqual("1111AA", saved.fundcenter)
-        self.assertEqual("DEFGTH", saved.shortname)
+        assert "1111AA" == saved.fundcenter
+        assert "DEFGTH" == saved.shortname
 
     def test_can_save_POST_request(self):
         data = {"fundcenter": "zzzz33", "shortname": "Kitchen FC", "parent": ""}
-        response = self.client.post("/fundcenter/fundcenter-add/", data=data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(FundCenter.objects.count(), 1)
+        response = Client().post("/fundcenter/fundcenter-add/", data=data)
+        assert response.status_code == 302
+        assert FundCenter.objects.count() == 1
         obj = FundCenter.objects.first()
-        self.assertEqual(obj.fundcenter, "ZZZZ33")
-        self.assertEqual(obj.shortname, "KITCHEN FC")
+        assert obj.fundcenter == "ZZZZ33"
+        assert obj.shortname == "KITCHEN FC"
 
     # TODO
     # def test_can_delete_POST_request():
@@ -362,7 +371,7 @@ class FundCenterModelTest(TestCase):
         f1.save()
 
         f2 = FundCenter.objects.get(pk=f1.pk)
-        self.assertEqual("0000FF", f2.fundcenter)
+        assert "0000FF" == f2.fundcenter
 
     def test_can_delete_fund_center(self):
         f0 = FundCenter(**self.fc_1111AA)
@@ -371,7 +380,7 @@ class FundCenterModelTest(TestCase):
         f1 = FundCenter.objects.get(pk=f0.id)
         f1.delete()
 
-        self.assertEqual(0, Fund.objects.count())
+        assert 0 == Fund.objects.count()
 
     def test_set_parent_to_itself_not_allowed(self):
         fc1 = FundCenter()
@@ -383,17 +392,17 @@ class FundCenterModelTest(TestCase):
         fc1.save()
 
         fc1.parent = fc1
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             fc1.save()
 
 
-class CostCenterModelTest(TestCase):
+class TestCostCenterModel:
     def test_string_representation(self):
         obj = CostCenter(**CC_1234FF)
-        self.assertEqual("1234FF - Food and drink", str(obj))
+        assert "1234FF - Food and drink" == str(obj)
 
     def test_verbose_name_plural(self):
-        self.assertEqual("Cost Centers", str(CostCenter._meta.verbose_name_plural))
+        assert "Cost Centers" == str(CostCenter._meta.verbose_name_plural)
 
     def test_can_save_and_retrieve_cost_centers(self):
         fund = Fund(**FUND_C113)
@@ -410,7 +419,7 @@ class CostCenterModelTest(TestCase):
         cc.save()
 
         saved_cc = CostCenter.objects.cost_center(cc.costcenter)
-        self.assertEqual(CC_1234FF["costcenter"].upper(), saved_cc.costcenter)
+        assert CC_1234FF["costcenter"].upper() == saved_cc.costcenter
 
     def test_saved_cost_center_as_uppercase(self):
         fund = Fund(**FUND_C113)
@@ -429,8 +438,8 @@ class CostCenterModelTest(TestCase):
         cc.save()
 
         saved = CostCenter.objects.cost_center(cc.costcenter)
-        self.assertEqual(cc.costcenter.upper(), saved.costcenter)
-        self.assertEqual(cc.shortname.upper(), saved.shortname)
+        assert cc.costcenter.upper() == saved.costcenter
+        assert cc.shortname.upper() == saved.shortname
 
     def test_can_save_POST_request(self):
         data = CC_1234FF.copy()
@@ -444,14 +453,11 @@ class CostCenterModelTest(TestCase):
         data["source"] = source.pk
         data["parent"] = parent.pk
         response = self.client.post("/costcenter/costcenter-add/", data=data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(CostCenter.objects.count(), 1)
+        assert response.status_code == 302
+        assert CostCenter.objects.count() == 1
         obj = CostCenter.objects.first()
-        self.assertEqual(CC_1234FF["costcenter"].upper(), obj.costcenter)
-        self.assertEqual(
-            CC_1234FF["shortname"].upper(),
-            obj.shortname,
-        )
+        assert CC_1234FF["costcenter"].upper() == obj.costcenter
+        assert CC_1234FF["shortname"].upper() == obj.shortname
 
     def test_can_update_cost_center_column_values(self):
         fund = Fund(**FUND_C113)
@@ -471,7 +477,7 @@ class CostCenterModelTest(TestCase):
         f1.save()
 
         f2 = CostCenter.objects.cost_center(f1.costcenter)
-        self.assertEqual(f1.shortname.upper(), f2.shortname)
+        assert f1.shortname.upper() == f2.shortname
 
     def test_can_delete_cost_center(self):
         fund = Fund(**FUND_C113)
@@ -489,7 +495,7 @@ class CostCenterModelTest(TestCase):
         f1 = CostCenter.objects.cost_center(f0.costcenter)
         f1.delete()
 
-        self.assertEqual(0, CostCenter.objects.count())
+        assert 0 == CostCenter.objects.count()
 
     def test_parent_cannot_be_cost_center(self):
         fund = Fund(**FUND_C113)
@@ -514,15 +520,15 @@ class CostCenterModelTest(TestCase):
             cc2.save()
 
 
-class ForecastAdjustmentModelTest(TestCase):
+class TestForecastAdjustmentModel:
     def test_string_representation(self):
         fund = Fund(fund="C113", name="NP", vote=1)
         cc = CostCenter(costcenter="8484WA", shortname="Kitchen", fund=fund)
         obj = ForecastAdjustment(costcenter=cc, fund=fund, amount=1000)
-        self.assertEqual(str(obj), "8484WA - Kitchen - C113 - NP - 1000")
+        assert str(obj) == "8484WA - Kitchen - C113 - NP - 1000"
 
     def test_verbose_name_plural(self):
-        self.assertEqual(str(ForecastAdjustment._meta.verbose_name_plural), "Forecast Adjustments")
+        assert str(ForecastAdjustment._meta.verbose_name_plural) == "Forecast Adjustments"
 
     def test_can_save_and_retreive_forecast_adjustment(self):
         fund = Fund(**FUND_C113)
@@ -546,46 +552,38 @@ class ForecastAdjustmentModelTest(TestCase):
         fa.save()
 
         f_saved = ForecastAdjustment.objects.get(pk=fa.pk)
-        self.assertEqual(fa.amount, f_saved.amount)
+        assert fa.amount == f_saved.amount
 
 
-class CostCenterAllocationTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        fund = Fund(**FUND_C113)
-        fund.save()
-        source = Source(**SOURCE_1)
-        source.save()
-        parent = FundCenter(**FC_1111AA)
-        parent.save()
-        cc = CostCenter(**CC_1234FF)
-        cc.fund = fund
-        cc.source = source
-        cc.parent = parent
-        cc.full_clean()
-        cc.save()
-        cls.data = {
-            "costcenter": cc,
-            "fund": fund,
-            "amount": 100,
-            "fy": 2024,
-            "quarter": "Q0",
-        }
+@pytest.mark.django_db
+class TestCostCenterAllocation:
+    @pytest.fixture
+    def setup(self):
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
 
-    def test_string_representation(self):
-        allocation = CostCenterAllocation(**self.data)
-        self.assertEqual(str(allocation), "1234FF - FOOD AND DRINK - C113 - National Procurement - 2024Q0 100")
+    def test_string_representation(self, setup):
+        cc = CostCenterManager().cost_center("8486c2")
+        fund = FundManager().fund("C113")
+        allocation = CostCenterAllocation.objects.get(costcenter=cc, fund=fund, fy=2023, quarter=1)
+        assert str(allocation) == "8486C2 - BASEMENT STUFF - C113 - National Procurement - 2023 Q1 250.00"
 
     def test_verbose_name_plural(self):
-        self.assertEqual(str(ForecastAdjustment._meta.verbose_name_plural), "Forecast Adjustments")
+        assert str(ForecastAdjustment._meta.verbose_name_plural) == "Forecast Adjustments"
 
     def test_save_and_retreive_allocation(self):
-        allocation = CostCenterAllocation(**self.data)
+        CostCenterAllocation.objects.all().delete()
+        cc = CostCenterManager().cost_center("8486c2")
+        fund = FundManager().fund("C523")
+
+        allocation = CostCenterAllocation(costcenter=cc, fund=fund, fy=2025, quarter=1, amount=100)
 
         allocation.save()
 
-        saved = CostCenterAllocation.objects.get(id=1)
-        self.assertEqual(100, saved.amount)
+        saved = CostCenterAllocation.objects.get(costcenter=cc, fund=fund, fy=2025, quarter=1)
+        assert 100 == saved.amount
 
     def test_save_with_invalid_quarter(self):
         self.data["quarter"] = "Q5"
@@ -614,7 +612,7 @@ class CostCenterAllocationTest(TestCase):
         self.data["fund"] = fund.id
         self.data["costcenter"] = cc.id
         response = self.client.post("/costcenter/costcenter-allocation-add/", data=self.data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(CostCenter.objects.count(), 1)
+        assert response.status_code == 302
+        assert CostCenter.objects.count() == 1
         obj = CostCenterAllocation.objects.first()
-        self.assertEqual(self.data["amount"], obj.amount)
+        assert self.data["amount"] == obj.amount
