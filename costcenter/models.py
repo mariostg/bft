@@ -700,7 +700,7 @@ class CostCenterAllocation(Allocation):
     costcenter = models.ForeignKey(CostCenter, on_delete=models.CASCADE, null=True, verbose_name="Cost Center")
 
     def __str__(self):
-        return f"{self.costcenter} - {self.fund} - {self.fy}{self.quarter} {self.amount}"
+        return f"{self.costcenter} - {self.fund} - {self.fy} Q{self.quarter} {self.amount}"
 
     def save(self, *args, **kwargs):
         if not self.costcenter:
