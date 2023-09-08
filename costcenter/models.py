@@ -681,7 +681,7 @@ class Allocation(models.Model):
         return f"{self.fund} - {self.amount}"
 
     def save(self, *args, **kwargs):
-        if self.quarter not in list(zip(*QUARTERS))[0]:
+        if str(self.quarter) not in list(zip(*QUARTERS))[0]:
             raise exceptions.InvalidOptionException(
                 f"Quarter {self.quarter} invalid.  Must be one of {','.join([x[0] for x in QUARTERS])}"
             )
