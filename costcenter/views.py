@@ -320,8 +320,12 @@ def costcenter_allocation_add(request):
             form.save()
             return redirect("costcenter-allocation-table")
         else:
-            err = form.errors.get_json_data()["__all__"][0]["message"]
-            messages.warning(request, err)
+            err = form.errors
+            try:
+                warning = err.get_json_data()["__all__"][0]["message"]
+                messages.warning(request, warning)
+            except:
+                pass
     else:
         form = CostCenterAllocationForm
 
