@@ -6,14 +6,13 @@ from costcenter.forms import FundForm
 class FundFormTest(TestCase):
     def test_empty_form(self):
         form = FundForm()
-        self.assertIn("fund", form.fields)
-        self.assertIn("name", form.fields)
-        self.assertIn("vote", form.fields)
-        self.assertIn("download", form.fields)
-
+        assert "fund" in form.fields
+        assert "name" in form.fields
+        assert "vote" in form.fields
+        assert "download" in form.fields
         # test just one rendered field
         self.assertInHTML(
-            '<input type="text" name="fund" maxlength="4" required id="id_fund">',
+            '<input class="input" type="text" name="fund" maxlength="4" required="" id="id_fund">',
             str(form),
         )
 

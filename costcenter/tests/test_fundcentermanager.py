@@ -2,6 +2,7 @@ import pytest
 from costcenter.models import FundCenter, FundCenterManager, FundCenterAllocation, Fund
 from bft.management.commands import populate
 import numpy as np
+from django.db.models import QuerySet
 
 
 @pytest.mark.django_db
@@ -39,17 +40,20 @@ class TestFundCenterManager:
 
     def test_fund_center_dataframe_empty(self):
         r = FundCenter
-        assert 0 == len(r.objects.fund_center_dataframe())
+        assert 0 == len(r.objects.fund_center_dataframe(r.objects))
 
     # Fund Center Tests
     def test_fund_center_dataframe(self):
         hnd = populate.Command()
         hnd.handle()
-
-        r = FundCenter.objects.fund_center_dataframe()
+        fc = FundCenter
+        r = FundCenter.objects.fund_center_dataframe(fc.objects)
 
         columns = np.array(r.columns)
-        expected_columns = np.array(["fundcenter_id", "Fund Center", "Fund Center Name", "Sequence No", "parent_id"])
+        print(columns)
+        expected_columns = np.array(
+            ["Fund Center ID", "Fund Center", "Fund Center Name", "FC Sequence No", "parent_id"]
+        )
 
         match = (columns == expected_columns).all()
         assert True == match
@@ -61,7 +65,7 @@ class TestFundCenterManager:
         FCM = FundCenterManager()
         fc = FCM.fundcenter(fundcenter="1111aa")
         fund = Fund.objects.get(fund="C113")
-        alloc = {"fundcenter": fc, "fund": fund, "fy": 2023, "quarter": "Q0", "amount": 1000}
+        alloc = {"fundcenter": fc, "fund": fund, "fy": 2023, "quarter": 0, "amount": 1000}
         FCA = FundCenterAllocation(**alloc)
         FCA.save()
 
@@ -75,7 +79,7 @@ class TestFundCenterManager:
         FCM = FundCenterManager()
         fc = FCM.fundcenter(fundcenter="1111aa")
         fund = Fund.objects.get(fund="C113")
-        alloc = {"fundcenter": fc, "fund": fund, "fy": 2023, "quarter": "Q0", "amount": 1000}
+        alloc = {"fundcenter": fc, "fund": fund, "fy": 2023, "quarter": 0, "amount": 1000}
         FCA = FundCenterAllocation(**alloc)
         FCA.save()
 
