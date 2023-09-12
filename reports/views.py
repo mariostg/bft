@@ -41,12 +41,16 @@ def allocation_status_report(request):
     Returns:
         HttpResponse: Content to display the Allocation Status Report
     """
+
     fundcenter = fund = fy = quarter = ""
     query_string = None  # Keep query_string in case paginator is required when more data is used.
     query_terms = set()  # Concatenation will produce query string
     context = {}  # Dict sent to the template
     table = None  # dataframe html formatted to include in context
-
+    form_filter = True
+    if not len(request.GET) and not CostCenterAllocation.objects.exists() and not FundCenterAllocation.objects.exists():
+        messages.warning(request, "There are no allocation to report")
+        form_filter = False
     if len(request.GET):
         try:
             fundcenter = FundCenterManager().get_request(request)
@@ -86,6 +90,7 @@ def allocation_status_report(request):
     form = SearchAllocationAnalysisForm(initial=initial)
     context = {
         "form": form,
+        "form_filter": form_filter,
         "initial": initial,
         "query_string": query_string,
         "table": table,
