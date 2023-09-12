@@ -31,11 +31,20 @@ def bmt_screening_report(request):
 
 
 def allocation_status_report(request):
+    """This function relies on provision of fundcenter, fund, fy, quarter which are extracted from GET request.  If not
+    part of GET request, exception will be raised and displayed as a message to the user.
+
+    Args:
+        request (HtpRequest): _description_
+
+    Returns:
+        HttpResponse: Content to display the Allocation Status Report
+    """
     fundcenter = fund = fy = quarter = ""
     query_string = None  # Keep query_string in case paginator is required when more data is used.
-    query_terms = set()
-    context = {}
-    table = None
+    query_terms = set()  # Concatenation will produce query string
+    context = {}  # Dict sent to the template
+    table = None  # dataframe html formatted to include in context
 
     if len(request.GET):
         try:
@@ -63,8 +72,6 @@ def allocation_status_report(request):
     if len(query_terms) > 0:
         query_string = "&".join(query_terms)
 
-    print("QUERY TERMS\n\n", query_terms)
-    print("INITIAL\n\n", initial)
     if query_string and (CostCenterAllocation.objects.exists() or FundCenterAllocation.objects.exists()):
         r = utils.AllocationReport()
         df = r.allocation_status_dataframe(fundcenter, fund, fy, int(quarter))
