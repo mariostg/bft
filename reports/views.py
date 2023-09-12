@@ -75,7 +75,7 @@ def allocation_status_report(request):
             # df = r.styler_clean_table(df)
             table = df.to_html()
 
-    form = form = SearchAllocationAnalysisForm(initial=initial)
+    form = SearchAllocationAnalysisForm(initial=initial)
     context = {
         "form": form,
         "initial": initial,
