@@ -5,7 +5,7 @@ from django.db import models, IntegrityError
 from django.db.models import QuerySet
 from django.conf import settings
 import pandas as pd
-from bft.conf import YEAR_CHOICES, QUARTERS
+from bft.conf import YEAR_CHOICES, QUARTERS, QUARTERKEYS
 from bft import exceptions
 from utils.dataframe import BFTDataFrame
 
@@ -154,7 +154,7 @@ class FundCenterManager(models.Manager):
             alloc = alloc.filter(fund=fund)
         if fy:
             alloc = alloc.filter(fy=fy)
-        if quarter in [0, 1, 2, 3, 4]:
+        if str(quarter) in QUARTERKEYS:
             alloc = alloc.filter(quarter=quarter)
         return alloc
 
@@ -544,7 +544,7 @@ class CostCenterManager(models.Manager):
             alloc = alloc.filter(fund=fund)
         if fy:
             alloc = alloc.filter(fy=fy)
-        if quarter in [0, 1, 2, 3, 4]:
+        if str(quarter) in QUARTERKEYS:
             alloc = alloc.filter(quarter=quarter)
         return alloc
 

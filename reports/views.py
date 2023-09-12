@@ -13,6 +13,7 @@ from costcenter.models import CostCenterAllocation, FundManager, FundCenterAlloc
 from reports.forms import SearchAllocationAnalysisForm
 from reports.models import CostCenterMonthly
 from bft.models import BftStatus
+from bft.conf import QUARTERKEYS
 
 
 def bmt_screening_report(request):
@@ -55,7 +56,7 @@ def allocation_status_report(request):
         except (TypeError, ValueError) as error:
             messages.warning(request, f"{error}, You have provided invalid request.")
 
-        if quarter not in [0, 1, 2, 3, 4]:
+        if str(quarter) not in QUARTERKEYS:
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
         if fundcenter and fund and fy:
             query_terms.add(f"fundcenter={fundcenter}")

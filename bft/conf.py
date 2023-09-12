@@ -10,13 +10,9 @@ last = current + 4
 for r in range(first, last):
     YEAR_CHOICES.append((r, str(r)))
 
-QUARTERS = [
-    ("0", "Q0"),
-    ("1", "Q1"),
-    ("2", "Q2"),
-    ("3", "Q3"),
-    ("4", "Q4"),
-]
+QUARTERKEYS = ("0", "1", "2", "3", "4")
+QUARTERVALUES = ("Q0", "Q1", "Q2", "Q3", "Q4")
+QUARTERS = list(zip(QUARTERKEYS, QUARTERVALUES))
 
 PERIODS = [
     ("1", "P1"),
