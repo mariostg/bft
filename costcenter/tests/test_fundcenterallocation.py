@@ -32,17 +32,20 @@ class TestFundCenterAllocation:
         CostCenterAllocation.objects.all().delete()
         fc = FundCenterManager().fundcenter("1111AB")
         fund = FundManager().fund("C113")
-        fc_alloc = FundCenterAllocation.objects.create(fundcenter=fc, amount=1000, fy=2023, quarter="1", fund=self.C113)
+        fy = 2023
+        quarter = 1
+        fc_alloc = FundCenterAllocation.objects.create(
+            fundcenter=fc, amount=1000, fy=fy, quarter=quarter, fund=self.C113
+        )
         assert "1111AB" == fc_alloc.fundcenter.fundcenter
 
         cc = CostCenterManager().cost_center(costcenter="8486C1")
-        CostCenterAllocation.objects.create(costcenter=cc, amount=1000, fy=2023, quarter="1", fund=self.C113)
+        CostCenterAllocation.objects.create(costcenter=cc, amount=1000, fy=fy, quarter=quarter, fund=self.C113)
 
         cc = CostCenterManager().cost_center(costcenter="8486C2")
-        CostCenterAllocation.objects.create(costcenter=cc, amount=2000, fy=2023, quarter="1", fund=self.C113)
+        CostCenterAllocation.objects.create(costcenter=cc, amount=2000, fy=fy, quarter=quarter, fund=self.C113)
 
-        fc_alloc = FundCenterAllocation(fundcenter=fc, fund=fund, fy=2023, quarter=1)
-        sub_alloc = CostCenterManager().get_sub_alloc(fc_alloc)
+        sub_alloc = CostCenterManager().get_sub_alloc(fc, fund, fy, quarter)
         assert 2 == sub_alloc.count()
 
     def test_get_fundcenter_subordinate_allocation(self, setup):

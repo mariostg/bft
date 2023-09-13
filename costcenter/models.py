@@ -504,13 +504,17 @@ class CostCenterManager(models.Manager):
             return None
         return cc
 
-    def get_sub_alloc(self, parent_alloc: "FundCenterAllocation") -> "CostCenterAllocation":
-        cc = FinancialStructureManager().get_fund_center_cost_centers(parent_alloc.fundcenter)
+    def get_sub_alloc(self, fc: FundCenter | str, fund: Fund | str, fy: int, quarter: int) -> "CostCenterAllocation":
+        if isinstance(fc, str):
+            fc = FundCenterManager().fundcenter(fc)
+        if isinstance(fund, str):
+            fund = FundManager().fund(fund)
+        cc = FinancialStructureManager().get_fund_center_cost_centers(fc)
         return CostCenterAllocation.objects.filter(
             costcenter__in=cc,
-            fy=parent_alloc.fy,
-            fund=parent_alloc.fund,
-            quarter=parent_alloc.quarter,
+            fy=fy,
+            fund=fund,
+            quarter=quarter,
         )
 
     def cost_center_dataframe(self, data: QuerySet) -> pd.DataFrame:
