@@ -57,7 +57,7 @@ class TestFundCenterManager:
         match = (columns == expected_columns).all()
         assert True == match
 
-    def test_fund_center_allocation(self):
+    def test_fund_center_manager_allocation(self):
         hnd = populate.Command()
         hnd.handle()
 
@@ -70,6 +70,17 @@ class TestFundCenterManager:
 
         test_alloc = FCM.allocation(fundcenter="1111AA").first()
         assert alloc["amount"] == test_alloc.amount
+
+    def test_fund_center_manager_without_allocation(self):
+        hnd = populate.Command()
+        hnd.handle()
+        FundCenterAllocation.objects.all().delete()
+        assert False == FundCenterAllocation.objects.exists()
+
+        FCM = FundCenterManager()
+        test_alloc = FCM.allocation(fundcenter="1111AA")
+        assert True == isinstance(test_alloc, FundCenterAllocation)
+        assert 0 == test_alloc.amount
 
     def test_fund_center_allocation_dataframe(self):
         hnd = populate.Command()

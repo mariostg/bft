@@ -144,19 +144,45 @@ class FundCenterManager(models.Manager):
         # df = BFTDataFrame(FundCenter).build()
         return df
 
-    def allocation(self, fundcenter: "FundCenter|str" = None, fund: str = None, fy: int = None, quarter: str = None):
+    def allocation(
+        self,
+        fundcenter: "FundCenter|str" = None,
+        fund: str = None,
+        fy: int = None,
+        quarter: str = None,
+    ) -> "QuerySet | FundCenterAllocation":
+        """This function retreive fund center allocation based on provided parameters.
+
+        Args:
+            fundcenter (FundCenter|str, optional): Fund Center of interest. Defaults to None.
+            fund (str, optional): Fund of allocation. Defaults to None.
+            fy (int, optional): Fiscal Year of interest. Defaults to None.
+            quarter (str, optional): Quarter of interest. Defaults to None.
+
+        Returns:
+            QuerySet | FundCenterAllocation: If only one element is retreived, a FundCenterAllocation will be returned.  If more than one element is retreived, a QuerySet will be returned.  If not allocation is retreived, a FundCenterAllocation object will be returned and will contains the applicable parameters passed and an allocation of 0.
+        """
         alloc = FundCenterAllocation.objects
         if fundcenter:
             if isinstance(fundcenter, str):
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
             alloc = alloc.filter(fundcenter=fundcenter)
         if fund:
+            if isinstance(fund, str):
+                fund = FundManager().fund(fund)
             alloc = alloc.filter(fund=fund)
         if fy:
             alloc = alloc.filter(fy=fy)
         if str(quarter) in QUARTERKEYS:
             alloc = alloc.filter(quarter=quarter)
-        return alloc
+
+        rows = alloc.count()
+        if not rows:
+            return FundCenterAllocation(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter, amount=0)
+        elif rows == 1:
+            return alloc[0]
+        else:
+            return alloc
 
     def allocation_dataframe(
         self, fundcenter: "FundCenter|str" = None, fund: "Fund|str" = None, fy: int = None, quarter: str = None
