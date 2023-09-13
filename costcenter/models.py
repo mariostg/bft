@@ -147,7 +147,7 @@ class FundCenterManager(models.Manager):
     def allocation(
         self,
         fundcenter: "FundCenter|str" = None,
-        fund: str = None,
+        fund: Fund | str = None,
         fy: int = None,
         quarter: str = None,
     ) -> "QuerySet | FundCenterAllocation":
