@@ -7,6 +7,14 @@ import pandas as pd
 @pytest.mark.django_db
 class TestCostCenterManager:
     # Cost Center Tests
+    def test_cost_center_allocation_without_parameters(self):
+        hnd = populate.Command()
+        hnd.handle()
+
+        CCM = CostCenterManager()
+        a = CCM.allocation()
+        assert 2 == len(a)
+
     def test_cost_center_allocation_at_quarter_0(self):
         hnd = populate.Command()
         hnd.handle()

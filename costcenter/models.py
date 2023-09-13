@@ -531,9 +531,24 @@ class CostCenterManager(models.Manager):
         return df
 
     def allocation(
-        self, costcenter: "CostCenter|str" = None, fund: Fund | str = None, fy: int = None, quarter: int = None
-    ):
-        alloc = CostCenterAllocation.objects
+        self,
+        costcenter: "CostCenter|str" = None,
+        fund: Fund | str = None,
+        fy: int = None,
+        quarter: int = None,
+    ) -> QuerySet:
+        """This method returns a cost center allocation queryset based on the specified query parameters.
+
+        Args:
+            costcenter (CostCenter|str, optional): A Cost Center that exist in the system. Defaults to None.
+            fund (Fund | str, optional): Fund assigned to the allocation. Defaults to None.
+            fy (int, optional): Fiscal year applicable to the allocation. Defaults to None.
+            quarter (int, optional): Quarter applicable to the allocation. Defaults to None.
+
+        Returns:
+            QuerySet: A queryset of one or more cost center allocations.
+        """
+        alloc = CostCenterAllocation.objects.all()
         if costcenter:
             if isinstance(costcenter, str):
                 costcenter = CostCenter.objects.get(costcenter=costcenter.upper())
