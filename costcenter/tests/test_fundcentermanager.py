@@ -47,10 +47,9 @@ class TestFundCenterManager:
         hnd = populate.Command()
         hnd.handle()
         fc = FundCenter
-        r = FundCenter.objects.fund_center_dataframe(fc.objects)
+        r = FundCenterManager().fund_center_dataframe(fc.objects.all())
 
         columns = np.array(r.columns)
-        print(columns)
         expected_columns = np.array(
             ["Fund Center ID", "Fund Center", "Fund Center Name", "FC Sequence No", "parent_id"]
         )
