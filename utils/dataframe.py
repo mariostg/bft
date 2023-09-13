@@ -2,6 +2,7 @@ import pandas as pd
 
 from django.db.models import QuerySet
 from django.db import models
+from bft.exceptions import BFTDataFrameExceptionError
 
 
 class BFTDataFrame(pd.DataFrame):
@@ -34,6 +35,8 @@ class BFTDataFrame(pd.DataFrame):
                     print((f"Failed to change type for {c}"))
 
     def build(self, model_data: QuerySet = None, rename_columns=True, set_dtype=True) -> pd.DataFrame:
+        if model_data and not isinstance(model_data, QuerySet):
+            raise BFTDataFrameExceptionError("Exception raised in build method")
         if not self.has_data:
             return pd.DataFrame()
         if not model_data:

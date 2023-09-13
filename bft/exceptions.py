@@ -51,3 +51,7 @@ class ParentDoesNotExistError(Exception):
 
     def __str__(self):
         return self.message
+
+
+class BFTDataFrameExceptionError(Exception):
+    pass
