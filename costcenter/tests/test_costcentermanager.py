@@ -49,14 +49,13 @@ class TestCostCenterManager:
 
         CCM = CostCenterManager()
         cc = CCM.get_sibblings("1111AB")
-        assert 2 == len(CCM.cost_center_dataframe(cc))
-
-    def test_cost_center_dataframe_column_id(self):
-        hnd = populate.Command()
-        hnd.handle()
-
-        df = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
-        assert True == ("Cost Center ID" in df.columns)
+        cc_df = CCM.cost_center_dataframe(cc)
+        print(cc_df)
+        assert "Costcenter_ID" in cc_df.columns
+        assert "Cost Center" in cc_df.columns
+        assert "Fund Center" in cc_df.columns
+        assert "Cost Center Name" in cc_df.columns
+        assert 2 == len(cc_df)
 
     def test_allocation_dataframe_empty(self):
         r = CostCenterManager()
@@ -65,8 +64,9 @@ class TestCostCenterManager:
     def test_allocation_dataframe(self):
         hnd = populate.Command()
         hnd.handle()
-        r = CostCenterManager()
-        assert 1 == len(r.allocation_dataframe(costcenter="8486B1"))
+        df = CostCenterManager().allocation_dataframe(costcenter="8486B1")
+        assert 1 == len(df)
+        assert "Allocation" in df.columns
 
     def test_allocation_dataframe_columns(self):
         hnd = populate.Command()
@@ -97,4 +97,6 @@ class TestCostCenterManager:
         costcenter = CostCenterManager().cost_center("8486b1")
         ForecastAdjustment(fund=fund, costcenter=costcenter, amount=1000).save()
 
-        assert 1 == len(CostCenterManager().forecast_adjustment_dataframe())
+        df = CostCenterManager().forecast_adjustment_dataframe()
+        assert 1 == len(df)
+        assert "Forecast Adjustment" in df.columns

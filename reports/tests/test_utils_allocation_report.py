@@ -20,7 +20,7 @@ class TestUtilsAllocationReport:
     root_fundcenter = "1111AA"
     fund = "C113"
     fy = 2023
-    quarter = "1"
+    quarter = 1
 
     @pytest.fixture
     def setup(self):
@@ -60,7 +60,7 @@ class TestUtilsAllocationReport:
         r = AllocationReport()
         family_df = r.family_dataframe()
         fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, 4)
-        assert 0 == len(fc_allocation_df)
+        assert True == fc_allocation_df.empty
 
     def test_cc_allocation_dataframe(self, setup):
         r = AllocationReport()

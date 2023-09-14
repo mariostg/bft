@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db import models, IntegrityError
 from django.db.models import QuerySet
 from django.conf import settings
+from django.forms.models import model_to_dict
 import pandas as pd
 from bft.conf import YEAR_CHOICES, QUARTERS, QUARTERKEYS
 from bft import exceptions
@@ -135,13 +136,7 @@ class FundCenterManager(models.Manager):
             return pd.DataFrame()
         df = BFTDataFrame(FundCenter).build(data)
 
-        df = df.rename(
-            columns={
-                "ID": "Fund Center ID",
-            }
-        )
-        df["parent_id"] = df["parent_id"].fillna(0).astype("int")
-        # df = BFTDataFrame(FundCenter).build()
+        df["Parent_ID"] = df["Parent_ID"].fillna(0).astype("int")
         return df
 
     def allocation(
@@ -150,6 +145,7 @@ class FundCenterManager(models.Manager):
         fund: Fund | str = None,
         fy: int = None,
         quarter: str = None,
+        columns: list = None,
     ) -> "QuerySet | FundCenterAllocation":
         """This function retreive fund center allocation based on provided parameters.
 
@@ -158,11 +154,15 @@ class FundCenterManager(models.Manager):
             fund (str, optional): Fund of allocation. Defaults to None.
             fy (int, optional): Fiscal Year of interest. Defaults to None.
             quarter (str, optional): Quarter of interest. Defaults to None.
+            columns (list, optional): List of columns names to include in the results.  Column must be valid field names from the model.
 
         Returns:
             QuerySet | FundCenterAllocation: If only one element is retreived, a FundCenterAllocation will be returned.  If more than one element is retreived, a QuerySet will be returned.  If not allocation is retreived, a FundCenterAllocation object will be returned and will contains the applicable parameters passed and an allocation of 0.
         """
-        alloc = FundCenterAllocation.objects
+        if columns:
+            alloc = FundCenterAllocation.objects.all().values(*columns)
+        else:
+            alloc = FundCenterAllocation.objects.all()
         if fundcenter:
             if isinstance(fundcenter, str):
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
@@ -197,23 +197,22 @@ class FundCenterManager(models.Manager):
                 fund = Fund.objects.get(fund=fund.upper())
             except Fund.DoesNotExist:
                 return pd.DataFrame()
-        data = list(
-            self.allocation(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter).values(
-                "fundcenter__fundcenter",
-                "fund__fund",
-                "amount",
-                "fy",
-                "quarter",
-            )
-        )
-        columns = {
+        columns = ["fundcenter__fundcenter", "fund__fund", "amount", "fy", "quarter"]
+        data = self.allocation(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter, columns=columns)
+        rename_columns = {
             "amount": "Allocation",
             "fy": "FY",
             "quarter": "Quarter",
             "fundcenter__fundcenter": "Fund Center",
             "fund__fund": "Fund",
         }
-        df = pd.DataFrame(data).rename(columns=columns)
+        try:
+            df = pd.DataFrame(data).rename(columns=rename_columns)
+        except ValueError:
+            if not isinstance(data, dict):
+                data = model_to_dict(data)
+            df = pd.DataFrame([data]).rename(columns=rename_columns)
+
         return df
 
     def get_direct_descendants(self, fundcenter: "FundCenter|str") -> list | None:
@@ -553,11 +552,9 @@ class CostCenterManager(models.Manager):
         if not CostCenter.objects.exists():
             return pd.DataFrame()
         df = BFTDataFrame(CostCenter).build(data)
-        df = df.rename(
-            columns={
-                "ID": "Cost Center ID",
-            }
-        )
+        fc_df = BFTDataFrame(FundCenter).build(FundCenter.objects.all())
+        print(fc_df)
+        df = pd.merge(df, fc_df, how="left", left_on="Parent_ID", right_on="Fundcenter_ID")
         return df
 
     def allocation(
@@ -601,7 +598,7 @@ class CostCenterManager(models.Manager):
         quarter: str = None,
     ) -> pd.DataFrame:
         """Prepare a pandas dataframe of the cost center allocations for the given FY and Quarter.
-        Columns are renamed with a more friendly name.
+        Columns are renamed with a more friendly name. Column names are : Fund Center, Cost Center, Fund, Allocation, FY, and Quarter.
 
         Returns:
             pd.DataFrame: A dataframe of cost center allocations.

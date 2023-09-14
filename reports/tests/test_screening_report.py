@@ -17,8 +17,7 @@ class TestCostCenterScreeningReport:
         up = uploadcsv.Command()
         up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
 
-        r = CostCenterScreeningReport()
-        assert 0 < len(r.cost_center_screening_report())
+        assert 0 < len(CostCenterScreeningReport().cost_center_screening_report())
 
     # Financial Structure Tests
     def test_financial_structure_dataframe(self):
@@ -27,8 +26,7 @@ class TestCostCenterScreeningReport:
         up = uploadcsv.Command()
         up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
 
-        r = CostCenterScreeningReport()
-        data = r.financial_structure_dataframe()
+        data = CostCenterScreeningReport().financial_structure_dataframe()
         assert False == data.empty
 
     def test_financial_structure_dataframe_empty(self):

@@ -8,6 +8,7 @@ from costcenter.models import (
     CostCenterAllocation,
     Fund,
     FundCenter,
+    FundCenterAllocation,
     FundCenterManager,
     FundManager,
     ForecastAdjustment,
@@ -151,7 +152,7 @@ class CostCenterScreeningReport(Report):
         self.aggregation_columns = [
             "Spent",
             "Balance",
-            "Working Plan",
+            "Workingplan",
             "CO",
             "PC",
             "FR",
@@ -175,7 +176,8 @@ class CostCenterScreeningReport(Report):
         """
         df = pd.DataFrame()
         li_df = LineItem.objects.line_item_detailed()
-        li_df = li_df.rename(columns={"fund": "Fund"})
+        for i in li_df.columns:
+            print(i)
         if len(li_df) > 0:
             df = pd.pivot_table(li_df, values=self.aggregation_columns, index=self.column_grouping, aggfunc="sum")
             if self.with_allocation == True:
@@ -199,12 +201,11 @@ class CostCenterScreeningReport(Report):
         return df
 
     def financial_structure_dataframe(self) -> pd.DataFrame | None:
-        x = FundCenter.objects.all()
         fc = FundCenterManager().fund_center_dataframe(FundCenter.objects.all())
         cc = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
         if fc.empty or cc.empty:
             return None
-        merged = pd.merge(fc, cc, how="left", left_on=["Fund Center ID"], right_on=["parent_id"])
+        merged = pd.merge(fc, cc, how="left", left_on=["Fundcenter_ID"], right_on=["Parent_ID"])
         print(merged)
         merged = merged.fillna("")
         merged.set_index(
@@ -212,12 +213,12 @@ class CostCenterScreeningReport(Report):
         )
         merged.drop(
             [
-                "Fund Center ID",
-                "parent_id_x",
-                "Cost Center ID",
-                "fund_id",
-                "source_id",
-                "parent_id_y",
+                "Fundcenter_ID",
+                "Parent_ID_x",
+                "Costcenter_ID",
+                "Fund_ID",
+                "Source_ID",
+                "Parent_ID_y",
             ],
             axis=1,
             inplace=True,
@@ -327,16 +328,23 @@ class AllocationReport(Report):
 
     def fc_allocation_dataframe(self, df_main: pd.DataFrame, fund: Fund | str, fy: int, quarter: int) -> pd.DataFrame:
         fc = list(filter(None, df_main["Fund Center"].to_list()))
-        alloc_fc = []
-        df_alloc_fc = pd.DataFrame()
-        for f in fc:
-            a = FundCenterManager().allocation_dataframe(f, fund, fy, quarter)
-            if not a.empty:
-                alloc_fc.append(a)
-        if len(alloc_fc) > 0:
-            df_alloc_fc = pd.concat(alloc_fc)
-            df_alloc_fc["Cost Element"] = df_alloc_fc["Fund Center"]
-            df_alloc_fc["Cost Center"] = ""
+        fc = FundCenter.objects.filter(fundcenter__in=fc)
+        if isinstance(fund, str):
+            fund = Fund.objects.get(fund=fund)
+        alloc = FundCenterAllocation.objects.filter(fundcenter__in=fc, fund=fund, fy=fy, quarter=quarter)
+        if not alloc:
+            return pd.DataFrame()
+        df_alloc_fc = BFTDataFrame(FundCenterAllocation).build(alloc)
+        # alloc_fc = []
+        # df_alloc_fc = pd.DataFrame()
+        # for f in fc:
+        #     a = FundCenterManager().allocation_dataframe(f, fund, fy, quarter)
+        #     if not a.empty:
+        #         alloc_fc.append(a)
+        # if len(alloc_fc) > 0:
+        #     df_alloc_fc = pd.concat(alloc_fc)
+        #     df_alloc_fc["Cost Element"] = df_alloc_fc["Fund Center"]
+        #     df_alloc_fc["Cost Center"] = ""
         return df_alloc_fc
 
     def cc_allocation_dataframe(self, df_main: pd.DataFrame, fund: Fund | str, fy: int, quarter: int) -> pd.DataFrame:

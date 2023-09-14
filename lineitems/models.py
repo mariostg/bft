@@ -3,6 +3,7 @@ from django.contrib import messages
 import logging
 from costcenter.models import CostCenter, CostCenterManager
 from encumbrance.models import EncumbranceImport
+from utils.dataframe import BFTDataFrame
 from django.forms.models import model_to_dict
 import pandas as pd
 import numpy as np
@@ -26,21 +27,12 @@ class LineItemManager(models.Manager):
         Returns:
             pd.DataFrame: A dataframe of DRMIS line items
         """
-        data = list(LineItem.objects.all().values())
+        data = LineItem.objects.all()
         if data:
-            df = pd.DataFrame(data).rename(
-                columns={
-                    "id": "lineitem_id",
-                    "costcenter_id": "Cost Center ID",
-                    "balance": "Balance",
-                    "workingplan": "Working Plan",
-                    "fundcenter": "Fund Center",
-                    "spent": "Spent",
-                }
-            )
-            df["CO"] = np.where(df["doctype"] == "CO", df["Balance"], 0)
-            df["PC"] = np.where(df["doctype"] == "PC", df["Balance"], 0)
-            df["FR"] = np.where(df["doctype"] == "FR", df["Balance"], 0)
+            df = BFTDataFrame(LineItem).build(data)
+            df["CO"] = np.where(df["Doctype"] == "CO", df["Balance"], 0)
+            df["PC"] = np.where(df["Doctype"] == "PC", df["Balance"], 0)
+            df["FR"] = np.where(df["Doctype"] == "FR", df["Balance"], 0)
             return df
         else:
             return pd.DataFrame({})
@@ -63,7 +55,7 @@ class LineItemManager(models.Manager):
                 li_df = pd.merge(li_df, fcst_df, how="left", on="lineitem_id")
             else:
                 li_df["Forecast"] = 0
-            li_df = pd.merge(li_df, cc_df, how="left", on="Cost Center ID")
+            li_df = pd.merge(li_df, cc_df, how="left", on="Costcenter_ID")
 
         return li_df
 
@@ -76,12 +68,8 @@ class LineItemManager(models.Manager):
         """
         if not LineForecast.objects.exists():
             return pd.DataFrame()
-        data = list(LineForecast.objects.all().values())
-        df = pd.DataFrame(data).rename(
-            columns={
-                "forecastamount": "Forecast",
-            }
-        )
+        data = LineForecast.objects.all()
+        df = BFTDataFrame(LineForecast).build(data)
         return df
 
 
@@ -247,7 +235,7 @@ class LineItem(models.Model):
 
 
 class LineForecast(models.Model):
-    forecastamount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    forecastamount = models.DecimalField("Forecast", max_digits=10, decimal_places=2, default=0)
     description = models.CharField(max_length=512, null=True, blank=True)
     comment = models.CharField(max_length=512, null=True, blank=True)
     deliverydate = models.DateField("Delivery Date", null=True, blank=True)
