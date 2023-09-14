@@ -56,7 +56,8 @@ class TestLineItemManager:
         assert "Costcenter_ID" in li_df.columns
         assert "Cost Center" in li_df.columns
         assert "Fund Center" in li_df.columns
-        assert "Parent_ID" in li_df.columns
+        assert "Costcenter_ID" in li_df.columns
+        assert "Fundcenter_ID" in li_df.columns
         assert "Source_ID" in li_df.columns
         assert "Fund_ID" in li_df.columns
         assert "Forecast" in li_df.columns

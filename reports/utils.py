@@ -318,7 +318,7 @@ class AllocationReport(Report):
         df_main = pd.concat(self.family_list).sort_values("sequence").fillna("")
         df_main["Cost Element"] = df_main.fundcenter + df_main.get("costcenter")
         df_main.drop(
-            ["isforecastable", "isupdatable", "note", "source_id", "fund_id", "parent_id"],
+            ["isforecastable", "isupdatable", "note", "source_id", "fund_id", "fundcenter_parent_id"],
             axis=1,
             inplace=True,
         )
@@ -349,15 +349,22 @@ class AllocationReport(Report):
 
     def cc_allocation_dataframe(self, df_main: pd.DataFrame, fund: Fund | str, fy: int, quarter: int) -> pd.DataFrame:
         cc = list(filter(None, df_main["Cost Center"].to_list()))
-        alloc_cc = []
-        df_alloc_cc = pd.DataFrame()
-        for f in cc:
-            a = CostCenterManager().allocation_dataframe(f, fund, fy, quarter)
-            if not a.empty:
-                alloc_cc.append(a)
-        if len(alloc_cc) > 0:
-            df_alloc_cc = pd.concat(alloc_cc)
-            df_alloc_cc["Cost Element"] = df_alloc_cc["Cost Center"]
+        cc = CostCenter.objects.filter(costcenter__in=cc)
+        if isinstance(fund, str):
+            fund = Fund.objects.get(fund=fund)
+        alloc = CostCenterAllocation.objects.filter(costcenter__in=cc, fund=fund, fy=fy, quarter=quarter)
+        if not alloc:
+            return pd.DataFrame()
+        df_alloc_cc = BFTDataFrame(FundCenterAllocation).build(alloc)
+        # alloc_cc = []
+        # df_alloc_cc = pd.DataFrame()
+        # for f in cc:
+        #     a = CostCenterManager().allocation_dataframe(f, fund, fy, quarter)
+        #     if not a.empty:
+        #         alloc_cc.append(a)
+        # if len(alloc_cc) > 0:
+        #     df_alloc_cc = pd.concat(alloc_cc)
+        #     df_alloc_cc["Cost Element"] = df_alloc_cc["Cost Center"]
         return df_alloc_cc
 
     def allocation_status_dataframe(

@@ -125,7 +125,7 @@ def fundcenter_page(request):
 
 
 def fundcenter_costcenters(request, pk):
-    data = CostCenter.objects.filter(parent=pk)
+    data = CostCenter.objects.filter(costcenter_parent=pk)
     return render(request, "costcenter/costcenter-table.html", {"data": data})
 
 
@@ -134,7 +134,7 @@ def fundcenter_add(request):
         form = FundCenterForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
-            obj.sequence = FinancialStructureManager().set_parent(fundcenter_parent=obj.parent)
+            obj.sequence = FinancialStructureManager().set_parent(fundcenter_parent=obj.fundcenter_parent)
             try:
                 obj.save()
             except IntegrityError:
@@ -157,10 +157,10 @@ def fundcenter_update(request, pk):
         if form.is_valid():
             obj = form.save(commit=False)
             current = FundCenterManager().pk(obj.pk)
-            if obj.parent != current.parent:
+            if obj.fundcenter_parent != current.fundcenter_parent:
                 # Need to change sequence given parent change
                 fsm = FinancialStructureManager()
-                obj.sequence = fsm.set_parent(fundcenter_parent=obj.parent)
+                obj.sequence = fsm.set_parent(fundcenter_parent=obj.fundcenter_parent)
             try:
                 obj.save()
             except IntegrityError:
@@ -252,7 +252,9 @@ def costcenter_add(request):
         form = CostCenterForm(request.POST)
         if form.is_valid():
             obj = form.save(commit=False)
-            obj.sequence = FinancialStructureManager().set_parent(fundcenter_parent=obj.parent, costcenter_child=True)
+            obj.sequence = FinancialStructureManager().set_parent(
+                fundcenter_parent=obj.costcenter_parent, costcenter_child=True
+            )
             obj.costcenter = obj.costcenter.upper()
             if obj.shortname:
                 obj.shortname = obj.shortname.upper()
@@ -273,10 +275,10 @@ def costcenter_update(request, pk):
         if form.is_valid():
             obj = form.save(commit=False)
             current = CostCenterManager().pk(obj.pk)
-            if obj.parent != current.parent:
+            if obj.costcenter_parent != current.fundcenter_parent:
                 # Need to change sequence given parent change
                 fsm = FinancialStructureManager()
-                obj.sequence = fsm.set_parent(fundcenter_parent=obj.parent, costcenter_child=obj)
+                obj.sequence = fsm.set_parent(fundcenter_parent=obj.fundcenter_parent, costcenter_child=obj)
             try:
                 obj.save()
             except IntegrityError:

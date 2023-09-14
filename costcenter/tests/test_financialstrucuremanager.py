@@ -128,7 +128,7 @@ class TestFinancialStructureManager:
         # create a fundcenter and assign it to 1.1.1
         assert "1.1.1.1" not in family
         parent = FundCenter.objects.get(sequence="1.1.1")
-        FundCenter.objects.create(fundcenter="3333WW", shortname="ww", parent=parent, sequence="1.1.1.1")
+        FundCenter.objects.create(fundcenter="3333WW", shortname="ww", fundcenter_parent=parent, sequence="1.1.1.1")
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
         assert "1.1.1.1" in family
 
@@ -163,13 +163,13 @@ class TestFinancialStructureManager:
         cc = CostCenterManager().cost_center("8486B1")
         p = self.fsm.set_parent(fundcenter_parent=parent, costcenter_child=True)
         cc.sequence = p
-        cc.parent = parent
+        cc.costcenter_parent = parent
         cc.save()
         assert "1.1.2.0.1" == CostCenterManager().cost_center("8486B1").sequence
         cc = CostCenterManager().cost_center("8486C1")
         p = self.fsm.set_parent(fundcenter_parent=parent, costcenter_child=True)
         cc.sequence = p
-        cc.parent = parent
+        cc.costcenter_parent = parent
         cc.save()
         assert "1.1.2.0.2" == CostCenterManager().cost_center("8486C1").sequence
 
@@ -180,7 +180,7 @@ class TestFinancialStructureManager:
         parent = FundCenterManager().fundcenter("2222BA")
         fund = FundManager().fund("C113")
         source = SourceManager().source("Kitchen")
-        cc = {"costcenter": "2222zz", "fund": fund, "source": source, "parent": parent}
+        cc = {"costcenter": "2222zz", "fund": fund, "source": source, "costcenter_parent": parent}
         cc["sequence"] = self.fsm.set_parent(parent, True)
         costcenter = CostCenter.objects.create(**cc)
         assert "1.1.1.0.1" == costcenter.sequence

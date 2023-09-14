@@ -10,11 +10,20 @@ from costcenter.models import (
 
 
 class CostCenterAdmin(admin.ModelAdmin):
-    list_display = ("costcenter", "parent", "fund", "source", "shortname", "isforecastable", "isupdatable", "sequence")
+    list_display = (
+        "costcenter",
+        "costcenter_parent",
+        "fund",
+        "source",
+        "shortname",
+        "isforecastable",
+        "isupdatable",
+        "sequence",
+    )
 
 
 class FundCenterAdmin(admin.ModelAdmin):
-    list_display = ("fundcenter", "parent", "shortname", "sequence")
+    list_display = ("fundcenter", "fundcenter_parent", "shortname", "sequence")
 
 
 class FundAdmin(admin.ModelAdmin):

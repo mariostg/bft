@@ -5,10 +5,10 @@ from costcenter.models import CostCenter, Fund, FundCenter, Source
 class CostCenterManagerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        fc = FundCenter.objects.create(fundcenter="2184QQ", parent=None)
+        fc = FundCenter.objects.create(fundcenter="2184QQ", fundcenter_parent=None)
         fund = Fund.objects.create(fund="C111", name="Big fund", vote=1, download=True)
         s = Source.objects.create(source="La source")
-        obj = CostCenter.objects.create(costcenter="8486AA", fund=fund, parent=fc, source=s)
+        obj = CostCenter.objects.create(costcenter="8486AA", fund=fund, costcenter_parent=fc, source=s)
         cls.pk = obj.pk
 
     def test_get_by_costcenter(self):

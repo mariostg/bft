@@ -234,10 +234,10 @@ class FundCenterManager(models.Manager):
         return pd.concat([fc, cc])
 
     def get_fund_centers(self, parent: "FundCenter") -> list:
-        return list(FundCenter.objects.filter(parent=parent).values())
+        return list(FundCenter.objects.filter(fundcenter_parent=parent).values())
 
     def get_cost_centers(self, parent: "FundCenter") -> list:
-        return list(CostCenter.objects.filter(parent=parent).values())
+        return list(CostCenter.objects.filter(costcenter_parent=parent).values())
 
     def exists(self, fundcenter: str) -> bool:
         return FundCenter.objects.filter(fundcenter=fundcenter).exists()
@@ -282,7 +282,7 @@ class FinancialStructureManager(models.Manager):
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
             except FundCenter.DoesNotExist:
                 return 0
-        return FundCenter.objects.filter(parent=fundcenter).count()
+        return FundCenter.objects.filter(fundcenter_parent=fundcenter).count()
 
     def has_cost_centers(self, fundcenter: "FundCenter|str") -> int:
         if type(fundcenter) == str:
@@ -290,7 +290,7 @@ class FinancialStructureManager(models.Manager):
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
             except FundCenter.DoesNotExist:
                 return 0
-        return CostCenter.objects.filter(parent=fundcenter).count()
+        return CostCenter.objects.filter(costcenter_parent=fundcenter).count()
 
     def is_child_of(self, parent: "FundCenter", child: "FundCenter | CostCenter") -> bool:
         """Check if child object is a direct descendant of parent
@@ -302,7 +302,12 @@ class FinancialStructureManager(models.Manager):
         Returns:
             bool: True is child is direct descendant of parent.
         """
-        return parent.fundcenter == child.parent.fundcenter
+        if isinstance(child, FundCenter):
+            return parent.fundcenter == child.fundcenter_parent.fundcenter
+        elif isinstance(child, CostCenter):
+            return parent.fundcenter == child.costcenter_parent.fundcenter
+        else:
+            return False
 
     def is_descendant_of(self, parent: "FundCenter", child: "FundCenter | CostCenter") -> bool:
         """Check if child is a direct descendant of parent.
@@ -406,7 +411,7 @@ class FinancialStructureManager(models.Manager):
         Returns:
             QuerySet | None: Returns a QuerySet of Cost Centers that are children.  Return None if there are no children.
         """
-        cc = CostCenter.objects.filter(parent=fundcenter)
+        cc = CostCenter.objects.filter(costcenter_parent=fundcenter)
         return cc
 
     def get_sequence_direct_descendants(self, seq_parent: str) -> list:
@@ -441,8 +446,6 @@ class FinancialStructureManager(models.Manager):
         """Create a new sequence number to be attributed to a cost center or a fund center.
 
         Args:
-            family (list): A list of sequence no representing the members of the family 
-            where the child will be added'
             parent (str, optional): A string representing the parent Fund Center. 
             Defaults to None.
             costcenter_child (bool, optional): If parent is for cost center, costcenter_child must be True. This will affect the way the sequence number is created. Defaults to False.
@@ -482,13 +485,14 @@ class FundCenter(models.Model):
     fundcenter = models.CharField("Fund Center", max_length=6, unique=True)
     shortname = models.CharField("Fund Center Name", max_length=25, null=True, blank=True)
     sequence = models.CharField("FC Sequence No", max_length=25, unique=True, default="1")
-    parent = models.ForeignKey(
+    fundcenter_parent = models.ForeignKey(
         "self",
         on_delete=models.RESTRICT,
         null=True,
         blank=True,
         default=None,
         related_name="parent_fc",
+        verbose_name="Fund Center Parent",
     )
 
     objects = FundCenterManager()
@@ -503,9 +507,9 @@ class FundCenter(models.Model):
         verbose_name_plural = "Fund Centers"
 
     def save(self, *args, **kwargs):
-        if self.sequence == None and self.parent == None:
+        if self.sequence == None and self.fundcenter_parent == None:
             self.sequence = "1"
-        if self.parent and self.fundcenter == self.parent.fundcenter:
+        if self.fundcenter_parent and self.fundcenter == self.fundcenter_parent.fundcenter:
             raise IntegrityError("Children Fund center cannot assign itself as parent")
         self.fundcenter = self.fundcenter.upper()
         if self.shortname:
@@ -553,8 +557,7 @@ class CostCenterManager(models.Manager):
             return pd.DataFrame()
         df = BFTDataFrame(CostCenter).build(data)
         fc_df = BFTDataFrame(FundCenter).build(FundCenter.objects.all())
-        print(fc_df)
-        df = pd.merge(df, fc_df, how="left", left_on="Parent_ID", right_on="Fundcenter_ID")
+        df = pd.merge(df, fc_df, how="left", left_on="Costcenter_parent_ID", right_on="Fundcenter_ID")
         return df
 
     def allocation(
@@ -614,8 +617,11 @@ class CostCenterManager(models.Manager):
             except Fund.DoesNotExist:
                 return pd.DataFrame()
 
+        data = self.allocation(costcenter=costcenter, fund=fund, fy=fy, quarter=quarter)
+        if not data:
+            return pd.DataFrame({})
         data = list(
-            self.allocation(costcenter=costcenter, fund=fund, fy=fy, quarter=quarter).values(
+            data.values(
                 "costcenter__parent__fundcenter",
                 "costcenter__costcenter",
                 "fund__fund",
@@ -657,7 +663,7 @@ class CostCenterManager(models.Manager):
     def get_sibblings(self, parent: FundCenter | str):
         if type(parent) == str:
             parent = FundCenterManager().fundcenter(fundcenter=parent)
-        return CostCenter.objects.filter(parent=parent)
+        return CostCenter.objects.filter(costcenter_parent=parent)
 
 
 class CostCenter(models.Model):
@@ -669,8 +675,8 @@ class CostCenter(models.Model):
     isupdatable = models.BooleanField("Is Updatable", default=False)
     note = models.TextField(null=True, blank=True)
     sequence = models.CharField("CC Sequence No", max_length=25, unique=True, default="")
-    parent = models.ForeignKey(
-        FundCenter, on_delete=models.RESTRICT, default="0", related_name="children", verbose_name="Parent"
+    costcenter_parent = models.ForeignKey(
+        FundCenter, on_delete=models.RESTRICT, default="0", related_name="children", verbose_name="Cost Center Parent"
     )
 
     objects = CostCenterManager()

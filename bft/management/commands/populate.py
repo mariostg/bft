@@ -73,14 +73,14 @@ class Command(BaseCommand):
 
     def set_fund_center(self):
         # Create root FC
-        fc = {"fundcenter": "1111AA", "shortname": "root", "parent": None}
+        fc = {"fundcenter": "1111AA", "shortname": "root", "fundcenter_parent": None}
         new_item = FundCenter.objects.create(**fc)
         root = FundCenter.objects.filter(fundcenter="1111AA").first()
         print(f"Created Fund Center {root}, sequence {root.sequence}")
 
         root_children = [
-            {"fundcenter": "1111AB", "shortname": "AB", "parent": root},
-            {"fundcenter": "1111AC", "shortname": "AC", "parent": root},
+            {"fundcenter": "1111AB", "shortname": "AB", "fundcenter_parent": root},
+            {"fundcenter": "1111AC", "shortname": "AC", "fundcenter_parent": root},
         ]
         for item in root_children:
             try:
@@ -94,8 +94,8 @@ class Command(BaseCommand):
 
         ab = FundCenter.objects.filter(fundcenter="1111AB").first()
         ab_children = [
-            {"fundcenter": "2222BA", "shortname": "BA", "parent": ab},
-            {"fundcenter": "2222BB", "shortname": "BB", "parent": ab},
+            {"fundcenter": "2222BA", "shortname": "BA", "fundcenter_parent": ab},
+            {"fundcenter": "2222BB", "shortname": "BB", "fundcenter_parent": ab},
         ]
         for item in ab_children:
             try:
@@ -122,7 +122,7 @@ class Command(BaseCommand):
                 "isforecastable": True,
                 "isupdatable": True,
                 "note": "",
-                "parent": ac,
+                "costcenter_parent": ac,
             },
             {
                 "costcenter": "8486C1",
@@ -132,7 +132,7 @@ class Command(BaseCommand):
                 "isforecastable": True,
                 "isupdatable": True,
                 "note": "A quick and short note for 1234FF",
-                "parent": ab,
+                "costcenter_parent": ab,
             },
             {
                 "costcenter": "8486C2",
@@ -142,7 +142,7 @@ class Command(BaseCommand):
                 "isforecastable": True,
                 "isupdatable": True,
                 "note": "",
-                "parent": ab,
+                "costcenter_parent": ab,
             },
         ]
         for item in items:
@@ -151,7 +151,7 @@ class Command(BaseCommand):
                 if found:
                     print(f"Cost Center {found} exists")
             except CostCenter.DoesNotExist:
-                item["sequence"] = FSM.set_parent(item["parent"], item)
+                item["sequence"] = FSM.set_parent(item["costcenter_parent"], item)
                 new_item = CostCenter.objects.create(**item)
                 print(f"Created Cost Center {new_item}")
 

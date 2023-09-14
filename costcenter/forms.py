@@ -50,7 +50,7 @@ class SourceForm(forms.ModelForm):
 class FundCenterForm(forms.ModelForm):
     class Meta:
         model = FundCenter
-        fields = ["fundcenter", "shortname", "parent"]
+        fields = ["fundcenter", "shortname", "fundcenter_parent"]
 
     def __init__(self, *args, **kwargs):
         super(FundCenterForm, self).__init__(*args, **kwargs)
@@ -74,7 +74,7 @@ class CostCenterForm(forms.ModelForm):
             "shortname",
             "fund",
             "source",
-            "parent",
+            "costcenter_parent",
             "isforecastable",
             "isupdatable",
             "note",

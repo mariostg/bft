@@ -24,7 +24,7 @@ from bft.management.commands import populate, uploadcsv
 
 FUND_C113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
 SOURCE_1 = {"source": "Kitchen"}
-FC_1111AA = {"fundcenter": "1111aa", "shortname": "bedroom", "parent": None}
+FC_1111AA = {"fundcenter": "1111aa", "shortname": "bedroom", "fundcenter_parent": None}
 CC_1234FF = {
     "costcenter": "1234ff",
     "shortname": "Food and drink",
@@ -33,7 +33,7 @@ CC_1234FF = {
     "isforecastable": True,
     "isupdatable": True,
     "note": "A quick and short note for 1234FF",
-    "parent": None,
+    "costcenter_parent": None,
 }
 
 
@@ -156,7 +156,7 @@ class TestFundModel:
         f0 = CostCenter(**CC_1234FF)
         f0.fund = fund
         f0.source = source
-        f0.parent = parent
+        f0.costcenter_parent = parent
         f0.save()
 
         with pytest.raises(RestrictedError):
@@ -237,7 +237,7 @@ class TestSourceModel:
         f0 = CostCenter(**CC_1234FF)
         f0.fund = fund
         f0.source = source
-        f0.parent = parent
+        f0.costcenter_parent = parent
         f0.save()
 
         with pytest.raises(RestrictedError):
@@ -246,10 +246,10 @@ class TestSourceModel:
 
 @pytest.mark.django_db
 class TestFundCenterModel:
-    fc_1111AA = {"fundcenter": "1111aa", "shortname": "bedroom", "parent": None}
+    fc_1111AA = {"fundcenter": "1111aa", "shortname": "bedroom", "fundcenter_parent": None}
 
     def test_string_representation(self):
-        obj = FundCenter(fundcenter="1234aa", shortname="abcdef", parent=None)
+        obj = FundCenter(fundcenter="1234aa", shortname="abcdef", fundcenter_parent=None)
         assert "1234AA - ABCDEF" == str(obj)
 
     def test_verbose_name_plural(self):
@@ -268,7 +268,12 @@ class TestFundCenterModel:
         child_sequence = fsm.set_parent(fundcenter_parent=parent)
 
         assert "1.1" == child_sequence
-        fc_1111bb = {"fundcenter": "1111bb", "shortname": "bedroom", "parent": parent, "sequence": child_sequence}
+        fc_1111bb = {
+            "fundcenter": "1111bb",
+            "shortname": "bedroom",
+            "fundcenter_parent": parent,
+            "sequence": child_sequence,
+        }
         child_fc = FundCenter.objects.create(**fc_1111bb)
         assert "1.1" == child_fc.sequence
 
@@ -284,7 +289,7 @@ class TestFundCenterModel:
         first_fc.fundcenter = "1111aa"
         first_fc.shortname = "defgth"
         first_fc.sequence = "1"
-        first_fc.parent = None
+        first_fc.fundcenter_parent = None
         first_fc.full_clean()
         first_fc.save()
 
@@ -318,7 +323,7 @@ class TestFundCenterModel:
         first_fc = FundCenter()
         first_fc.fundcenter = "1111aa"
         first_fc.sequence = "1"
-        first_fc.parent = None
+        first_fc.fundcenter_parent = None
         first_fc.full_clean()
         first_fc.save()
 
@@ -341,7 +346,7 @@ class TestFundCenterModel:
         first_fc.fundcenter = "1111aa"
         first_fc.shortname = "defgth"
         first_fc.sequence = "1"
-        first_fc.parent = None
+        first_fc.fundcenter_parent = None
         first_fc.full_clean()
         first_fc.save()
 
@@ -350,7 +355,7 @@ class TestFundCenterModel:
         assert "DEFGTH" == saved.shortname
 
     def test_can_save_POST_request(self):
-        data = {"fundcenter": "zzzz33", "shortname": "Kitchen FC", "parent": ""}
+        data = {"fundcenter": "zzzz33", "shortname": "Kitchen FC", "fundcenter_parent": ""}
         response = Client().post("/fundcenter/fundcenter-add/", data=data)
         assert response.status_code == 302
         assert FundCenter.objects.count() == 1
@@ -387,11 +392,11 @@ class TestFundCenterModel:
         fc1.fundcenter = "1111aa"
         fc1.shortname = "defgth"
         fc1.sequence = "1"
-        fc1.parent = None
+        fc1.fundcenter_parent = None
         fc1.full_clean()
         fc1.save()
 
-        fc1.parent = fc1
+        fc1.fundcenter_parent = fc1
         with pytest.raises(IntegrityError):
             fc1.save()
 
@@ -415,7 +420,7 @@ class TestCostCenterModel:
         cc = CostCenter(**CC_1234FF)
         cc.fund = fund
         cc.source = source
-        cc.parent = parent
+        cc.costcenter_parent = parent
         # cc.full_clean()
         cc.save()
 
@@ -433,10 +438,10 @@ class TestCostCenterModel:
         cc = CostCenter(**CC_1234FF)
         cc.fund = fund
         cc.source = source
-        cc.parent = parent
+        cc.costcenter_parent = parent
         cc.costcenter = "1111aa"
         cc.shortname = "should be uppercase"
-        cc.sequence = FSM.set_parent(cc.parent, cc)
+        cc.sequence = FSM.set_parent(cc.costcenter_parent, cc)
         cc.full_clean()
         cc.save()
 
@@ -454,7 +459,7 @@ class TestCostCenterModel:
         parent.save()
         data["fund"] = fund.pk
         data["source"] = source.pk
-        data["parent"] = parent.pk
+        data["costcenter_parent"] = parent.pk
         response = Client().post("/costcenter/costcenter-add/", data=data)
         assert response.status_code == 302
         assert CostCenter.objects.count() == 1
@@ -473,7 +478,7 @@ class TestCostCenterModel:
         f0 = CostCenter(**CC_1234FF)
         f0.fund = fund
         f0.source = source
-        f0.parent = parent
+        f0.costcenter_parent = parent
         f0.save()
         f1 = CostCenter.objects.get(pk=f0.pk)
         f1.shortname = "new shortname"
@@ -492,7 +497,7 @@ class TestCostCenterModel:
         f0 = CostCenter(**CC_1234FF)
         f0.fund = fund
         f0.source = source
-        f0.parent = parent
+        f0.costcenter_parent = parent
         f0.save()
 
         f1 = CostCenter.objects.cost_center(f0.costcenter)
@@ -508,7 +513,7 @@ class TestCostCenterModel:
         parent = CostCenterManager().cost_center("8486B1")
 
         with pytest.raises(ValueError):
-            cc.parent = parent  # set a cost center as parent
+            cc.costcenter_parent = parent  # set a cost center as parent
             cc.save()
 
 

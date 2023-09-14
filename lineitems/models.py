@@ -207,7 +207,7 @@ class LineItem(models.Model):
         cc = CostCenter.objects.select_related()
         cc_set = set()
         for c in cc:
-            cc_set.add((c.costcenter, c.parent.fundcenter))
+            cc_set.add((c.costcenter, c.costcenter_parent.fundcenter))
 
         li = LineItem.objects.select_related()
         li.update(fcintegrity=False)
