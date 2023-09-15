@@ -231,7 +231,7 @@ class CostCenterScreeningReport(Report):
             axis=1,
             inplace=True,
         )
-        # merged.sort_values(by=["Sequence No"], inplace=True)
+        merged.sort_values(by=["FC Sequence No"], inplace=True)
 
         return merged
 
