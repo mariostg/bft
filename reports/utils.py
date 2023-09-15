@@ -205,7 +205,13 @@ class CostCenterScreeningReport(Report):
         cc = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
         if fc.empty or cc.empty:
             return None
-        merged = pd.merge(fc, cc, how="left", left_on=["Fundcenter_ID"], right_on=["Parent_ID"])
+        merged = pd.merge(
+            fc,
+            cc,
+            how="left",
+            left_on=["Fundcenter_ID", "FC Sequence No", "Fund Center", "Fund Center Name"],
+            right_on=["Costcenter_parent_ID", "FC Sequence No", "Fund Center", "Fund Center Name"],
+        )
         print(merged)
         merged = merged.fillna("")
         merged.set_index(
@@ -213,12 +219,14 @@ class CostCenterScreeningReport(Report):
         )
         merged.drop(
             [
-                "Fundcenter_ID",
-                "Parent_ID_x",
+                "Fundcenter_ID_x",
+                "Fundcenter_ID_y",
+                "Fundcenter_parent_ID_x",
+                "Fundcenter_parent_ID_y",
                 "Costcenter_ID",
                 "Fund_ID",
                 "Source_ID",
-                "Parent_ID_y",
+                "Costcenter_parent_ID",
             ],
             axis=1,
             inplace=True,
@@ -335,6 +343,11 @@ class AllocationReport(Report):
         if not alloc:
             return pd.DataFrame()
         df_alloc_fc = BFTDataFrame(FundCenterAllocation).build(alloc)
+
+        fund_df = BFTDataFrame(Fund).build(Fund.objects.all())
+        df_alloc_fc = pd.merge(df_alloc_fc, fund_df, how="left", on="Fund_ID")
+        fc_df = BFTDataFrame(FundCenter).build(fc)
+        df_alloc_fc = pd.merge(df_alloc_fc, fc_df, how="left", on="Fundcenter_ID")
         # alloc_fc = []
         # df_alloc_fc = pd.DataFrame()
         # for f in fc:
@@ -343,7 +356,7 @@ class AllocationReport(Report):
         #         alloc_fc.append(a)
         # if len(alloc_fc) > 0:
         #     df_alloc_fc = pd.concat(alloc_fc)
-        #     df_alloc_fc["Cost Element"] = df_alloc_fc["Fund Center"]
+        df_alloc_fc["Cost Element"] = df_alloc_fc["Fund Center"]
         #     df_alloc_fc["Cost Center"] = ""
         return df_alloc_fc
 
@@ -355,7 +368,12 @@ class AllocationReport(Report):
         alloc = CostCenterAllocation.objects.filter(costcenter__in=cc, fund=fund, fy=fy, quarter=quarter)
         if not alloc:
             return pd.DataFrame()
-        df_alloc_cc = BFTDataFrame(FundCenterAllocation).build(alloc)
+        df_alloc_cc = BFTDataFrame(CostCenterAllocation).build(alloc)
+
+        fund_df = BFTDataFrame(Fund).build(Fund.objects.all())
+        df_alloc_cc = pd.merge(df_alloc_cc, fund_df, how="left", on="Fund_ID")
+        cc_df = BFTDataFrame(CostCenter).build(cc)
+        df_alloc_cc = pd.merge(df_alloc_cc, cc_df, how="left", on="Costcenter_ID")
         # alloc_cc = []
         # df_alloc_cc = pd.DataFrame()
         # for f in cc:
@@ -364,7 +382,7 @@ class AllocationReport(Report):
         #         alloc_cc.append(a)
         # if len(alloc_cc) > 0:
         #     df_alloc_cc = pd.concat(alloc_cc)
-        #     df_alloc_cc["Cost Element"] = df_alloc_cc["Cost Center"]
+        df_alloc_cc["Cost Element"] = df_alloc_cc["Cost Center"]
         return df_alloc_cc
 
     def allocation_status_dataframe(
@@ -403,8 +421,8 @@ class AllocationReport(Report):
                 "Cost Center",
                 "shortname",
                 "Fund",
-                "Allocation",
-                "FY",
+                "Amount",
+                "Fiscal Year",
                 "Quarter",
                 "Cost Element",
             ]

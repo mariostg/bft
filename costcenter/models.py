@@ -136,7 +136,7 @@ class FundCenterManager(models.Manager):
             return pd.DataFrame()
         df = BFTDataFrame(FundCenter).build(data)
 
-        df["Parent_ID"] = df["Parent_ID"].fillna(0).astype("int")
+        df["Fundcenter_parent_ID"] = df["Fundcenter_parent_ID"].fillna(0).astype("int")
         return df
 
     def allocation(
@@ -622,7 +622,7 @@ class CostCenterManager(models.Manager):
             return pd.DataFrame({})
         data = list(
             data.values(
-                "costcenter__parent__fundcenter",
+                "costcenter__costcenter_parent__fundcenter",
                 "costcenter__costcenter",
                 "fund__fund",
                 "amount",
@@ -635,7 +635,7 @@ class CostCenterManager(models.Manager):
             "fy": "FY",
             "quarter": "Quarter",
             "costcenter__costcenter": "Cost Center",
-            "costcenter__parent__fundcenter": "Fund Center",
+            "costcenter__costcenter_parent__fundcenter": "Fund Center",
             "fund__fund": "Fund",
         }
         df = pd.DataFrame(data).rename(columns=columns)
@@ -646,7 +646,7 @@ class CostCenterManager(models.Manager):
             return pd.DataFrame()
         data = list(
             ForecastAdjustment.objects.all().values(
-                "costcenter__parent__fundcenter",
+                "costcenter__costcenter_parent__fundcenter",
                 "costcenter__costcenter",
                 "fund__fund",
                 "amount",
@@ -654,7 +654,7 @@ class CostCenterManager(models.Manager):
         )
         columns = {
             "amount": "Forecast Adjustment",
-            "costcenter__parent__fundcenter": "Fund Center",
+            "costcenter__costcenter_parent__fundcenter": "Fund Center",
             "costcenter__costcenter": "Cost Center",
             "fund__fund": "Fund",
         }

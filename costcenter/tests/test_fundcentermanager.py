@@ -50,7 +50,9 @@ class TestFundCenterManager:
         r = FundCenterManager().fund_center_dataframe(fc.objects.all())
 
         columns = np.array(r.columns)
-        expected_columns = np.array(["Fundcenter_ID", "Fund Center", "Fund Center Name", "FC Sequence No", "Parent_ID"])
+        expected_columns = np.array(
+            ["Fundcenter_ID", "Fund Center", "Fund Center Name", "FC Sequence No", "Fundcenter_parent_ID"]
+        )
 
         match = (columns == expected_columns).all()
         assert True == match

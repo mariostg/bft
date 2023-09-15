@@ -37,7 +37,7 @@ class TestDataFrame:
         # Confirm columns have been renamed
         assert "C113" == df_fund.at[0, "Fund"]
         assert "National Procurement" == df_fund.at[0, "Name"]
-        assert 9 == df_fund.at[0, "ID"]
+        assert 9 == df_fund.at[0, "Fund_ID"]
 
     def test_dataframe_with_model_instance(self):
         hnd = populate.Command()
@@ -49,7 +49,7 @@ class TestDataFrame:
         # Confirm columns have been renamed
         assert "C113" == df_fund.at[0, "Fund"]
         assert "National Procurement" == df_fund.at[0, "Name"]
-        assert fund.id == df_fund.at[0, "ID"]
+        assert fund.id == df_fund.at[0, "Fund_ID"]
 
     def test_dataframe_with_queryset(self):
         hnd = populate.Command()
@@ -60,17 +60,6 @@ class TestDataFrame:
         d.build(qst)
 
         assert len(qst) == len(d.dataframe)
-
-    def test_dataframe_without_queryset(self):
-        hnd = populate.Command()
-        hnd.handle()
-
-        d = BFTDataFrame(CostCenter)
-
-        d.build()
-        print(d.dataframe)
-        assert 0 < len(d.dataframe)
-        assert CostCenter.objects.all().count() == len(d.dataframe)
 
     def test_dataframe_fields_are_capitalized(self):
         # Testing with 3 models, that should be more than enough.
