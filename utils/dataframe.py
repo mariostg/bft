@@ -47,7 +47,9 @@ class BFTDataFrame(pd.DataFrame):
         for c in self.dataframe_fields:
             if self.django_model._meta.get_field(c).get_internal_type() == "DecimalField":
                 try:
-                    self.dataframe[self.dataframe_fields[c]] = self.dataframe[self.dataframe_fields[c]].astype(int)
+                    self.dataframe[self.dataframe_fields[c]] = (
+                        self.dataframe[self.dataframe_fields[c]].fillna(0).astype(int)
+                    )
                 except TypeError:
                     print((f"Failed to change type for {c}"))
 

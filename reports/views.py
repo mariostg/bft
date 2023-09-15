@@ -81,8 +81,8 @@ def allocation_status_report(request):
         r = utils.AllocationReport()
         df = r.allocation_status_dataframe(fundcenter, fund, fy, int(quarter))
         if not df.empty:
-            df["Allocation"] = df["Allocation"].astype(int)
-            df["FY"] = df["FY"].astype(str)
+            df["Amount"] = df["Amount"].astype(int)
+            df["Fiscal Year"] = df["Fiscal Year"].astype(str)
             df = df.style.format(thousands=",")
             # df = r.styler_clean_table(df)
             table = df.to_html()

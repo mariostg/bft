@@ -124,7 +124,6 @@ class CostCenterMonthlyReport:
         monthly_df["Allocation"].fillna(0, inplace=True)
         monthly_df["Fund Center"].fillna("", inplace=True)
         columns = [
-            "ID",
             "Fund",
             "Source",
             "Cost Center",
