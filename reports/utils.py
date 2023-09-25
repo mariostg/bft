@@ -138,7 +138,10 @@ class CostCenterMonthlyReport:
             "Working Plan",
             "Allocation",
         ]
-        return monthly_df[columns]
+        monthly_df = monthly_df.reindex(columns=columns).set_index(
+            ["Fund Center", "Cost Center", "Fund", "Source", "FY", "Period"]
+        )
+        return monthly_df
 
 
 class CostCenterScreeningReport(Report):
