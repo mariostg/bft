@@ -48,7 +48,7 @@ class LineItemManager(models.Manager):
         if li_df.empty:
             return li_df
         if len(li_df) > 0:
-            fcst_df = self.forecast_dataframe()
+            fcst_df = LineForecastManager().forecast_dataframe()
             cc_df = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
 
             if len(fcst_df) > 0:
@@ -58,19 +58,6 @@ class LineItemManager(models.Manager):
             li_df = pd.merge(li_df, cc_df, how="left", on="Costcenter_ID")
 
         return li_df
-
-    def forecast_dataframe(self) -> pd.DataFrame:
-        """Prepare a pandas dataframe of the forecast line items.  Columns are renamed
-        with a more friendly name.
-
-        Returns:
-            pd.DataFrame: A dataframe of forecast lines
-        """
-        if not LineForecast.objects.exists():
-            return pd.DataFrame()
-        data = LineForecast.objects.all()
-        df = BFTDataFrame(LineForecast).build(data)
-        return df
 
 
 class LineItem(models.Model):
@@ -232,6 +219,21 @@ class LineItem(models.Model):
             li = LineItem.objects.filter(enctype=t["enctype"]).update(doctype=t["doctype"])
             logger.info(f"Set {li} lines to {t['doctype']}")
         logger.info("Set doctype complete")
+
+
+class LineForecastManager(models.Manager):
+    def forecast_dataframe(self) -> pd.DataFrame:
+        """Prepare a pandas dataframe of the forecast line items.  Columns are renamed
+        with a more friendly name.
+
+        Returns:
+            pd.DataFrame: A dataframe of forecast lines
+        """
+        if not LineForecast.objects.exists():
+            return pd.DataFrame()
+        data = LineForecast.objects.all()
+        df = BFTDataFrame(LineForecast).build(data)
+        return df
 
 
 class LineForecast(models.Model):
