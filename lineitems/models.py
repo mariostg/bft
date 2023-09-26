@@ -222,6 +222,12 @@ class LineItem(models.Model):
 
 
 class LineForecastManager(models.Manager):
+    def get_line_forecast(self, lineitem: LineItem) -> "LineForecast | None":
+        if hasattr(lineitem, "fcst"):
+            return LineForecast.objects.get(lineitem_id=lineitem.id)
+        else:
+            return None
+
     def forecast_dataframe(self) -> pd.DataFrame:
         """Prepare a pandas dataframe of the forecast line items.  Columns are renamed
         with a more friendly name.
@@ -254,6 +260,13 @@ class LineForecast(models.Model):
         if self.lineitem:
             text = f"{self.forecastamount} - {self.id} -  {self.lineitem.id}"
         return str(text)
+
+    def save(self, *args, **kwargs):
+        if self.forecastamount > self.lineitem.workingplan:
+            self.forecastamount = self.lineitem.workingplan
+        if self.forecastamount < self.lineitem.spent:
+            self.forecastamount = self.lineitem.spent
+        super(LineForecast, self).save(*args, **kwargs)
 
     def below_spent(self, request, lineitem: LineItem) -> bool:
         if self.forecastamount < lineitem.spent:

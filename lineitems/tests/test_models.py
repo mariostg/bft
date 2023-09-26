@@ -1,31 +1,30 @@
 from django.test import TestCase
+import pytest
 
-from lineitems.models import LineItem, LineForecast
+from lineitems.models import LineItem, LineForecast, LineForecastManager
 from encumbrance.models import EncumbranceImport, Encumbrance
-from bft.management.commands.uploadcsv import Command
-import bft.management.commands.populate as populate
+from bft.management.commands import populate, uploadcsv
 
 
-class LineItemManagerTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        print("Setting up")
-        filldata = populate.Command()
-        filldata.handle()
-        a = Command()
-        a.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
-
+@pytest.mark.django_db
+class TestLineItemManager:
     def test_get_line_items_when_cost_center_exists(self):
-        from costcenter.models import CostCenter
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
 
         li = LineItem.objects.cost_center("8486C1")
-        self.assertGreater(li.count(), 0)
+        assert li.count() > 0
 
     def test_get_line_items_when_cost_center_not_exists(self):
-        from costcenter.models import CostCenter
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
 
         li = LineItem.objects.cost_center("0000C1")
-        self.assertIsNone(li)
+        assert li == None
 
 
 class LineItemModelTest(TestCase):
@@ -147,12 +146,38 @@ class LineItemManagementTest(TestCase):
         self.assertEqual(1, LineItem.objects.filter(fcintegrity=False).count())
 
 
-class LineForecastModelTest(TestCase):
-    def test_create_line_forecast(self):
-        LineForecast.objects.all().delete()
+@pytest.mark.django_db
+class TestLineForecastModel:
+    def test_create_forecast_higher_than_wp(self):
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+
         li = LineItem.objects.all().first()
-        data = {"forecastamount": 1000, "lineitem": li}
-        fcst = LineForecast(**data)
-        fcst.save()
-        saved = LineForecast.objects.all().count()
-        self.assertEqual(1, saved)
+        new_fcst = li.workingplan + 10000
+
+        line_fcst = LineForecast()
+        line_fcst.lineitem = li
+        line_fcst.forecastamount = new_fcst
+        line_fcst.save()
+
+        fcst = LineForecastManager().get_line_forecast(li)
+        assert fcst.forecastamount == li.workingplan
+
+    def test_create_forecast_smaller_than_spent(self):
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+
+        li = LineItem.objects.filter(spent__gt=0).first()
+        new_fcst = float(li.spent) * 0.1
+
+        line_fcst = LineForecast()
+        line_fcst.lineitem = li
+        line_fcst.forecastamount = new_fcst
+        line_fcst.save()
+
+        fcst = LineForecastManager().get_line_forecast(li)
+        assert fcst.forecastamount == li.spent
