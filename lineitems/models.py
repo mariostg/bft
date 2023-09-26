@@ -270,8 +270,3 @@ class LineForecast(models.Model):
             )
             return True
         return False
-
-    # def save(self, *args, **kwargs):
-    # do_something before()
-    # super.save(*args, **kwargs)
-    # do_something_after()
