@@ -42,14 +42,14 @@ class TestLineItemManager:
 
     def test_line_item_detailed_empty(self):
         r = LineItem
-        assert True == r.objects.line_item_detailed().empty
+        assert True == r.objects.line_item_detailed_dataframe().empty
 
     def test_line_item_detailed(self):
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
         up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
-        li_df = LineItemManager().line_item_detailed()
+        li_df = LineItemManager().line_item_detailed_dataframe()
         for c in li_df.columns:
             print(c)
         assert "Lineitem_ID" in li_df.columns

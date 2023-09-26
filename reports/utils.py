@@ -177,7 +177,7 @@ class CostCenterScreeningReport(Report):
             pd.DataFrame: _description_
         """
         df = pd.DataFrame()
-        li_df = LineItem.objects.line_item_detailed()
+        li_df = LineItem.objects.line_item_detailed_dataframe()
         for i in li_df.columns:
             print(i)
         if len(li_df) > 0:

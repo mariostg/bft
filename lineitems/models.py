@@ -37,7 +37,7 @@ class LineItemManager(models.Manager):
         else:
             return pd.DataFrame({})
 
-    def line_item_detailed(self) -> pd.DataFrame:
+    def line_item_detailed_dataframe(self) -> pd.DataFrame:
         """
         Prepare a pandas dataframe of merged line items, forecast line items and cost center.
 
