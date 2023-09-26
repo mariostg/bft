@@ -52,7 +52,7 @@ class LineItemManager(models.Manager):
             cc_df = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
 
             if len(fcst_df) > 0:
-                li_df = pd.merge(li_df, fcst_df, how="left", on="lineitem_id")
+                li_df = pd.merge(li_df, fcst_df, how="left", on="Lineitem_ID")
             else:
                 li_df["Forecast"] = 0
             li_df = pd.merge(li_df, cc_df, how="left", on="Costcenter_ID")

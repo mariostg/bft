@@ -1,5 +1,5 @@
 import pytest
-from lineitems.models import LineItem, LineItemManager
+from lineitems.models import LineItem, LineItemManager, LineForecast
 from bft.management.commands import populate, uploadcsv
 
 
@@ -22,11 +22,11 @@ class TestLineItemManager:
         assert "Lineitem_ID" in df.columns
         assert "Costcenter_ID" in df.columns
 
-    def test_line_item_detailed_empty(self):
+    def test_line_item_detailed_dataframe_empty(self):
         r = LineItem
         assert True == r.objects.line_item_detailed_dataframe().empty
 
-    def test_line_item_detailed(self):
+    def test_line_item_detailed_dataframe(self):
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
@@ -44,3 +44,16 @@ class TestLineItemManager:
         assert "Fund_ID" in li_df.columns
         assert "Forecast" in li_df.columns
         assert 0 < len(li_df)
+
+    def test_line_item_detailed_dataframe_with_forecast(self):
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+
+        li = LineItem.objects.all().first()
+        data = {"forecastamount": 1000, "lineitem": li}
+        fcst = LineForecast(**data)
+        fcst.save()
+
+        li_df = LineItemManager().line_item_detailed_dataframe()
