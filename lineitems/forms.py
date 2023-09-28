@@ -45,3 +45,8 @@ class SearchLineItemForm(forms.ModelForm):
             "createdby",
             "status",
         )
+
+
+class DocumentNumberForm(forms.Form):
+    docno = forms.CharField(label="Document Number", max_length=24)
+    forecastamount = forms.DecimalField(label="Forecast Amount", max_digits=10, decimal_places=2)

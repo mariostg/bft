@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
+from django.db.models import Sum
 from django.core.paginator import Paginator
 import logging
 from .models import LineItem, LineForecast
 from utils import getrequestfilter
-from .forms import LineForecastForm, SearchLineItemForm
+from .forms import LineForecastForm, SearchLineItemForm, DocumentNumberForm
 
 logger = logging.getLogger("django")
 
@@ -132,3 +133,28 @@ def costcenter_lineitems(request, costcenter):
         messages.info(request, f"There appears to be no line items in {costcenter}")
     context = {"data": data}
     return render(request, "lineitems/lineitem-table.html", context)
+
+
+def document_forecast(request, docno):
+    context = {}
+    context["docno"] = docno
+    if request.method == "POST":
+        form = DocumentNumberForm(request.POST)
+        if form.is_valid():
+            docno = request.POST.get("docno")
+            forecast = request.POST.get("forecastamount")
+            lf = LineForecast().forecast_line_by_line(docno, float(forecast))
+            return redirect("lineitem-page")
+    doc = LineItem.objects.filter(docno=docno)
+    agg = doc.aggregate(Sum("workingplan"), Sum("spent"))
+    form = DocumentNumberForm(
+        initial={
+            "docno": docno,
+            "forecastamount": agg["workingplan__sum"],
+        }
+    )
+    context["form"] = form
+    context["agg"] = agg
+    if doc.count() == 0:
+        messages.warning(request, f"Requested document number was not found : {docno} ")
+    return render(request, "lineitems/document-item-forecast-form.html", context)
