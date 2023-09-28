@@ -1,6 +1,6 @@
 from django.test import TestCase
 import pytest
-
+from django.db.models import Sum
 from lineitems.models import LineItem, LineForecast, LineForecastManager
 from encumbrance.models import EncumbranceImport, Encumbrance
 from bft.management.commands import populate, uploadcsv
@@ -181,3 +181,34 @@ class TestLineForecastModel:
 
         fcst = LineForecastManager().get_line_forecast(li)
         assert fcst.forecastamount == li.spent
+
+    def test_forecast_document_number_to_working_plan(self):
+        # each line item will have a forecast equivalent to its own working plan
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        docno = "12699110"
+
+        lf = LineForecast
+        target_forecast = LineItem.objects.filter(docno=docno).aggregate(Sum("workingplan"))["workingplan__sum"]
+        lf().forecast_line_by_line(docno, target_forecast)
+
+        applied_forecast = lf.objects.aggregate(Sum("forecastamount"))["forecastamount__sum"]
+        assert applied_forecast == target_forecast
+
+    def test_forecast_document_number_to_zero(self):
+        # When setting document forecast to 0, forecast will consider spent and assign this value or 0.
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        docno = "12699110"
+
+        lf = LineForecast
+        target_forecast = 0
+        total_spent = LineItem.objects.filter(docno=docno).aggregate(Sum("spent"))["spent__sum"]
+        lf().forecast_line_by_line(docno, target_forecast)
+
+        applied_forecast = lf.objects.aggregate(Sum("forecastamount"))["forecastamount__sum"]
+        assert applied_forecast == total_spent

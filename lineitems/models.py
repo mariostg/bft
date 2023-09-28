@@ -264,8 +264,10 @@ class LineForecast(models.Model):
     def save(self, *args, **kwargs):
         if self.forecastamount > self.lineitem.workingplan:
             self.forecastamount = self.lineitem.workingplan
+            print("TOO HIGH")
         if self.forecastamount < self.lineitem.spent:
             self.forecastamount = self.lineitem.spent
+            print("TOO LOW")
         super(LineForecast, self).save(*args, **kwargs)
 
     def below_spent(self, request, lineitem: LineItem) -> bool:
@@ -285,3 +287,16 @@ class LineForecast(models.Model):
             )
             return True
         return False
+
+    def forecast_line_by_line(self, docno: str, forecast: int):
+        lines = LineItem.objects.filter(docno=docno)
+        document_working_plan = lines.aggregate(models.Sum("workingplan"))["workingplan__sum"]
+        ratio = forecast / document_working_plan
+        for li in lines:
+            if hasattr(li, "fcst"):
+                li_fcst = LineForecastManager().get_line_forecast(li)
+                li_fcst.forecastamount = li.workingplan * ratio
+                li_fcst.save()
+            else:
+                li_fcst = LineForecast(lineitem=li, forecastamount=li.workingplan * ratio)
+                li_fcst.save()
