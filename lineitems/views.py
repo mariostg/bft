@@ -11,7 +11,21 @@ from .forms import LineForecastForm, SearchLineItemForm, DocumentNumberForm
 logger = logging.getLogger("django")
 
 
-def lineitem_page(request):
+def document_page(request, docno):
+    lines = LineItem.objects.filter(docno=docno)
+    paginator = Paginator(lines, 25)
+    page_number = request.GET.get("page")
+    form = SearchLineItemForm()
+    context = {
+        "data": paginator.get_page(page_number),
+        "form": form,
+        # "initial": initial,
+        # "query_string": query_string,
+    }
+    return render(request, "lineitems/lineitem-table.html", context)
+
+
+def lineitem_page(request, docno=None):
     logger.info("Visiting Line Item page as info")
     lines, initial, query_string = getrequestfilter.search_lines(request)
     paginator = Paginator(lines, 25)
@@ -144,7 +158,7 @@ def document_forecast(request, docno):
             docno = request.POST.get("docno")
             forecast = request.POST.get("forecastamount")
             lf = LineForecast().forecast_line_by_line(docno, float(forecast))
-            return redirect("lineitem-page") #TODO Redirect to docno page
+            return redirect("document-page", docno)
     doc = LineItem.objects.filter(docno=docno)
     agg = doc.aggregate(Sum("workingplan"), Sum("spent"))
     form = DocumentNumberForm(

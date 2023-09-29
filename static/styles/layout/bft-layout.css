@@ -46,7 +46,10 @@
 .c4 {
     grid-template-columns: repeat(4, 1fr);
 }
-
+.spread {
+    display: flex;
+    justify-content: space-between;
+}
 .header {
     background-color: #4b5544;
     color: #bec6b8;

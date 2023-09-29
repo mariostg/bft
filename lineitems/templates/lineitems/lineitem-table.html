@@ -20,7 +20,7 @@
 {% for line in data  %}
 <article class="container lineitem">
     <div class='lineitem__header'> 
-        <div class='padded'> <a href="{% url 'lineitem-page'%}?docno={{line.docno }}">{{line.docno }}</a> - {{line.lineno }} {{line.linetext|default:''}}</div>
+        <div class='padded'> <a href="{% url 'document-page' line.docno %}">{{line.docno }}</a> - {{line.lineno }} {{line.linetext|default:''}}</div>
         {% if line.fcintegrity == False%} <div class="hint-warning">Fund center incoherent</div> {% endif %}
         <div class=''>{{line.fundcenter}} - {{line.costcenter}} - {{line.fund}} : {{line.id}}:{{line.status}}</div> 
     </div>
@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        <div class="columns c2 frame">
+        <div class="spread frame">
             <div class='lineitem__nav'>
                 <div>Forecast Document</div>
                 <a class="btn btn--link-small" href="{% url 'document-forecast' line.docno %}">No {{line.docno}}</a>
