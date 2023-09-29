@@ -18,10 +18,6 @@
     padding: 1rem 0;
 }
 
-.frame {
-    padding: 0 1rem;
-}
-
 .columns {
     display: grid;
     column-gap: 1.5rem;
@@ -30,6 +26,9 @@
     align-items: center;
 }
 
+.frame {
+    padding: 0 1rem;
+}
 .rows {
     display: flex;
     align-items: center;

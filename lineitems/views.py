@@ -144,7 +144,7 @@ def document_forecast(request, docno):
             docno = request.POST.get("docno")
             forecast = request.POST.get("forecastamount")
             lf = LineForecast().forecast_line_by_line(docno, float(forecast))
-            return redirect("lineitem-page")
+            return redirect("lineitem-page") #TODO Redirect to docno page
     doc = LineItem.objects.filter(docno=docno)
     agg = doc.aggregate(Sum("workingplan"), Sum("spent"))
     form = DocumentNumberForm(

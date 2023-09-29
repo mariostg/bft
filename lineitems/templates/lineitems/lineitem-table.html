@@ -44,29 +44,38 @@
         {% if line.workingplan == 0 %}
         <a class="btn btn--link-small btn-delete" href="{% url 'line-item-delete' line.id %}">Delete Line</a>
         {% elif not line.fcst.id %} 
+        <span>Forecast Document</span>
+        <a class="btn btn--link-small" href="{% url 'document-forecast' line.docno %}">No {{line.docno}}</a>
             <a class='btn btn--link-small' href="{% url 'line-forecast-add' line.id%}">Create Forecast</a>
         {% else %}
             <div class="{% if line.fcst.forecastamount < 0%} hint-too-low {% elif line.fcst.forecastamount > line.workingplan %} hint-warning{% endif %}"> Forecast:{{line.fcst.forecastamount|intcomma}}
             </div>
         </div>
 
-        <div class="lineitem__nav">
-            <div>Modify Forecast:</div>
-            <div>
-                {% if line.workingplan != line.fcst.forecastamount %}
-                <a class="btn btn--link-small" href="{% url 'line-forecast-to-wp-update' line.fcst.id %}">Set to WP</a>
-                {% endif %}
+        <div class="columns c2 frame">
+            <div class='lineitem__nav'>
+                <div>Forecast Document</div>
+                <a class="btn btn--link-small" href="{% url 'document-forecast' line.docno %}">No {{line.docno}}</a>
+            </div>
+            <div class='lineitem__nav'>
+                <div>Forecast Item</div>
+                <div>
+                    {% if line.workingplan != line.fcst.forecastamount %}
+                    <a class="btn btn--link-small" href="{% url 'line-forecast-to-wp-update' line.fcst.id %}">Set to WP</a>
+                    {% endif %}
 
-                {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
-                <a class="btn btn--link-small" href="{% url 'line-forecast-zero-update' line.fcst.id %}">Set to 0</a>
-                {% endif %}
+                    {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
+                    <a class="btn btn--link-small" href="{% url 'line-forecast-zero-update' line.fcst.id %}">Set to 0</a>
+                    {% endif %}
 
-                {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
-                <a class="btn btn--link-small btn-delete" 
-                    href="{% url 'line-forecast-delete' line.fcst.id %}" >Delete</a >
-                {% endif %}
+                    {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
+                    <a class="btn btn--link-small btn-delete"
+                        href="{% url 'line-forecast-delete' line.fcst.id %}" >Delete</a >
+                    {% endif %}
 
-                <a class="btn btn--link-small" href="{% url 'line-forecast-update' line.fcst.id %}">Form input</a>
+                    <a class="btn btn--link-small" href="{% url 'line-forecast-update' line.fcst.id %}">Form input</a>
+                </div>
+
             </div>
         </div>
         {% endif %}

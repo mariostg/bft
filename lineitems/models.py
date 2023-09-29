@@ -298,5 +298,5 @@ class LineForecast(models.Model):
                 li_fcst.forecastamount = float(li.workingplan) * ratio
                 li_fcst.save()
             else:
-                li_fcst = LineForecast(lineitem=li, forecastamount=li.workingplan * ratio)
+                li_fcst = LineForecast(lineitem=li, forecastamount=float(li.workingplan) * ratio)
                 li_fcst.save()
