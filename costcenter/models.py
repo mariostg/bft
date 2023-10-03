@@ -165,7 +165,7 @@ class FundCenterManager(models.Manager):
             alloc = FundCenterAllocation.objects.all()
         if fundcenter:
             if isinstance(fundcenter, str):
-                fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
+                fundcenter = FundCenter.objects.get(fundcenter__iexact=fundcenter)
             alloc = alloc.filter(fundcenter=fundcenter)
         if fund:
             if isinstance(fund, str):

@@ -17,7 +17,7 @@
         <tbody>
             {% for elem in fundcenters %}
             <tr>
-            <td>{{elem.sequence}}</td><td>{{elem.fundcenter}}</td><td>{{elem.shortname}}<td>{{elem.parent}}</td>
+            <td>{{elem.sequence}}</td><td>{{elem.fundcenter}}</td><td>{{elem.shortname}}<td>{{elem.fundcenter_parent}}</td>
             <td> <a class='btn' href="{% url "fundcenter-costcenters" elem.pk  %}">Cost centers</a></button> </td>
             {% if user.is_authenticated %}
             <td> <a class='btn'href="{% url "fundcenter-update" elem.id %}">Update</a></button> </td>
