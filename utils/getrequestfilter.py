@@ -49,7 +49,7 @@ def search_lines(request):
             createdby__icontains=createdby,
         )
     if request.GET.get("status"):
-        status = request.GET.get("status")
+        status = request.GET.get("status").capitalize()
         data = data.filter(
             status__exact=status,
         )
