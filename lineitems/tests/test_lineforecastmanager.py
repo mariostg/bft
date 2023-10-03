@@ -21,6 +21,7 @@ class TestLineForecastManager:
         assert True == ("Forecast" in li_df.columns)
         assert True == ("Delivery Date" in li_df.columns)
         assert 1 == len(li_df)
+        assert "int" == li_df.dtypes.Forecast
 
     def test_get_line_forecast_from_lineitem_when_no_forecast(self):
         hnd = populate.Command()
