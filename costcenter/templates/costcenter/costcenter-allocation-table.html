@@ -10,7 +10,7 @@
         {% for item in data %}
         <section class='summary'>
             <div class='summary__header'>
-                <span>{{item.costcenter}} [{{item.costcenter.parent.fundcenter}}]</span>
+                <span>{{item.costcenter}} [{{item.costcenter.costcenter_parent.fundcenter}}]</span>
                 <span>{{item.fund}}</span>
                 <span>{{item.fy|stringformat:'s'}}</span>
                 <span>{{item.quarter}}</span>
