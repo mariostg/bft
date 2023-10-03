@@ -20,7 +20,7 @@
             <span>{{elem.source}}</span>
         </div>
         <div class="summary__body">
-            {{elem.note}}
+            {{elem.note|linebreaksbr}}
         </div>
         {% if user.is_authenticated %}
         <div class="summary__footer">
