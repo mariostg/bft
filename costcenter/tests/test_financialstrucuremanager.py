@@ -104,7 +104,7 @@ class TestFinancialStructureManager:
 
     def test_create_root_sequence(self, setup):
         sequence = self.fsm.set_parent()
-        assert "1" == sequence
+        assert "2" == sequence
 
     def test_create_child_of_root(self, setup):
         pc = populate.Command()
@@ -148,13 +148,6 @@ class TestFinancialStructureManager:
         p = self.fsm.set_parent(fundcenter_parent=parent)
         assert "1.1.2.1" == p
 
-    def test_set_parent_without_parent(self, setup):
-        pc = populate.Command()
-        pc.handle()
-
-        p = self.fsm.set_parent()
-        assert "1" == p
-
     def test_set_parent_of_cost_center(self, setup):
         pc = populate.Command()
         pc.handle()
@@ -184,3 +177,24 @@ class TestFinancialStructureManager:
         cc["sequence"] = self.fsm.set_parent(parent, True)
         costcenter = CostCenter.objects.create(**cc)
         assert "1.1.1.0.1" == costcenter.sequence
+
+    def test_last_root_with_no_root_element(self):
+        fsm = FinancialStructureManager()
+
+        assert None == fsm.last_root()
+
+    def test_last_root_with_one_root_element(self):
+        fc = {"fundcenter": "1111AA", "shortname": "root 1", "fundcenter_parent": None}
+        FundCenter.objects.create(**fc)
+        fsm = FinancialStructureManager()
+
+        assert "1" == fsm.last_root()
+
+    def test_last_root_with_two_roots_element(self):
+        fc = {"fundcenter": "1111AA", "shortname": "root 1", "fundcenter_parent": None}
+        FundCenter.objects.create(**fc)
+        fc = {"fundcenter": "1111AB", "shortname": "root 2", "fundcenter_parent": None}
+        FundCenter.objects.create(**fc)
+        fsm = FinancialStructureManager()
+
+        assert "2" == fsm.last_root()

@@ -305,20 +305,6 @@ class TestFundCenterModel:
         assert "1111AA" == saved_fc.fundcenter
         assert "1" == saved_fc.sequence
 
-    def test_save_duplicate_root_sequence(self):
-        fc = {"fundcenter": "1111aa", "shortname": "defgh"}
-        first_fc = FundCenter(**fc)
-        first_fc.save()
-
-        saved_fc = FundCenter.objects.get(pk=first_fc.pk)
-        assert "1111AA" == saved_fc.fundcenter
-        assert "1" == saved_fc.sequence
-
-        fc = {"fundcenter": "1111ab", "shortname": "defgh"}
-        second_fc = FundCenter(**fc)
-        with pytest.raises(IntegrityError):
-            second_fc.save()
-
     def test_save_without_shortname(self):
         first_fc = FundCenter()
         first_fc.fundcenter = "1111aa"

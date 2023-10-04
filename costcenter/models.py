@@ -346,7 +346,12 @@ class FinancialStructureManager(models.Manager):
             str: A string the represents the child sequence number.
         """
         if fundcenter_parent == None:
-            return "1"
+            last_root = FinancialStructureManager().last_root()
+            if not last_root:
+                parent = "1"
+            else:
+                parent = str(int(last_root) + 1)
+            return parent
         new_seq = self.create_child(fundcenter_parent.fundcenter, costcenter_child)
         return new_seq
 
@@ -474,6 +479,25 @@ class FinancialStructureManager(models.Manager):
         new_born = ".".join(new_born)
         return new_born
 
+    def last_root(self) -> str | None:
+        """A root element is one where the sequence number does not contain a dot ('.').
+        last_root function finds the highest sequence number amongst the root elements.
+
+        Returns:
+            str | None: The last sequence number assigned as a root element or None if there is no root element.
+        """
+        seq = list(FundCenter.objects.all().values_list("sequence", flat=True))
+        if not seq:
+            return None
+
+        return str(max([int(s) for s in seq if "." not in s]))
+
+    def new_root(self) -> str:
+        lr = self.last_root()
+        if not lr:
+            return "1"
+        return str(int(lr) + 1)
+
     def CostCenters(self):
         pass
 
@@ -484,7 +508,7 @@ class FinancialStructureManager(models.Manager):
 class FundCenter(models.Model):
     fundcenter = models.CharField("Fund Center", max_length=6, unique=True)
     shortname = models.CharField("Fund Center Name", max_length=25, null=True, blank=True)
-    sequence = models.CharField("FC Sequence No", max_length=25, unique=True, default="1")
+    sequence = models.CharField("FC Sequence No", max_length=25, unique=True)
     fundcenter_parent = models.ForeignKey(
         "self",
         on_delete=models.RESTRICT,
@@ -507,8 +531,8 @@ class FundCenter(models.Model):
         verbose_name_plural = "Fund Centers"
 
     def save(self, *args, **kwargs):
-        if self.sequence == None and self.fundcenter_parent == None:
-            self.sequence = "1"
+        if self.sequence == "" and self.fundcenter_parent == None:
+            self.sequence = FinancialStructureManager().new_root()
         if self.fundcenter_parent and self.fundcenter == self.fundcenter_parent.fundcenter:
             raise IntegrityError("Children Fund center cannot assign itself as parent")
         self.fundcenter = self.fundcenter.upper()
