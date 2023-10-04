@@ -200,11 +200,11 @@ class CostCenterScreeningReport(Report):
                     df["Forecast Total"] = df["Forecast"] + df["Forecast Adjustment"]
         return df
 
-    def financial_structure_dataframe(self) -> pd.DataFrame | None:
+    def financial_structure_dataframe(self) -> pd.DataFrame:
         fc = FundCenterManager().fund_center_dataframe(FundCenter.objects.all())
         cc = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
         if fc.empty or cc.empty:
-            return None
+            return pd.DataFrame()
         merged = pd.merge(
             fc,
             cc,

@@ -3,6 +3,7 @@ from reports.utils import CostCenterScreeningReport
 from costcenter.models import CostCenterAllocation, Fund, CostCenterManager, ForecastAdjustment
 from bft.management.commands import populate, uploadcsv
 import numpy as np
+import pandas as pd
 
 
 @pytest.mark.django_db
@@ -32,4 +33,5 @@ class TestCostCenterScreeningReport:
     def test_financial_structure_dataframe_empty(self):
         r = CostCenterScreeningReport()
         data = r.financial_structure_dataframe()
-        assert None == data
+        assert True == isinstance(data, pd.DataFrame)
+        assert True == data.empty
