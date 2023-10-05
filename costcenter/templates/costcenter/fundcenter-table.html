@@ -7,6 +7,7 @@
         <caption>Fund Centers</caption>
         <thead>
             <tr>
+                <th>line No</th>
                 <th>Seq. No</th>
                 <th>FundCenter</th>
                 <th>Name</th>
@@ -17,6 +18,7 @@
         <tbody>
             {% for elem in fundcenters %}
             <tr>
+            <td>{{ forloop.counter }}</td>
             <td>{{elem.sequence}}</td><td>{{elem.fundcenter}}</td><td>{{elem.shortname}}<td>{{elem.fundcenter_parent}}</td>
             <td> <a class='btn' href="{% url "fundcenter-costcenters" elem.pk  %}">Cost centers</a></button> </td>
             {% if user.is_authenticated %}
