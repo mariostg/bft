@@ -216,6 +216,8 @@ class FundCenterManager(models.Manager):
         return df
 
     def get_direct_descendants(self, fundcenter: "FundCenter|str") -> list | None:
+        if not fundcenter:
+            return []
         if isinstance(fundcenter, str):
             try:
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter.upper())
@@ -303,9 +305,26 @@ class FinancialStructureManager(models.Manager):
             bool: True is child is direct descendant of parent.
         """
         if isinstance(child, FundCenter):
-            return parent.fundcenter == child.fundcenter_parent.fundcenter
+            try:
+                _parent = FundCenter.objects.get(fundcenter=parent.fundcenter)
+            except FundCenter.DoesNotExist:
+                return False
+            try:
+                _child = FundCenter.objects.get(fundcenter=child.fundcenter)
+            except FundCenter.DoesNotExist:
+                return False
+            return self.is_sequence_child_of(_parent.sequence, _child.sequence)
+            # return _parent.fundcenter == _child.fundcenter_parent.fundcenter
         elif isinstance(child, CostCenter):
-            return parent.fundcenter == child.costcenter_parent.fundcenter
+            try:
+                _parent = FundCenter.objects.get(fundcenter=parent.fundcenter)
+            except FundCenter.DoesNotExist:
+                return False
+            try:
+                _child = CostCenter.objects.get(costcenter=child.costcenter)
+            except CostCenter.DoesNotExist:
+                return False
+            return _parent.fundcenter == _child.costcenter_parent.fundcenter
         else:
             return False
 
@@ -531,10 +550,13 @@ class FundCenter(models.Model):
         verbose_name_plural = "Fund Centers"
 
     def save(self, *args, **kwargs):
-        if self.sequence == "" and self.fundcenter_parent == None:
+        if self.fundcenter_parent == None:
             self.sequence = FinancialStructureManager().new_root()
-        if self.fundcenter_parent and self.fundcenter == self.fundcenter_parent.fundcenter:
+        elif self.fundcenter_parent and self.fundcenter == self.fundcenter_parent.fundcenter:
             raise IntegrityError("Children Fund center cannot assign itself as parent")
+        elif not FinancialStructureManager().is_child_of(self.fundcenter_parent, self):
+            self.sequence = FinancialStructureManager().set_parent(self.fundcenter_parent)
+
         self.fundcenter = self.fundcenter.upper()
         if self.shortname:
             self.shortname = self.shortname.upper()
@@ -713,10 +735,15 @@ class CostCenter(models.Model):
         verbose_name_plural = "Cost Centers"
 
     def save(self, *args, **kwargs):
+        if not FinancialStructureManager().is_child_of(self.costcenter_parent, self):
+            self.sequence = FinancialStructureManager().set_parent(self.costcenter_parent, costcenter_child=True)
+        if self.costcenter_parent and self.costcenter == self.costcenter_parent.fundcenter:
+            raise IntegrityError("Children Fund center cannot assign itself as parent")
+
         self.costcenter = self.costcenter.upper()
         if self.shortname:
             self.shortname = self.shortname.upper()
-        super().save(*args, **kwargs)
+        super(CostCenter, self).save(*args, **kwargs)
 
 
 class ForecastAdjustment(models.Model):
@@ -765,7 +792,7 @@ class Allocation(models.Model):
             )
         if not self.fund:
             raise ValueError("Allocation cannot be saved without Fund")
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 class CostCenterAllocation(Allocation):

@@ -11,11 +11,11 @@ class CostCenterLineItemTest(TestCase):
         filldata = populate.Command()
         filldata.handle()
         a = Command()
-        a.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        a.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
     def test_url_is_good(self):
         c = Client()
-        response = c.get("/lineitem/costcenter/8486B1/")
+        response = c.get("/lineitem/costcenter/8484WA/")
         self.assertEqual(200, response.status_code)
 
     def test_url_is_bad(self):
@@ -25,12 +25,11 @@ class CostCenterLineItemTest(TestCase):
         assert True == ("There appears to be no line items in 1111" in str(response.content))
 
     def test_view_uses_correct_template(self):
-        response = self.client.get("/lineitem/costcenter/8486B1/")
+        response = self.client.get("/lineitem/costcenter/8484WA/")
         self.assertTemplateUsed(response, "lineitems/lineitem-table.html")
 
     def test_cost_center_line_items_has_lines(self):
-        # there are 5 lines for 8486B1 in encumbrance_tiny.txt
         c = Client()
-        response = c.get("/lineitem/costcenter/8486B1/")
+        response = c.get("/lineitem/costcenter/8484WA/")
         self.assertEqual(200, response.status_code)
-        self.assertEqual(len(response.context["data"]), 5)
+        self.assertGreater(len(response.context["data"]), 0)

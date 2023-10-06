@@ -16,6 +16,8 @@ from costcenter.models import (
 from lineitems.models import LineForecast, LineItem
 from bft.models import BftStatus, BftStatusManager
 
+from bft import finstructure
+
 
 class Command(BaseCommand):
     """
@@ -72,77 +74,136 @@ class Command(BaseCommand):
                 print(f"Created Source {new_item}")
 
     def set_fund_center(self):
-        # Create root FC
-        fc = {"fundcenter": "1111AA", "shortname": "root", "fundcenter_parent": None}
-        new_item = FundCenter.objects.create(**fc)
-        root = FundCenter.objects.filter(fundcenter="1111AA").first()
-        print(f"Created Fund Center {root}, sequence {root.sequence}")
+        def set_children(parent, children):
+            for child_obj in children:
+                try:
+                    found = FundCenter.objects.get(fundcenter=child_obj["fundcenter"])
+                    if found:
+                        print(f"Fund Center {found} exists")
+                except FundCenter.DoesNotExist:
+                    new_item = FundCenter.objects.create(**child_obj, fundcenter_parent=parent)
+                    print(f"Created Fund Center {new_item}, sequence {new_item.sequence}")
 
-        root_children = [
-            {"fundcenter": "1111AB", "shortname": "AB", "fundcenter_parent": root},
-            {"fundcenter": "1111AC", "shortname": "AC", "fundcenter_parent": root},
-        ]
-        for item in root_children:
-            try:
-                found = FundCenter.objects.get(fundcenter=item["fundcenter"])
-                if found:
-                    print(f"Fund Center {found} exists")
-            except FundCenter.DoesNotExist:
-                item["sequence"] = FinancialStructureManager().set_parent(fundcenter_parent=root)
-                new_item = FundCenter.objects.create(**item)
-                print(f"Created Fund Center {new_item}, sequence {new_item.sequence}")
+        # Create root DND
+        dnd_obj = FundCenter.objects.create(**finstructure.dnd)
+        dnd_obj = FundCenter.objects.get(pk=dnd_obj.pk)
+        print(f"Created Fund Center {dnd_obj}, sequence {dnd_obj.sequence}")
+        dnd = FundCenter.objects.get(fundcenter="0162ND")
+        set_children(dnd, finstructure.dnd_children)
 
-        ab = FundCenter.objects.filter(fundcenter="1111AB").first()
-        ab_children = [
-            {"fundcenter": "2222BA", "shortname": "BA", "fundcenter_parent": ab},
-            {"fundcenter": "2222BB", "shortname": "BB", "fundcenter_parent": ab},
-        ]
-        for item in ab_children:
-            try:
-                found = FundCenter.objects.get(fundcenter=item["fundcenter"])
-                if found:
-                    print(f"Fund Center {found} exists")
-            except FundCenter.DoesNotExist:
-                item["sequence"] = FinancialStructureManager().set_parent(fundcenter_parent=ab)
-                new_item = FundCenter.objects.create(**item)
-                print(f"Created Fund Center {new_item}")
+        special_ops = FundCenter.objects.get(fundcenter="6399AA")
+        set_children(special_ops, finstructure.special_ops_children)
+
+        admmat = FundCenter.objects.get(fundcenter="0153ZZ")
+        set_children(admmat, finstructure.admmat_children)
+
+        dglepm = FundCenter.objects.get(fundcenter="2184AA")
+        set_children(dglepm, finstructure.dglepm_children)
+
+        wd = FundCenter.objects.get(fundcenter="1985BA")
+        set_children(wd, finstructure.wd_fundcenters)
+
+        dglepm_corp = FundCenter.objects.get(fundcenter="2184BB")
+        set_children(dglepm_corp, finstructure.dglepm_corp_fundcenters)
+
+        dsspm = FundCenter.objects.get(fundcenter="2184BC")
+        set_children(dsspm, finstructure.dsspm_fundcenters)
+
+        davpm = FundCenter.objects.get(fundcenter="2184BD")
+        set_children(davpm, finstructure.davpm_children)
+
+        dsvpm = FundCenter.objects.get(fundcenter="2184BE")
+        set_children(dsvpm, finstructure.dsvpm_fundcenters)
+
+        dleps = FundCenter.objects.get(fundcenter="2184BK")
+        set_children(dleps, finstructure.dleps_fundcenters)
+
+        daspm = FundCenter.objects.get(fundcenter="2184BP")
+        set_children(daspm, finstructure.daspm_fundcenters)
+
+        dlcspm = FundCenter.objects.get(fundcenter="2184BQ")
+        set_children(dlcspm, finstructure.dlcspm_fundcenters)
+
+        dcsem = FundCenter.objects.get(fundcenter="2184BR")
+        set_children(dcsem, finstructure.dcsem_fundcenters)
+
+        daeme = FundCenter.objects.get(fundcenter="2184DA")
+        set_children(daeme, finstructure.daeme_fundcenters)
+
+        qete = FundCenter.objects.get(fundcenter="2689BQ")
+        set_children(qete, finstructure.qete_fundcenters)
+
+        a82184 = FundCenter.objects.get(fundcenter="2184A8")
+        set_children(a82184, finstructure.a82184_fundcenters)
+
+        c22184 = FundCenter.objects.get(fundcenter="2184C2")
+        set_children(c22184, finstructure.c22184_fundcenters)
+
+        c32184 = FundCenter.objects.get(fundcenter="2184C3")
+        set_children(c32184, finstructure.c32184_fundcenters)
+
+        cs2184 = FundCenter.objects.get(fundcenter="2184CS")
+        set_children(cs2184, finstructure.cs2184_fundcenters)
+
+        e32184 = FundCenter.objects.get(fundcenter="2184E3")
+        set_children(e32184, finstructure.e32184_fundcenters)
+
+        q32184 = FundCenter.objects.get(fundcenter="2184Q3")
+        set_children(q32184, finstructure.q32184_fundcenters)
+
+        q42184 = FundCenter.objects.get(fundcenter="2184Q4")
+        set_children(q42184, finstructure.q42184_fundcenters)
+
+        r22184 = FundCenter.objects.get(fundcenter="2184R2")
+        set_children(r22184, finstructure.r22184_fundcenters)
+
+        r32184 = FundCenter.objects.get(fundcenter="2184R3")
+        set_children(r32184, finstructure.r32184_fundcenters)
+
+        r62184 = FundCenter.objects.get(fundcenter="2184R6")
+        set_children(r62184, finstructure.r62184_fundcenters)
+
+        # xxxx = FundCenter.objects.get(fundcenter="")
+        # xxxx_fundcenters = [
+        #     {"fundcenter": "", "shortname": "", "fundcenter_parent": xxxx},
+        #     {"fundcenter": "", "shortname": "", "fundcenter_parent": xxxx},
+        # ]
 
     def set_cost_center(self):
         fund = Fund.objects.get(fund="C113")
         source = Source.objects.get(source="Kitchen")
-        ab = FundCenter.objects.get(fundcenter="1111AB")
-        ac = FundCenter.objects.get(fundcenter="1111AC")
+        a32184 = FundCenter.objects.get(fundcenter="2184A3")
         FSM = FinancialStructureManager()
         items = [
             {
-                "costcenter": "8486B1",
+                "costcenter": "8484WA",
                 "shortname": "Utensils",
                 "fund": fund,
                 "source": source,
                 "isforecastable": True,
                 "isupdatable": True,
                 "note": "",
-                "costcenter_parent": ac,
+                "costcenter_parent": a32184,
             },
             {
-                "costcenter": "8486C1",
+                "costcenter": "8484XA",
                 "shortname": "Food and drink",
                 "fund": fund,
                 "source": source,
                 "isforecastable": True,
                 "isupdatable": True,
                 "note": "A quick and short note for 1234FF",
-                "costcenter_parent": ab,
+                "costcenter_parent": a32184,
             },
             {
-                "costcenter": "8486C2",
+                "costcenter": "8484YA",
                 "shortname": "Basement Stuff",
                 "fund": fund,
                 "source": source,
                 "isforecastable": True,
                 "isupdatable": True,
                 "note": "",
-                "costcenter_parent": ab,
+                "costcenter_parent": a32184,
             },
         ]
         for item in items:
@@ -151,7 +212,6 @@ class Command(BaseCommand):
                 if found:
                     print(f"Cost Center {found} exists")
             except CostCenter.DoesNotExist:
-                item["sequence"] = FSM.set_parent(item["costcenter_parent"], item)
                 new_item = CostCenter.objects.create(**item)
                 print(f"Created Cost Center {new_item}")
 
@@ -173,7 +233,7 @@ class Command(BaseCommand):
         print(f"Set Period to {BftStatusManager().period()}")
 
     def set_fund_center_allocation(self):
-        root_fundcenter = "1111AA"
+        root_fundcenter = "2184DA"
         fy = 2023
         quarter = "1"
 
@@ -183,17 +243,17 @@ class Command(BaseCommand):
         a = FundCenterAllocation.objects.create(fundcenter=root_fc, amount=1000, fy=fy, quarter=quarter, fund=fund)
         print("Created Allocation", a)
         a = FundCenterAllocation.objects.create(
-            fundcenter=FundCenterManager().fundcenter("1111AC"), amount=500, fy=fy, quarter=quarter, fund=fund
+            fundcenter=FundCenterManager().fundcenter("2184A3"), amount=500, fy=fy, quarter=quarter, fund=fund
         )
         print("Created Allocation", a)
 
     def set_cost_center_allocation(self):
         fund = Fund.objects.fund("C113")
 
-        cc = CostCenter.objects.cost_center("8486B1")
+        cc = CostCenter.objects.cost_center("8484WA")
         a = CostCenterAllocation.objects.create(costcenter=cc, fund=fund, fy=2023, quarter="1", amount=1000)
         print("Created Allocation", a)
 
-        cc = CostCenter.objects.cost_center("8486C2")
+        cc = CostCenter.objects.cost_center("8484XA")
         a = CostCenterAllocation.objects.create(costcenter=cc, fund=fund, fy=2023, quarter="1", amount=250)
         print("Created Allocation", a)

@@ -10,7 +10,7 @@ class TestCostCenterMonthlyReport:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
     def test_period_out_of_range(self):
         with pytest.raises(
@@ -22,7 +22,7 @@ class TestCostCenterMonthlyReport:
     def test_sum_line_items(self, setup):
         cm = CostCenterMonthlyReport(2023, 1)
         lines = cm.sum_line_items()
-        assert 5 == len(lines)
+        assert 2 == len(lines)
 
     def test_line_item_columns(self, setup):
         cm = CostCenterMonthlyReport(2023, 1)
@@ -47,7 +47,7 @@ class TestCostCenterMonthlyReport:
         cm = CostCenterMonthlyReport(2023, 1)
         lines = cm.sum_line_items()
         inserted = cm.insert_line_items(lines)
-        assert 5 == inserted
+        assert 2 == inserted
 
     def test_insert_line_items_when_none(self, setup):
         cm = CostCenterMonthlyReport(2023, 1)

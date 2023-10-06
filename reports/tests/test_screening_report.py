@@ -16,7 +16,7 @@ class TestCostCenterScreeningReport:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
         assert 0 < len(CostCenterScreeningReport().cost_center_screening_report())
 
@@ -25,7 +25,7 @@ class TestCostCenterScreeningReport:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
         data = CostCenterScreeningReport().financial_structure_dataframe()
         assert False == data.empty

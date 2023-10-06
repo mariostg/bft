@@ -15,7 +15,7 @@ class TestLineItemManager:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
         df = LineItemManager().line_item_dataframe()
         assert 0 < len(df)
@@ -30,7 +30,7 @@ class TestLineItemManager:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
         li_df = LineItemManager().line_item_detailed_dataframe()
         for c in li_df.columns:
             print(c)
@@ -51,7 +51,7 @@ class TestLineItemManager:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
         li = LineItem.objects.all().first()
         data = {"forecastamount": 1000, "lineitem": li}

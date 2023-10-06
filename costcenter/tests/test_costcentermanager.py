@@ -20,7 +20,7 @@ class TestCostCenterManager:
         hnd.handle()
 
         CCM = CostCenterManager()
-        a = CCM.allocation("8486B1", "C113", 2023, 0)
+        a = CCM.allocation("8484WA", "C113", 2023, 0)
         assert 0 == len(a)
 
     def test_cost_center_allocation_at_quarter_1(self):
@@ -28,7 +28,7 @@ class TestCostCenterManager:
         hnd.handle()
 
         CCM = CostCenterManager()
-        a = CCM.allocation("8486B1", "C113", 2023, 1)
+        a = CCM.allocation("8484WA", "C113", 2023, 1)
         assert 1 == len(a)
 
     def test_cost_center_dataframe_empty(self):
@@ -48,14 +48,14 @@ class TestCostCenterManager:
         hnd.handle()
 
         CCM = CostCenterManager()
-        cc = CCM.get_sibblings("1111AB")
+        cc = CCM.get_sibblings("2184A3")
         cc_df = CCM.cost_center_dataframe(cc)
         print(cc_df)
         assert "Costcenter_ID" in cc_df.columns
         assert "Cost Center" in cc_df.columns
         assert "Fund Center" in cc_df.columns
         assert "Cost Center Name" in cc_df.columns
-        assert 2 == len(cc_df)
+        assert CostCenter.objects.all().count() == len(cc_df)
 
     def test_allocation_dataframe_empty(self):
         r = CostCenterManager()
@@ -64,7 +64,7 @@ class TestCostCenterManager:
     def test_allocation_dataframe(self):
         hnd = populate.Command()
         hnd.handle()
-        df = CostCenterManager().allocation_dataframe(costcenter="8486B1")
+        df = CostCenterManager().allocation_dataframe(costcenter="8484WA")
         assert 1 == len(df)
         assert "Allocation" in df.columns
 
@@ -72,7 +72,7 @@ class TestCostCenterManager:
         hnd = populate.Command()
         hnd.handle()
         fund = Fund.objects.all().first()
-        costcenter = CostCenterManager().cost_center("8486b1")
+        costcenter = CostCenterManager().cost_center("8484WA")
         alloc = CostCenterAllocation(fund=fund, costcenter=costcenter, amount=1000)
         alloc.save()
         columns = CostCenterManager().allocation_dataframe().columns
@@ -83,7 +83,7 @@ class TestCostCenterManager:
         hnd = populate.Command()
         hnd.handle()
         CCM = CostCenterManager()
-        siblings = CCM.get_sibblings("1111AB")
+        siblings = CCM.get_sibblings("2184A3")
         print(siblings)
 
     # Forecast Adjustment Tests
@@ -94,7 +94,7 @@ class TestCostCenterManager:
         hnd = populate.Command()
         hnd.handle()
         fund = Fund.objects.all().first()
-        costcenter = CostCenterManager().cost_center("8486b1")
+        costcenter = CostCenterManager().cost_center("8484WA")
         ForecastAdjustment(fund=fund, costcenter=costcenter, amount=1000).save()
 
         df = CostCenterManager().forecast_adjustment_dataframe()

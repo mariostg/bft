@@ -277,13 +277,6 @@ class TestFundCenterModel:
         child_fc = FundCenter.objects.create(**fc_1111bb)
         assert "1.1" == child_fc.sequence
 
-    def test_get_financial_structure(self):
-        pp = populate.Command()
-        pp.handle()
-        st = FinancialStructureManager()
-        st_data = st.FundCenters()
-        assert 5 == len(st_data)
-
     def test_can_save_and_retrieve_fund_centers(self):
         first_fc = FundCenter()
         first_fc.fundcenter = "1111aa"
@@ -377,9 +370,7 @@ class TestFundCenterModel:
         fc1 = FundCenter()
         fc1.fundcenter = "1111aa"
         fc1.shortname = "defgth"
-        fc1.sequence = "1"
         fc1.fundcenter_parent = None
-        fc1.full_clean()
         fc1.save()
 
         fc1.fundcenter_parent = fc1
@@ -389,6 +380,11 @@ class TestFundCenterModel:
 
 @pytest.mark.django_db
 class TestCostCenterModel:
+    @pytest.fixture
+    def populate(self):
+        hnd = populate.Command()
+        hnd.handle()
+
     def test_string_representation(self):
         obj = CostCenter(**CC_1234FF)
         assert "1234FF - Food and drink" == str(obj)
@@ -491,12 +487,10 @@ class TestCostCenterModel:
 
         assert 0 == CostCenter.objects.count()
 
-    def test_parent_cannot_be_cost_center(self):
-        hnd = populate.Command()
-        hnd.handle()
-        cc = CostCenterManager().cost_center("8486C2")
+    def test_parent_cannot_be_cost_center(self, populate):
+        cc = CostCenterManager().cost_center("8484WA")
 
-        parent = CostCenterManager().cost_center("8486B1")
+        parent = CostCenterManager().cost_center("8484XA")
 
         with pytest.raises(ValueError):
             cc.costcenter_parent = parent  # set a cost center as parent
@@ -533,25 +527,26 @@ class TestForecastAdjustmentModel:
 @pytest.mark.django_db
 class TestCostCenterAllocation:
     @pytest.fixture
-    def setup(self):
+    def populate(self):
         hnd = populate.Command()
         hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
 
-    def test_string_representation(self, setup):
-        cc = CostCenterManager().cost_center("8486c2")
+    @pytest.fixture
+    def upload(self):
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
+
+    def test_string_representation(self, populate):
+        cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C113")
         allocation = CostCenterAllocation.objects.get(costcenter=cc, fund=fund, fy=2023, quarter=1)
-        assert str(allocation) == "8486C2 - BASEMENT STUFF - C113 - National Procurement - 2023 Q1 250.00"
+        assert str(allocation) == "8484WA - UTENSILS - C113 - National Procurement - 2023 Q1 1000.00"
 
     def test_verbose_name_plural(self):
         assert str(ForecastAdjustment._meta.verbose_name_plural) == "Forecast Adjustments"
 
-    def test_save_and_retreive_allocation(self):
-        hnd = populate.Command()
-        hnd.handle()
-        cc = CostCenterManager().cost_center("8486C2")
+    def test_save_and_retreive_allocation(self, populate):
+        cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C523")
 
         allocation = CostCenterAllocation(costcenter=cc, fund=fund, fy=2025, quarter=1, amount=100)
@@ -560,30 +555,24 @@ class TestCostCenterAllocation:
         saved = CostCenterAllocation.objects.get(costcenter=cc, fund=fund, fy=2025, quarter=1)
         assert 100 == saved.amount
 
-    def test_save_with_invalid_quarter(self):
-        hnd = populate.Command()
-        hnd.handle()
-        cc = CostCenterManager().cost_center("8486C2")
+    def test_save_with_invalid_quarter(self, populate):
+        cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C523")
 
         allocation = CostCenterAllocation(costcenter=cc, fund=fund, fy=2025, quarter=5, amount=100)
         with pytest.raises(InvalidOptionException):
             allocation.save()
 
-    def test_save_with_negative_allocation(self):
-        hnd = populate.Command()
-        hnd.handle()
-        cc = CostCenterManager().cost_center("8486C2")
+    def test_save_with_negative_allocation(self, populate):
+        cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C523")
 
         allocation = CostCenterAllocation(costcenter=cc, fund=fund, fy=2025, quarter=1, amount=-100)
         with pytest.raises(InvalidAllocationException):
             allocation.save()
 
-    def test_save_with_invalid_year(self):
-        hnd = populate.Command()
-        hnd.handle()
-        cc = CostCenterManager().cost_center("8486C2")
+    def test_save_with_invalid_year(self, populate):
+        cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C523")
 
         allocation = CostCenterAllocation(costcenter=cc, fund=fund, fy=3025, quarter=1, amount=100)

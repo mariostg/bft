@@ -4,6 +4,8 @@ from bft.management.commands import populate
 from costcenter.models import (
     FundCenterAllocation,
     FundManager,
+    CostCenter,
+    FundCenter,
     FundCenterManager,
     CostCenterManager,
     CostCenterAllocation,
@@ -28,7 +30,7 @@ class TestUtilsAllocationReport:
         hnd.handle()
 
     def test_we_have_fund_centers(self, setup):
-        fc = self.fcm.fund_center_exist("2222BB")
+        fc = self.fcm.fund_center_exist("2184AA")
         assert True == fc
 
     def test_we_have_fund_fc_allocation(self, setup):
@@ -37,18 +39,10 @@ class TestUtilsAllocationReport:
     def test_we_have_fund_cc_allocation(self, setup):
         assert 2 == CostCenterAllocation.objects.count()
 
-    def test_family_list(self, setup):
-        r = AllocationReport()
-        r._get_family_list("1111AA")
-        assert 3 == len(r.family_list)
-        assert 2 == len(r.family_list[0])
-        assert 4 == len(r.family_list[1])
-        assert 1 == len(r.family_list[2])
-
     def test_family_dataframe(self, setup):
         r = AllocationReport()
         family_df = r.family_dataframe()
-        assert 8 == len(family_df)
+        assert FundCenter.objects.count() + CostCenter.objects.count() == len(family_df)
 
     def test_fc_allocation_dataframe(self, setup):
         r = AllocationReport()

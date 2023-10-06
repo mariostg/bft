@@ -289,8 +289,10 @@ class LineForecast(models.Model):
             return True
         return False
 
-    def forecast_line_by_line(self, docno: str, forecast: float):
+    def forecast_line_by_line(self, docno: str, forecast: float) -> int:
         lines = LineItem.objects.filter(docno=docno)
+        if not lines:
+            return 0
         document_working_plan = lines.aggregate(models.Sum("workingplan"))["workingplan__sum"]
         ratio = float(forecast) / float(document_working_plan)
         for li in lines:
@@ -301,3 +303,4 @@ class LineForecast(models.Model):
             else:
                 li_fcst = LineForecast(lineitem=li, forecastamount=float(li.workingplan) * ratio)
                 li_fcst.save()
+        return len(lines)

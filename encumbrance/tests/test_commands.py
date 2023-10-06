@@ -15,7 +15,7 @@ class TestCostCenterParentAnalysis(TestCase):
         print("Setting up")
 
         a = uploadcsv.Command()
-        a.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        a.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
     def test_is_true(self):
         self.assertTrue(True)

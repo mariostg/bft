@@ -6,6 +6,7 @@ __pycache__
 *.pyc
 .vscode
 encumbrance.csv
+finstructure.py
 .coverage
 htmlcov/
 .DS_Store

@@ -8,21 +8,18 @@ from bft.management.commands import populate, uploadcsv
 
 @pytest.mark.django_db
 class TestLineItemManager:
-    def test_get_line_items_when_cost_center_exists(self):
+    @pytest.fixture
+    def setup(self):
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
-        li = LineItem.objects.cost_center("8486C1")
+    def test_get_line_items_when_cost_center_exists(self, setup):
+        li = LineItem.objects.cost_center("8484WA")
         assert li.count() > 0
 
-    def test_get_line_items_when_cost_center_not_exists(self):
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
-
+    def test_get_line_items_when_cost_center_not_exists(self, setup):
         li = LineItem.objects.cost_center("0000C1")
         assert li == None
 
@@ -46,7 +43,7 @@ class LineItemImportTest(TestCase):
     def setUpTestData(cls):
         filldata = populate.Command()
         filldata.handle()
-        runner = Encumbrance("encumbrance_tiny.txt")
+        runner = Encumbrance("encumbrance_2184a3.txt")
         runner.run_all()
 
     def test_insert_line_item_from_encumbrance_line(self):
@@ -131,7 +128,7 @@ class LineItemManagementTest(TestCase):
     def setUpTestData(cls):
         filldata = populate.Command()
         filldata.handle()
-        runner = Encumbrance("encumbrance_tiny.txt")
+        runner = Encumbrance("encumbrance_2184a3.txt")
         runner.run_all()
 
     def test_line_item_fund_center_wrong(self):
@@ -148,12 +145,14 @@ class LineItemManagementTest(TestCase):
 
 @pytest.mark.django_db
 class TestLineForecastModel:
-    def test_create_forecast_higher_than_wp(self):
+    @pytest.fixture
+    def setup(self):
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184A3.txt")
 
+    def test_create_forecast_higher_than_wp(self, setup):
         li = LineItem.objects.all().first()
         new_fcst = li.workingplan + 10000
 
@@ -165,12 +164,7 @@ class TestLineForecastModel:
         fcst = LineForecastManager().get_line_forecast(li)
         assert fcst.forecastamount == li.workingplan
 
-    def test_create_forecast_smaller_than_spent(self):
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
-
+    def test_create_forecast_smaller_than_spent(self, setup):
         li = LineItem.objects.filter(spent__gt=0).first()
         new_fcst = float(li.spent) * 0.1
 
@@ -182,16 +176,15 @@ class TestLineForecastModel:
         fcst = LineForecastManager().get_line_forecast(li)
         assert fcst.forecastamount == li.spent
 
-    def test_forecast_document_number_to_working_plan(self):
+    def test_forecast_document_number_to_working_plan(self, setup):
         # each line item will have a forecast equivalent to its own working plan
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
-        docno = "12699110"
+        docno = "12663089"
 
         lf = LineForecast
-        target_forecast = LineItem.objects.filter(docno=docno).aggregate(Sum("workingplan"))["workingplan__sum"]
+        lines = LineItem.objects.filter(docno=docno)
+        if not lines:
+            assert False, f"No lines found in {docno}"
+        target_forecast = lines.aggregate(Sum("workingplan"))["workingplan__sum"]
         lf().forecast_line_by_line(docno, target_forecast)
 
         applied_forecast = lf.objects.aggregate(Sum("forecastamount"))["forecastamount__sum"]
@@ -202,7 +195,7 @@ class TestLineForecastModel:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
         docno = "12699110"
 
         lf = LineForecast
@@ -212,3 +205,8 @@ class TestLineForecastModel:
 
         applied_forecast = lf.objects.aggregate(Sum("forecastamount"))["forecastamount__sum"]
         assert applied_forecast == total_spent
+
+    def test_create_forecast_no_lines(self, setup):
+        docno = "XXXX"
+        lf = LineForecast()
+        assert 0 == lf.forecast_line_by_line(docno, 1000)

@@ -9,7 +9,7 @@ class TestLineForecastManager:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
         li = LineItem.objects.all().first()
         data = {"forecastamount": 1000, "lineitem": li}
@@ -27,7 +27,7 @@ class TestLineForecastManager:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_tiny.txt")
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
         lineitem = LineItem.objects.all().first()
         assert LineForecastManager().get_line_forecast(lineitem) == None

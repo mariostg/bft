@@ -11,6 +11,8 @@ class TestFundCenterManager:
     def setup(self):
         fc = {"fundcenter": "1111aa", "shortname": "bedroom", "sequence": "1"}
         self.current = FundCenter.objects.create(**fc)
+        fund = {"fund": "C113"}
+        Fund.objects.create(**fund)
 
     def test_fundcenter(self, setup):
         assert "1111AA" == FundCenterManager().fundcenter("1111aa").fundcenter
@@ -57,10 +59,7 @@ class TestFundCenterManager:
         match = (columns == expected_columns).all()
         assert True == match
 
-    def test_fund_center_manager_allocation(self):
-        hnd = populate.Command()
-        hnd.handle()
-
+    def test_fund_center_manager_allocation(self, setup):
         FCM = FundCenterManager()
         fc = FCM.fundcenter(fundcenter="1111aa")
         fund = Fund.objects.get(fund="C113")
@@ -68,24 +67,16 @@ class TestFundCenterManager:
         FCA = FundCenterAllocation(**alloc)
         FCA.save()
 
-        test_alloc = FCM.allocation(fundcenter="1111AA").first()
+        test_alloc = FCM.allocation(fundcenter="1111AA")
         assert alloc["amount"] == test_alloc.amount
 
-    def test_fund_center_manager_without_allocation(self):
-        hnd = populate.Command()
-        hnd.handle()
-        FundCenterAllocation.objects.all().delete()
-        assert False == FundCenterAllocation.objects.exists()
-
+    def test_fund_center_manager_without_allocation(self, setup):
         FCM = FundCenterManager()
         test_alloc = FCM.allocation(fundcenter="1111AA")
         assert True == isinstance(test_alloc, FundCenterAllocation)
         assert 0 == test_alloc.amount
 
-    def test_fund_center_allocation_dataframe(self):
-        hnd = populate.Command()
-        hnd.handle()
-
+    def test_fund_center_allocation_dataframe(self, setup):
         FCM = FundCenterManager()
         fc = FCM.fundcenter(fundcenter="1111aa")
         fund = Fund.objects.get(fund="C113")
@@ -94,19 +85,16 @@ class TestFundCenterManager:
         FCA.save()
 
         test_alloc = FCM.allocation_dataframe(fundcenter="1111AA")
-        print(test_alloc["Allocation"][0])
         assert alloc["amount"] == test_alloc["Allocation"][0]
 
-    def test_get_direct_descendants(self, setup):
+    def test_get_direct_descendants(self):
         hnd = populate.Command()
         hnd.handle()
-        parent = FundCenterManager().fundcenter(fundcenter="1111AA")
+        parent = FundCenterManager().fundcenter(fundcenter="2184DA")
         descendants = FundCenterManager().get_direct_descendants(parent)
-        assert 2 == len(descendants)
+        assert 6 == len(descendants)
 
     def test_get_direct_descendants_empty(self, setup):
-        hnd = populate.Command()
-        hnd.handle()
         parent = FundCenterManager().fundcenter(fundcenter="2222BB")
         descendants = FundCenterManager().get_direct_descendants(parent)
         assert 0 == len(descendants)

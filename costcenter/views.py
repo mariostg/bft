@@ -120,7 +120,7 @@ def source_delete(request, pk):
 
 
 def fundcenter_page(request):
-    data = FundCenter.objects.all()
+    data = FundCenter.objects.all().order_by("sequence")
     return render(request, "costcenter/fundcenter-table.html", context={"fundcenters": data})
 
 
