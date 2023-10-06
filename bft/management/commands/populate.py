@@ -86,7 +86,6 @@ class Command(BaseCommand):
 
         # Create root DND
         dnd_obj = FundCenter.objects.create(**finstructure.dnd)
-        dnd_obj = FundCenter.objects.get(pk=dnd_obj.pk)
         print(f"Created Fund Center {dnd_obj}, sequence {dnd_obj.sequence}")
         dnd = FundCenter.objects.get(fundcenter="0162ND")
         set_children(dnd, finstructure.dnd_children)
