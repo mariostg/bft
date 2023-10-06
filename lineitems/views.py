@@ -150,7 +150,7 @@ def costcenter_lineitems(request, costcenter):
 
 
 def document_forecast(request, docno):
-    context = {}
+    context = {"back": "lineitem-page"}
     context["docno"] = docno
     if request.method == "POST":
         form = DocumentNumberForm(request.POST)
@@ -161,6 +161,8 @@ def document_forecast(request, docno):
             return redirect("document-page", docno)
     doc = LineItem.objects.filter(docno=docno)
     agg = doc.aggregate(Sum("workingplan"), Sum("spent"))
+    agg["workingplan__sum"] = round(agg["workingplan__sum"], 2)
+    agg["spent__sum"] = round(agg["spent__sum"], 2)
     form = DocumentNumberForm(
         initial={
             "docno": docno,
