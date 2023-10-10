@@ -365,14 +365,6 @@ class AllocationStatusReport(Report):
         df_alloc_cc = pd.merge(df_alloc_cc, fund_df, how="left", on="Fund_ID")
         cc_df = BFTDataFrame(CostCenter).build(cc)
         df_alloc_cc = pd.merge(df_alloc_cc, cc_df, how="left", on="Costcenter_ID")
-        # alloc_cc = []
-        # df_alloc_cc = pd.DataFrame()
-        # for f in cc:
-        #     a = CostCenterManager().allocation_dataframe(f, fund, fy, quarter)
-        #     if not a.empty:
-        #         alloc_cc.append(a)
-        # if len(alloc_cc) > 0:
-        #     df_alloc_cc = pd.concat(alloc_cc)
         df_alloc_cc["Cost Element"] = df_alloc_cc["Cost Center"]
         return df_alloc_cc
 
