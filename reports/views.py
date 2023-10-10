@@ -78,7 +78,7 @@ def allocation_status_report(request):
         query_string = "&".join(query_terms)
 
     if query_string and (CostCenterAllocation.objects.exists() or FundCenterAllocation.objects.exists()):
-        r = utils.AllocationReport()
+        r = utils.AllocationStatusReport()
         df = r.allocation_status_dataframe(fundcenter, fund, fy, int(quarter))
         if not df.empty:
             df["Amount"] = df["Amount"].astype(int)

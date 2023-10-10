@@ -1,5 +1,5 @@
 import pytest
-from reports.utils import AllocationReport
+from reports.utils import AllocationStatusReport
 from bft.management.commands import populate
 from costcenter.models import (
     FundCenterAllocation,
@@ -40,44 +40,44 @@ class TestUtilsAllocationReport:
         assert 2 == CostCenterAllocation.objects.count()
 
     def test_family_dataframe(self, setup):
-        r = AllocationReport()
+        r = AllocationStatusReport()
         family_df = r.family_dataframe()
         assert FundCenter.objects.count() + CostCenter.objects.count() == len(family_df)
 
     def test_fc_allocation_dataframe(self, setup):
-        r = AllocationReport()
+        r = AllocationStatusReport()
         family_df = r.family_dataframe()
         fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, self.quarter)
         assert 2 == len(fc_allocation_df)
 
     def test_fc_allocation_dataframe_outside_quarter(self, setup):
-        r = AllocationReport()
+        r = AllocationStatusReport()
         family_df = r.family_dataframe()
         fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, 4)
         assert True == fc_allocation_df.empty
 
     def test_cc_allocation_dataframe(self, setup):
-        r = AllocationReport()
+        r = AllocationStatusReport()
         family_df = r.family_dataframe()
         cc_allocation_df = r.cc_allocation_dataframe(family_df, self.fund, self.fy, self.quarter)
         assert 2 == len(cc_allocation_df)
 
     def test_cc_allocation_dataframe_outside_quarter(self, setup):
-        r = AllocationReport()
+        r = AllocationStatusReport()
         family_df = r.family_dataframe()
         cc_allocation_df = r.cc_allocation_dataframe(family_df, self.fund, self.fy, 4)
         assert 0 == len(cc_allocation_df)
 
     def test_allocation_status_report(self, setup):
 
-        r = AllocationReport()
+        r = AllocationStatusReport()
         data = r.allocation_status_dataframe(self.root_fundcenter, self.fund, self.fy, self.quarter)
         assert pd.DataFrame == type(data)
         assert 4 == len(data)
 
     def test_allocation_status_report_outside_quarter(self, setup):
 
-        r = AllocationReport()
+        r = AllocationStatusReport()
 
         data = r.allocation_status_dataframe(self.root_fundcenter, self.fund, self.fy, 4)
         assert pd.DataFrame == type(data)

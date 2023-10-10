@@ -287,7 +287,7 @@ class CostCenterScreeningReport(Report):
         return concattable.sort_index(axis=0, ascending=True)
 
 
-class AllocationReport(Report):
+class AllocationStatusReport(Report):
     fsm = FinancialStructureManager()
     fcm = FundCenterManager()
     family_list = []
