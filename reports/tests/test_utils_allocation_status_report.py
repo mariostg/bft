@@ -50,13 +50,20 @@ class TestUtilsAllocationReport:
         fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, self.quarter)
         assert 2 == len(fc_allocation_df)
 
+    def test_fc_allocation_status_dataframe_when_no_costcenter_allocation(self, setup):
+        CostCenterAllocation.objects.all().delete()
+        r = AllocationStatusReport()
+        fc_allocation_df = r.allocation_status_dataframe("2184DA", "C113", 2023, 1)
+        assert 2 == len(fc_allocation_df)
+
     def test_fc_allocation_dataframe_outside_quarter(self, setup):
         r = AllocationStatusReport()
         family_df = r.family_dataframe()
         fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, 4)
-        assert True == fc_allocation_df.empty
+        assert 0 == sum(fc_allocation_df["Amount"])
 
     def test_cc_allocation_dataframe(self, setup):
+        # CostCenterAllocation.objects.all().delete()
         r = AllocationStatusReport()
         family_df = r.family_dataframe()
         cc_allocation_df = r.cc_allocation_dataframe(family_df, self.fund, self.fy, self.quarter)
@@ -66,7 +73,7 @@ class TestUtilsAllocationReport:
         r = AllocationStatusReport()
         family_df = r.family_dataframe()
         cc_allocation_df = r.cc_allocation_dataframe(family_df, self.fund, self.fy, 4)
-        assert 0 == len(cc_allocation_df)
+        assert 0 == sum(cc_allocation_df["Amount"])
 
     def test_allocation_status_report(self, setup):
 

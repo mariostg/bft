@@ -341,7 +341,14 @@ class AllocationStatusReport(Report):
             fund = Fund.objects.get(fund=fund)
         alloc = FundCenterAllocation.objects.filter(fundcenter__in=fc, fund=fund, fy=fy, quarter=quarter)
         if not alloc:
-            return pd.DataFrame()
+            fc_list_without_allocation = []
+            for c in fc:
+                fc_list_without_allocation.append([c, c, fy, fund, quarter, 0])
+            return pd.DataFrame(
+                fc_list_without_allocation,
+                columns=["Fund Center", "Cost Element", "Fiscal Year", "Fund", "Quarter", "Amount"],
+            )
+
         df_alloc_fc = BFTDataFrame(FundCenterAllocation).build(alloc)
 
         fund_df = BFTDataFrame(Fund).build(Fund.objects.all())
@@ -358,7 +365,14 @@ class AllocationStatusReport(Report):
             fund = Fund.objects.get(fund=fund)
         alloc = CostCenterAllocation.objects.filter(costcenter__in=cc, fund=fund, fy=fy, quarter=quarter)
         if not alloc:
-            return pd.DataFrame()
+            cc_list_without_allocation = []
+            for c in cc:
+                cc_list_without_allocation.append([c, c, fy, fund, quarter, 0])
+            return pd.DataFrame(
+                cc_list_without_allocation,
+                columns=["Cost Center", "Cost Element", "Fiscal Year", "Fund", "Quarter", "Amount"],
+            )
+
         df_alloc_cc = BFTDataFrame(CostCenterAllocation).build(alloc)
 
         fund_df = BFTDataFrame(Fund).build(Fund.objects.all())

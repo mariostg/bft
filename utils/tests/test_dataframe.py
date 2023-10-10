@@ -17,7 +17,7 @@ class TestDataFrame:
 
     def test_cost_center_model_fields(self):
         d = BFTDataFrame(CostCenter)
-        assert 0 < len(d.concrete_fields)
+        assert 0 < len(d.dataframe_fields)
 
     def test_dataframe_with_unhandled_datatype(self):
         hnd = populate.Command()

@@ -27,9 +27,8 @@ class BFTDataFrame(pd.DataFrame):
 
         self.django_model = django_model
         self.dataframe_fields = {}
-        self.concrete_fields = django_model._meta.concrete_fields
         self.has_data = django_model.objects.all().exists()
-        for c in self.concrete_fields:
+        for c in django_model._meta.concrete_fields:
             if c.column.endswith("_id"):
                 self.dataframe_fields[c.column] = f"{c.name.capitalize()}_ID"
             elif c.name == "id":
