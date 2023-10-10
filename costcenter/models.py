@@ -235,10 +235,14 @@ class FundCenterManager(models.Manager):
         cc = pd.DataFrame(self.get_cost_centers(fundcenter))
         return pd.concat([fc, cc])
 
-    def get_fund_centers(self, parent: "FundCenter") -> list:
+    def get_fund_centers(self, parent: "FundCenter|str") -> list:
+        if isinstance(parent, str):
+            parent = self.fundcenter(parent)
         return list(FundCenter.objects.filter(fundcenter_parent=parent).values())
 
-    def get_cost_centers(self, parent: "FundCenter") -> list:
+    def get_cost_centers(self, parent: "FundCenter|str") -> list:
+        if isinstance(parent, str):
+            parent = self.fundcenter(parent)
         return list(CostCenter.objects.filter(costcenter_parent=parent).values())
 
     def exists(self, fundcenter: str) -> bool:
