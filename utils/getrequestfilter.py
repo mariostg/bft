@@ -89,7 +89,7 @@ def search_lines(request):
 
 def search_fund_center_allocations(request):
     fundcenter = fund = fy = quarter = query_string = ""
-    data = FundCenterAllocation.objects.all()
+    data = FundCenterAllocation.objects.all().order_by("fundcenter__sequence")
     query_terms = set()
     if request.GET.get("fundcenter"):
         fundcenter = request.GET.get("fundcenter").upper()
