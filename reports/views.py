@@ -44,13 +44,24 @@ def allocation_status_report(request):
 
     fundcenter = fund = fy = quarter = ""
     query_string = None  # Keep query_string in case paginator is required when more data is used.
-    query_terms = set()  # Concatenation will produce query string
     context = {}  # Dict sent to the template
     table = None  # dataframe html formatted to include in context
     form_filter = True
+
+    def set_query_string(fundcenter, fund, fy, quarter):
+        query_terms = set()  # Concatenation will produce query string
+        query_terms.add(f"fundcenter={fundcenter}")
+        query_terms.add(f"fund={fund}")
+        query_terms.add(f"quarter={quarter}")
+        query_terms.add(f"fy={fy}")
+        if len(query_terms) > 0:
+            query_string = "&".join(query_terms)
+        return query_string
+
     if not len(request.GET) and not CostCenterAllocation.objects.exists() and not FundCenterAllocation.objects.exists():
         messages.warning(request, "There are no allocation to report")
         form_filter = False
+
     if len(request.GET):
         try:
             fundcenter = FundCenterManager().get_request(request)
@@ -63,10 +74,7 @@ def allocation_status_report(request):
         if str(quarter) not in QUARTERKEYS:
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
         if fundcenter and fund and fy:
-            query_terms.add(f"fundcenter={fundcenter}")
-            query_terms.add(f"fund={fund}")
-            query_terms.add(f"quarter={quarter}")
-            query_terms.add(f"fy={fy}")
+            query_string = set_query_string(fundcenter, fund, fy, quarter)
 
     initial = {
         "fundcenter": fundcenter,
@@ -74,8 +82,6 @@ def allocation_status_report(request):
         "fy": fy,
         "quarter": quarter,
     }
-    if len(query_terms) > 0:
-        query_string = "&".join(query_terms)
 
     if query_string and (CostCenterAllocation.objects.exists() or FundCenterAllocation.objects.exists()):
         r = utils.AllocationStatusReport()
