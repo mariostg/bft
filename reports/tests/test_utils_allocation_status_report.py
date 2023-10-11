@@ -55,6 +55,12 @@ class TestUtilsAllocationReport:
         fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, self.quarter)
         assert 2 == len(fc_allocation_df)
 
+    def test_allocation_status_dataframe_non_existing_fc(self, setup):
+        r = AllocationStatusReport()
+        fc_allocation_df = r.allocation_status_dataframe("2184XX", "C113", 2023, 1)
+
+        assert fc_allocation_df.empty
+
     def test_fc_allocation_status_dataframe_when_no_costcenter_allocation(self, setup):
         CostCenterAllocation.objects.all().delete()
         r = AllocationStatusReport()

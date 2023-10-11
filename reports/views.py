@@ -14,6 +14,7 @@ from reports.forms import SearchAllocationAnalysisForm
 from reports.models import CostCenterMonthly
 from bft.models import BftStatus
 from bft.conf import QUARTERKEYS
+from utils.getrequestfilter import set_query_string
 
 
 def bmt_screening_report(request):
@@ -48,16 +49,6 @@ def allocation_status_report(request):
     table = None  # dataframe html formatted to include in context
     form_filter = True
 
-    def set_query_string(fundcenter, fund, fy, quarter):
-        query_terms = set()  # Concatenation will produce query string
-        query_terms.add(f"fundcenter={fundcenter}")
-        query_terms.add(f"fund={fund}")
-        query_terms.add(f"quarter={quarter}")
-        query_terms.add(f"fy={fy}")
-        if len(query_terms) > 0:
-            query_string = "&".join(query_terms)
-        return query_string
-
     if not len(request.GET) and not CostCenterAllocation.objects.exists() and not FundCenterAllocation.objects.exists():
         messages.warning(request, "There are no allocation to report")
         form_filter = False
@@ -75,7 +66,7 @@ def allocation_status_report(request):
         if str(quarter) not in QUARTERKEYS:
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
         if fundcenter and fund and fy:
-            query_string = set_query_string(fundcenter, fund, fy, quarter)
+            query_string = set_query_string(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter)
 
     initial = {
         "fundcenter": fundcenter,

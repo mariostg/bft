@@ -390,6 +390,8 @@ class AllocationStatusReport(Report):
         quarter: int = None,
     ) -> pd.DataFrame:
         df_main = self.family_dataframe(root_fundcenter)
+        if df_main.empty:
+            return pd.DataFrame
         # FC Allocations
         df_alloc_fc = self.fc_allocation_dataframe(df_main, fund, fy, quarter)
 
