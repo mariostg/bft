@@ -48,20 +48,18 @@ def allocation_status_report(request):
     context = {}  # Dict sent to the template
     table = None  # dataframe html formatted to include in context
     form_filter = True
+    has_cc_allocation = CostCenterAllocation.objects.exists()
+    has_fc_allocation = FundCenterAllocation.objects.exists()
 
-    if not len(request.GET) and not CostCenterAllocation.objects.exists() and not FundCenterAllocation.objects.exists():
+    if not len(request.GET) and not has_cc_allocation and not has_fc_allocation:
         messages.warning(request, "There are no allocation to report")
         form_filter = False
 
     if len(request.GET):
-        try:
-            fundcenter = FundCenterManager().get_request(request)
-            print("FUND CENTER:", fundcenter)
-            fund = FundManager().get_request(request)
-            quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
-            fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
-        except (TypeError, ValueError) as error:
-            messages.warning(request, f"{error}, You have provided invalid request.")
+        fundcenter = FundCenterManager().get_request(request)
+        fund = FundManager().get_request(request)
+        quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
+        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
 
         if str(quarter) not in QUARTERKEYS:
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
@@ -75,14 +73,13 @@ def allocation_status_report(request):
         "quarter": quarter,
     }
 
-    if query_string and (CostCenterAllocation.objects.exists() or FundCenterAllocation.objects.exists()):
+    if query_string and (has_cc_allocation or has_fc_allocation):
         r = utils.AllocationStatusReport()
         df = r.allocation_status_dataframe(fundcenter, fund, fy, int(quarter))
         if not df.empty:
             df["Amount"] = df["Amount"].astype(int)
             df["Fiscal Year"] = df["Fiscal Year"].astype(str)
             df = df.style.format(thousands=",")
-            # df = r.styler_clean_table(df)
             table = df.to_html()
 
     form = SearchAllocationAnalysisForm(initial=initial)
