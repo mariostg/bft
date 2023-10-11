@@ -167,9 +167,12 @@ class FundCenterManager(models.Manager):
             if isinstance(fundcenter, str):
                 fundcenter = FundCenter.objects.get(fundcenter__iexact=fundcenter)
                 alloc = alloc.filter(fundcenter=fundcenter)
-            if isinstance(fundcenter, list):
+            elif isinstance(fundcenter, list):
+                fundcenter = [fc.upper() for fc in fundcenter]
                 fundcenter = FundCenter.objects.filter(fundcenter__in=fundcenter)
                 alloc = alloc.filter(fundcenter__in=fundcenter)
+            elif isinstance(fundcenter, FundCenter):
+                alloc = alloc.filter(fundcenter=fundcenter)
         if fund:
             if isinstance(fund, str):
                 fund = FundManager().fund(fund)
@@ -615,7 +618,7 @@ class CostCenterManager(models.Manager):
 
     def allocation(
         self,
-        costcenter: "CostCenter|str" = None,
+        costcenter: "CostCenter|str|list" = None,
         fund: Fund | str = None,
         fy: int = None,
         quarter: int = None,
@@ -635,7 +638,13 @@ class CostCenterManager(models.Manager):
         if costcenter:
             if isinstance(costcenter, str):
                 costcenter = CostCenter.objects.get(costcenter=costcenter.upper())
-            alloc = alloc.filter(costcenter=costcenter)
+                alloc = alloc.filter(costcenter=costcenter)
+            elif isinstance(costcenter, list):
+                costcenter = [cc.upper() for cc in costcenter]
+                costcenter = CostCenter.objects.filter(costcenter__in=costcenter)
+                alloc = alloc.filter(costcenter__in=costcenter)
+            elif isinstance(costcenter, CostCenter):
+                alloc = alloc.filter(costcenter=costcenter)
         if fund:
             if isinstance(fund, str):
                 fund = Fund.objects.get(fund=fund.upper())

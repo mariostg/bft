@@ -6,6 +6,11 @@ import pandas as pd
 
 @pytest.mark.django_db
 class TestCostCenterManager:
+    @pytest.fixture
+    def populate(self):
+        hnd = populate.Command()
+        hnd.handle()
+
     # Cost Center Tests
     def test_cost_center_allocation_without_parameters(self):
         hnd = populate.Command()
@@ -30,6 +35,14 @@ class TestCostCenterManager:
         CCM = CostCenterManager()
         a = CCM.allocation("8484WA", "C113", 2023, 1)
         assert 1 == len(a)
+
+    def test_cost_center_manager_allocation_from_cc_list(self, populate):
+        cc = ["8484xa", "8484wa"]
+        data = CostCenter.objects.allocation(costcenter=cc, fund="c113", fy=2023, quarter=1)
+
+        assert 2 == len(data)
+        assert data[0].amount == 1000
+        assert data[1].amount == 250
 
     def test_cost_center_dataframe_empty(self):
         r = CostCenterManager()
