@@ -315,12 +315,12 @@ class AllocationStatusReport(Report):
     def family_dataframe(
         self,
         root_fundcenter: str = None,
-        fund: str = None,
     ) -> pd.DataFrame:
         if root_fundcenter:
             root_fundcenter = root_fundcenter.upper()
         root = FundCenter.objects.filter(fundcenter=root_fundcenter)
-        fund = FundManager().fund(fund=fund)
+        if root.count() == 0:
+            return pd.DataFrame()
         self.family_list = [pd.DataFrame(list(root.values()))]
         self._get_family_list(root.first())
         df_main = pd.concat(self.family_list).sort_values("sequence").fillna("")
@@ -389,8 +389,7 @@ class AllocationStatusReport(Report):
         fy: int = None,
         quarter: int = None,
     ) -> pd.DataFrame:
-        df_main = self.family_dataframe(root_fundcenter, fund)
-
+        df_main = self.family_dataframe(root_fundcenter)
         # FC Allocations
         df_alloc_fc = self.fc_allocation_dataframe(df_main, fund, fy, quarter)
 
@@ -426,5 +425,4 @@ class AllocationStatusReport(Report):
         ]
         df_main.fillna("", inplace=True)
         df_main.set_index(["sequence", "Fund Center", "Cost Center", "Fund"], inplace=True)
-        print(df_main)
         return df_main

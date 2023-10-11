@@ -65,6 +65,7 @@ def allocation_status_report(request):
     if len(request.GET):
         try:
             fundcenter = FundCenterManager().get_request(request)
+            print("FUND CENTER:", fundcenter)
             fund = FundManager().get_request(request)
             quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
             fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0

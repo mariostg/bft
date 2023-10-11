@@ -19,7 +19,7 @@ class TestUtilsAllocationReport:
     ccm = CostCenterManager()
     fca = FundCenterAllocation()
     cca = CostCenterAllocation()
-    root_fundcenter = "1111AA"
+    root_fundcenter = "2184da"
     fund = "C113"
     fy = 2023
     quarter = 1
@@ -39,14 +39,19 @@ class TestUtilsAllocationReport:
     def test_we_have_fund_cc_allocation(self, setup):
         assert 2 == CostCenterAllocation.objects.count()
 
-    def test_family_dataframe(self, setup):
+    def test_family_dataframe_valid_fund_center(self, setup):
         r = AllocationStatusReport()
-        family_df = r.family_dataframe()
-        assert FundCenter.objects.count() + CostCenter.objects.count() == len(family_df)
+        family_df = r.family_dataframe("2184A3")
+        assert 4 == len(family_df)
+
+    def test_family_dataframe_invalid_fund_center(self, setup):
+        r = AllocationStatusReport()
+        family_df = r.family_dataframe("2023")
+        assert 0 == len(family_df)
 
     def test_fc_allocation_dataframe(self, setup):
         r = AllocationStatusReport()
-        family_df = r.family_dataframe()
+        family_df = r.family_dataframe("2184da")
         fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, self.quarter)
         assert 2 == len(fc_allocation_df)
 
@@ -58,20 +63,20 @@ class TestUtilsAllocationReport:
 
     def test_fc_allocation_dataframe_outside_quarter(self, setup):
         r = AllocationStatusReport()
-        family_df = r.family_dataframe()
+        family_df = r.family_dataframe("2184da")
         fc_allocation_df = r.fc_allocation_dataframe(family_df, self.fund, self.fy, 4)
         assert 0 == sum(fc_allocation_df["Amount"])
 
     def test_cc_allocation_dataframe(self, setup):
         # CostCenterAllocation.objects.all().delete()
         r = AllocationStatusReport()
-        family_df = r.family_dataframe()
+        family_df = r.family_dataframe("2184da")
         cc_allocation_df = r.cc_allocation_dataframe(family_df, self.fund, self.fy, self.quarter)
         assert 2 == len(cc_allocation_df)
 
     def test_cc_allocation_dataframe_outside_quarter(self, setup):
         r = AllocationStatusReport()
-        family_df = r.family_dataframe()
+        family_df = r.family_dataframe("2184da")
         cc_allocation_df = r.cc_allocation_dataframe(family_df, self.fund, self.fy, 4)
         assert 0 == sum(cc_allocation_df["Amount"])
 
