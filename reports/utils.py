@@ -338,7 +338,7 @@ class AllocationStatusReport(Report):
         fc = list(filter(None, df_main["Fund Center"].to_list()))
         fc = FundCenter.objects.filter(fundcenter__in=fc)
         if isinstance(fund, str):
-            fund = Fund.objects.get(fund=fund)
+            fund = Fund.objects.get(fund=fund.upper())
         alloc = FundCenterAllocation.objects.filter(fundcenter__in=fc, fund=fund, fy=fy, quarter=quarter)
         if not alloc:
             fc_list_without_allocation = []

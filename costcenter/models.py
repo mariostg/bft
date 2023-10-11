@@ -141,7 +141,7 @@ class FundCenterManager(models.Manager):
 
     def allocation(
         self,
-        fundcenter: "FundCenter|str" = None,
+        fundcenter: "FundCenter|str|list" = None,
         fund: Fund | str = None,
         fy: int = None,
         quarter: str = None,
@@ -166,7 +166,10 @@ class FundCenterManager(models.Manager):
         if fundcenter:
             if isinstance(fundcenter, str):
                 fundcenter = FundCenter.objects.get(fundcenter__iexact=fundcenter)
-            alloc = alloc.filter(fundcenter=fundcenter)
+                alloc = alloc.filter(fundcenter=fundcenter)
+            if isinstance(fundcenter, list):
+                fundcenter = FundCenter.objects.filter(fundcenter__in=fundcenter)
+                alloc = alloc.filter(fundcenter__in=fundcenter)
         if fund:
             if isinstance(fund, str):
                 fund = FundManager().fund(fund)

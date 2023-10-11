@@ -14,6 +14,11 @@ class TestFundCenterManager:
         fund = {"fund": "C113"}
         Fund.objects.create(**fund)
 
+    @pytest.fixture
+    def populate(self):
+        hnd = populate.Command()
+        hnd.handle()
+
     def test_fundcenter(self, setup):
         assert "1111AA" == FundCenterManager().fundcenter("1111aa").fundcenter
 
@@ -69,6 +74,14 @@ class TestFundCenterManager:
 
         test_alloc = FCM.allocation(fundcenter="1111AA")
         assert alloc["amount"] == test_alloc.amount
+
+    def test_fund_center_manager_allocation_from_fc_list(self, populate):
+        fc = ["2184DA", "2184A3"]
+        data = FundCenter.objects.allocation(fundcenter=fc, fund="c113", fy=2023, quarter=1)
+
+        assert 2 == len(data)
+        assert data[0].amount == 1000
+        assert data[1].amount == 500
 
     def test_fund_center_manager_without_allocation(self, setup):
         FCM = FundCenterManager()
