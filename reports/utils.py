@@ -306,7 +306,7 @@ class AllocationStatusReport(Report):
                 self.family_list.append(children)
                 if "fundcenter" in children:
                     for fc in children["fundcenter"]:
-                        if type(fc) == str:
+                        if isinstance(fc, str):
                             self._get_family_list(fc)
                 break
             else:
