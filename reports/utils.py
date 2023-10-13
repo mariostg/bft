@@ -287,144 +287,123 @@ class CostCenterScreeningReport(Report):
         return concattable.sort_index(axis=0, ascending=True)
 
 
-class AllocationStatusReport(Report):
-    fsm = FinancialStructureManager()
-    fcm = FundCenterManager()
-    family_list = []
-    df_main = None
+class AllocationStatusReport:
+    def fund_center_alloc_to_dict(self, alloc: QuerySet[FundCenterAllocation]) -> dict:
+        lst = {}
+        for item in alloc:
+            id = item.fundcenter.id
+            fc = item.fundcenter
+            pid = fc.fundcenter_parent.id
+            d = {
+                "Cost Element": fc.fundcenter,
+                "Cost Element Name": fc.shortname,
+                "Fund Center ID": fc.id,
+                "Parent ID": pid,
+                "Path": fc.sequence,
+                "Parent Path": fc.fundcenter_parent.sequence,
+                "Allocation": float(item.amount),
+                "Type": "FC",
+            }
+            lst[id] = d
+        return lst
 
-    def _get_family_list(self, fc):
-        """Recursive function to build a dataframe of descendants of specified fund center.
-
-        Args:
-        fc (FundCenter): Fund center object to get all descendants
-        """
-        while True:
-            ct = self.fsm.has_children(fc)
-            if ct:
-                children = FundCenterManager().get_direct_descendants_dataframe(fc)
-                self.family_list.append(children)
-                if "fundcenter" in children:
-                    for fc in children["fundcenter"]:
-                        if isinstance(fc, str):
-                            self._get_family_list(fc)
-                break
+    def fund_center_set_sub_id(self, alloc: dict) -> dict:
+        d = {}
+        for id in alloc:
+            pid = alloc[id]["Parent ID"]
+            if not d.get(id):
+                d[id] = alloc.get(id)
+                d[id]["sub_id"] = []
+            if not d.get(pid):
+                d[pid] = alloc.get(pid, {})
+                d[pid]["sub_id"] = [id]
             else:
-                return
+                d[pid]["sub_id"].append(id)
+        return d
 
-    def family_dataframe(
-        self,
-        root_fundcenter: str = None,
-    ) -> pd.DataFrame:
-        if root_fundcenter:
-            root_fundcenter = root_fundcenter.upper()
-        root = FundCenter.objects.filter(fundcenter=root_fundcenter)
-        if root.count() == 0:
-            return pd.DataFrame()
-        self.family_list = [pd.DataFrame(list(root.values()))]
-        self._get_family_list(root.first())
-        df_main = pd.concat(self.family_list).sort_values("sequence").fillna("")
-        df_main["Cost Element"] = df_main.fundcenter + df_main.get("costcenter")
-        df_main.drop(
-            ["isforecastable", "isupdatable", "note", "source_id", "fund_id", "fundcenter_parent_id"],
-            axis=1,
-            inplace=True,
-        )
-        df_main.rename(columns={"fundcenter": "Fund Center", "costcenter": "Cost Center"}, inplace=True)
+    def cost_center_alloc_to_dict(self, alloc: QuerySet[CostCenterAllocation]) -> dict:
+        lst = {}
+        d = {}
+        for item in alloc:
+            id = item.costcenter.id
+            cc = item.costcenter
+            pid = cc.costcenter_parent.id
+            d = {
+                "Cost Element": cc.costcenter,
+                "Cost Element Name": cc.shortname,
+                "Fund Center ID": cc.id,
+                "Parent ID": pid,
+                "Path": cc.sequence,
+                "Parent Path": cc.costcenter_parent.sequence,
+                "Allocation": float(item.amount),
+                "Type": "CC",
+            }
+            lst[id] = d
+        return lst
 
-        return df_main
+    def main(self, fundcenter: str, fund: str, fy: int, quarter: int) -> str:
+        fcm = FundCenterManager()
+        ccm = CostCenterManager()
+        root = fcm.fundcenter(fundcenter)
 
-    def fc_allocation_dataframe(self, df_main: pd.DataFrame, fund: Fund | str, fy: int, quarter: int) -> pd.DataFrame:
-        fc = list(filter(None, df_main["Fund Center"].to_list()))
-        fc = FundCenter.objects.filter(fundcenter__in=fc)
-        if isinstance(fund, str):
-            fund = Fund.objects.get(fund=fund.upper())
-        alloc = FundCenterAllocation.objects.filter(fundcenter__in=fc, fund=fund, fy=fy, quarter=quarter)
-        if not alloc:
-            fc_list_without_allocation = []
-            for c in fc:
-                fc_list_without_allocation.append([c, c, fy, fund, quarter, 0])
-            return pd.DataFrame(
-                fc_list_without_allocation,
-                columns=["Fund Center", "Cost Element", "Fiscal Year", "Fund", "Quarter", "Amount"],
-            )
+        fc = FundCenter.objects.filter(sequence__startswith=root.sequence)
+        fc_list = list(fc.values_list("fundcenter", flat=True))
+        alloc_fc = fcm.allocation(fundcenter=fc_list, fund=fund, fy=fy, quarter=quarter)
 
-        df_alloc_fc = BFTDataFrame(FundCenterAllocation).build(alloc)
+        cc = CostCenter.objects.filter(sequence__startswith=root.sequence)
+        cc_list = list(cc.values_list("costcenter", flat=True))
+        alloc_cc = ccm.allocation(costcenter=cc_list, fund=fund, fy=fy, quarter=quarter)
 
-        fund_df = BFTDataFrame(Fund).build(Fund.objects.all())
-        df_alloc_fc = pd.merge(df_alloc_fc, fund_df, how="left", on="Fund_ID")
-        fc_df = BFTDataFrame(FundCenter).build(fc)
-        df_alloc_fc = pd.merge(df_alloc_fc, fc_df, how="left", on="Fundcenter_ID")
-        df_alloc_fc["Cost Element"] = df_alloc_fc["Fund Center"]
-        return df_alloc_fc
+        data_fc = self.fund_center_alloc_to_dict(alloc_fc)
+        data_cc = self.cost_center_alloc_to_dict(alloc_cc)
+        data = self.fund_center_set_sub_id({**data_fc, **data_cc})
 
-    def cc_allocation_dataframe(self, df_main: pd.DataFrame, fund: Fund | str, fy: int, quarter: int) -> pd.DataFrame:
-        cc = list(filter(None, df_main["Cost Center"].to_list()))
-        cc = CostCenter.objects.filter(costcenter__in=cc)
-        if isinstance(fund, str):
-            fund = Fund.objects.get(fund=fund.upper())
-        alloc = CostCenterAllocation.objects.filter(costcenter__in=cc, fund=fund, fy=fy, quarter=quarter)
-        if not alloc:
-            cc_list_without_allocation = []
-            for c in cc:
-                cc_list_without_allocation.append([c, c, fy, fund, quarter, 0])
-            return pd.DataFrame(
-                cc_list_without_allocation,
-                columns=["Cost Center", "Cost Element", "Fiscal Year", "Fund", "Quarter", "Amount"],
-            )
+        for v in data.values():
+            ce = v.get("Cost Element")
+            if not ce:
+                continue
 
-        df_alloc_cc = BFTDataFrame(CostCenterAllocation).build(alloc)
+            tbody = ""
+            zebra = {0: "fc-even", -1: "fc-odd"}
+            odd = 0
+            for allocation in data.values():
+                ce = allocation.get("Cost Element")
+                if not ce or allocation.get("Type") == "CC":
+                    continue
+                odd = ~odd
 
-        fund_df = BFTDataFrame(Fund).build(Fund.objects.all())
-        df_alloc_cc = pd.merge(df_alloc_cc, fund_df, how="left", on="Fund_ID")
-        cc_df = BFTDataFrame(CostCenter).build(cc)
-        df_alloc_cc = pd.merge(df_alloc_cc, cc_df, how="left", on="Costcenter_ID")
-        df_alloc_cc["Cost Element"] = df_alloc_cc["Cost Center"]
-        return df_alloc_cc
+                trow = f"<tr class='{zebra[odd]}'>"
+                trow += f"<td>{ce}</td>"
+                parent_allocation = int(allocation.get("Allocation"))
+                if parent_allocation:
+                    trow += f"<td class='numbers'>{parent_allocation:,}</td>"
+                    subtotal = variation = 0
+                    sub_id = allocation.get("sub_id")
+                    sub_table = ""
+                    if sub_id:
+                        sub_table = "<table>"
+                        for sid in sub_id:
+                            sub_row = "<tr>"
+                            sub_data = data.get(sid)
+                            sub_allocation = int(sub_data.get("Allocation", 0))
+                            sub_ce = sub_data.get("Cost Element")
+                            sub_row += f"<td>{sub_ce}</td><td class='numbers'> {sub_allocation:,}</td><tr>"
+                            subtotal += sub_allocation
+                            sub_table += sub_row
 
-    def allocation_status_dataframe(
-        self,
-        root_fundcenter: str = None,
-        fund: str = None,
-        fy: int = None,
-        quarter: int = None,
-    ) -> pd.DataFrame:
-        df_main = self.family_dataframe(root_fundcenter)
-        if df_main.empty:
-            return pd.DataFrame
-        # FC Allocations
-        df_alloc_fc = self.fc_allocation_dataframe(df_main, fund, fy, quarter)
+                        variation = parent_allocation - subtotal
+                        if variation:
+                            sub_table += f"<tr><td>Sub Total</td><td class='numbers'>{subtotal:,}</td></tr><tr><td class='alert--warning'>Variation</td><td class='numbers'>{variation:,}</td></tr>"
+                        else:
+                            sub_table += f"<tr><td>Sub Total</td><td class='numbers'>{subtotal:,}</td></tr>"
+                        sub_table = f"<td>{sub_table}</td>"
+                    else:
+                        sub_table = "<td class='alert--info'>No Sub Allocation</td>"
 
-        # CC Allocations
-        df_alloc_cc = self.cc_allocation_dataframe(df_main, fund, fy, quarter)
-
-        # merge FC and CC allocation
-        df_alloc = pd.concat([df_alloc_cc, df_alloc_fc])
-        if df_alloc.empty:
-            return pd.DataFrame()
-
-        # Merge df_main with df_alloc and rearrange
-        df_main.drop(["Cost Center", "Fund Center"], inplace=True, axis=1)
-        df_main = pd.merge(
-            df_main,
-            df_alloc,
-            how="inner",
-            on=["Cost Element"],
-        )
-        df_main.sort_values("sequence", inplace=True)
-        df_main = df_main[
-            [
-                "sequence",
-                "Fund Center",
-                "Cost Center",
-                "shortname",
-                "Fund",
-                "Amount",
-                "Fiscal Year",
-                "Quarter",
-                "Cost Element",
-            ]
-        ]
-        df_main.fillna("", inplace=True)
-        df_main.set_index(["sequence", "Fund Center", "Cost Center", "Fund"], inplace=True)
-        return df_main
+                    trow += f"{sub_table}</table>"
+                tbody += trow
+                print("======")
+                print(tbody)
+            thead = "<thead><th>Fund Center</th><th>Allocation</th><th>Sub-Allocations</th></thead>"
+            table = f"<table class=''>{thead}{tbody}</table>"
+            return table

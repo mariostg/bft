@@ -75,12 +75,7 @@ def allocation_status_report(request):
 
     if query_string and (has_cc_allocation or has_fc_allocation):
         r = utils.AllocationStatusReport()
-        df = r.allocation_status_dataframe(fundcenter, fund, fy, int(quarter))
-        if not df.empty:
-            df["Amount"] = df["Amount"].astype(int)
-            df["Fiscal Year"] = df["Fiscal Year"].astype(str)
-            df = df.style.format(thousands=",")
-            table = df.to_html()
+        table = r.main(fundcenter, fund, fy, quarter)  # allocation_status_dataframe(fundcenter, fund, fy, int(quarter))
 
     form = SearchAllocationAnalysisForm(initial=initial)
     context = {
