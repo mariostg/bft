@@ -88,10 +88,13 @@ table caption {
     color: #f3f3f3;
 }
 
-table tbody.numbers {
+table tbody.numbers,
+.numbers {
     text-align: right;
 }
-
+table table td {
+    padding: 0 1rem;
+}
 .container {
     width: 100%;
 }
