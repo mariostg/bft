@@ -289,7 +289,13 @@ class CostCenterScreeningReport(Report):
 
 class AllocationStatusReport:
     def fund_center_alloc_to_dict(self, alloc: QuerySet[FundCenterAllocation]) -> dict:
+        if not alloc:
+            return {}
         lst = {}
+        try:
+            iter(alloc)
+        except TypeError:
+            alloc = [alloc]
         for item in alloc:
             id = item.fundcenter.id
             fc = item.fundcenter
