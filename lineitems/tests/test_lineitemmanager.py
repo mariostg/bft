@@ -5,40 +5,35 @@ from bft.management.commands import populate, uploadcsv
 
 @pytest.mark.django_db
 class TestLineItemManager:
+    @pytest.fixture
+    def populate(self):
+        hnd = populate.Command()
+        hnd.handle()
+
+    @pytest.fixture
+    def upload(self):
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
+
     # Line Items tests
     def test_line_item_dataframe_no_line_items(self):
         r = LineItem
 
         assert True == r.objects.line_item_dataframe().empty
 
-    def test_line_item_dataframe(self):
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
-
+    def test_line_item_dataframe(self, populate, upload):
         df = LineItemManager().line_item_dataframe()
         assert 0 < len(df)
         assert "Lineitem_ID" in df.columns
         assert "Costcenter_ID" in df.columns
 
-    def test_line_item_dataframe_single_fund(self):
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
-
+    def test_line_item_dataframe_single_fund(self, populate, upload):
         df = LineItemManager().line_item_dataframe(fund="c113")
         assert 6 == len(df)
         assert "Lineitem_ID" in df.columns
         assert "Costcenter_ID" in df.columns
 
-    def test_line_item_dataframe_single_doctype(self):
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
-
+    def test_line_item_dataframe_single_doctype(self, populate, upload):
         df = LineItemManager().line_item_dataframe(doctype="co")
         assert 1 == len(df)
         assert "Lineitem_ID" in df.columns
@@ -48,11 +43,8 @@ class TestLineItemManager:
         r = LineItem
         assert True == r.objects.line_item_detailed_dataframe().empty
 
-    def test_line_item_detailed_dataframe(self):
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
+    def test_line_item_detailed_dataframe(self, populate, upload):
+
         li_df = LineItemManager().line_item_detailed_dataframe()
         for c in li_df.columns:
             print(c)
@@ -69,12 +61,7 @@ class TestLineItemManager:
         assert "int" == li_df.dtypes.Forecast
         assert 0 < len(li_df)
 
-    def test_line_item_detailed_dataframe_with_forecast(self):
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
-
+    def test_line_item_detailed_dataframe_with_forecast(self, populate, upload):
         li = LineItem.objects.all().first()
         data = {"forecastamount": 1000, "lineitem": li}
         fcst = LineForecast(**data)
@@ -94,23 +81,13 @@ class TestLineItemManager:
         assert "int" == li_df.dtypes.Forecast
         assert 0 < len(li_df)
 
-    def test_line_item_detailed_dataframe_single_doctype(self):
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
-
+    def test_line_item_detailed_dataframe_single_doctype(self, populate, upload):
         df = LineItemManager().line_item_detailed_dataframe(doctype="co")
         assert 1 == len(df)
         assert "Lineitem_ID" in df.columns
         assert "Costcenter_ID" in df.columns
 
-    def test_line_item_detailed_dataframe_single_fund(self):
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
-
+    def test_line_item_detailed_dataframe_single_fund(self, populate, upload):
         df = LineItemManager().line_item_detailed_dataframe(fund="C113")
         assert 6 == len(df)
         assert "Lineitem_ID" in df.columns
