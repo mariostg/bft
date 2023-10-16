@@ -41,14 +41,14 @@ class LineItemManager(models.Manager):
         else:
             return pd.DataFrame({})
 
-    def line_item_detailed_dataframe(self) -> pd.DataFrame:
+    def line_item_detailed_dataframe(self, fund=None, doctype=None) -> pd.DataFrame:
         """
         Prepare a pandas dataframe of merged line items, forecast line items and cost center.
 
         Returns:
             pd.DataFrame : A dataframe of line items including forecast.
         """
-        li_df = self.line_item_dataframe()
+        li_df = self.line_item_dataframe(fund=fund, doctype=doctype)
         if li_df.empty:
             return li_df
         if len(li_df) > 0:
