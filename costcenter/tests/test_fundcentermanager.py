@@ -58,7 +58,7 @@ class TestFundCenterManager:
 
         columns = np.array(r.columns)
         expected_columns = np.array(
-            ["Fundcenter_ID", "Fund Center", "Fund Center Name", "FC Sequence No", "Fundcenter_parent_ID"]
+            ["Fundcenter_ID", "Fund Center", "Fund Center Name", "FC Path", "Fundcenter_parent_ID"]
         )
 
         match = (columns == expected_columns).all()

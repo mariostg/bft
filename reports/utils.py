@@ -209,13 +209,13 @@ class CostCenterScreeningReport(Report):
             fc,
             cc,
             how="left",
-            left_on=["Fundcenter_ID", "FC Sequence No", "Fund Center", "Fund Center Name"],
-            right_on=["Costcenter_parent_ID", "FC Sequence No", "Fund Center", "Fund Center Name"],
+            left_on=["Fundcenter_ID", "FC Path", "Fund Center", "Fund Center Name"],
+            right_on=["Costcenter_parent_ID", "FC Path", "Fund Center", "Fund Center Name"],
         )
         print(merged)
         merged = merged.fillna("")
         merged.set_index(
-            ["FC Sequence No", "Fund Center", "Fund Center Name", "Cost Center", "Cost Center Name"], inplace=True
+            ["FC Path", "Fund Center", "Fund Center Name", "Cost Center", "Cost Center Name"], inplace=True
         )
         merged.drop(
             [
@@ -231,7 +231,7 @@ class CostCenterScreeningReport(Report):
             axis=1,
             inplace=True,
         )
-        merged.sort_values(by=["FC Sequence No"], inplace=True)
+        merged.sort_values(by=["FC Path"], inplace=True)
 
         return merged
 

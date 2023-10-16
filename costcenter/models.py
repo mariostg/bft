@@ -537,7 +537,7 @@ class FinancialStructureManager(models.Manager):
 class FundCenter(models.Model):
     fundcenter = models.CharField("Fund Center", max_length=6, unique=True)
     shortname = models.CharField("Fund Center Name", max_length=25, null=True, blank=True)
-    sequence = models.CharField("FC Sequence No", max_length=25, unique=True)
+    sequence = models.CharField("FC Path", max_length=25, unique=True)
     fundcenter_parent = models.ForeignKey(
         "self",
         on_delete=models.RESTRICT,
@@ -736,7 +736,7 @@ class CostCenter(models.Model):
     isforecastable = models.BooleanField("Is Forecastable", default=False)
     isupdatable = models.BooleanField("Is Updatable", default=False)
     note = models.TextField(null=True, blank=True)
-    sequence = models.CharField("CC Sequence No", max_length=25, unique=True, default="")
+    sequence = models.CharField("CC Path", max_length=25, unique=True, default="")
     costcenter_parent = models.ForeignKey(
         FundCenter, on_delete=models.RESTRICT, default="0", related_name="children", verbose_name="Cost Center Parent"
     )
