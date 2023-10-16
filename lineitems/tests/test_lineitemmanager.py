@@ -22,6 +22,28 @@ class TestLineItemManager:
         assert "Lineitem_ID" in df.columns
         assert "Costcenter_ID" in df.columns
 
+    def test_line_item_dataframe_single_fund(self):
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
+
+        df = LineItemManager().line_item_dataframe(fund="c113")
+        assert 6 == len(df)
+        assert "Lineitem_ID" in df.columns
+        assert "Costcenter_ID" in df.columns
+
+    def test_line_item_dataframe_single_doctype(self):
+        hnd = populate.Command()
+        hnd.handle()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
+
+        df = LineItemManager().line_item_dataframe(doctype="co")
+        assert 1 == len(df)
+        assert "Lineitem_ID" in df.columns
+        assert "Costcenter_ID" in df.columns
+
     def test_line_item_detailed_dataframe_empty(self):
         r = LineItem
         assert True == r.objects.line_item_detailed_dataframe().empty

@@ -20,7 +20,7 @@ class LineItemManager(models.Manager):
             return None
         return self.filter(costcenter=cc)
 
-    def line_item_dataframe(self) -> pd.DataFrame:
+    def line_item_dataframe(self, fund: str = None, doctype: str = None) -> pd.DataFrame:
         """Prepare a pandas dataframe of the DRMIS line items.  Columns are renamed
         with a more friendly name.
 
@@ -28,6 +28,10 @@ class LineItemManager(models.Manager):
             pd.DataFrame: A dataframe of DRMIS line items
         """
         data = LineItem.objects.all()
+        if fund:
+            data = data.filter(fund=fund.upper())
+        if doctype:
+            data = data.filter(doctype=doctype.upper())
         if data:
             df = BFTDataFrame(LineItem).build(data)
             df["CO"] = np.where(df["Doctype"] == "CO", df["Balance"], 0)
