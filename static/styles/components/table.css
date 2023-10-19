@@ -18,3 +18,30 @@ table.fin-structure {
 .cc-even {
     background-color: #eaeab4;
 }
+.level3 {
+    background-color: #a3b09c;
+}
+.level4 {
+    background-color: #899980;
+}
+.level5 {
+    background-color: #f5f5dc;
+}
+.level7 {
+    background-color: #eaeab4;
+}
+.level3 > td:first-child {
+    padding-left: 2rem;
+}
+.level4 > td:first-child {
+    padding-left: 4rem;
+}
+.level5 > td:first-child {
+    padding-left: 5rem;
+}
+.level6 > td:first-child {
+    padding-left: 6rem;
+}
+.level7 > td:first-child {
+    padding-left: 8rem;
+}
