@@ -6,6 +6,7 @@ from django.db.models import QuerySet
 from django.conf import settings
 from django.forms.models import model_to_dict
 import pandas as pd
+from pandas.io.formats.style import Styler
 from bft.conf import YEAR_CHOICES, QUARTERS, QUARTERKEYS
 from bft import exceptions
 from utils.dataframe import BFTDataFrame
@@ -527,6 +528,56 @@ class FinancialStructureManager(models.Manager):
             return "1"
         return str(int(lr) + 1)
 
+    def financial_structure_dataframe(self) -> pd.DataFrame:
+        fc = FundCenterManager().fund_center_dataframe(FundCenter.objects.all())
+        cc = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
+        if fc.empty or cc.empty:
+            return pd.DataFrame()
+        merged = pd.merge(
+            fc,
+            cc,
+            how="left",
+            left_on=["Fundcenter_ID", "FC Path", "Fund Center", "Fund Center Name"],
+            right_on=["Costcenter_parent_ID", "FC Path", "Fund Center", "Fund Center Name"],
+        )
+        print(merged)
+        merged = merged.fillna("")
+        merged.set_index(
+            ["FC Path", "Fund Center", "Fund Center Name", "Cost Center", "Cost Center Name"], inplace=True
+        )
+        merged.drop(
+            [
+                "Fundcenter_ID_x",
+                "Fundcenter_ID_y",
+                "Fundcenter_parent_ID_x",
+                "Fundcenter_parent_ID_y",
+                "Costcenter_ID",
+                "Fund_ID",
+                "Source_ID",
+                "Costcenter_parent_ID",
+            ],
+            axis=1,
+            inplace=True,
+        )
+        merged.sort_values(by=["FC Path"], inplace=True)
+
+        return merged
+
+    def financial_structure_styler(self, data: pd.DataFrame):
+        def indent(s):
+            return f"text-align:left;padding-left:{len(str(s))*4}px"
+
+        html = Styler(data, uuid_len=0, cell_ids=False)
+        table_style = [
+            {"selector": "tbody:nth-child(odd)", "props": "background-color:red"},
+        ]
+        data = (
+            html.applymap_index(indent, level=0)
+            .set_table_attributes("class=fin-structure")
+            .set_table_styles(table_style)
+        )
+        return data
+
     def CostCenters(self):
         pass
 
@@ -760,6 +811,47 @@ class CostCenter(models.Model):
         if self.shortname:
             self.shortname = self.shortname.upper()
         super(CostCenter, self).save(*args, **kwargs)
+
+
+class ForecastAdjustmentManager(models.Manager):
+    def fundcenter_descendants(self, fundcenter: str, fund: str = None) -> dict:
+        """Produce a dictionay of Forecast Adjustments including all descendants of the specified fund center.  The key element of each entry is the id of the cost center.
+
+        Args:
+            fundcenter (str): Fund Center
+            fund (str): Fund.
+
+        Returns:
+            dict: A dictionary of forecast adjustments for all descendants of the specified fund center.
+        """
+        root = FundCenterManager().fundcenter(fundcenter)
+
+        cc = CostCenter.objects.filter(sequence__startswith=root.sequence)
+        fund = FundManager().fund(fund)
+        if cc:
+            fcst_adj = ForecastAdjustment.objects.filter(costcenter__in=cc, fund=fund)
+
+            lst = {}
+            d = {}
+            for item in fcst_adj:
+                _id = item.costcenter.id
+                cc = item.costcenter
+                pid = cc.costcenter_parent.id
+                d = {
+                    "Cost Element": cc.costcenter,
+                    "Cost Element Name": cc.shortname,
+                    "Fund Center ID": cc.id,
+                    "Fund": cc.fund.fund,
+                    "Parent ID": pid,
+                    "Path": cc.sequence,
+                    "Parent Path": cc.costcenter_parent.sequence,
+                    "Parent Fund Center": cc.costcenter_parent.fundcenter,
+                    "Forecast Adjustment": float(item.amount),
+                    "Type": "CC",
+                }
+                lst[_id] = d
+
+        return lst
 
 
 class ForecastAdjustment(models.Model):

@@ -1,4 +1,6 @@
 from django.db.models import Sum, Value, Q, QuerySet, F
+from django.db.models.functions import Cast
+from django.db.models import IntegerField
 from bft.conf import P2Q
 from bft import conf
 from lineitems.models import LineItem
@@ -19,27 +21,6 @@ from utils.dataframe import BFTDataFrame
 import pandas as pd
 from pandas.io.formats.style import Styler
 import numpy as np
-
-
-class Report:
-    def df_to_html(self, df: pd.DataFrame, classname=None) -> str:
-        """Create an html version of the dataframe provided.
-
-        Args:
-            df (pd.DataFrame): A dataframe to render as html
-
-        Returns:
-            str: HTML string of a dataframe.
-        """
-        if classname:
-            report = df.style.set_table_attributes(f'class="{classname}"').to_html()
-        else:
-            report = df.to_html()
-        return report
-
-    def styler_clean_table(self, data: pd.DataFrame):
-        """Clean up dataframe by stripping tag ids and format numbers."""
-        return Styler(data, uuid_len=0, cell_ids=False).format("${0:>,.0f}")
 
 
 class CostCenterMonthlyReport:
@@ -144,147 +125,239 @@ class CostCenterMonthlyReport:
         return monthly_df
 
 
-class CostCenterScreeningReport(Report):
+class CostCenterScreeningReport:
     def __init__(self):
-        self.column_grouping = [
-            "Fund Center",
-            "Cost Center",
+        self.fcm = FundCenterManager()
+        self.ccm = CostCenterManager()
+
+    def fund_center_alloc_to_dict(self, alloc: QuerySet[FundCenterAllocation]) -> dict:
+        lst = {}
+        try:
+            iter(alloc)
+        except TypeError:
+            alloc = [alloc]  # when one item only in queryset
+        for item in alloc:
+            _id = item.fundcenter.id
+            fc = item.fundcenter
+            pid = fc.fundcenter_parent.id
+            d = {
+                "Cost Element": fc.fundcenter,
+                "Cost Element Name": fc.shortname,
+                "Fund Center ID": fc.id,
+                "Parent ID": pid,
+                "Fund": item.fund.fund,
+                "Path": fc.sequence,
+                "Parent Path": fc.fundcenter_parent.sequence,
+                "Parent Fund Center": fc.fundcenter_parent.fundcenter,
+                "Allocation": float(item.amount),
+                "Type": "FC",
+            }
+            lst[_id] = d
+        return lst
+
+    def cost_center_alloc_to_dict(self, alloc: QuerySet[CostCenterAllocation]) -> dict:
+        lst = {}
+        d = {}
+        for item in alloc:
+            _id = item.costcenter.id
+            cc = item.costcenter
+            pid = cc.costcenter_parent.id
+            d = {
+                "Cost Element": cc.costcenter,
+                "Cost Element Name": cc.shortname,
+                "Fund Center ID": cc.id,
+                "Fund": cc.fund.fund,
+                "Parent ID": pid,
+                "Path": cc.sequence,
+                "Parent Path": cc.costcenter_parent.sequence,
+                "Parent Fund Center": cc.costcenter_parent.fundcenter,
+                "Allocation": float(item.amount),
+                "Type": "CC",
+            }
+            lst[_id] = d
+        return lst
+
+    def cost_element_allocations(self, fundcenter: str, fund: str = None) -> dict:
+        """Produce a dictionay of allocation including all descendants of the specified fund center.  The key element of each entry is the id of the cost element.
+
+        Args:
+            fundcenter (str): Fund Center
+            fund (str, optional): Fund. Defaults to None.
+
+        Returns:
+            dict: A dictionary of allocation for all descendants of the specified fund center.
+        """
+        root = self.fcm.fundcenter(fundcenter)
+        alloc_cc = {}
+        alloc_fc = {}
+
+        fc = FundCenter.objects.filter(sequence__startswith=root.sequence)
+        fc_list = list(fc.values_list("fundcenter", flat=True))
+        alloc_fc = self.fcm.allocation(fundcenter=fc_list, fund=fund, fy=2023, quarter=1)
+        alloc_fc = self.fund_center_alloc_to_dict(alloc_fc)
+
+        cc = CostCenter.objects.filter(sequence__startswith=root.sequence)
+        if cc:
+            cc_list = list(cc.values_list("costcenter", flat=True))
+            alloc_cc = self.ccm.allocation(costcenter=cc_list, fund=fund, fy=2023, quarter=1)
+            alloc_cc = self.cost_center_alloc_to_dict(alloc_cc)
+
+        return {**alloc_fc, **alloc_cc}
+
+    def cost_element_line_items(self, fundcenter: str, fund, doctype=None) -> dict:
+        """Produce a dictionary of line items including forecast, CO, PC, FR, Working Plan, Spent, Balance.  If fundcenter is specified, all decendants will be included.  Data will be grouped by cost center.
+
+        Args:
+            fundcenter (str): Parent Fund center.
+            costcenter (str): Cost center.
+            fund (str): Fund.
+            doctype (str, optional): Document Type. Defaults to None.
+
+        Returns:
+            dict: _description_
+        """
+        lines = LineItem.objects.all()
+        fc = FundCenter.objects.get(fundcenter=fundcenter.upper())
+        path = fc.sequence
+        ccs = list(CostCenter.objects.filter(sequence__startswith=path).values_list("costcenter", flat=True))
+        ccs = CostCenter.objects.filter(sequence__startswith=path)
+        lines = lines.filter(costcenter__in=ccs)
+        lines = lines.filter(fund=fund.upper())
+        if doctype:
+            lines = lines.filter(doctype=doctype.upper())
+
+        def caster(value):
+            return Cast(value, IntegerField())
+
+        lines = lines.values("costcenter__costcenter", "costcenter__sequence", "costcenter", "fund").annotate(
+            Working_plan=caster(Sum("workingplan")),
+            Spent=caster(Sum("spent")),
+            Balance=caster(Sum("balance")),
+            Forecast=caster(Sum("fcst__forecastamount", default=0)),
+            CO=caster(Sum("balance", filter=Q(doctype="CO"), default=0)),
+            PC=caster(Sum("balance", filter=Q(doctype="PC"), default=0)),
+            FR=caster(Sum("balance", filter=Q(doctype="FR"), default=0)),
+        )
+
+        line_dict = {}
+        for item in lines:
+            d = {
+                # "Cost Center": item["costcenter__costcenter"],
+                "Costcenter_ID": item["costcenter"],
+                "Working Plan": item["Working_plan"],
+                "Spent": item["Spent"],
+                "Balance": item["Balance"],
+                "Forecast": item["Forecast"],
+                "CO": item["CO"],
+                "PC": item["PC"],
+                "FR": item["FR"],
+                "Path": item["costcenter__sequence"],
+            }
+            line_dict[item["costcenter"]] = d
+        return line_dict
+
+    def id_to_sequence(self, data: dict) -> dict:
+        """REbuild a dictionary by switching the key with the path of the cost element
+
+        Args:
+            data (dict): A dictinary who has a path (sequence No) as part of its content for each entry.
+
+        Returns:
+            dict: A dictionary whose key is the path of the cost element
+        """
+        ids = {}
+
+        for _, v in data.items():
+            ids[v["Path"]] = v
+        return ids
+
+    def allocation_rollup(self, alloc: dict) -> dict:
+        """Update the financial data of the specified dict by summing up the numbers based on parent hierarchy.
+
+        Args:
+            alloc (dict): Allocations to process
+
+        Returns:
+            dict: A dictionary which financial data is rolled up.
+        """
+
+        for path, item in alloc.items():
+            parent_path = alloc.get(item["Parent Path"], {"Path": None})["Path"]
+            if parent_path:
+                for p in alloc:
+                    if alloc[p]["Path"] == parent_path:
+                        continue
+                    if parent_path in alloc[p]["Path"]:
+                        alloc[parent_path]["Spent"] += item["Spent"]
+
+        return alloc
+
+    def init_fin_values(self, allocation: dict) -> dict:
+        init_values = {
+            "CO": 0,
+            "PC": 0,
+            "FR": 0,
+            "Working Plan": 0,
+            "Balance": 0,
+            "Spent": 0,
+            "Forecast": 0,
+            "Forecast Adjustment": 0,
+            "Variance": 0,
+        }
+        return {**allocation, **init_values}
+
+    def dict_html_table(self, data: dict) -> str:
+        headings = [
+            "Cost Element",
+            "Cost Element Name",
             "Fund",
-        ]
-        self.aggregation_columns = [
             "Spent",
             "Balance",
-            "Workingplan",
+            "Working Plan",
             "CO",
             "PC",
             "FR",
             "Forecast",
+            "Forecast Adjustment",
+            "Forecast Total",
+            "Allocation",
+            "Variance",
         ]
-        self.with_allocation = False
-        self.with_forecast_adjustment = False
-        if CostCenterAllocation.objects.exists():
-            self.with_allocation = True
-        if ForecastAdjustment.objects.exists():
-            # self.aggregation_columns.append("Forecast Adjustment")
-            # self.aggregation_columns.append("Forecast Total")
-            self.with_forecast_adjustment = True
+        _sorted = list(data.keys())
+        _sorted.sort()
+        thead = ""
+        for h in headings:
+            thead += f"<th>{h}</th>"
+        thead = f"<thead><tr>{thead}</tr></thead>"
 
-    def cost_center_screening_report(self) -> pd.DataFrame:
-        """Create a dataframe of merged line items, forecast and cost centers grouped as per <grouping>.
-        Aggregation is done on fields Spent, Balance, Working Plan, Forecast and Allocation
+        trows = ""
+        for s in _sorted:
+            tr = ""
+            for h in headings:
+                level = len(data[s]["Path"].split("."))
+                if h == "Path" or h == "Parent Path":
+                    continue  # don't show these columns
+                match h:
+                    case h if h in [
+                        "Spent",
+                        "Balance",
+                        "Working Plan",
+                        "CO",
+                        "PC",
+                        "FR",
+                        "Forecast",
+                        "Allocation",
+                        "Variance",
+                    ]:
+                        tr += f"<td>{data[s][h]:,}</td>"
+                    case _:
+                        tr += f"<td>{data[s][h]}</td>"
+            tr = f"<tr class='level{level}'>{tr}</tr>"
+            trows += tr
 
-        Returns:
-            pd.DataFrame: _description_
-        """
-        df = pd.DataFrame()
-        li_df = LineItem.objects.line_item_detailed_dataframe()
-        if len(li_df) > 0:
-            df = pd.pivot_table(li_df, values=self.aggregation_columns, index=self.column_grouping, aggfunc="sum")
-            if self.with_allocation == True:
-                allocation_df = CostCenter.objects.allocation_dataframe()
-                if not allocation_df.empty:
-                    self.aggregation_columns.append("Allocation")
-                    allocation_agg = pd.pivot_table(
-                        allocation_df, values="Allocation", index=self.column_grouping, aggfunc=np.sum
-                    )
-                    df = pd.merge(df, allocation_agg, how="left", on=self.column_grouping)
-            if self.with_forecast_adjustment == True:
-                fa = CostCenter.objects.forecast_adjustment_dataframe()
-                if not fa.empty:
-                    self.aggregation_columns.append("Forecast Adjustment")
-                    self.aggregation_columns.append("Forecast Total")
-                    fa_agg = pd.pivot_table(
-                        fa, values="Forecast Adjustment", index=self.column_grouping, aggfunc=np.sum
-                    )
-                    df = pd.merge(df, fa_agg, how="left", on=self.column_grouping).fillna(0)
-                    df["Forecast Total"] = df["Forecast"] + df["Forecast Adjustment"]
-        return df
+        table = f"<table id='screeningreport'>{thead}<tbody>{trows}</tbody></table>"
 
-    def financial_structure_dataframe(self) -> pd.DataFrame:
-        fc = FundCenterManager().fund_center_dataframe(FundCenter.objects.all())
-        cc = CostCenterManager().cost_center_dataframe(CostCenter.objects.all())
-        if fc.empty or cc.empty:
-            return pd.DataFrame()
-        merged = pd.merge(
-            fc,
-            cc,
-            how="left",
-            left_on=["Fundcenter_ID", "FC Path", "Fund Center", "Fund Center Name"],
-            right_on=["Costcenter_parent_ID", "FC Path", "Fund Center", "Fund Center Name"],
-        )
-        print(merged)
-        merged = merged.fillna("")
-        merged.set_index(
-            ["FC Path", "Fund Center", "Fund Center Name", "Cost Center", "Cost Center Name"], inplace=True
-        )
-        merged.drop(
-            [
-                "Fundcenter_ID_x",
-                "Fundcenter_ID_y",
-                "Fundcenter_parent_ID_x",
-                "Fundcenter_parent_ID_y",
-                "Costcenter_ID",
-                "Fund_ID",
-                "Source_ID",
-                "Costcenter_parent_ID",
-            ],
-            axis=1,
-            inplace=True,
-        )
-        merged.sort_values(by=["FC Path"], inplace=True)
-
-        return merged
-
-    def financial_structure_styler(self, data: pd.DataFrame):
-        def indent(s):
-            return f"text-align:left;padding-left:{len(str(s))*4}px"
-
-        def set_row_class(r):
-            # TODO something to implement zebra rows in table
-            pass
-
-        html = Styler(data, uuid_len=0, cell_ids=False)
-        table_style = [
-            {"selector": "tbody:nth-child(odd)", "props": "background-color:red"},
-        ]
-        data = (
-            html.applymap_index(indent, level=0)
-            .set_table_attributes("class=fin-structure")
-            .set_table_styles(table_style)
-        )
-        return data
-
-    def pivot_table_w_subtotals(self, df: pd.DataFrame, aggvalues: list, grouper: list) -> pd.DataFrame:
-        """
-        Adds tabulated subtotals to pandas pivot tables with multiple hierarchical indices.
-
-        Args:
-        - df - dataframe used in pivot table
-        - aggvalues - list-like or scalar to aggregate
-        - grouper - ordered list of indices to aggregrate by
-        - fill_value - value used to in place of empty cells
-
-        Returns:
-        -flat table with data aggregrated and tabulated
-
-        """
-        tables = []
-        for indexnumber in range(len(grouper)):
-            n = indexnumber + 1
-            table = pd.pivot_table(
-                df,
-                values=aggvalues,
-                index=grouper[:n],
-                aggfunc=np.sum,
-                fill_value="",
-            ).reset_index()
-            table = table.reindex(list(table.columns[:n]) + aggvalues, axis=1)
-            for column in grouper[n:]:
-                table[column] = ""
-            tables.append(table)
-        concattable = pd.concat(tables).sort_index()
-        concattable = concattable.set_index(keys=grouper)
-        return concattable.sort_index(axis=0, ascending=True)
+        return table
 
 
 class AllocationStatusReport:
