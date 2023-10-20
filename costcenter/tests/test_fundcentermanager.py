@@ -75,6 +75,11 @@ class TestFundCenterManager:
         test_alloc = FCM.allocation(fundcenter="1111AA")
         assert alloc["amount"] == test_alloc.amount
 
+    def test_fund_center_manager_allocation_non_existing_fund(self, populate):
+        alloc = FundCenterManager().allocation(fund="C999")
+        print(alloc)
+        assert 0 == alloc.amount
+
     def test_fund_center_manager_allocation_from_fc_list(self, populate):
         fc = ["2184DA", "2184A3"]
         data = FundCenter.objects.allocation(fundcenter=fc, fund="c113", fy=2023, quarter=1)

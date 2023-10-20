@@ -112,6 +112,12 @@
     gap: 14px;
     padding: 2rem;
 }
+.form__fields-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 2rem;
+}
 .form__row {
     display: flex;
     gap: 8px;

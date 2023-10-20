@@ -18,6 +18,9 @@ table.fin-structure {
 .cc-even {
     background-color: #eaeab4;
 }
+#screeningreport {
+    margin-top: 12px;
+}
 #screeningreport tr.level3 {
     background-color: #a3b09c;
 }

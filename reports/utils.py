@@ -177,12 +177,14 @@ class CostCenterScreeningReport:
             lst[_id] = d
         return lst
 
-    def cost_element_allocations(self, fundcenter: str, fund: str = None) -> dict:
+    def cost_element_allocations(self, fundcenter: str, fund: str, fy: int, quarter: int) -> dict:
         """Produce a dictionay of allocation including all descendants of the specified fund center.  The key element of each entry is the id of the cost element.
 
         Args:
             fundcenter (str): Fund Center
-            fund (str, optional): Fund. Defaults to None.
+            fund (str): Fund.
+            fy (str): Fiscal Year.  Required for allocation
+            quarter (str): Quarter. Required for allocation.
 
         Returns:
             dict: A dictionary of allocation for all descendants of the specified fund center.
@@ -192,8 +194,11 @@ class CostCenterScreeningReport:
         alloc_fc = {}
 
         fc = FundCenter.objects.filter(sequence__startswith=root.sequence)
+        fund = FundManager().fund(fund)
+        if not fund:
+            return {}
         fc_list = list(fc.values_list("fundcenter", flat=True))
-        alloc_fc = self.fcm.allocation(fundcenter=fc_list, fund=fund, fy=2023, quarter=1)
+        alloc_fc = self.fcm.allocation(fundcenter=fc_list, fund=fund, fy=fy, quarter=quarter)
         alloc_fc = self.fund_center_alloc_to_dict(alloc_fc)
 
         cc = CostCenter.objects.filter(sequence__startswith=root.sequence)

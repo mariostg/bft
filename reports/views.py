@@ -17,43 +17,82 @@ from costcenter.models import (
     FinancialStructureManager,
     ForecastAdjustmentManager,
 )
-from reports.forms import SearchAllocationAnalysisForm
-from reports.models import CostCenterMonthly
+from reports.forms import SearchAllocationAnalysisForm, SearchCostCenterScreeningReportForm
 from bft.models import BftStatus
 from bft.conf import QUARTERKEYS
 from utils.getrequestfilter import set_query_string
 
 
 def bmt_screening_report(request):
-    r = utils.CostCenterScreeningReport()
-    fc = "2184aa"
-    fund = "c113"
-    lines = r.cost_element_line_items(fundcenter=fc, fund=fund)
-    lines = r.id_to_sequence(lines)
-    alloc = r.cost_element_allocations(fc, fund=fund)
-    alloc = r.id_to_sequence(alloc)
-    fcst_adj = ForecastAdjustmentManager().fundcenter_descendants(fc, fund)
-    fcst_adj = r.id_to_sequence(fcst_adj)
-    # Integrate Encumbrance and forecast
-    columns = ["Spent", "Balance", "Working Plan", "CO", "PC", "FR", "Forecast"]
-    for alloc_path, alloc_item in alloc.items():
-        alloc[alloc_path] = r.init_fin_values(alloc_item)
+    fundcenter = fund = fy = quarter = ""
+    query_string = None
+    table = None
+    form_filter = True
+    context = {}
 
-        for line_path, line_item in lines.items():
-            if alloc_path in line_path:
-                for col in columns:
-                    alloc[alloc_path][col] += line_item[col]
+    has_cc_allocation = CostCenterAllocation.objects.exists()
+    has_fc_allocation = FundCenterAllocation.objects.exists()
 
-        for fcst_adj_path, fcst_Adj_item in fcst_adj.items():
-            if alloc_path in fcst_adj_path:
-                alloc[alloc_path]["Forecast Adjustment"] += fcst_Adj_item["Forecast Adjustment"]
+    if not len(request.GET) and not has_cc_allocation and not has_fc_allocation:
+        messages.warning(request, "There are no allocation to report, hence nothing really to screen")
+        form_filter = False
 
-    # integrate variance and forecast total
-    for _, item in alloc.items():
-        item["Variance"] = item["Forecast"] - item["Allocation"]
-        item["Forecast Total"] = item["Forecast"] + item["Forecast Adjustment"]
+    if len(request.GET):
+        fundcenter = FundCenterManager().get_request(request)
+        fund = FundManager().get_request(request)
+        quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
+        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
 
-    return render(request, "bmt-screening-report.html", {"table": r.dict_html_table(alloc)})
+        if str(quarter) not in QUARTERKEYS:
+            messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
+        if fundcenter and fund and quarter and fy:
+            query_string = set_query_string(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter)
+
+    initial = {
+        "fundcenter": fundcenter,
+        "fund": fund,
+        "fy": fy,
+        "quarter": quarter,
+    }
+
+    if query_string and (has_cc_allocation or has_fc_allocation):
+        r = utils.CostCenterScreeningReport()
+
+        lines = r.cost_element_line_items(fundcenter=fundcenter, fund=fund)
+        lines = r.id_to_sequence(lines)
+        alloc = r.cost_element_allocations(fundcenter, fund, fy, quarter)
+        alloc = r.id_to_sequence(alloc)
+        fcst_adj = ForecastAdjustmentManager().fundcenter_descendants(fundcenter, fund)
+        fcst_adj = r.id_to_sequence(fcst_adj)
+        # Integrate Encumbrance and forecast
+        columns = ["Spent", "Balance", "Working Plan", "CO", "PC", "FR", "Forecast"]
+        for alloc_path, alloc_item in alloc.items():
+            alloc[alloc_path] = r.init_fin_values(alloc_item)
+
+            for line_path, line_item in lines.items():
+                if alloc_path in line_path:
+                    for col in columns:
+                        alloc[alloc_path][col] += line_item[col]
+
+            for fcst_adj_path, fcst_Adj_item in fcst_adj.items():
+                if alloc_path in fcst_adj_path:
+                    alloc[alloc_path]["Forecast Adjustment"] += fcst_Adj_item["Forecast Adjustment"]
+
+        # integrate variance and forecast total
+        for _, item in alloc.items():
+            item["Variance"] = item["Forecast"] - item["Allocation"]
+            item["Forecast Total"] = item["Forecast"] + item["Forecast Adjustment"]
+
+        table = r.dict_html_table(alloc)
+
+    form = SearchCostCenterScreeningReportForm(initial=initial)
+    context = {
+        "form": form,
+        "form_filter": form_filter,
+        "initial": initial,
+        "table": table,
+    }
+    return render(request, "bmt-screening-report.html", context)
 
 
 def allocation_status_report(request):

@@ -60,10 +60,15 @@ class TestCostCenterScreeningReport:
     def test_cost_element_allocation(self, populate, upload):
         r = CostCenterScreeningReport()
         expected_ce = set(["2184A3", "8484WA", "8484XA"])
-        data = r.cost_element_allocations("2184a3")
+        data = r.cost_element_allocations("2184a3", "c113", 2023, 1)
         ce = set(pd.DataFrame(data).T["Cost Element"])
         assert 3 == len(data)
         assert expected_ce == ce
+
+    def test_cost_element_allocation_non_existing_fund(self, populate, upload):
+        r = CostCenterScreeningReport()
+        data = r.cost_element_allocations("2184a3", "c999", 2023, 1)
+        assert 0 == len(data)
 
     def test_cost_element_line_item_using_fund_center(self, populate, upload):
         r = CostCenterScreeningReport()

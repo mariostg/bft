@@ -16,3 +16,18 @@ class SearchAllocationAnalysisForm(forms.ModelForm):
             "fy",
             "quarter",
         )
+
+
+class SearchCostCenterScreeningReportForm(forms.ModelForm):
+    fundcenter = forms.CharField(required=False)
+    fund = forms.CharField(required=False)
+    quarter = forms.CharField(required=False)
+
+    class Meta:
+        model = FundCenterAllocation
+        fields = (
+            "fundcenter",
+            "fund",
+            "fy",
+            "quarter",
+        )

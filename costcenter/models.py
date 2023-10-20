@@ -164,7 +164,7 @@ class FundCenterManager(models.Manager):
             alloc = FundCenterAllocation.objects.all().values(*columns)
         else:
             alloc = FundCenterAllocation.objects.all()
-        if fundcenter:
+        if fundcenter and alloc:
             if isinstance(fundcenter, str):
                 fundcenter = FundCenter.objects.get(fundcenter__iexact=fundcenter)
                 alloc = alloc.filter(fundcenter=fundcenter)
@@ -174,18 +174,18 @@ class FundCenterManager(models.Manager):
                 alloc = alloc.filter(fundcenter__in=fundcenter)
             elif isinstance(fundcenter, FundCenter):
                 alloc = alloc.filter(fundcenter=fundcenter)
-        if fund:
+        if fund and alloc:
             if isinstance(fund, str):
                 fund = FundManager().fund(fund)
             alloc = alloc.filter(fund=fund)
-        if fy:
+        if fy and alloc:
             alloc = alloc.filter(fy=fy)
-        if str(quarter) in QUARTERKEYS:
+        if alloc and str(quarter) in QUARTERKEYS:
             alloc = alloc.filter(quarter=quarter)
 
         rows = alloc.count()
         if not rows:
-            return FundCenterAllocation(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter, amount=0)
+            return FundCenterAllocation(fundcenter=None, fund=None, fy=None, quarter=None, amount=0)
         elif rows == 1:
             return alloc[0]
         else:
