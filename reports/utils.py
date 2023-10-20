@@ -471,7 +471,7 @@ class AllocationStatusReport:
                             sub_data = data.get(sid)
                             sub_allocation = int(sub_data.get("Allocation", 0))
                             sub_ce = sub_data.get("Cost Element")
-                            sub_row += f"<td>{sub_ce}</td><td class='numbers'> {sub_allocation:,}</td><tr>"
+                            sub_row += f"<td>{sub_ce}</td><td class='numbers'> {sub_allocation:,}</td></tr>"
                             subtotal += sub_allocation
                             sub_table += sub_row
 
@@ -480,14 +480,12 @@ class AllocationStatusReport:
                             sub_table += f"<tr><td>Sub Total</td><td class='numbers'>{subtotal:,}</td></tr><tr><td class='alert--warning'>Variation</td><td class='numbers'>{variation:,}</td></tr>"
                         else:
                             sub_table += f"<tr><td>Sub Total</td><td class='numbers'>{subtotal:,}</td></tr>"
-                        sub_table = f"<td>{sub_table}</td>"
+                        sub_table = f"<td>{sub_table}</table></td>"
                     else:
                         sub_table = "<td class='alert--info'>No Sub Allocation</td>"
 
-                    trow += f"{sub_table}</table>"
+                    trow += f"{sub_table}"
                 tbody += trow
-                print("======")
-                print(tbody)
             thead = "<thead><th>Fund Center</th><th>Allocation</th><th>Sub-Allocations</th></thead>"
             table = f"<table class=''>{thead}{tbody}</table>"
             return table
