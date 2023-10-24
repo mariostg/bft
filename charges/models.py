@@ -1,5 +1,7 @@
 from django.db import models
 from datetime import datetime
+import os
+import csv
 import pandas as pd
 
 
@@ -34,10 +36,12 @@ class CostCenterChargeProcessor:
         FileNotFoundError: If the encumbrance file is not found
     """
 
-    def to_csv(self, file_path: str):
+    def __init__(self):
+        self.csv_file = "drmis_data/charges.csv"
 
+    def to_csv(self, source_file: str):
         df = pd.read_csv(
-            file_path,
+            source_file,
             dtype={2: object, 3: object, 8: object},
             sep="|",
             header=3,
@@ -67,4 +71,23 @@ class CostCenterChargeProcessor:
         df.loc[df["ValCOArCur"].str.endswith("-"), "ValCOArCur"] = "-" + df["ValCOArCur"].str.replace("-", "")
 
         print(df)
-        df.to_csv("drmis_data/charges.csv", index=False)
+        df.to_csv(self.csv_file, index=False)
+
+    def csv2table(self):
+        CostCenterChargeImport.objects.all().delete()
+        with open(self.csv_file) as file:
+            next(file)  # skip the header row
+            reader = csv.reader(file)
+            for row in reader:
+                charge_line = CostCenterChargeImport(
+                    fund=row[0],
+                    costcenter=row[1],
+                    gl=row[2],
+                    ref_doc_no=row[3],
+                    aux_acct_asmnt=row[4],
+                    amount=row[5],
+                    doc_type=row[6],
+                    posting_date=row[7],
+                    period=row[8],
+                )
+                charge_line.save()
