@@ -1,4 +1,5 @@
 from django.db import models
+from bft.models import BftStatusManager
 from datetime import datetime
 import os
 import csv
@@ -24,6 +25,7 @@ class CostCenterChargeImport(models.Model):
     doc_type = models.CharField(max_length=2, null=True, blank=True)
     posting_date = models.DateField()
     period = models.CharField(max_length=2)
+    fy = models.PositiveSmallIntegerField("Fiscal Year", default=BftStatusManager().fy())
 
 
 class CostCenterChargeProcessor:
@@ -70,6 +72,9 @@ class CostCenterChargeProcessor:
         # move negative sign forward
         df.loc[df["ValCOArCur"].str.endswith("-"), "ValCOArCur"] = "-" + df["ValCOArCur"].str.replace("-", "")
 
+        # set FY
+        df["fy"] = BftStatusManager().fy()
+
         print(df)
         df.to_csv(self.csv_file, index=False)
 
@@ -89,5 +94,6 @@ class CostCenterChargeProcessor:
                     doc_type=row[6],
                     posting_date=row[7],
                     period=row[8],
+                    fy=row[9],
                 )
                 charge_line.save()
