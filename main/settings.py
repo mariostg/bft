@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "lineitems.apps.LineitemsConfig",
     "encumbrance.apps.EncumbranceConfig",
     "reports.apps.ReportsConfig",
+    "charges.apps.ChargesConfig",
     # dev
     "django_extensions",
 ]
