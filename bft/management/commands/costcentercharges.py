@@ -36,4 +36,4 @@ class Command(BaseCommand):
             cp.to_csv(rawtextfile)
             csv_processed = True
         if to_table and csv_processed:
-            cp.csv2table()
+            cp.csv2cost_center_charge_import_table()

@@ -40,8 +40,14 @@ class CostCenterChargeProcessor:
 
     def __init__(self):
         self.csv_file = "drmis_data/charges.csv"
+        self.fy = BftStatusManager().fy()
 
     def to_csv(self, source_file: str):
+        """Process the raw DRMIS Cost Center Charges report and save it as a csv file.
+
+        Args:
+            source_file (str): Full path of the DRMIS report
+        """
         df = pd.read_csv(
             source_file,
             dtype={2: object, 3: object, 8: object},
@@ -73,12 +79,13 @@ class CostCenterChargeProcessor:
         df.loc[df["ValCOArCur"].str.endswith("-"), "ValCOArCur"] = "-" + df["ValCOArCur"].str.replace("-", "")
 
         # set FY
-        df["fy"] = BftStatusManager().fy()
+        df["fy"] = self.fy
 
         print(df)
         df.to_csv(self.csv_file, index=False)
 
-    def csv2table(self):
+    def csv2cost_center_charge_import_table(self):
+        """Process the csv file that contains cost center charges and upload them in the destination table.ß"""
         CostCenterChargeImport.objects.all().delete()
         with open(self.csv_file) as file:
             next(file)  # skip the header row
