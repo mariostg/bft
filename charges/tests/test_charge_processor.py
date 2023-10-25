@@ -31,7 +31,7 @@ class TestChargeProcessor:
             )
             assert expected_header == line
             line = f.readline()
-            first_line = "L111,46722A,1101,7000008167,ORD 11189281,-1273.38,RX,2023-10-17,7,2023\n"
+            first_line = "L111,46722A,1101,7000008167,ORD 11189281,-1273.38,RX,2023-10-17,1,2023\n"
             assert first_line == line
 
     @pytest.mark.django_db  # needed to get BFT status
