@@ -48,6 +48,9 @@ class CostCenterChargeProcessor:
 
         Args:
             source_file (str): Full path of the DRMIS report
+
+        Raises:
+            ValueError: If columm Period has values that are not the same.
         """
         df = pd.read_csv(
             source_file,
