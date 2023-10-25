@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import csv
 import pandas as pd
+import numpy as np
 
 
 class CostCenterChargeImport(models.Model):
@@ -81,12 +82,18 @@ class CostCenterChargeProcessor:
         # set FY
         df["fy"] = self.fy
 
+        # Confirm we have one single period
+        periods = df["Per"].to_numpy()
+        all_same = (periods[0] == periods).all()
+        if not all_same:
+            raise ValueError("element values in periods are not all the same")
+
         print(df)
         df.to_csv(self.csv_file, index=False)
 
-    def csv2cost_center_charge_import_table(self):
+    def csv2cost_center_charge_import_table(self, fy, period):
         """Process the csv file that contains cost center charges and upload them in the destination table.ß"""
-        CostCenterChargeImport.objects.all().delete()
+        CostCenterChargeImport.objects.filter(fy=fy, period=period).delete()
         with open(self.csv_file) as file:
             next(file)  # skip the header row
             reader = csv.reader(file)
