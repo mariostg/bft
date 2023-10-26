@@ -49,7 +49,7 @@ class Command(BaseCommand):
             rawtextfile = options["cc_charge_file"]
             print(f"Send to csv using {rawtextfile} for {fy}, period {period}")
             print(args)
-            cp.to_csv(rawtextfile)
+            cp.to_csv(rawtextfile, period)
             csv_processed = True
         if to_table and csv_processed:
             cp.csv2cost_center_charge_import_table(fy, period)
