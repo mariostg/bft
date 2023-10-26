@@ -24,6 +24,11 @@ class Command(BaseCommand):
             help="Import DRMIS Report into import table",
         )
         parser.add_argument(
+            "--to_monthly",
+            action="store_true",
+            help="Process monthly charge from import table",
+        )
+        parser.add_argument(
             "--fy",
             type=str,
             required=True,
@@ -42,9 +47,11 @@ class Command(BaseCommand):
             help="cc charge drmis report full path",
         )
 
-    def handle(self, *args, to_csv, to_table, fy, period, **options):
+    def handle(self, *args, to_csv, to_table, to_monthly, fy, period, **options):
         cp = CostCenterChargeProcessor()
         csv_processed = False
+        to_table_processed = False
+        monthly_lines = 0
         if to_csv:
             rawtextfile = options["cc_charge_file"]
             print(f"Send to csv using {rawtextfile} for {fy}, period {period}")
@@ -53,3 +60,7 @@ class Command(BaseCommand):
             csv_processed = True
         if to_table and csv_processed:
             cp.csv2cost_center_charge_import_table(fy, period)
+            to_table_processed = True
+        if to_table_processed and csv_processed:
+            monthly_lines = cp.monthly_charges(fy, period)
+            print(f"{monthly_lines} have been recorded in monthly charges.")

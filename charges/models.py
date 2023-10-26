@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum, Value
 from bft.models import BftStatusManager
 from datetime import datetime
 import os
@@ -10,6 +11,8 @@ import numpy as np
 class CostCenterChargeImport(models.Model):
     """This class defines the model that represents the DND Actual Listings, Cost Center Transaction Listing report.  Historically, we call it Charges against cost center.  Each line read from the
     report during the uploadcsv command must match this model.
+
+    This table contains the charges for the current fiscal year only.  Its content is to be deleted when moving to a new FY.
 
     Here is a sample report with its header and ons single line:
     |Fund|Cost Ctr|Cost Elem.|RefDocNo  |AuxAcctAsmnt_1  |    ValCOArCur|DocTyp|Postg Date|Per|
@@ -29,6 +32,52 @@ class CostCenterChargeImport(models.Model):
     fy = models.PositiveSmallIntegerField("Fiscal Year", default=BftStatusManager().fy())
 
 
+class CostCenterChargeMonthlyManager(models.Manager):
+    def flush_current(self) -> int:
+        """Delete from the database the charges against cost center for the current FY and Period as defined by the BftStatusManager"""
+        fy = BftStatusManager().fy()
+        period = BftStatusManager().period()
+        res = CostCenterChargeMonthly.objects.filter(fy=fy, period=period).delete()
+        return res[0]
+
+    def flush_monthly(self, fy: int, period: str) -> int:
+        """Delete from the database the charges against cost center for the given fy and period"""
+        res = CostCenterChargeMonthly.objects.filter(fy=fy, period=period).delete()
+        return res[0]
+
+    def insert_current(self, fy, period):
+        """Insert in the monthly cost center charges table lines taken from charges import.  Insert selection is executed based on the provided fy and period equals to or less than provided period.  This is to ensure there is a rollup of charges on a monthly basis.
+
+        Returns:
+            int: Number of lines inserted
+        """
+        current = (
+            CostCenterChargeImport.objects.filter(fy=fy, period__lte=period)
+            .values("costcenter", "fund", "fy")
+            .annotate(amount=Sum("amount"), period=Value(period))
+        )
+        lines = CostCenterChargeMonthly.objects.bulk_create([CostCenterChargeMonthly(**c) for c in current])
+        return len(lines)
+
+
+class CostCenterChargeMonthly(models.Model):
+    """This class defines the model that represents the cost center charges summarized by fy and period."""
+
+    fund = models.CharField(max_length=4)
+    costcenter = models.CharField(max_length=6)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    period = models.CharField(max_length=2)
+    fy = models.PositiveSmallIntegerField("Fiscal Year", default=BftStatusManager().fy())
+
+    objects = CostCenterChargeMonthlyManager()
+
+    def __str__(self):
+        return f"{self.fund} {self.costcenter} {self.amount} {self.fy} {self.period}"
+
+    class Meta:
+        verbose_name_plural = "Cost Center charges monthly"
+
+
 class CostCenterChargeProcessor:
     """
     CostCenterChargeProcessor class processes the Charges against cost center report.  It
@@ -43,14 +92,14 @@ class CostCenterChargeProcessor:
         self.csv_file = "drmis_data/charges.csv"
         self.fy = BftStatusManager().fy()
 
-    def to_csv(self, source_file: str):
+    def to_csv(self, source_file: str, period: str):
         """Process the raw DRMIS Cost Center Charges report and save it as a csv file.
 
         Args:
             source_file (str): Full path of the DRMIS report
 
         Raises:
-            ValueError: If columm Period has values that are not the same.
+            ValueError: If columm Period has values that are not the same or period passed as argument does not match period in data file
         """
         df = pd.read_csv(
             source_file,
@@ -91,7 +140,10 @@ class CostCenterChargeProcessor:
         if not all_same:
             raise ValueError("element values in periods are not all the same")
 
-        print(df)
+        # Confirm period passed to command line matches those of csv file
+        if periods[0] != period:
+            raise ValueError(f"Requested period {period} does not match the periods in the file")
+
         df.to_csv(self.csv_file, index=False)
 
     def csv2cost_center_charge_import_table(self, fy, period):
@@ -114,3 +166,8 @@ class CostCenterChargeProcessor:
                     fy=row[9],
                 )
                 charge_line.save()
+
+    def monthly_charges(self, fy, period) -> int:
+        m = CostCenterChargeMonthlyManager()
+        m.flush_monthly(fy, period)
+        return m.insert_current(fy, period)
