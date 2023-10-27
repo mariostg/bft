@@ -25,6 +25,7 @@ from .forms import (
     SearchFundCenterAllocationForm,
     SearchCostCenterAllocationForm,
 )
+from bft.models import BftStatusManager
 from utils import getrequestfilter
 
 
@@ -244,7 +245,8 @@ def fundcenter_allocation_delete(request, pk):
 
 def costcenter_page(request):
     data = CostCenter.objects.all()
-    return render(request, "costcenter/costcenter-table.html", context={"data": data})
+    status = {"fy": BftStatusManager().fy(), "period": BftStatusManager().period}
+    return render(request, "costcenter/costcenter-table.html", context={"data": data, "status": status})
 
 
 def costcenter_add(request):

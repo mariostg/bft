@@ -17,6 +17,7 @@ from costcenter.models import (
     FinancialStructureManager,
     ForecastAdjustmentManager,
 )
+from charges.models import CostCenterChargeMonthly
 from reports.forms import SearchAllocationAnalysisForm, SearchCostCenterScreeningReportForm
 from bft.models import BftStatus
 from bft.conf import QUARTERKEYS
@@ -206,3 +207,17 @@ def csv_line_items(request):
     for obj in data:
         writer.writerow([getattr(obj, field) for field in field_names])
     return response
+
+
+def cost_center_charge_table(request, cc: str, fy: int, period: int):
+    cc = cc.upper()
+    table = ""
+    data = CostCenterChargeMonthly.objects.filter(costcenter=cc, fy=fy, period=period)
+    if data:
+        df = utils.BFTDataFrame(CostCenterChargeMonthly).build(data).set_index(["Cost Center", "Fund"])
+        df = df[["Amount", "Fiscal Year", "Period"]]
+        df = df.style.format(thousands=",")
+        table = df.to_html()
+    else:
+        messages.info(request, f"There are no charges agains {cc} for FY {fy} and period {period}")
+    return render(request, "costcenter-monthly-charge-data.html", {"table": table})

@@ -13,6 +13,7 @@ urlpatterns = [
     path("costcenter/", include("costcenter.urls")),
     path("lineitem/", include("lineitems.urls")),
     path("reports/", include("reports.urls")),
+    path("charges/", include("charges.urls")),
 ]
 
 

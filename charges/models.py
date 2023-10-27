@@ -64,7 +64,7 @@ class CostCenterChargeMonthly(models.Model):
     """This class defines the model that represents the cost center charges summarized by fy and period."""
 
     fund = models.CharField(max_length=4)
-    costcenter = models.CharField(max_length=6)
+    costcenter = models.CharField("Cost Center", max_length=6)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     period = models.CharField(max_length=2)
     fy = models.PositiveSmallIntegerField("Fiscal Year", default=BftStatusManager().fy())
