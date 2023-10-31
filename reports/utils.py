@@ -91,9 +91,10 @@ class CostCenterMonthlyReport:
             "Allocation"
         """
         monthly_df = BFTDataFrame(CostCenterMonthly)
-        monthly_df = monthly_df.build(CostCenterMonthly.objects.filter(fy=self.fy, period=self.period))
-        if monthly_df.empty:
+        qst = CostCenterMonthly.objects.filter(fy=self.fy, period=self.period)
+        if qst.count() == 0:
             return pd.DataFrame()
+        monthly_df = monthly_df.build(qst)
 
         alloc_df = CostCenterManager().allocation_dataframe(fy=self.fy, quarter=P2Q[self.period])
         alloc_df.drop(["FY", "Quarter"], axis=1, inplace=True)
