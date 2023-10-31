@@ -18,7 +18,7 @@ class TestChargeProcessor:
     def test_to_csv(self, setup):
 
         cp = CostCenterChargeProcessor()
-        cp.to_csv(self.test_file)
+        cp.to_csv(self.test_file, "1")
 
         with open(cp.csv_file, "r") as f:
             line_count = f.readlines()
@@ -39,12 +39,12 @@ class TestChargeProcessor:
 
         cp = CostCenterChargeProcessor()
         with pytest.raises(ValueError):
-            cp.to_csv(self.test_file_invalid_period)
+            cp.to_csv(self.test_file_invalid_period, "7")
 
     @pytest.mark.django_db
     def test_csv2cost_center_charge_import_table(self, setup):
         cp = CostCenterChargeProcessor()
-        cp.to_csv(self.test_file)
-        cp.csv2cost_center_charge_import_table(2023, 7)
+        cp.to_csv(self.test_file, "1")
+        cp.csv2cost_center_charge_import_table(2023, 1)
 
         assert 98 == CostCenterChargeImport.objects.count()

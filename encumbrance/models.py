@@ -371,7 +371,7 @@ class Encumbrance:
             ok = False
 
         if ok:
-            self.csv2cost_center_charge_import_table()
+            self.csv2table()
             linecount = EncumbranceImport.objects.count()
             print(f"{linecount} lines have been written to Encumbrance import table")
         else:
