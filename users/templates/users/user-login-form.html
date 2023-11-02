@@ -23,9 +23,12 @@
             <label class="label" id="show_password">Montrer le mot de passe </label>
             <input class="" type="checkbox" onclick="togglePassword()" />
           </div>
-          <div class="block block--spaced">
+          <div class="columns c2">
             <input class="btn" type="submit" value="Log In" />
-            <a class="" href="forgetpassword.html">Mot de passe oublié?</a>
+            <div class='columns'>
+              <a class="" href="forgetpassword.html">Mot de passe oublié?</a>
+              <a class="" href="{% url 'register' %}">Submit request for access</a>
+            </div>
         </div> 
       </form>
     </section>
