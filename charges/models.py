@@ -29,7 +29,7 @@ class CostCenterChargeImport(models.Model):
     doc_type = models.CharField(max_length=2, null=True, blank=True)
     posting_date = models.DateField()
     period = models.CharField(max_length=2)
-    fy = models.PositiveSmallIntegerField("Fiscal Year", default=BftStatusManager().fy())
+    fy = models.PositiveSmallIntegerField("Fiscal Year", default=0)
 
 
 class CostCenterChargeMonthlyManager(models.Manager):
@@ -67,7 +67,7 @@ class CostCenterChargeMonthly(models.Model):
     costcenter = models.CharField("Cost Center", max_length=6)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     period = models.CharField(max_length=2)
-    fy = models.PositiveSmallIntegerField("Fiscal Year", default=BftStatusManager().fy())
+    fy = models.PositiveSmallIntegerField("Fiscal Year", default=0)
 
     objects = CostCenterChargeMonthlyManager()
 

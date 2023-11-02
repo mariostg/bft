@@ -102,6 +102,13 @@
     gap: 14px;
     padding: 2rem;
 }
+
+@media (max-width: 768px) {
+    .form__fields {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+}
 .form__fields > .right {
     grid-column: 1/-1;
     justify-content: end;

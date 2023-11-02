@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "encumbrance.apps.EncumbranceConfig",
     "reports.apps.ReportsConfig",
     "charges.apps.ChargesConfig",
+    "users.apps.UsersConfig",
     # dev
     "django_extensions",
 ]
@@ -187,3 +188,6 @@ LOGGING = {
         # },
     },
 }
+
+LOGIN_URL = "/users/login/"
+AUTH_USER_MODEL = "users.BftUser"

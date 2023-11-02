@@ -26,9 +26,11 @@
       <a class="btn btn--link" href="{% url 'forecast-adjustment-table' %}">Forecast Adjustments</a>
       {% if user.is_authenticated %}
       <a class="btn btn--link" href="/users/account/">Account</a>
-      <a class="btn btn--link" href="/users/logout/" class="btn btn--sub">Logout</a>
+      <a class="btn btn--link" href="/users/logout/" class="btn btn--sub">Logout ({{ request.session.data }} {{user.get_full_name}})</a>
+      <a class="btn btn--link" href="/users/profile/" class="btn btn--sub">My Profile</a>
       {% else %}
       <a class="btn btn--link" href="/users/login/">Login</a>
+      <a class="btn btn--link" href="/users/register/">Register</a>
 
       {% endif %}
     </div>
