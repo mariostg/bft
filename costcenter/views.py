@@ -127,7 +127,8 @@ def fundcenter_page(request):
 
 def fundcenter_costcenters(request, pk):
     data = CostCenter.objects.filter(costcenter_parent=pk)
-    return render(request, "costcenter/costcenter-table.html", {"data": data})
+    status = {"fy": BftStatusManager().fy(), "period": BftStatusManager().period}
+    return render(request, "costcenter/costcenter-table.html", context={"data": data, "status": status})
 
 
 def fundcenter_add(request):

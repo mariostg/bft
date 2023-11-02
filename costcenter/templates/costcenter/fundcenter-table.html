@@ -3,8 +3,17 @@
 {% block title %}Fund Center Table{% endblock title %}
 {% block content %}
 <main class="block block--centered">
+    <header class='block'>
+        <h2>Fund Center Table</h2>
+    </header>
+    {% if user.is_authenticated %}
+    <div class='block'>
+        <div class="action-bar block">
+            <a class='btn' href="{% url 'fundcenter-add' %}">Add Fund Center</a>
+        </div>
+    </div>
+    {% endif %}
     <table id='fundcenter-table' class='zebra'>
-        <caption>Fund Centers</caption>
         <thead>
             <tr>
                 <th>line No</th>
@@ -31,11 +40,6 @@
             {% endfor %} 
 
         </tbody>
-        {% if user.is_authenticated %}
-        <tfoot>
-            <tr><td colspan=8><a class='btn' href="{% url 'fundcenter-add' %}">Add Fund Center</a></td></tr>
-        </tfoot>
-        {% endif %}
     </table>
 </main>
 </body>

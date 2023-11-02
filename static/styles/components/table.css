@@ -21,7 +21,8 @@ table.fin-structure {
 #screeningreport {
     margin-top: 12px;
 }
-#screeningreport tr.level3 {
+#screeningreport tr.level3,
+#fundcenter-table tr.level3 {
     background-color: #a3b09c;
 }
 #screeningreport tr.level4 {
