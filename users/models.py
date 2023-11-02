@@ -11,9 +11,29 @@ class BftUserManager(BaseUserManager):
     """
 
     @classmethod
+    def normalize_user(cls, obj: "BftUser"):
+        obj.first_name = obj.first_name.capitalize()
+        obj.last_name = obj.last_name.capitalize()
+        obj.default_fc = obj.default_fc.upper()
+        obj.default_cc = obj.default_cc.upper()
+        return obj
+
+    @classmethod
+    def make_username(cls, email) -> str:
+        """Create username by extracting the username part of the email address
+
+        Args:
+            email (_type_): Email address
+        Returns:
+            str: Username
+        """
+        username, _ = email.strip().rsplit("@", 1)
+        return username.lower()
+
+    @classmethod
     def normalize_email(cls, email):
         """
-        Normalize the email address by lowercasing the domain part of it.
+        Normalize the email address by lowercasing both the domain and username part of the email address.  No need to call super()
         """
         email = email or ""
         try:
@@ -21,7 +41,9 @@ class BftUserManager(BaseUserManager):
         except ValueError:
             pass
         else:
-            email = email_name.lower() + "@" + domain_part.lower()
+            email_name = email_name.lower()
+            domain_part = domain_part.lower()
+            email = email_name + "@" + domain_part
 
         if domain_part != "forces.gc.ca":
             raise ValueError("Domain Part of email not valid.  Expected forces.gc.ca")
