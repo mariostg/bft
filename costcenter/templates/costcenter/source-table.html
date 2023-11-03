@@ -11,7 +11,7 @@
         {% if user.is_authenticated %}
         <div class=''>
             <div class="action-bar block">
-                <a class='btn' href="{% url 'source-add' %}">Add</a>
+                <a class='btn btn-add' href="{% url 'source-add' %}"></a>
             </div>
         </div>
         {% endif %}
@@ -32,8 +32,8 @@
             <td>{{source.source}}</td>
             {% if user.is_authenticated %}
             <td>
-                <a class='btn' href="{% url "source-update" source.id %}">Update</a>
-                <a class='btn btn-delete' href="{% url "source-delete" source.id %}">Delete</a>
+                <a class='btn btn-edit' href="{% url "source-update" source.id %}"></a>
+                <a class='btn btn-delete' href="{% url "source-delete" source.id %}"></a>
             </td>
             {% endif %}
         </tr>

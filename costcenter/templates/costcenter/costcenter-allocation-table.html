@@ -10,7 +10,7 @@
         {% if user.is_authenticated %}
         <div class="block">
             <div class="block action-bar">
-                <a class='btn'  href="{% url 'costcenter-allocation-add' %}">Create Cost Center Allocation</a>
+                <a class='btn btn-add'  href="{% url 'costcenter-allocation-add' %}"></a>
             </div>
         </div>
         {% endif %}
@@ -33,8 +33,8 @@
             </div>
             {% if user.is_authenticated %}
             <div class="summary__footer">
-                <a class="btn" href="{% url 'costcenter-allocation-update' item.pk%}">Edit</a>
-                <a class="btn btn-delete" href="{% url 'costcenter-allocation-delete' item.pk %}" >Delete</a >
+                <a class="btn btn-edit" href="{% url 'costcenter-allocation-update' item.pk%}"></a>
+                <a class="btn btn-delete" href="{% url 'costcenter-allocation-delete' item.pk %}" ></a >
             </div>
             {% endif %}
         </section>

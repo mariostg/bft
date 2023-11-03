@@ -10,7 +10,7 @@
         {% if user.is_authenticated %}
         <div class=''>
             <div class="action-bar block">
-                <a class='btn' href="{% url 'costcenter-add' %}">Add</a>
+                <a class='btn btn-add' href="{% url 'costcenter-add' %}"></a>
             </div>
         </div>
         {% endif %}
@@ -28,12 +28,12 @@
         </div>
         {% if user.is_authenticated %}
         <div class="summary__footer">
-            <span class="tag {% if elem.isforecastable %} nofreeze"> {%else%} freeze"> Not{%endif%} Forecastable</span>
-            <span class="tag {% if elem.isupdatable %} nofreeze"> {%else%} freeze"> Not {%endif%} Updatable</span>
-            <a class='btn btn--link' href="{% url 'costcenter-lineitems' elem.costcenter %}">Lines</a>
-            <a class='btn btn--link' href="{% url 'costcenter-charges' elem.costcenter status.fy status.period %}">Current charges</a>
-            <a class="btn" href="{% url 'costcenter-update' elem.id %}" >Edit</a>
-            <a class="btn btn-delete" href="{% url 'costcenter-delete' elem.pk %}" >Delete</a >
+            <span class="tag {% if elem.isforecastable %}yes"> {%else%} no"> Not{%endif%} Forecastable</span>
+            <span class="tag {% if elem.isupdatable %} yes"> {%else%} no"> Not {%endif%} Updatable</span>
+            <a class='btn btn-view' href="{% url 'costcenter-lineitems' elem.costcenter %}">Lines</a>
+            <a class='btn btn-view' href="{% url 'costcenter-charges' elem.costcenter status.fy status.period %}">Current charges</a>
+            <a class="btn btn-edit" href="{% url 'costcenter-update' elem.id %}" ></a>
+            <a class="btn btn-delete" href="{% url 'costcenter-delete' elem.pk %}" ></a >
         </div>
         {% endif %}
     </section>

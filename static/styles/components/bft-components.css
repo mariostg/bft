@@ -37,7 +37,29 @@
     opacity: 1;
 }
 .btn.btn-delete {
-    background-color: #a02128;
+    background: url(../../images/icon-deletelink.svg) 5px 1px no-repeat;
+    background-size: 2rem;
+    min-width: fit-content;
+    background-color: #404040;
+}
+.btn.btn-add {
+    background: url(../../images/icon-addlink.svg) 5px 1px no-repeat;
+    background-size: 2rem;
+    min-width: fit-content;
+    background-color: #404040;
+}
+.btn.btn-edit {
+    background: url(../../images/icon-changelink.svg) 5px 1px no-repeat;
+    background-size: 2rem;
+    min-width: fit-content;
+    background-color: #404040;
+}
+.btn.btn-view {
+    background: url(../../images/icon-viewlink.svg) 5px 1px no-repeat;
+    background-size: 2.4rem;
+    min-width: fit-content;
+    background-color: #404040;
+    padding-left: 32px;
 }
 .btn.btn-back {
     background-color: #404040;
@@ -315,14 +337,19 @@ textarea {
     display: inline-flex;
     margin: 5px;
 }
-.nofreeze {
-    color: #f3f3f3;
-    background-color: #2196f3;
+.tag.yes {
+    background: url(../../images/icon-yes.svg) 5px 1px no-repeat;
+    background-size: 2.4rem;
+    min-width: fit-content;
+    background-color: #ffff;
+    padding-left: 32px;
 }
-
-.freeze {
-    color: #f3f3f3;
-    background-color: #ff5722;
+.tag.no {
+    background: url(../../images/icon-no.svg) 5px 1px no-repeat;
+    background-size: 2.4rem;
+    min-width: fit-content;
+    background-color: #ffff;
+    padding-left: 32px;
 }
 
 .status {

@@ -11,7 +11,7 @@
         {% if user.is_authenticated %}
         <div class="block">
             <div class="block action-bar">
-                <a class='btn'  href="{% url 'fundcenter-allocation-add' %}">Add</a>
+                <a class='btn btn-add'  href="{% url 'fundcenter-allocation-add' %}"></a>
             </div>
         </div>
         {% endif %}
@@ -34,8 +34,8 @@
                 </div>
                 {% if user.is_authenticated %}
                 <div class="summary__footer">
-                    <a class="btn" href="{% url 'fundcenter-allocation-update' item.pk%}">Edit</a>
-                    <a class="btn btn-delete" href="{% url 'fundcenter-allocation-delete' item.pk %}" >Delete</a >
+                    <a class="btn btn-edit" href="{% url 'fundcenter-allocation-update' item.pk%}"></a>
+                    <a class="btn btn-delete" href="{% url 'fundcenter-allocation-delete' item.pk %}" ></a >
                 </div>
                 {% endif %}
             </section>

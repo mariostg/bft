@@ -11,7 +11,7 @@
         {% if user.is_authenticated %}
         <div class=''>
             <div class="action-bar block">
-                <a class='btn' href="{% url 'fundcenter-add' %}">Add</a>
+                <a class='btn btn-add' href="{% url 'fundcenter-add' %}"></a>
             </div>
         </div>
         {% endif %}
@@ -33,11 +33,11 @@
             <tr class="level{{elem.level}}">
             <td>{{ forloop.counter }}</td>
             <td>{{elem.sequence}}</td><td>{{elem.fundcenter}}</td><td>{{elem.shortname}}</td><td>{{elem.fundcenter_parent}}</td>
-            <td> 
-                <a class='btn' href="{% url "fundcenter-costcenters" elem.pk  %}">Cost centers</a> 
-                {% if user.is_authenticated %}
-                <a class='btn'href="{% url "fundcenter-update" elem.id %}">Modify</a> 
-                <a class='btn btn-delete' href="{% url "fundcenter-delete" elem.id %}">Delete</a>
+            <td class='spread'> 
+                    <a class='btn btn-view' href="{% url "fundcenter-costcenters" elem.pk  %}">Cost centers</a> 
+                    {% if user.is_authenticated %}
+                    <a class='btn btn-edit' href="{% url "fundcenter-update" elem.id %}"></a> 
+                    <a class='btn btn-delete' href="{% url "fundcenter-delete" elem.id %}"></a>
             </td>
             {% endif %}
         </tr>

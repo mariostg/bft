@@ -11,7 +11,7 @@
         {% if user.is_authenticated %}
         <div class=''>
             <div class="action-bar block">
-                <a class='btn' href="{% url 'fund-add' %}">Add</a>
+                <a class='btn btn-add' href="{% url 'fund-add' %}"></a>
             </div>
         </div>
         {% endif %}
@@ -34,10 +34,10 @@
             <td>{{fund.download}}</td>
             {% if user.is_authenticated %}
                 <td>
-                    <a class='btn' href="{% url "fund-update" fund.id %}">Update</a>
+                    <a class='btn btn-edit' href="{% url "fund-update" fund.id %}"></a>
                 </td>
                 <td>
-                    <a class='btn btn-delete' href="{% url "fund-delete" fund.id %}">Delete</a>
+                    <a class='btn btn-delete' href="{% url "fund-delete" fund.id %}"></a>
                 </td>
             {% endif %}
             </tr>

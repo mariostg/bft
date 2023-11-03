@@ -9,7 +9,7 @@
     {% if user.is_authenticated %}
         <div class=''>
             <div class="action-bar block">
-                <a class='btn' href="{% url 'forecast-adjustment-add' %}">Add</a>
+                <a class='btn btn-add' href="{% url 'forecast-adjustment-add' %}"></a>
             </div>
         </div>
         {% endif %}
@@ -32,8 +32,8 @@
 
         {% if user.is_authenticated %}
         <div class="summary__footer">
-            <a href='{% url "forecast-adjustment-update" item.pk %}' class="btn">Edit</a>
-            <a class="btn btn-delete" href="{% url 'forecast-adjustment-delete' item.pk %}" >Delete</a >
+            <a class="btn btn-edit" href="{% url "forecast-adjustment-update" item.pk %}"></a>
+            <a class="btn btn-delete" href="{% url 'forecast-adjustment-delete' item.pk %}" ></a >
         </div>
         {% endif %}
     </section>
