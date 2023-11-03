@@ -4,17 +4,21 @@
 {% block content %} 
 
 <main class="block block--centered">
-    <table id='user-table' class='zebra'>
-        <header class='block'>
-            <h2>BFT Users</h2>
+    <div class="container">
+        <header class=''>
+            <h2>Bft Users</h2>
         </header>
         {% if user.is_authenticated %}
-        <div class='block'>
+        <div class=''>
             <div class="action-bar block">
-                <a class='btn' href="{% url 'user-add' %}">Add user</a>
+                <a class='btn' href="{% url 'user-add' %}">Add</a>
             </div>
         </div>
         {% endif %}
+    </div>
+
+    <table class='container' id='user-table' class='zebra'>
+
         <thead>
             <tr>
                 <th>Sequence</th>

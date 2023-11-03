@@ -3,8 +3,21 @@
 {% block title %}Fund List{% endblock title %}
 {% block content %}
 <main class="block block--centered">
-    <table id='fund-table'>
-        <caption>Funds</caption>
+
+    <div class="container">
+        <header class=''>
+            <h2>Funds</h2>
+        </header>
+        {% if user.is_authenticated %}
+        <div class=''>
+            <div class="action-bar block">
+                <a class='btn' href="{% url 'fund-add' %}">Add</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <table class='container' id='fund-table'>
         <thead>
             <tr>
                 <th>Fund</th>
@@ -31,11 +44,7 @@
             {% endfor %} 
 
         </tbody>
-        {% if user.is_authenticated %}
-        <tfoot>
-            <tr><td colspan=6><a class='btn' href="{% url 'fund-add' %}">Add Fund</a></td></tr>
-        </tfoot>
-        {% endif %}
+
     </table>
 </main>
 </body>

@@ -7,12 +7,14 @@
         <h2>Forecast Ajustments</h2>
     </header>
     {% if user.is_authenticated %}
-    <div class='block'>
-        <div class="action-bar block">
-            <a class='btn' href="{% url 'forecast-adjustment-add' %}">Add Forecast Adjustment</a>
+        <div class=''>
+            <div class="action-bar block">
+                <a class='btn' href="{% url 'forecast-adjustment-add' %}">Add</a>
+            </div>
         </div>
+        {% endif %}
     </div>
-    {% endif %}
+
     {% for item in data %}
     <section class='summary'>
         <div class='summary__header'>

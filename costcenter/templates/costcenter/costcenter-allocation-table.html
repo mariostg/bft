@@ -7,6 +7,14 @@
         <header class='frame'>
             <h2>Cost Centers Allocations</h2>
         </header>
+        {% if user.is_authenticated %}
+        <div class="block">
+            <div class="block action-bar">
+                <a class='btn'  href="{% url 'costcenter-allocation-add' %}">Create Cost Center Allocation</a>
+            </div>
+        </div>
+        {% endif %}
+
         {% for item in data %}
         <section class='summary'>
             <div class='summary__header'>
@@ -31,11 +39,7 @@
             {% endif %}
         </section>
         {% endfor %}
-        {% if user.is_authenticated %}
-        <div class="block block--centered">
-            <a class='btn'  href="{% url 'costcenter-allocation-add' %}">Create Cost Center Allocation</a>
-        </div>
-        {% endif %}
+
     </div>
 </main>
 </body>
