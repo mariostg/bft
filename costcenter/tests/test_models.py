@@ -289,6 +289,31 @@ class TestFundCenterModel:
         saved_fc = FundCenter.objects.get(pk=first_fc.pk)
         assert "1111AA" == saved_fc.fundcenter
 
+    def test_create_fund_center_assigns_level(self):
+        # Create a root level fund center, level should be one
+        first_fc = FundCenter()
+        first_fc.fundcenter = "1111aa"
+        first_fc.shortname = "defgth"
+        first_fc.sequence = "1"
+        first_fc.fundcenter_parent = None
+        first_fc.full_clean()
+        first_fc.save()
+
+        saved_fc = FundCenter.objects.get(pk=first_fc.pk)
+        assert 1 == saved_fc.level
+
+        # create a child to root level, level should be 2
+        second_fc = FundCenter()
+        second_fc.fundcenter = "1111bb"
+        second_fc.shortname = "defgth"
+        second_fc.sequence = FinancialStructureManager().set_parent(first_fc)
+        second_fc.fundcenter_parent = first_fc
+        second_fc.full_clean()
+        second_fc.save()
+
+        saved_fc = FundCenter.objects.get(pk=second_fc.pk)
+        assert 2 == saved_fc.level
+
     def test_can_save_without_sequence_and_without_parent(self):
         fc = {"fundcenter": "1111aa", "shortname": "defgh"}
         first_fc = FundCenter(**fc)

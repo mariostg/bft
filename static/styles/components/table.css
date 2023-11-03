@@ -21,18 +21,26 @@ table.fin-structure {
 #screeningreport {
     margin-top: 12px;
 }
+
 #screeningreport tr.level3,
 #fundcenter-table tr.level3 {
-    background-color: #a3b09c;
+    background-color: #909b86;
 }
-#screeningreport tr.level4 {
-    background-color: #899980;
+#screeningreport tr.level4,
+#fundcenter-table tr.level4 {
+    background-color: #a0a68f;
 }
-#screeningreport tr.level5 {
-    background-color: #f5f5dc;
+#screeningreport tr.level5,
+#fundcenter-table tr.level5 {
+    background-color: #adb39b;
 }
-#screeningreport tr.level7 {
-    background-color: #eaeab4;
+#screeningreport tr.level6,
+#fundcenter-table tr.level6 {
+    background-color: #bdb682;
+}
+#screeningreport tr.level7,
+#fundcenter-table tr.level7 {
+    background-color: #b8bca2;
 }
 #screeningreport tr.level3 > td:first-child {
     padding-left: 2rem;

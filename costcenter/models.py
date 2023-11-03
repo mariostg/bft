@@ -589,6 +589,7 @@ class FundCenter(models.Model):
     fundcenter = models.CharField("Fund Center", max_length=6, unique=True)
     shortname = models.CharField("Fund Center Name", max_length=25, null=True, blank=True)
     sequence = models.CharField("FC Path", max_length=25, unique=True)
+    level = models.SmallIntegerField("Level", default=0)
     fundcenter_parent = models.ForeignKey(
         "self",
         on_delete=models.RESTRICT,
@@ -621,6 +622,7 @@ class FundCenter(models.Model):
         self.fundcenter = self.fundcenter.upper()
         if self.shortname:
             self.shortname = self.shortname.upper()
+        self.level = len(self.sequence.split("."))
         super(FundCenter, self).save(*args, **kwargs)
 
 
