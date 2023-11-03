@@ -1,9 +1,10 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+
+# from django.contrib.auth.admin import UserAdmin
 from users.models import BftUser
 
 
-class UserAdmin(admin.ModelAdmin):
+class BftUserAdmin(admin.ModelAdmin):
     list_display = (
         "username",
         "first_name",
@@ -17,4 +18,4 @@ class UserAdmin(admin.ModelAdmin):
     )
 
 
-admin.site.register(BftUser, UserAdmin)
+admin.site.register(BftUser, BftUserAdmin)
