@@ -330,26 +330,34 @@ textarea {
     color: #f3f3f3;
 }
 .tag {
-    padding: 0 8px;
-    border-radius: 14px;
+    padding: 0 6px;
+    border-radius: 50%;
     justify-content: center;
     align-items: center;
     display: inline-flex;
     margin: 5px;
 }
-.tag.yes {
-    background: url(../../images/icon-yes.svg) 5px 1px no-repeat;
-    background-size: 2.4rem;
-    min-width: fit-content;
-    background-color: #ffff;
-    padding-left: 32px;
+.yes::before {
+    content: "";
+    background-image: url(../../images/icon-yes.svg);
+    background-size: 23px;
+    display: inline-block;
+    background-color: #fff;
+    height: 23px;
+    width: 23px;
+    border-radius: 50%;
+    text-align: center;
 }
-.tag.no {
-    background: url(../../images/icon-no.svg) 5px 1px no-repeat;
-    background-size: 2.4rem;
-    min-width: fit-content;
-    background-color: #ffff;
-    padding-left: 32px;
+.no::before {
+    content: "";
+    background-image: url(../../images/icon-no.svg);
+    background-size: 23px;
+    display: inline-block;
+    background-color: #fff;
+    height: 23px;
+    width: 23px;
+    border-radius: 50%;
+    text-align: center;
 }
 
 .status {
