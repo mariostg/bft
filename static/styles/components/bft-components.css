@@ -122,7 +122,7 @@
     grid-template-columns: 200px 1fr;
     align-items: center;
     gap: 14px;
-    padding: 2rem;
+    padding: 1rem;
 }
 
 @media (max-width: 768px) {

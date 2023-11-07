@@ -27,6 +27,7 @@ from .forms import (
 )
 from bft.models import BftStatusManager
 from utils import getrequestfilter
+from .filters import CostCenterFilter, FundCenterFilter
 
 
 def fund_page(request):
@@ -121,8 +122,12 @@ def source_delete(request, pk):
 
 
 def fundcenter_page(request):
-    data = FundCenter.objects.all().order_by("sequence")
-    return render(request, "costcenter/fundcenter-table.html", context={"fundcenters": data})
+    if not request.GET:
+        data = None
+    else:
+        data = FundCenter.objects.all().order_by("sequence")
+    search_filter = FundCenterFilter(request.GET, queryset=data)
+    return render(request, "costcenter/fundcenter-table.html", {"filter": search_filter})
 
 
 def fundcenter_costcenters(request, pk):
@@ -245,9 +250,13 @@ def fundcenter_allocation_delete(request, pk):
 
 
 def costcenter_page(request):
-    data = CostCenter.objects.all()
     status = {"fy": BftStatusManager().fy(), "period": BftStatusManager().period}
-    return render(request, "costcenter/costcenter-table.html", context={"data": data, "status": status})
+    if not request.GET:
+        data = None
+    else:
+        data = CostCenter.objects.all()
+    search_filter = CostCenterFilter(request.GET, queryset=data)
+    return render(request, "costcenter/costcenter-table.html", {"filter": search_filter, "status": status})
 
 
 def costcenter_add(request):

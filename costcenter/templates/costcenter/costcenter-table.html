@@ -1,8 +1,20 @@
 {% extends 'core/base.html' %}
+{% load static %}
 {% block title %}Cost Centers Table{% endblock title %}
 {% block content %}
+<aside class="form form--collapsible" id="filter-form">
+    <form method="get">
+    <div class='form__header'>Filter</div>
+        <section class="form__fields_flex">
+            {{filter.form.as_div}}
+            <div class="block block--spaced">
+                <button class='btn' type='submit'>Search</button>
+            </div>
+        </section>
+        </form>
+    <div id="expender" class="form__expender"><p>&nbsp;</p></div>
+</aside>
 <main class="block block--centered">
-
     <div class="container">
         <header class=''>
             <h2>Cost Centers</h2>
@@ -16,7 +28,7 @@
         {% endif %}
     </div>
 
-    {% for elem in data  %}
+    {% for elem in filter.qs  %}
     <section class='summary'>
         <div class='summary__header'>
             <span><strong>{{elem.costcenter}} </strong>- {{elem.shortname}} - {{elem.costcenter_parent}}</span>
@@ -41,5 +53,5 @@
 
 </main>
 
-
+<script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
 {% endblock content %}

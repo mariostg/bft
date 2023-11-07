@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     "django.forms",  # to use custom templates such as textarea.html
+    "django_filters",
     # apps
     "bft.apps.BftConfig",
     "costcenter.apps.CostcenterConfig",
