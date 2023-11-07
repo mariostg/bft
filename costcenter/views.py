@@ -123,7 +123,7 @@ def source_delete(request, pk):
 
 def fundcenter_page(request):
     if not request.GET:
-        data = None
+        data = FundCenter.objects.none()
     else:
         data = FundCenter.objects.all().order_by("sequence")
     search_filter = FundCenterFilter(request.GET, queryset=data)
