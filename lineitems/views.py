@@ -5,8 +5,8 @@ from django.db.models import Sum
 from django.core.paginator import Paginator
 import logging
 from .models import LineItem, LineForecast
-from utils import getrequestfilter
-from .forms import LineForecastForm, SearchLineItemForm, DocumentNumberForm
+from .forms import LineForecastForm, DocumentNumberForm
+from lineitems.filters import LineItemFilter
 
 logger = logging.getLogger("django")
 
@@ -15,29 +15,20 @@ def document_page(request, docno):
     lines = LineItem.objects.filter(docno=docno)
     paginator = Paginator(lines, 25)
     page_number = request.GET.get("page")
-    form = SearchLineItemForm()
     context = {
         "data": paginator.get_page(page_number),
-        "form": form,
-        # "initial": initial,
-        # "query_string": query_string,
     }
     return render(request, "lineitems/lineitem-table.html", context)
 
 
-def lineitem_page(request, docno=None):
-    logger.info("Visiting Line Item page as info")
-    lines, initial, query_string = getrequestfilter.search_lines(request)
-    paginator = Paginator(lines, 25)
-    page_number = request.GET.get("page")
-    form = SearchLineItemForm(initial=initial)
-    context = {
-        "data": paginator.get_page(page_number),
-        "form": form,
-        "initial": initial,
-        "query_string": query_string,
-    }
-    return render(request, "lineitems/lineitem-table.html", context)
+def lineitem_page(request):
+
+    if not request.GET:
+        data = LineItem.objects.none()
+    else:
+        data = LineItem.objects.all().order_by("docno")
+    search_filter = LineItemFilter(request.GET, queryset=data)
+    return render(request, "lineitems/lineitem-table.html", {"filter": search_filter})
 
 
 def line_forecast_add(request, pk):

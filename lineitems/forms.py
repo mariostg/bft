@@ -23,30 +23,6 @@ class LineForecastForm(forms.ModelForm):
     # super(LineForecastForm, self).__init__(*args, **kwargs)
 
 
-class SearchLineItemForm(forms.ModelForm):
-    costcenter = forms.CharField(required=False)
-    fund = forms.CharField(required=False)
-    linetext = forms.CharField(required=False)
-    doctype = forms.CharField(required=False)
-    docno = forms.CharField(required=False)
-    createdby = forms.CharField(required=False)
-    status = forms.CharField(required=False)
-    has_forecast = forms.BooleanField(required=False)
-    has_workingplan = forms.BooleanField(required=False)
-
-    class Meta:
-        model = LineItem
-        fields = (
-            "costcenter",
-            "fund",
-            "doctype",
-            "docno",
-            "linetext",
-            "createdby",
-            "status",
-        )
-
-
 class DocumentNumberForm(forms.Form):
     docno = forms.CharField(label="Document Number", max_length=24)
     forecastamount = forms.DecimalField(label="Forecast Amount", max_digits=10, decimal_places=2)

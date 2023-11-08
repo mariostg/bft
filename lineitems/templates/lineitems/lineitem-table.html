@@ -5,9 +5,8 @@
 
 {% block title %}Line Items Table{% endblock title %}
 {% block content %}
-<main>
-
-{% include 'lineitems/lineitem-filter-form.html' %}
+{% include "core/form-filter.html" %}
+<main class="block block--centered">
 
 <section class='container lineitems'>
     <h1>Line Items</h1>
@@ -17,7 +16,7 @@
 
 {% include 'paginator.html' %}
     
-{% for line in data  %}
+{% for line in filter.qs  %}
 <article class="container lineitem">
     <div class='lineitem__header'> 
         <div class='padded'> <a href="{% url 'document-page' line.docno %}">{{line.docno }}</a> - {{line.lineno }} {{line.linetext|default:''}}</div>
@@ -93,4 +92,5 @@
 {% endfor %}
 </section>
 </main>
+<script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
 {% endblock content %}
