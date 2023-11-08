@@ -1,4 +1,4 @@
-from costcenter.models import CostCenter, FundCenter
+from costcenter.models import CostCenter, CostCenterAllocation, FundCenter, FundCenterAllocation
 import django_filters
 
 
@@ -23,4 +23,26 @@ class CostCenterFilter(django_filters.FilterSet):
             "costcenter_parent__fundcenter": ["icontains"],
             "isupdatable": ["exact"],
             "isforecastable": ["exact"],
+        }
+
+
+class FundCenterAllocationFilter(django_filters.FilterSet):
+    class Meta:
+        model = FundCenterAllocation
+        fields = {
+            "fundcenter": ["exact"],
+            "fund": ["exact"],
+            "fy": ["iexact"],
+            "quarter": ["iexact"],
+        }
+
+
+class CostCenterAllocationFilter(django_filters.FilterSet):
+    class Meta:
+        model = CostCenterAllocation
+        fields = {
+            "costcenter": ["exact"],
+            "fund": ["exact"],
+            "fy": ["iexact"],
+            "quarter": ["iexact"],
         }

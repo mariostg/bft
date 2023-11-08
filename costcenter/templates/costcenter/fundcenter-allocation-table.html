@@ -1,8 +1,20 @@
 {% extends 'core/base.html' %}
+{% load static %}
 {% block title %}Fund Center Allocation Table{% endblock title %}
 {% block content %}
-<main class="block">
-    {% include 'costcenter/fundcenter-allocation-form-filter.html' %}
+<aside class="form form--collapsible" id="filter-form">
+    <form method="get">
+    <div class='form__header'>Filter</div>
+        <section class="form__fields_flex">
+            {{filter.form.as_div}}
+            <div class="block block--spaced">
+                <button class='btn' type='submit'>Search</button>
+            </div>
+        </section>
+        </form>
+    <div id="expender" class="form__expender"><p>&nbsp;</p></div>
+</aside>
+<main class="block block--centered">
     <div>
 
         <header class='frame'>
@@ -16,7 +28,7 @@
         </div>
         {% endif %}
 
-            {% for item in data %}
+            {% for item in filter.qs %}
             <section class='summary'>
                 <div class='summary__header'>
                     <span>{{item.fundcenter}}</span>
@@ -42,7 +54,6 @@
             {% endfor %}
     </div>
 </main>
-</body>
-</html>
+<script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
 
 {% endblock content %}

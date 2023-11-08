@@ -22,12 +22,10 @@ from .forms import (
     CostCenterForm,
     CostCenterAllocationForm,
     ForecastadjustmentForm,
-    SearchFundCenterAllocationForm,
-    SearchCostCenterAllocationForm,
 )
 from bft.models import BftStatusManager
 from utils import getrequestfilter
-from .filters import CostCenterFilter, FundCenterFilter
+from .filters import CostCenterFilter, CostCenterAllocationFilter, FundCenterFilter, FundCenterAllocationFilter
 
 
 def fund_page(request):
@@ -191,20 +189,12 @@ def fundcenter_delete(request, pk):
 
 
 def fundcenter_allocation_page(request):
-
-    lines, initial, query_string = getrequestfilter.search_fund_center_allocations(request)
-    if lines.count() == 0:
-        messages.info(request, "There are no Allocations.")
-    # paginator = Paginator(lines, 25)
-    # page_number = request.GET.get("page")
-    form = SearchFundCenterAllocationForm(initial=initial)
-    context = {
-        "data": lines,
-        "form": form,
-        "initial": initial,
-        "query_string": query_string,
-    }
-    return render(request, "costcenter/fundcenter-allocation-table.html", context)
+    if not request.GET:
+        data = FundCenterAllocation.objects.none()
+    else:
+        data = FundCenterAllocation.objects.all().order_by("fundcenter")
+    search_filter = FundCenterAllocationFilter(request.GET, queryset=data)
+    return render(request, "costcenter/fundcenter-allocation-table.html", {"filter": search_filter})
 
 
 def fundcenter_allocation_add(request):
@@ -310,19 +300,12 @@ def costcenter_delete(request, pk):
 
 
 def costcenter_allocation_page(request):
-    lines, initial, query_string = getrequestfilter.search_cost_center_allocations(request)
-    if lines.count() == 0:
-        messages.info(request, "There are no Allocations.")
-    # paginator = Paginator(lines, 25)
-    # page_number = request.GET.get("page")
-    form = SearchCostCenterAllocationForm(initial=initial)
-    context = {
-        "data": lines,
-        "form": form,
-        "initial": initial,
-        "query_string": query_string,
-    }
-    return render(request, "costcenter/costcenter-allocation-table.html", context)
+    if not request.GET:
+        data = CostCenterAllocation.objects.none()
+    else:
+        data = CostCenterAllocation.objects.all().order_by("costcenter")
+    search_filter = CostCenterAllocationFilter(request.GET, queryset=data)
+    return render(request, "costcenter/costcenter-allocation-table.html", {"filter": search_filter})
 
 
 def costcenter_allocation_add(request):
