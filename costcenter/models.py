@@ -260,7 +260,7 @@ class FundCenterManager(models.Manager):
         if fundcenter:
             fundcenter = fundcenter.upper()
             if not FundCenterManager().exists(fundcenter):
-                messages.info(request, "Fund Center specified does not exist.")
+                messages.info(request, f"Fund Center {fundcenter} does not exist.")
             return fundcenter
         else:
             return None

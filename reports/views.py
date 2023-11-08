@@ -108,7 +108,6 @@ def allocation_status_report(request):
     """
 
     fundcenter = fund = fy = quarter = ""
-    query_string = None  # Keep query_string in case paginator is required when more data is used.
     context = {}  # Dict sent to the template
     table = None  # dataframe html formatted to include in context
     form_filter = True
@@ -127,8 +126,6 @@ def allocation_status_report(request):
 
         if str(quarter) not in QUARTERKEYS:
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
-        if fundcenter and fund and fy:
-            query_string = set_query_string(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter)
 
     initial = {
         "fundcenter": fundcenter,
@@ -137,7 +134,7 @@ def allocation_status_report(request):
         "quarter": quarter,
     }
 
-    if query_string and (has_cc_allocation or has_fc_allocation):
+    if has_cc_allocation or has_fc_allocation:
         r = utils.AllocationStatusReport()
         table = r.main(fundcenter, fund, fy, quarter)  # allocation_status_dataframe(fundcenter, fund, fy, int(quarter))
 
@@ -145,8 +142,6 @@ def allocation_status_report(request):
     context = {
         "form": form,
         "form_filter": form_filter,
-        "initial": initial,
-        "query_string": query_string,
         "table": table,
     }
     return render(request, "allocation-status-report.html", context)

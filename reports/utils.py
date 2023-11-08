@@ -427,9 +427,13 @@ class AllocationStatusReport:
         return lst
 
     def main(self, fundcenter: str, fund: str, fy: int, quarter: int) -> str:
+        if not fundcenter or not fund or not fy or not quarter:
+            return ""
         fcm = FundCenterManager()
         ccm = CostCenterManager()
         root = fcm.fundcenter(fundcenter)
+        if not root:
+            return ""
 
         fc = FundCenter.objects.filter(sequence__startswith=root.sequence)
         fc_list = list(fc.values_list("fundcenter", flat=True))
