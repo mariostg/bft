@@ -22,7 +22,7 @@ class FundPageTest(TestCase):
         html = strip_white_space(response.content.decode("utf8"))
         # print(html)
         self.assertTrue(html.startswith("<!DOCTYPE html>"))
-        self.assertIn("<caption>Funds</caption>", html)
+        self.assertIn("<h2>Funds</h2>", html)
 
 
 class FundCreatePageTest(TestCase):
