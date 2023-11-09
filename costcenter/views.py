@@ -128,12 +128,6 @@ def fundcenter_page(request):
     return render(request, "costcenter/fundcenter-table.html", {"filter": search_filter})
 
 
-def fundcenter_costcenters(request, pk):
-    data = CostCenter.objects.filter(costcenter_parent=pk)
-    status = {"fy": BftStatusManager().fy(), "period": BftStatusManager().period}
-    return render(request, "costcenter/costcenter-table.html", context={"data": data, "status": status})
-
-
 def fundcenter_add(request):
     if request.method == "POST":
         form = FundCenterForm(request.POST)
