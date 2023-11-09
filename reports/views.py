@@ -52,7 +52,7 @@ def bmt_screening_report(request):
     initial = {
         "fundcenter": fundcenter,
         "fund": fund,
-        "fy": fy,
+        "fy": BftStatus.current.fy(),
         "quarter": quarter,
     }
 
@@ -92,6 +92,7 @@ def bmt_screening_report(request):
         "form_filter": form_filter,
         "initial": initial,
         "table": table,
+        "fy": BftStatus.current.fy(),
     }
     return render(request, "bmt-screening-report.html", context)
 
@@ -130,8 +131,8 @@ def allocation_status_report(request):
     initial = {
         "fundcenter": fundcenter,
         "fund": fund,
-        "fy": fy,
-        "quarter": quarter,
+        "fy": BftStatus.current.fy(),
+        "quarter": BftStatus.current.quarter(),
     }
 
     if has_cc_allocation or has_fc_allocation:
