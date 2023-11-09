@@ -131,15 +131,6 @@ def line_item_delete(request, pk):
         messages.warning(request, "Only owner can delete a line item.")
     return redirect("lineitem-page")
 
-
-def costcenter_lineitems(request, costcenter):
-    data = LineItem.objects.cost_center(costcenter)
-    if not data:
-        messages.info(request, f"There appears to be no line items in {costcenter}")
-    context = {"data": data}
-    return render(request, "lineitems/lineitem-table.html", context)
-
-
 def document_forecast(request, docno):
     context = {"back": "lineitem-page"}
     context["docno"] = docno

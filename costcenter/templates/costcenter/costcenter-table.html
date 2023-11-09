@@ -31,7 +31,7 @@
         <div class="summary__footer">
             <span class="tag {% if elem.isforecastable %}yes"> {%else%} no"> Not{%endif%} Forecastable</span>
             <span class="tag {% if elem.isupdatable %} yes"> {%else%} no"> Not {%endif%} Updatable</span>
-            <a class='btn btn-view' href="{% url 'costcenter-lineitems' elem.costcenter %}">Lines</a>
+            <a class='btn btn-view' href="{% url 'lineitem-page'%}?costcenter={{elem.pk}}">Lines</a>
             <a class='btn btn-view' href="{% url 'costcenter-charges' elem.costcenter status.fy status.period %}">Current charges</a>
             <a class="btn btn-edit" href="{% url 'costcenter-update' elem.id %}" ></a>
             <a class="btn btn-delete" href="{% url 'costcenter-delete' elem.pk %}" ></a >

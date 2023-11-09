@@ -2,6 +2,7 @@ from django.test import Client, TestCase
 
 from bft.management.commands.uploadcsv import Command
 import bft.management.commands.populate as populate
+from costcenter.models import CostCenter
 
 
 class CostCenterLineItemTest(TestCase):
@@ -12,15 +13,16 @@ class CostCenterLineItemTest(TestCase):
         filldata.handle()
         a = Command()
         a.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
+        cls.cc_id = CostCenter.objects.cost_center("8484wa").id
 
     def test_url_is_good(self):
         c = Client()
-        response = c.get("/lineitem/costcenter/8484WA/")
+        response = c.get(f"/lineitem/lineitem/?costcenter={{cc_id}}")
         self.assertEqual(200, response.status_code)
 
     def test_url_is_bad(self):
         c = Client()
-        response = c.get("/lineitem/costcenter/1111/")
+        response = c.get("/lineitem/lineitem/?costcenter=99")
         # self.assertEqual(404, response.status_code)
         assert True == ("There appears to be no line items in 1111" in str(response.content))
 
@@ -30,6 +32,6 @@ class CostCenterLineItemTest(TestCase):
 
     def test_cost_center_line_items_has_lines(self):
         c = Client()
-        response = c.get("/lineitem/costcenter/8484WA/")
+        response = c.get("/lineitem/lineitem/?costcenter=8484WA")
         self.assertEqual(200, response.status_code)
         self.assertGreater(len(response.context["data"]), 0)
