@@ -3,6 +3,7 @@ from django.contrib import messages
 import logging
 from costcenter.models import CostCenter, CostCenterManager
 from encumbrance.models import EncumbranceImport
+from users.models import BftUser
 from utils.dataframe import BFTDataFrame
 from django.forms.models import model_to_dict
 import pandas as pd
@@ -246,6 +247,22 @@ class LineForecastManager(models.Manager):
         df = BFTDataFrame(LineForecast).build(data)
         return df
 
+    def update_owner(self, costcenter: CostCenter, new_owner: BftUser, old_owner: BftUser = None) -> int:
+        """This function allows for transfer ownership of forecasted lines for a given cost center and optionally the loosing owner.
+
+        Args:
+            costcenter (CostCenter): Cost center of choice for which lines will be moved
+            new_owner (BftUser): Bft User that will be assigned the lines.
+            old_owner (BftUser, optional): Bft User whose lines will be transfered. Defaults to None.. Defaults to None.
+
+        Returns:
+            int: Number of lines transfered.
+        """
+
+        lines = LineForecast.objects.filter(lineitem__costcenter=costcenter)
+        if lines:
+            return lines.update(owner=new_owner)
+
 
 class LineForecast(models.Model):
     forecastamount = models.DecimalField("Forecast", max_digits=10, decimal_places=2, default=0)
@@ -255,7 +272,7 @@ class LineForecast(models.Model):
     delivered = models.BooleanField(default=False)
     lineitem = models.OneToOneField(LineItem, on_delete=models.SET_NULL, related_name="fcst", null=True)
     buyer = models.CharField(max_length=175, null=True, blank=True)  # PWGSC buyer
-    # TODO procurement_officer
+    owner = models.ForeignKey(BftUser, on_delete=models.RESTRICT, default="", null=True)
     updated = models.DateTimeField(auto_now=True, null=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
     status = models.CharField(max_length=10, default="", blank=True, null=True)
