@@ -1,16 +1,22 @@
-const tg = document.getElementById("filter-form");
+const ff = document.getElementById("filter-form");
 const expender = document.getElementById("expender");
-const expender_width = -tg.offsetWidth + 10 + "px";
-tg.style.marginLeft = expender_width;
+const expender_width = -ff.offsetWidth + 10 + "px";
+ff.style.marginLeft = expender_width;
 function asidetoggle(state) {
     let tg = document.getElementById("filter-form").style.marginLeft;
+    fheader = document.querySelector("#filter-form form div.form__header");
     console.log(tg);
     if (tg == expender_width) {
         console.log("closed, need to opwn");
-        document.getElementById("filter-form").style.marginLeft = "0";
+        ff.style.marginLeft = "0";
+        fheader.style.background = "#a3b09c";
+        expender.style.background = "#a3b09c";
+        fheader.style.color = "#4b5544";
     } else {
         console.log("open, beed to clise");
-        document.getElementById("filter-form").style.marginLeft = expender_width;
+        fheader.style.background = "#4b5544";
+        expender.style.background = "#4b5544";
+        ff.style.marginLeft = expender_width;
     }
 }
 
