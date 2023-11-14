@@ -22,6 +22,7 @@ class LineItemFilter(django_filters.FilterSet):
             "createdby": ["icontains"],
             "status": ["iexact"],
             "workingplan": ["gt", "lt"],
+            "fcst__owner": ["exact"],
         }
 
     def filter_has_no_forecast(self, queryset, name, value):

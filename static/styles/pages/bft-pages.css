@@ -3,6 +3,7 @@ main {
 }
 
 aside {
+    margin-top: -240px;
     position: fixed;
     height: auto;
 }
