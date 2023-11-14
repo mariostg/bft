@@ -31,6 +31,7 @@
                 <th>Last Login</th>
                 <th>Date Joined</th>
                 <th>Is Active</th>
+                <th>Procurement Officer</th>
                 <th></th>
             </tr>
         </thead>
@@ -47,6 +48,7 @@
             <td>{{elem.last_login|date:"Y-m-d"}}, {{elem.last_login|time:"H:i"}}</td>
             <td>{{elem.date_joined|date:"Y-m-d"}}</td>
             <td class={%if elem.is_active %}"yes" {% else %} "no" {% endif %}>&nbsp;</td>
+            <td class={%if elem.procurement_officer %}"yes" {% else %} "no" {% endif %}>&nbsp;</td>
             <td> 
                 {% if user.is_authenticated %}
                 <a class='btn btn-edit'href="{% url "user-update" elem.id %}"> </a> 

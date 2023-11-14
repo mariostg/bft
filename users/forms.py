@@ -23,4 +23,5 @@ class BftUserForm(forms.ModelForm):
             "default_cc",
             "email",
             "is_active",
+            "procurement_officer",
         ]
