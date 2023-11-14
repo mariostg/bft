@@ -1,7 +1,9 @@
 table.fin-structure {
     text-align: left;
 }
-
+td.center {
+    text-align: center;
+}
 .fin-structure > tbody > tr {
     border-top: 1px solid;
 }
