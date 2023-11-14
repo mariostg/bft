@@ -12,6 +12,7 @@ class LineForecastForm(forms.ModelForm):
             "deliverydate",
             "delivered",
             "buyer",
+            "owner",
         ]
         widgets = {
             "description": forms.Textarea(attrs={"cols": 80, "rows": 5}),
