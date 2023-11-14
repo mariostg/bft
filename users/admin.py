@@ -15,6 +15,7 @@ class BftUserAdmin(admin.ModelAdmin):
         "last_login",
         "date_joined",
         "is_active",
+        "procurement_officer",
     )
 
 

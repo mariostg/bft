@@ -84,5 +84,5 @@ class BftUserManager(BaseUserManager):
 class BftUser(AbstractUser):
     default_fc = models.CharField("Default FC", max_length=6, blank=True)
     default_cc = models.CharField("Default CC", max_length=6, blank=True)
-
+    procurement_officer = models.BooleanField(default=False)
     objects = BftUserManager()
