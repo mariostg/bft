@@ -131,6 +131,7 @@ def line_item_delete(request, pk):
         messages.warning(request, "Only owner can delete a line item.")
     return redirect("lineitem-page")
 
+
 def document_forecast(request, docno):
     context = {"back": "lineitem-page"}
     context["docno"] = docno
