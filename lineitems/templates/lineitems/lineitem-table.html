@@ -19,7 +19,7 @@
 {% for line in filter.qs  %}
 <article class="container lineitem">
     <div class='lineitem__header'> 
-        <div class='padded'> <a href="{% url 'document-page' line.docno %}">{{line.docno }}</a> - {{line.lineno }} {{line.linetext|default:''}}</div>
+        <div class='padded'> <a href="{% url 'lineitem-page'%}?docno__iexact={{line.docno}}">{{line.docno }}</a> - {{line.lineno }} {{line.linetext|default:''}}</div>
         {% if line.fcintegrity == False%} <div class="hint-warning">Fund center incoherent</div> {% endif %}
         <div class=''>{{line.fundcenter}} - {{line.costcenter}} - {{line.fund}} : {{line.id}}:{{line.status}}</div> 
     </div>

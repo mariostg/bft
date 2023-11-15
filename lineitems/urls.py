@@ -10,6 +10,5 @@ urlpatterns = [
     path("line_forecast/zero/<int:pk>", views.line_forecast_zero_update, name="line-forecast-zero-update"),
     path("line-forecast/add/<int:pk>", views.line_forecast_add, name="line-forecast-add"),
     path("line_forecast/delete/<int:pk>", views.line_forecast_delete, name="line-forecast-delete"),
-    path("lineitem/docno/<str:docno>", views.document_page, name="document-page"),
     path("document-forecast/<str:docno>", views.document_forecast, name="document-forecast"),
 ]
