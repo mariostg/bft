@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum
 from django.core.paginator import Paginator
 import logging
 from .models import LineItem, LineForecast
-from .forms import LineForecastForm, DocumentNumberForm
+from .forms import LineForecastForm, DocumentNumberForm, CostCenterForecastForm
 from lineitems.filters import LineItemFilter
 
 logger = logging.getLogger("django")
@@ -158,3 +159,30 @@ def document_forecast(request, docno):
     if doc.count() == 0:
         messages.warning(request, f"Requested document number was not found : {docno} ")
     return render(request, "lineitems/document-item-forecast-form.html", context)
+
+
+def costcenter_forecast(request, costcenter):
+    context = {"back": "lineitem-page"}
+    context["costcenter"] = costcenter
+    if request.method == "POST":
+        form = CostCenterForecastForm(request.POST)
+        if form.is_valid():
+            costcenter = request.POST.get("costcenter")
+            forecast = request.POST.get("forecastamount")
+            lf = LineForecast().forecast_costcenter_lines(costcenter, float(forecast))
+            return redirect(reverse("lineitem-page") + f"?costcenter={costcenter}")
+    doc = LineItem.objects.filter(costcenter=costcenter)
+    agg = doc.aggregate(Sum("workingplan"), Sum("spent"))
+    agg["workingplan__sum"] = round(agg["workingplan__sum"], 2)
+    agg["spent__sum"] = round(agg["spent__sum"], 2)
+    form = CostCenterForecastForm(
+        initial={
+            "costcenter": costcenter,
+            "forecastamount": agg["workingplan__sum"],
+        }
+    )
+    context["form"] = form
+    context["agg"] = agg
+    if doc.count() == 0:
+        messages.warning(request, f"Requested cost center was not found : {costcenter} ")
+    return render(request, "lineitems/costcenter-item-forecast-form.html", context)

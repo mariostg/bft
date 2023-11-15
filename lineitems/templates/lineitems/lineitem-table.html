@@ -62,11 +62,13 @@
         {% if line.fcst.id %}
         <div class="spread frame">
             <div class='lineitem__nav'>
-                <div>Forecast Document</div>
+                <div>Forecast: Document</div>
                 <a class="btn btn--link-small" href="{% url 'document-forecast' line.docno %}">No {{line.docno}}</a>
+                <div>Cost Center</div>
+                <a class="btn btn--link-small" href="{% url 'costcenter-forecast' line.costcenter.pk%}">{{line.costcenter.costcenter}}</a>
             </div>
             <div class='lineitem__nav'>
-                <div>Forecast Item</div>
+                <div>Line Item</div>
                 <div>
                     {% if line.workingplan != line.fcst.forecastamount %}
                     <a class="btn btn--link-small" href="{% url 'line-forecast-to-wp-update' line.fcst.id %}">Set to WP</a>

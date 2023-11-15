@@ -327,3 +327,19 @@ class LineForecast(models.Model):
                 li_fcst = LineForecast(lineitem=li, forecastamount=float(li.workingplan) * ratio)
                 li_fcst.save()
         return len(lines)
+
+    def forecast_costcenter_lines(self, costcenter: str, forecast: float) -> int:
+        lines = LineItem.objects.filter(costcenter=costcenter)
+        if not lines:
+            return 0
+        lines_working_plan = lines.aggregate(models.Sum("workingplan"))["workingplan__sum"]
+        ratio = float(forecast) / float(lines_working_plan)
+        for li in lines:
+            if hasattr(li, "fcst"):
+                li_fcst = LineForecastManager().get_line_forecast(li)
+                li_fcst.forecastamount = float(li.workingplan) * ratio
+                li_fcst.save()
+            else:
+                li_fcst = LineForecast(lineitem=li, forecastamount=float(li.workingplan) * ratio)
+                li_fcst.save()
+        return len(lines)
