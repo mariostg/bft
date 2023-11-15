@@ -120,12 +120,21 @@ def source_delete(request, pk):
 
 
 def fundcenter_page(request):
+    has_filter = False
     if not request.GET:
         data = FundCenter.objects.none()
     else:
         data = FundCenter.objects.all().order_by("sequence")
+        has_filter = True
     search_filter = FundCenterFilter(request.GET, queryset=data)
-    return render(request, "costcenter/fundcenter-table.html", {"filter": search_filter})
+    return render(
+        request,
+        "costcenter/fundcenter-table.html",
+        {
+            "filter": search_filter,
+            "has_filter": has_filter,
+        },
+    )
 
 
 def fundcenter_add(request):
@@ -234,13 +243,23 @@ def fundcenter_allocation_delete(request, pk):
 
 
 def costcenter_page(request):
+    has_filter = False
     status = {"fy": BftStatusManager().fy(), "period": BftStatusManager().period}
     if not request.GET:
         data = None
     else:
         data = CostCenter.objects.all()
+        has_filter = True
     search_filter = CostCenterFilter(request.GET, queryset=data)
-    return render(request, "costcenter/costcenter-table.html", {"filter": search_filter, "status": status})
+    return render(
+        request,
+        "costcenter/costcenter-table.html",
+        {
+            "filter": search_filter,
+            "status": status,
+            "has_filter": has_filter,
+        },
+    )
 
 
 def costcenter_add(request):

@@ -22,13 +22,14 @@ def document_page(request, docno):
 
 
 def lineitem_page(request):
-
+    has_filter = False
     if not request.GET:
         data = LineItem.objects.none()
     else:
         data = LineItem.objects.all().order_by("docno")
+        has_filter = True
     search_filter = LineItemFilter(request.GET, queryset=data)
-    return render(request, "lineitems/lineitem-table.html", {"filter": search_filter})
+    return render(request, "lineitems/lineitem-table.html", {"filter": search_filter, "has_filter": has_filter})
 
 
 def line_forecast_add(request, pk):

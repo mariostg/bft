@@ -1,6 +1,11 @@
 <aside class="form form--collapsible" id="filter-form">
     <form method="get">
     <div class='form__header'>Filter</div>
+    {% if has_filter%}
+    <div class="block block--spaced">
+    <a class='btn' href="{% url 'lineitem-page' %}">Reset Filter</a>
+    </div>
+    {% endif %}
         <section class="form__fields_flex form__scroll">
             {{filter.form.as_div}}
             <div class="block block--spaced">
