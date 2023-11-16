@@ -18,6 +18,12 @@
     text-decoration: none;
     margin: 0.5rem;
 }
+.btn__row {
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    gap: 5px;
+}
 .btn:hover,
 .btn :active {
     opacity: 0.6;
