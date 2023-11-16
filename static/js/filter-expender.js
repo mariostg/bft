@@ -1,7 +1,6 @@
 const ff = document.getElementById("filter-form");
 const expender = document.getElementById("expender");
 const expender_width = -ff.offsetWidth + 10 + "px";
-ff.style.marginLeft = expender_width;
 function asidetoggle(state) {
     let tg = document.getElementById("filter-form").style.marginLeft;
     fheader = document.querySelector("#filter-form form div.form__header");
