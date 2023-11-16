@@ -77,6 +77,7 @@ class CostCenterForm(forms.ModelForm):
             "costcenter_parent",
             "isforecastable",
             "isupdatable",
+            "procurement_officer",
             "note",
         ]
 
@@ -102,5 +103,9 @@ class ForecastadjustmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ForecastadjustmentForm, self).__init__(*args, **kwargs)
 
-        self.fields["note"] = forms.CharField(widget=forms.Textarea(attrs={"class": "input"}))
-        self.fields["amount"] = forms.CharField(widget=forms.TextInput(attrs={"class": "input"}))
+        self.fields["note"] = forms.CharField(
+            widget=forms.Textarea(attrs={"class": "input"})
+        )
+        self.fields["amount"] = forms.CharField(
+            widget=forms.TextInput(attrs={"class": "input"})
+        )

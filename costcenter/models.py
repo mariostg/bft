@@ -793,7 +793,7 @@ class CostCenter(models.Model):
     costcenter_parent = models.ForeignKey(
         FundCenter, on_delete=models.RESTRICT, default="0", related_name="children", verbose_name="Cost Center Parent"
     )
-
+    procurement_officer= models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.RESTRICT,limit_choices_to={"procurement_officer": True},)
     objects = CostCenterManager()
 
     def __str__(self):
