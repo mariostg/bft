@@ -847,32 +847,6 @@ class AllocationQuerySet(models.QuerySet):
         return self.filter(quarter=quarter)
 
 
-class AllocationManager(models.Manager):
-    def get_queryset(self):
-        return AllocationQuerySet(self.model, using=self._db)
-
-    def fund(self, fund: Fund | str):
-        return self.get_queryset().fund(fund)
-
-    def costcenter(self, costcenter: CostCenter | str):
-        return self.get_queryset().costcenter(costcenter)
-
-    def descendants_fundcenter(self, fundcenter: FundCenter | str):
-        return self.get_queryset().descendants_fundcenter(fundcenter)
-
-    def descendants_costcenter(self, fundcenter: FundCenter | str):
-        return self.get_queryset().descendants_costcenter(fundcenter)
-
-    def fundcenter(self, fundcenter: FundCenter | str):
-        return self.get_queryset().fundcenter(fundcenter)
-
-    def fy(self, fy: int):
-        return self.get_queryset().fy(fy)
-
-    def quarter(self, quarter: int):
-        return self.get_queryset().quarter(quarter)
-
-
 class Allocation(models.Model):
     fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -883,7 +857,7 @@ class Allocation(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
 
-    objects = AllocationManager()
+    objects = AllocationQuerySet.as_manager()
 
     class Meta:
         abstract = True
