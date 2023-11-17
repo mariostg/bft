@@ -137,7 +137,9 @@ def allocation_status_report(request):
 
     if has_cc_allocation or has_fc_allocation:
         r = utils.AllocationStatusReport()
-        table = r.main(fundcenter, fund, fy, quarter)  # allocation_status_dataframe(fundcenter, fund, fy, int(quarter))
+        table = r.main(
+            fundcenter, fund, fy, quarter
+        )  # allocation_status_dataframe(fundcenter, fund, fy, int(quarter))
 
     form = SearchAllocationAnalysisForm(initial=initial)
     context = {

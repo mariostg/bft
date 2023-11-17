@@ -12,28 +12,6 @@ class TestCostCenterManager:
         hnd.handle()
 
     # Cost Center Tests
-    def test_cost_center_allocation_without_parameters(self, populate):
-        CCM = CostCenterManager()
-        a = CCM.allocation()
-        assert 2 == len(a)
-
-    def test_cost_center_allocation_at_quarter_0(self, populate):
-        CCM = CostCenterManager()
-        a = CCM.allocation("8484WA", "C113", 2023, 0)
-        assert 0 == len(a)
-
-    def test_cost_center_allocation_at_quarter_1(self, populate):
-        CCM = CostCenterManager()
-        a = CCM.allocation("8484WA", "C113", 2023, 1)
-        assert 1 == len(a)
-
-    def test_cost_center_manager_allocation_from_cc_list(self, populate):
-        cc = ["8484xa", "8484wa"]
-        data = CostCenter.objects.allocation(costcenter=cc, fund="c113", fy=2023, quarter=1)
-
-        assert 2 == len(data)
-        assert data[0].amount == 1000
-        assert data[1].amount == 250
 
     def test_cost_center_dataframe_empty(self):
         r = CostCenterManager()

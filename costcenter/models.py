@@ -140,72 +140,14 @@ class FundCenterManager(models.Manager):
         df["Fundcenter_parent_ID"] = df["Fundcenter_parent_ID"].fillna(0).astype("int")
         return df
 
-    def allocation(
+    def allocation_dataframe(
         self,
-        fundcenter: "FundCenter|str|list" = None,
-        fund: Fund | str = None,
+        fundcenter: "FundCenter|str" = None,
+        fund: "Fund|str" = None,
         fy: int = None,
         quarter: str = None,
-        columns: list = None,
-    ) -> "QuerySet | FundCenterAllocation":
-        """This function retreive fund center allocation based on provided parameters.
-
-        Args:
-            fundcenter (FundCenter|str, optional): Fund Center of interest. Defaults to None.
-            fund (str, optional): Fund of allocation. Defaults to None.
-            fy (int, optional): Fiscal Year of interest. Defaults to None.
-            quarter (str, optional): Quarter of interest. Defaults to None.
-            columns (list, optional): List of columns names to include in the results.  Column must be valid field names from the model.
-
-        Returns:
-            QuerySet | FundCenterAllocation: If only one element is retreived, a FundCenterAllocation will be returned.  If more than one element is retreived, a QuerySet will be returned.  If not allocation is retreived, a FundCenterAllocation object will be returned and will contains the applicable parameters passed and an allocation of 0.
-        """
-        if columns:
-            alloc = FundCenterAllocation.objects.all().values(*columns)
-        else:
-            alloc = FundCenterAllocation.objects.all()
-        if fundcenter and alloc:
-            if isinstance(fundcenter, str):
-                fundcenter = FundCenter.objects.get(fundcenter__iexact=fundcenter)
-                alloc = alloc.filter(fundcenter=fundcenter)
-            elif isinstance(fundcenter, list):
-                fundcenter = [fc.upper() for fc in fundcenter]
-                fundcenter = FundCenter.objects.filter(fundcenter__in=fundcenter)
-                alloc = alloc.filter(fundcenter__in=fundcenter)
-            elif isinstance(fundcenter, FundCenter):
-                alloc = alloc.filter(fundcenter=fundcenter)
-        if fund and alloc:
-            if isinstance(fund, str):
-                fund = FundManager().fund(fund)
-            alloc = alloc.filter(fund=fund)
-        if fy and alloc:
-            alloc = alloc.filter(fy=fy)
-        if alloc and str(quarter) in QUARTERKEYS:
-            alloc = alloc.filter(quarter=quarter)
-
-        rows = alloc.count()
-        if not rows:
-            return FundCenterAllocation(fundcenter=None, fund=None, fy=None, quarter=None, amount=0)
-        elif rows == 1:
-            return alloc[0]
-        else:
-            return alloc
-
-    def allocation_dataframe(
-        self, fundcenter: "FundCenter|str" = None, fund: "Fund|str" = None, fy: int = None, quarter: str = None
     ) -> pd.DataFrame:
-        if isinstance(fundcenter, str):
-            try:
-                fundcenter = FundCenter.objects.get(fundcenter=fundcenter.upper())
-            except FundCenter.DoesNotExist:
-                return pd.DataFrame()
-        if isinstance(fund, str):
-            try:
-                fund = Fund.objects.get(fund=fund.upper())
-            except Fund.DoesNotExist:
-                return pd.DataFrame()
-        columns = ["fundcenter__fundcenter", "fund__fund", "amount", "fy", "quarter"]
-        data = self.allocation(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter, columns=columns)
+        data = FundCenterAllocation.objects.fundcenter(fundcenter).fund(fund).fy(fy).quarter(quarter)
         rename_columns = {
             "amount": "Allocation",
             "fy": "FY",
@@ -642,7 +584,9 @@ class CostCenterManager(models.Manager):
             return None
         return cc
 
-    def get_sub_alloc(self, fc: FundCenter | str, fund: Fund | str, fy: int, quarter: int) -> "CostCenterAllocation":
+    def get_sub_alloc(
+        self, fc: FundCenter | str, fund: Fund | str, fy: int, quarter: int
+    ) -> "CostCenterAllocation":
         if isinstance(fc, str):
             fc = FundCenterManager().fundcenter(fc)
         if isinstance(fund, str):
@@ -669,45 +613,6 @@ class CostCenterManager(models.Manager):
         df = pd.merge(df, fc_df, how="left", left_on="Costcenter_parent_ID", right_on="Fundcenter_ID")
         return df
 
-    def allocation(
-        self,
-        costcenter: "CostCenter|str|list" = None,
-        fund: Fund | str = None,
-        fy: int = None,
-        quarter: int = None,
-    ) -> QuerySet:
-        """This method returns a cost center allocation queryset based on the specified query parameters.
-
-        Args:
-            costcenter (CostCenter|str, optional): A Cost Center that exist in the system. Defaults to None.
-            fund (Fund | str, optional): Fund assigned to the allocation. Defaults to None.
-            fy (int, optional): Fiscal year applicable to the allocation. Defaults to None.
-            quarter (int, optional): Quarter applicable to the allocation. Defaults to None.
-
-        Returns:
-            QuerySet: A queryset of one or more cost center allocations.
-        """
-        alloc = CostCenterAllocation.objects.all()
-        if costcenter:
-            if isinstance(costcenter, str):
-                costcenter = CostCenter.objects.get(costcenter=costcenter.upper())
-                alloc = alloc.filter(costcenter=costcenter)
-            elif isinstance(costcenter, list):
-                costcenter = [cc.upper() for cc in costcenter]
-                costcenter = CostCenter.objects.filter(costcenter__in=costcenter)
-                alloc = alloc.filter(costcenter__in=costcenter)
-            elif isinstance(costcenter, CostCenter):
-                alloc = alloc.filter(costcenter=costcenter)
-        if fund:
-            if isinstance(fund, str):
-                fund = Fund.objects.get(fund=fund.upper())
-            alloc = alloc.filter(fund=fund)
-        if fy:
-            alloc = alloc.filter(fy=fy)
-        if str(quarter) in QUARTERKEYS:
-            alloc = alloc.filter(quarter=quarter)
-        return alloc
-
     def allocation_dataframe(
         self,
         costcenter: "CostCenter|str" = None,
@@ -721,18 +626,7 @@ class CostCenterManager(models.Manager):
         Returns:
             pd.DataFrame: A dataframe of cost center allocations.
         """
-        if isinstance(costcenter, str):
-            try:
-                costcenter = CostCenter.objects.get(costcenter=costcenter.upper())
-            except CostCenter.DoesNotExist:
-                return pd.DataFrame()
-        if isinstance(fund, str):
-            try:
-                fund = Fund.objects.get(fund=fund.upper())
-            except Fund.DoesNotExist:
-                return pd.DataFrame()
-
-        data = self.allocation(costcenter=costcenter, fund=fund, fy=fy, quarter=quarter)
+        data = CostCenterAllocation.objects.costcenter(costcenter).fund(fund).fy(fy).quarter(quarter)
         if not data:
             return pd.DataFrame({})
         data = list(
@@ -791,9 +685,19 @@ class CostCenter(models.Model):
     note = models.TextField(null=True, blank=True)
     sequence = models.CharField("CC Path", max_length=25, unique=True, default="")
     costcenter_parent = models.ForeignKey(
-        FundCenter, on_delete=models.RESTRICT, default="0", related_name="children", verbose_name="Cost Center Parent"
+        FundCenter,
+        on_delete=models.RESTRICT,
+        default="0",
+        related_name="children",
+        verbose_name="Cost Center Parent",
     )
-    procurement_officer= models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.RESTRICT,limit_choices_to={"procurement_officer": True},)
+    procurement_officer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
+        limit_choices_to={"procurement_officer": True},
+    )
     objects = CostCenterManager()
 
     def __str__(self):
@@ -805,7 +709,9 @@ class CostCenter(models.Model):
 
     def save(self, *args, **kwargs):
         if not FinancialStructureManager().is_child_of(self.costcenter_parent, self):
-            self.sequence = FinancialStructureManager().set_parent(self.costcenter_parent, costcenter_child=True)
+            self.sequence = FinancialStructureManager().set_parent(
+                self.costcenter_parent, costcenter_child=True
+            )
         if self.costcenter_parent and self.costcenter == self.costcenter_parent.fundcenter:
             raise IntegrityError("Children Fund center cannot assign itself as parent")
 
@@ -857,7 +763,9 @@ class ForecastAdjustmentManager(models.Manager):
 
 
 class ForecastAdjustment(models.Model):
-    costcenter = models.ForeignKey(CostCenter, on_delete=models.CASCADE, null=True, verbose_name="Cost Center")
+    costcenter = models.ForeignKey(
+        CostCenter, on_delete=models.CASCADE, null=True, verbose_name="Cost Center"
+    )
     fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     note = models.TextField(null=True, blank=True)
@@ -873,6 +781,98 @@ class ForecastAdjustment(models.Model):
         verbose_name_plural = "Forecast Adjustments"
 
 
+class AllocationQuerySet(models.QuerySet):
+    def fund(self, fund: Fund | str) -> QuerySet | None:
+        if not fund:
+            return self
+        if isinstance(fund, str):
+            try:
+                fund = Fund.objects.get(fund=fund.upper())
+            except Fund.DoesNotExist:
+                return None
+        return self.filter(fund=fund)
+
+    def costcenter(self, costcenter: CostCenter | str) -> QuerySet | None:
+        if not costcenter:
+            return self
+        if isinstance(costcenter, str):
+            try:
+                costcenter = CostCenter.objects.get(costcenter=costcenter.upper())
+            except CostCenter.DoesNotExist:
+                return None
+        return self.filter(costcenter=costcenter)
+
+    def descendants_fundcenter(self, fundcenter: FundCenter | str) -> QuerySet | None:
+        if not fundcenter:
+            return self
+        if isinstance(fundcenter, str):
+            try:
+                fundcenter = FundCenter.objects.get(fundcenter=fundcenter.upper())
+            except FundCenter.DoesNotExist:
+                return None
+        fc_family = FundCenter.objects.filter(sequence__startswith=fundcenter.sequence)
+        return self.filter(fundcenter__in=fc_family)
+
+    def descendants_costcenter(self, fundcenter: FundCenter | str) -> QuerySet | None:
+        if not fundcenter:
+            return self
+        if isinstance(fundcenter, str):
+            try:
+                fundcenter = FundCenter.objects.get(fundcenter=fundcenter.upper())
+            except FundCenter.DoesNotExist:
+                return None
+        cc_family = CostCenter.objects.filter(sequence__startswith=fundcenter.sequence)
+        return self.filter(costcenter__in=cc_family)
+
+    def fundcenter(self, fundcenter: FundCenter | str) -> QuerySet | None:
+        if not fundcenter:
+            return self
+        if isinstance(fundcenter, str):
+            try:
+                fundcenter = FundCenter.objects.get(fundcenter=fundcenter.upper())
+            except FundCenter.DoesNotExist:
+                return None
+        return self.filter(fundcenter=fundcenter)
+
+    def fy(self, fy: int) -> QuerySet | None:
+        if not fy:
+            return self
+        return self.filter(fy=fy)
+
+    def quarter(self, quarter: int) -> QuerySet | None:
+        if not quarter:
+            return self
+        if str(quarter) not in QUARTERKEYS:
+            return None
+        return self.filter(quarter=quarter)
+
+
+class AllocationManager(models.Manager):
+    def get_queryset(self):
+        return AllocationQuerySet(self.model, using=self._db)
+
+    def fund(self, fund: Fund | str):
+        return self.get_queryset().fund(fund)
+
+    def costcenter(self, costcenter: CostCenter | str):
+        return self.get_queryset().costcenter(costcenter)
+
+    def descendants_fundcenter(self, fundcenter: FundCenter | str):
+        return self.get_queryset().descendants_fundcenter(fundcenter)
+
+    def descendants_costcenter(self, fundcenter: FundCenter | str):
+        return self.get_queryset().descendants_costcenter(fundcenter)
+
+    def fundcenter(self, fundcenter: FundCenter | str):
+        return self.get_queryset().fundcenter(fundcenter)
+
+    def fy(self, fy: int):
+        return self.get_queryset().fy(fy)
+
+    def quarter(self, quarter: int):
+        return self.get_queryset().quarter(quarter)
+
+
 class Allocation(models.Model):
     fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -882,6 +882,8 @@ class Allocation(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.RESTRICT)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
+
+    objects = AllocationManager()
 
     class Meta:
         abstract = True
@@ -906,7 +908,9 @@ class Allocation(models.Model):
 
 
 class CostCenterAllocation(Allocation):
-    costcenter = models.ForeignKey(CostCenter, on_delete=models.CASCADE, null=True, verbose_name="Cost Center")
+    costcenter = models.ForeignKey(
+        CostCenter, on_delete=models.CASCADE, null=True, verbose_name="Cost Center"
+    )
 
     def __str__(self):
         return f"{self.costcenter} - {self.fund} - {self.fy} Q{self.quarter} {self.amount}"
@@ -932,7 +936,9 @@ class CostCenterAllocation(Allocation):
 
 
 class FundCenterAllocation(Allocation):
-    fundcenter = models.ForeignKey(FundCenter, on_delete=models.CASCADE, null=True, verbose_name="Fund Center")
+    fundcenter = models.ForeignKey(
+        FundCenter, on_delete=models.CASCADE, null=True, verbose_name="Fund Center"
+    )
 
     def __str__(self):
         return f"{self.fundcenter} - {self.fund} - {self.fy}Q{self.quarter} {self.amount}"

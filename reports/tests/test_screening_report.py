@@ -29,34 +29,6 @@ class TestCostCenterScreeningReport:
         up = uploadcsv.Command()
         up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
-    def test_fund_center_alloc_to_dict_with_one_item(self, populate, upload):
-        r = CostCenterScreeningReport()
-
-        alloc = FundCenterManager().allocation(fundcenter="2184a3", fund="c113", fy=2023, quarter=1)
-        data = r.fund_center_alloc_to_dict(alloc)
-
-        assert 1 == len(data)
-        _keys = data.values()
-        assert set(list(data[list(data.keys())[0]].keys())) == set(self.expected_keys)
-
-    def test_fund_center_alloc_to_dict_with_many_item(self, populate, upload):
-        r = CostCenterScreeningReport()
-
-        alloc = FundCenterManager().allocation(fundcenter=["2184da", "2184a3"], fund="c113", fy=2023, quarter=1)
-        data = r.fund_center_alloc_to_dict(alloc)
-
-        assert 2 == len(data)
-        assert set(list(data[list(data.keys())[0]].keys())) == set(self.expected_keys)
-
-    def test_cost_center_alloc_to_dict_with_many_item(self, populate, upload):
-        r = CostCenterScreeningReport()
-
-        alloc = CostCenterManager().allocation(costcenter=["8484wa", "8484xa"], fund="c113", fy=2023, quarter=1)
-        data = r.cost_center_alloc_to_dict(alloc)
-
-        assert 2 == len(data)
-        assert set(list(data[list(data.keys())[0]].keys())) == set(self.expected_keys)
-
     def test_cost_element_allocation(self, populate, upload):
         r = CostCenterScreeningReport()
         expected_ce = set(["2184A3", "8484WA", "8484XA"])

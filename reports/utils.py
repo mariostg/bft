@@ -194,19 +194,18 @@ class CostCenterScreeningReport:
         alloc_cc = {}
         alloc_fc = {}
 
-        fc = FundCenter.objects.filter(sequence__startswith=root.sequence)
         fund = FundManager().fund(fund)
         if not fund:
             return {}
-        fc_list = list(fc.values_list("fundcenter", flat=True))
-        alloc_fc = self.fcm.allocation(fundcenter=fc_list, fund=fund, fy=fy, quarter=quarter)
+        alloc_fc = (
+            FundCenterAllocation.objects.descendants_fundcenter(root).fund(fund).fy(fy).quarter(quarter)
+        )
         alloc_fc = self.fund_center_alloc_to_dict(alloc_fc)
 
-        cc = CostCenter.objects.filter(sequence__startswith=root.sequence)
-        if cc:
-            cc_list = list(cc.values_list("costcenter", flat=True))
-            alloc_cc = self.ccm.allocation(costcenter=cc_list, fund=fund, fy=2023, quarter=1)
-            alloc_cc = self.cost_center_alloc_to_dict(alloc_cc)
+        alloc_cc = (
+            CostCenterAllocation.objects.descendants_costcenter(root).fund(fund).fy(fy).quarter(quarter)
+        )
+        alloc_cc = self.cost_center_alloc_to_dict(alloc_cc)
 
         return {**alloc_fc, **alloc_cc}
 
