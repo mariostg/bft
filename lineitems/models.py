@@ -112,8 +112,10 @@ class LineItem(models.Model):
         return orphans
 
     def mark_orphan_lines(self, orphans: set):
-        """
-        Set the status of the line item to orphan.
+        """Set the status of the line item to orphan.  Because these lines are orphans, their forecast amount is also set to 0 leaving comments and description unaffected.
+
+        Args:
+            orphans (set): Lines that need to have their status updated to orphan.
         """
         logger.info("Begin marking orphan lines")
         for o in orphans:
@@ -127,7 +129,7 @@ class LineItem(models.Model):
                 li.save()
             except LineItem.DoesNotExist:
                 logger.info(f"LineItem {docno} - {lineno} does not exist")
-        # TODO need to set forecast too.
+        LineForecast.objects.filter(lineitem__status="orphan").update(forecastamount=0)
 
     def insert_line_item(self, ei: EncumbranceImport):
         """
