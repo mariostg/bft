@@ -12,6 +12,6 @@ htmlcov/
 .DS_Store
 
 #log files
-*.log
+log/
 jupyter/
 scripts/quick-test.py

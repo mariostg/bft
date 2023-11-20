@@ -140,7 +140,7 @@ MEDIA_ROOT = BASE_DIR / "static/images"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
+LOG_DIR = BASE_DIR / "log"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -158,13 +158,13 @@ LOGGING = {
         "file": {
             "level": "INFO",
             "class": "logging.FileHandler",
-            "filename": BASE_DIR / "django.log",
+            "filename": LOG_DIR / "django.log",
             "formatter": "verbose",
         },
         "file_uploadcsv": {
             "level": "INFO",
             "class": "logging.FileHandler",
-            "filename": BASE_DIR / "upload.log",
+            "filename": LOG_DIR / "upload.log",
             "formatter": "simple",
         },
         # "console": {
