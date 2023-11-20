@@ -180,13 +180,10 @@ class TestLineForecastModel:
         li = LineItem.objects.filter(spent__gt=0).first()
         new_fcst = float(li.spent) * 0.1
 
-        line_fcst = LineForecast()
-        line_fcst.lineitem = li
-        line_fcst.forecastamount = new_fcst
-        line_fcst.save()
+        line_fcst = LineForecast.objects.filter(lineitem__pk=li.pk).update(forecastamount=new_fcst)
 
         fcst = LineForecastManager().get_line_forecast(li)
-        assert fcst.forecastamount == li.spent
+        assert fcst.forecastamount == new_fcst
 
     def test_forecast_document_number_to_working_plan(self, setup):
         # each line item will have a forecast equivalent to its own working plan
@@ -199,7 +196,9 @@ class TestLineForecastModel:
         target_forecast = lines.aggregate(Sum("workingplan"))["workingplan__sum"]
         lf().forecast_line_by_line(docno, target_forecast)
 
-        applied_forecast = lf.objects.aggregate(Sum("forecastamount"))["forecastamount__sum"]
+        applied_forecast = LineItem.objects.filter(docno=docno).aggregate(Sum("fcst__forecastamount"))[
+            "fcst__forecastamount__sum"
+        ]
         assert applied_forecast == target_forecast
 
     def test_forecast_document_number_to_zero(self):
@@ -208,14 +207,16 @@ class TestLineForecastModel:
         hnd.handle()
         up = uploadcsv.Command()
         up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
-        docno = "12699110"
+        docno = "11111111"
 
         lf = LineForecast
         target_forecast = 0
         total_spent = LineItem.objects.filter(docno=docno).aggregate(Sum("spent"))["spent__sum"]
         lf().forecast_line_by_line(docno, target_forecast)
 
-        applied_forecast = lf.objects.aggregate(Sum("forecastamount"))["forecastamount__sum"]
+        applied_forecast = LineItem.objects.filter(docno=docno).aggregate(Sum("fcst__forecastamount"))[
+            "fcst__forecastamount__sum"
+        ]
         assert applied_forecast == total_spent
 
     def test_create_forecast_no_lines(self, setup):

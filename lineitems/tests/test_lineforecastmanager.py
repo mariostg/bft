@@ -28,7 +28,7 @@ class TestLineForecastManager:
         assert True == ("Lineforecast_ID" in li_df.columns)
         assert True == ("Forecast" in li_df.columns)
         assert True == ("Delivery Date" in li_df.columns)
-        assert 1 == len(li_df)
+        assert 3 == len(li_df)  # one line forecasted + 2 lines have spent.
         assert "int" == li_df.dtypes.Forecast
 
     def test_get_line_forecast_from_lineitem_when_no_forecast(self, populate, upload):
@@ -51,4 +51,4 @@ class TestLineForecastManager:
         li = LineForecast.objects.filter(owner=new_owner).first()
 
         assert li.owner.username == "luigi"
-        assert 1 == affected
+        assert 3 == affected  # one line forecasted + 2 lines have spent.
