@@ -263,6 +263,26 @@ class LineForecastManager(models.Manager):
         if lines:
             return lines.update(owner=new_owner)
 
+    def set_unforecasted_to_spent(self) -> int:
+        """Primarily used during line import, set an initial forecast for lines that have spent other than zero.  Write to logger the outcome of the operation.
+
+        Returns:
+            int: Number of lines forecasted.
+        """
+        lines = LineItem.objects.filter(fcst=None).exclude(spent=0)
+        maxlines = lines.count()
+        logger.info(f"{maxlines} lines with spent greater than zero need forecast.")
+        counter = 0
+        for li in lines:
+            counter += 1
+            li_fcst = LineForecast(lineitem=li, forecastamount=li.spent)
+            li_fcst.save()
+        if counter == maxlines:
+            logger.info(f"Forecasted {counter} out of {maxlines}")
+            return counter
+        else:
+            logger.warn(f"Forecasted {counter} out of {maxlines}")
+
 
 class LineForecast(models.Model):
     forecastamount = models.DecimalField("Forecast", max_digits=10, decimal_places=2, default=0)

@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 import os
 from encumbrance.models import Encumbrance, EncumbranceImport
-from lineitems.models import LineItem
+from lineitems.models import LineItem, LineForecastManager
 from main.settings import BASE_DIR
 
 import logging
@@ -37,6 +37,7 @@ class Command(BaseCommand):
                 li.import_lines()
                 li.set_fund_center_integrity()
                 li.set_doctype()
+                LineForecastManager().set_unforecasted_to_spent()
                 logger.info("-- BFT dowload complete")
         else:
             logger.warning(f"{rawtextfile} not found")
