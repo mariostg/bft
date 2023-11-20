@@ -273,7 +273,11 @@ class LineForecast(models.Model):
     lineitem = models.OneToOneField(LineItem, on_delete=models.SET_NULL, related_name="fcst", null=True)
     buyer = models.CharField(max_length=175, null=True, blank=True)  # PWGSC buyer
     owner = models.ForeignKey(
-        BftUser, on_delete=models.RESTRICT, default="", null=True, limit_choices_to={"procurement_officer": True}
+        BftUser,
+        on_delete=models.RESTRICT,
+        default="",
+        null=True,
+        limit_choices_to={"procurement_officer": True},
     )
     updated = models.DateTimeField(auto_now=True, null=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
