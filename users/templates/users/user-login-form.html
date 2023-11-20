@@ -1,10 +1,10 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% block content %} 
+{% block content %}
 
 <div class="">
 
-  <main class="block block--centered"> 
+  <main class="block block--centered">
     <section class="form">
       <form action="#" method="POST">
         <header class='form__header'>Business Forecasting Tool </header>
@@ -13,12 +13,12 @@
             <label class='label' for="username">Nom d'utilisateur </label>
             <input class="input" type="text" name="username"autofocus='autofocus'/>
           </div>
-    
+
           <div class="form__fields">
             <label class='label' for="password">Mot de passe: </label>
             <input class="input" id="formInput#password" type="password" name="password" placeholder="••••••••"/>
           </div>
-          
+
           <div class="form__fields">
             <label class="label" id="show_password">Montrer le mot de passe </label>
             <input class="" type="checkbox" onclick="togglePassword()" />
@@ -28,18 +28,15 @@
             <div class='columns'>
               <a class="" href="forgetpassword.html">Mot de passe oublié?</a>
               <a class="" href="{% url 'register' %}">Submit request for access</a>
+              <a class="link" href="mailto:mario@mail.ca">Contactez le resonsable</a>
+          </div>
             </div>
-        </div> 
-      </form>
-    </section>
-  
-  </main>
+          </div>
+        </form>
+      </section>
 
-  <div class="">
-    <div>Contacter le responsable</div>
-    <a class="link" href="mailto:">mario@mail.ca</a>
-  </div>
-</div>
+    </main>
+
 <script>
   function togglePassword() {
     var x = document.getElementById("formInput#password");
