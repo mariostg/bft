@@ -190,6 +190,7 @@ class LineItem(models.Model):
                 self.update_line_item(target, e)
             except LineItem.DoesNotExist:
                 self.insert_line_item(e)
+        LineForecastManager().set_encumbrance_history_record()
 
     def set_fund_center_integrity(self):
         """
@@ -285,9 +286,34 @@ class LineForecastManager(models.Manager):
         else:
             logger.warn(f"Forecasted {counter} out of {maxlines}")
 
+    def set_encumbrance_history_record(self) -> int:
+        """Primarily used during line import, set the working plans, spent and balance values in the LineForecast model for historical purpose.  These will remain uneditable.
+
+        Returns:
+            int: Number of lines affected.
+        """
+        lines = LineItem.objects.filter(status="New")
+        maxlines = lines.count()
+        logger.info(f"{maxlines} new lines need encumbrance record history to be set.")
+        counter = 0
+        for li in lines:
+            counter += 1
+            li_fcst = LineForecast(
+                lineitem=li, spent=li.spent, workingplan=li.workingplan, balance=li.balance
+            )
+            li_fcst.save()
+        if counter == maxlines:
+            logger.info(f"Forecasted {counter} out of {maxlines}")
+            return counter
+        else:
+            logger.warn(f"Forecasted {counter} out of {maxlines}")
+
 
 class LineForecast(models.Model):
     forecastamount = models.DecimalField("Forecast", max_digits=10, decimal_places=2, default=0)
+    spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    workingplan = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     description = models.CharField(max_length=512, null=True, blank=True)
     comment = models.CharField(max_length=512, null=True, blank=True)
     deliverydate = models.DateField("Delivery Date", null=True, blank=True)

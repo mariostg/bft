@@ -23,6 +23,9 @@ class LineItemAdmin(admin.ModelAdmin):
 class LineForecastAdmin(admin.ModelAdmin):
     list_display = (
         "forecastamount",
+        "spent",
+        "balance",
+        "workingplan",
         "description",
         "comment",
         "deliverydate",
