@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F
 from django.contrib import messages
 import logging
 from costcenter.models import CostCenter, CostCenterManager
@@ -190,7 +191,6 @@ class LineItem(models.Model):
                 self.update_line_item(target, e)
             except LineItem.DoesNotExist:
                 self.insert_line_item(e)
-        LineForecastManager().set_encumbrance_history_record()
 
     def set_fund_center_integrity(self):
         """
@@ -266,25 +266,27 @@ class LineForecastManager(models.Manager):
         if lines:
             return lines.update(owner=new_owner)
 
-    def set_unforecasted_to_spent(self) -> int:
-        """Primarily used during line import, set an initial forecast for lines that have spent other than zero.  Write to logger the outcome of the operation.
-
-        Returns:
-            int: Number of lines forecasted.
-        """
-        lines = LineItem.objects.filter(fcst=None).exclude(spent=0)
+    def set_underforecasted(self) -> int:
+        """Adjust the forecast of line items to match the spent if the forecast is lower than the spent"""
+        lines = LineForecast.objects.filter(lineitem__spent__gt=F("forecastamount"))
         maxlines = lines.count()
-        logger.info(f"{maxlines} lines with spent greater than zero need forecast.")
-        counter = 0
+        logger.info(f"{maxlines} lines with spent greater than forecast.")
         for li in lines:
-            counter += 1
-            li_fcst = LineForecast(lineitem=li, forecastamount=li.spent)
-            li_fcst.save()
-        if counter == maxlines:
-            logger.info(f"Forecasted {counter} out of {maxlines}")
-            return counter
-        else:
-            logger.warn(f"Forecasted {counter} out of {maxlines}")
+            li.forecastamount = li.lineitem.spent
+        affected = LineForecast.objects.bulk_update(lines, ["forecastamount"])
+        logger.info(f"Forecasted to spent {affected} out of {maxlines} lines")
+        return affected
+
+    def set_overforecasted(self) -> int:
+        """Adjust the forecast of line items to match the working plan if the forecast is highr than the working plan"""
+        lines = LineForecast.objects.filter(lineitem__workingplan__lt=F("forecastamount"))
+        maxlines = lines.count()
+        logger.info(f"{maxlines} lines with working plan less than forecast.")
+        for li in lines:
+            li.forecastamount = li.lineitem.workingplan
+        affected = LineForecast.objects.bulk_update(lines, ["forecastamount"])
+        logger.info(f"Forecasted to working plan {affected} out of {maxlines} lines")
+        return affected
 
     def set_encumbrance_history_record(self) -> int:
         """Primarily used during line import, set the working plans, spent and balance values in the LineForecast model for historical purpose.  These will remain uneditable.
@@ -303,10 +305,10 @@ class LineForecastManager(models.Manager):
             )
             li_fcst.save()
         if counter == maxlines:
-            logger.info(f"Forecasted {counter} out of {maxlines}")
-            return counter
+            logger.info(f"Encumbrance history set for {counter} out of {maxlines}")
         else:
-            logger.warn(f"Forecasted {counter} out of {maxlines}")
+            logger.warn(f"Encumbrance history set for {counter} out of {maxlines}")
+        return counter
 
 
 class LineForecast(models.Model):

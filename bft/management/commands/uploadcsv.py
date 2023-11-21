@@ -37,7 +37,10 @@ class Command(BaseCommand):
                 li.import_lines()
                 li.set_fund_center_integrity()
                 li.set_doctype()
-                LineForecastManager().set_unforecasted_to_spent()
+                LineForecastManager().set_encumbrance_history_record()
+                # LineForecastManager().set_unforecasted_to_spent()
+                LineForecastManager().set_underforecasted()
+                LineForecastManager().set_overforecasted()
                 logger.info("-- BFT dowload complete")
         else:
             logger.warning(f"{rawtextfile} not found")
