@@ -370,7 +370,47 @@ textarea {
     border-radius: 50%;
     text-align: center;
 }
+.rising-red::after {
+    content: "";
+    background-image: url(../../images/icon-rising-red.svg);
+    background-size: 23px;
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    align-self: end;
+    transform: translate(0, 3px);
+}
+.rising-green::after {
+    content: "";
+    background-image: url(../../images/icon-rising-green.svg);
+    background-size: 23px;
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    align-self: end;
+    transform: translate(0, 3px);
+}
 
+.decreasing-green::after {
+    content: "";
+    background-image: url(../../images/icon-decreasing-green.svg);
+    background-size: 23px;
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    align-self: end;
+    transform: translate(0, 3px);
+}
+.decreasing-red::after {
+    content: "";
+    background-image: url(../../images/icon-decreasing-red.svg);
+    background-size: 23px;
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    align-self: end;
+    transform: translate(0, 3px);
+}
 .status {
     padding: 0.2rem 0.4rem;
 }

@@ -6,6 +6,7 @@ aside {
     margin-top: -240px;
     position: fixed;
     height: auto;
+    z-index: 1000;
 }
 
 .lineitems {

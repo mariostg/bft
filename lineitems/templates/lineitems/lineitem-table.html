@@ -15,13 +15,13 @@
     {% endif %}
 
 {% include 'paginator.html' %}
-    
+
 {% for line in filter.qs  %}
 <article class="container lineitem">
-    <div class='lineitem__header'> 
+    <div class='lineitem__header'>
         <div class='padded'> <a href="{% url 'lineitem-page'%}?docno__iexact={{line.docno}}">{{line.docno }}</a> - {{line.lineno }} {{line.linetext|default:''}}</div>
         {% if line.fcintegrity == False%} <div class="hint-warning">Fund center incoherent</div> {% endif %}
-        <div class=''>{{line.fundcenter}} - {{line.costcenter}} - {{line.fund}} : {{line.id}}:{{line.status}}</div> 
+        <div class=''>{{line.fundcenter}} - {{line.costcenter}} - {{line.fund}} : {{line.id}}:{{line.status}}</div>
     </div>
     <div class='lineitem__part'>
         <div class='padded'>{{line.doctype|default:"" }} {{line.enctype }}</div>
@@ -35,9 +35,25 @@
         <div>{% if line.predecessordocno%} Predecessor: {{line.predecessordocno|default:'' }} {{line.predecessorlineno|default:''}}{% endif %}</div>
     </div>
     <div class='lineitem__footer'>
-        <div class='padded'>Spent:{{line.spent|intcomma }}</div>
+
+        <div class="padded">Spent:{{line.spent|intcomma }}
+            {% if line.spent > line.fcst.spent %}
+                <span class="rising-green"></span>
+            {% elif line.spent < line.fcst.spent %}
+                <span class="decreasing-red"></span>
+            {% endif %}
+        </div>
+
         <div>Balance:{{line.balance|intcomma }}</div>
-        <div>Working Plan:{{line.workingplan|intcomma}}</div>
+
+        <div>Working Plan:{{line.workingplan|intcomma}}
+        {% if line.workingplan < line.fcst.workingplan%}
+            <span class="decreasing-green">
+        {% elif line.workingplan > line.fcst.workingplan%}
+            <span class="rising-red">
+        {%endif%}
+        </div>
+
         {% if line.fcst.id %}
         <div class="{% if line.fcst.forecastamount < 0%} hint-too-low {% elif line.fcst.forecastamount > line.workingplan %} hint-warning{% endif %}"> Forecast:{{line.fcst.forecastamount|intcomma}}</div>
         {% endif %}
@@ -46,8 +62,8 @@
         <a class="btn btn--link-small btn-delete" href="{% url 'line-item-delete' line.id %}">Delete Line</a>
         {% endif %}
     </div>
-    
-        {% if not line.fcst.id %} 
+
+        {% if not line.fcst.id %}
         <div class="spread frame">
             <div class="lineitem__nav">
                 <span>Forecast Document</span>
@@ -77,9 +93,9 @@
                     {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
                     <a class="btn btn--link-small" href="{% url 'line-forecast-zero-update' line.fcst.id %}">Set to 0</a>
                     {% endif %}
-                    
+
                     <a class="btn btn--link-small" href="{% url 'line-forecast-update' line.fcst.id %}">Form input</a>
-                    
+
                     {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
                     <a class="btn btn-delete"
                         href="{% url 'line-forecast-delete' line.fcst.id %}" ></a >
@@ -90,7 +106,7 @@
             </div>
         </div>
         {% endif %}
-    
+
 </article>
 {% endfor %}
 </section>
