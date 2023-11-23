@@ -90,15 +90,14 @@ class TestFinancialStructureManager:
         assert 0 == cc.count()
 
     def test_get_sequence_direct_descendants(self, populate):
-
         parent = "1"
         assert 2 == len(FinancialStructureManager().get_sequence_direct_descendants(parent))
 
         parent = "1.1.1.1"
         assert 2 == len(FinancialStructureManager().get_sequence_direct_descendants(parent))
 
-        parent = "1.1.1.10.4"
-        assert 2 == len(FinancialStructureManager().get_sequence_direct_descendants(parent))
+        parent = FundCenterManager().fundcenter("2184da")
+        assert 6 == len(FinancialStructureManager().get_sequence_direct_descendants(parent.sequence))
 
         parent = "2"
         with pytest.raises(ParentDoesNotExistError):
@@ -109,7 +108,6 @@ class TestFinancialStructureManager:
         assert "1" == sequence
 
     def test_create_child_of_root(self, populate):
-
         root = FinancialStructureManager().FundCenters(fundcenter="0162ND").first()
         child = FinancialStructureManager().set_parent(root)
         assert "1.3" == child  # 1.1 and 1.2 alreadey set
@@ -117,17 +115,16 @@ class TestFinancialStructureManager:
     def test_create_child_using_parent(self, populate):
         parent_obj = self.fsm.FundCenters(fundcenter="2184A3").first()
         new_seqno = self.fsm.create_child(parent_obj.fundcenter)
-        assert "1.1.1.12.2.1" == new_seqno
+        assert parent_obj.sequence + ".1" == new_seqno
 
     def test_move_fundcenter_to_another_one(self, populate):
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
 
         # create a fundcenter and assign it to SOFCOM
-        assert "1.1.1.11.1" not in family
         parent = FundCenter.objects.get(fundcenter="2184BT")
         new_fc = FundCenter.objects.create(fundcenter="0000AA", shortname="AA", fundcenter_parent=parent)
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
-        assert "1.1.1.11.1" in family
+        assert new_fc.sequence in family
 
         # move fund center from 1.1.1.12.2 to 1.1.2
         fc = FundCenter.objects.get(fundcenter="2184A3")
@@ -140,14 +137,14 @@ class TestFinancialStructureManager:
     def test_set_parent(self, populate):
         parent = self.fsm.FundCenters(fundcenter="2184BT").first()
         p = self.fsm.set_parent(fundcenter_parent=parent)
-        assert "1.1.1.11.1" == p
+        assert parent.sequence + ".1" == p
 
     def test_set_parent_of_cost_center(self, populate):
         parent = FundCenterManager().fundcenter("2184BT")
         cc = CostCenterManager().cost_center("8484WA")
         cc.costcenter_parent = parent
         cc.save()
-        assert "1.1.1.11.0.1" == CostCenterManager().cost_center("8484WA").sequence
+        assert parent.sequence + ".0.1" == CostCenterManager().cost_center("8484WA").sequence
 
     def test_sequence_on_create_cost_center_under_level_2(self, populate):
         parent = FundCenterManager().fundcenter("2184AA")

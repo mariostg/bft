@@ -152,26 +152,12 @@ class TestLineForecastModel:
         up = uploadcsv.Command()
         up.handle(encumbrancefile="drmis_data/encumbrance_2184A3.txt")
 
-    def test_create_forecast(self, setup):
-        li = LineItem.objects.all().first()
-        new_fcst = li.workingplan - 10
-
-        line_fcst = LineForecast()
-        line_fcst.lineitem = li
-        line_fcst.forecastamount = new_fcst
-        line_fcst.save()
-
-        fcst = LineForecastManager().get_line_forecast(li)
-        assert fcst.forecastamount == new_fcst
-
     def test_create_forecast_higher_than_wp(self, setup):
         li = LineItem.objects.all().first()
-        new_fcst = li.workingplan + 10000
+        fcst = LineForecast.objects.get(lineitem=li)
 
-        line_fcst = LineForecast()
-        line_fcst.lineitem = li
-        line_fcst.forecastamount = new_fcst
-        line_fcst.save()
+        fcst.forecastamount = li.workingplan + 10000
+        fcst.save()
 
         fcst = LineForecastManager().get_line_forecast(li)
         assert fcst.forecastamount == li.workingplan

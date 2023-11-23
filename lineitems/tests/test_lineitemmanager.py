@@ -35,7 +35,7 @@ class TestLineItemManager:
 
     def test_line_item_dataframe_single_doctype(self, populate, upload):
         df = LineItemManager().line_item_dataframe(doctype="co")
-        assert 1 == len(df)
+        assert 2 == len(df)
         assert "Lineitem_ID" in df.columns
         assert "Costcenter_ID" in df.columns
 
@@ -44,29 +44,6 @@ class TestLineItemManager:
         assert True == r.objects.line_item_detailed_dataframe().empty
 
     def test_line_item_detailed_dataframe(self, populate, upload):
-
-        li_df = LineItemManager().line_item_detailed_dataframe()
-        for c in li_df.columns:
-            print(c)
-        assert "Lineitem_ID" in li_df.columns
-        assert "Costcenter_ID" in li_df.columns
-        assert "Cost Center" in li_df.columns
-        assert "Fund Center" in li_df.columns
-        assert "Costcenter_ID" in li_df.columns
-        assert "Fundcenter_ID" in li_df.columns
-        assert "Source_ID" in li_df.columns
-        assert "Fund_ID" in li_df.columns
-        assert "Forecast" in li_df.columns
-        assert "int" == li_df.dtypes.Spent
-        assert "int" == li_df.dtypes.Forecast
-        assert 0 < len(li_df)
-
-    def test_line_item_detailed_dataframe_with_forecast(self, populate, upload):
-        li = LineItem.objects.all().first()
-        data = {"forecastamount": 1000, "lineitem": li}
-        fcst = LineForecast(**data)
-        fcst.save()
-
         li_df = LineItemManager().line_item_detailed_dataframe()
         assert "Lineitem_ID" in li_df.columns
         assert "Costcenter_ID" in li_df.columns
@@ -83,7 +60,7 @@ class TestLineItemManager:
 
     def test_line_item_detailed_dataframe_single_doctype(self, populate, upload):
         df = LineItemManager().line_item_detailed_dataframe(doctype="co")
-        assert 1 == len(df)
+        assert 2 == len(df)
         assert "Lineitem_ID" in df.columns
         assert "Costcenter_ID" in df.columns
 

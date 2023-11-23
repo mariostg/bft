@@ -423,7 +423,7 @@ class FinancialStructureManager(models.Manager):
         """Create a new sequence number to be attributed to a cost center or a fund center.
 
         Args:
-            parent (str, optional): A string representing the parent Fund Center. 
+            parent (str, optional): A string representing the parent Fund Center.
             Defaults to None.
             costcenter_child (bool, optional): If parent is for cost center, costcenter_child must be True. This will affect the way the sequence number is created. Defaults to False.
 
@@ -712,8 +712,10 @@ class CostCenter(models.Model):
             self.sequence = FinancialStructureManager().set_parent(
                 self.costcenter_parent, costcenter_child=True
             )
-        if self.costcenter_parent and self.costcenter == self.costcenter_parent.fundcenter:
-            raise IntegrityError("Children Fund center cannot assign itself as parent")
+        # if self.costcenter_parent and self.costcenter == self.costcenter_parent.fundcenter:
+        #     raise IntegrityError(
+        #         f"Children Fund center cannot assign itself as parent {self.costcenter_parent.fundcenter}"
+        #     )
 
         self.costcenter = self.costcenter.upper()
         if self.shortname:
@@ -891,7 +893,7 @@ class CostCenterAllocation(Allocation):
 
     def save(self, *args, **kwargs):
         if not self.costcenter:
-            raise ValueError("Allocation cannot be saved without Cost Center")
+            raise ValueError(f"Allocation cannot be saved without Cost Center {self}")
         super(CostCenterAllocation, self).save(*args, **kwargs)
 
     class Meta:

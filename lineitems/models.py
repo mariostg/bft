@@ -301,7 +301,10 @@ class LineForecastManager(models.Manager):
         for li in lines:
             counter += 1
             li_fcst = LineForecast(
-                lineitem=li, spent=li.spent, workingplan=li.workingplan, balance=li.balance
+                lineitem=li,
+                spent_initial=li.spent,
+                workingplan_initial=li.workingplan,
+                balance_initial=li.balance,
             )
             li_fcst.save()
         if counter == maxlines:
@@ -313,9 +316,9 @@ class LineForecastManager(models.Manager):
 
 class LineForecast(models.Model):
     forecastamount = models.DecimalField("Forecast", max_digits=10, decimal_places=2, default=0)
-    spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    workingplan = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    spent_initial = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    balance_initial = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    workingplan_initial = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     description = models.CharField(max_length=512, null=True, blank=True)
     comment = models.CharField(max_length=512, null=True, blank=True)
     deliverydate = models.DateField("Delivery Date", null=True, blank=True)
