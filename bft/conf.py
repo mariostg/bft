@@ -4,10 +4,14 @@ import datetime
 Constants used throughout BFT
 """
 YEAR_CHOICES = []
+YEAR_VALUES = []
+YEAR_KEYS = []
 current = datetime.datetime.now().year
 first = current - 4
 last = current + 4
 for r in range(first, last):
+    YEAR_VALUES.append(r)
+    YEAR_KEYS.append(str(r))
     YEAR_CHOICES.append((r, str(r)))
 
 QUARTERKEYS = ("0", "1", "2", "3", "4")
