@@ -15,3 +15,5 @@ htmlcov/
 log/
 jupyter/
 scripts/quick-test.py
+
+uploads/
