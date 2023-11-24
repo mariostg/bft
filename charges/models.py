@@ -6,6 +6,10 @@ import os
 import csv
 import pandas as pd
 import numpy as np
+import logging
+from main.settings import UPLOADS
+
+logger = logging.getLogger("uploadcsv")
 
 
 class CostCenterChargeImport(models.Model):
@@ -57,7 +61,9 @@ class CostCenterChargeMonthlyManager(models.Manager):
             .annotate(amount=Sum("amount"), period=Value(period))
         )
         lines = CostCenterChargeMonthly.objects.bulk_create([CostCenterChargeMonthly(**c) for c in current])
-        return len(lines)
+        linecount = len(lines)
+        logger.info(f"Inserted {linecount} in table cost_center_charge_monthly")
+        return linecount
 
 
 class CostCenterChargeMonthly(models.Model):
@@ -89,7 +95,7 @@ class CostCenterChargeProcessor:
     """
 
     def __init__(self):
-        self.csv_file = "drmis_data/charges.csv"
+        self.csv_file = f"{UPLOADS}/charges.csv"
         self.fy = BftStatusManager().fy()
 
     def to_csv(self, source_file: str, period: str):

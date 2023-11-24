@@ -192,3 +192,4 @@ LOGGING = {
 
 LOGIN_URL = "/users/login/"
 AUTH_USER_MODEL = "users.BftUser"
+UPLOADS = BASE_DIR / "uploads/"

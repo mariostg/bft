@@ -14,6 +14,7 @@ from costcenter.models import (
     FundCenterAllocation,
     CostCenterAllocation,
 )
+from charges.models import CostCenterChargeImport, CostCenterChargeMonthly
 from lineitems.models import LineForecast, LineItem
 from bft.models import BftStatus, BftStatusManager
 
@@ -36,6 +37,8 @@ class Command(BaseCommand):
             BftStatus.objects.all().delete()
             CostCenterAllocation.objects.all().delete()
             FundCenterAllocation.objects.all().delete()
+            CostCenterChargeMonthly.objects.all().delete()
+            CostCenterChargeImport.objects.all().delete()
             self.set_bft_status()
             self.set_fund()
             self.set_source()
