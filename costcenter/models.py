@@ -932,3 +932,96 @@ class FundCenterAllocation(Allocation):
                 name="unique_fund_center_allocation",
             )
         ]
+
+
+class AllocationProcessor:
+
+    """AllocationProcess is a utility class that allows for uploading of allocation in the BFT."""
+
+    def __init__(self, filepath) -> None:
+        self.filepath = filepath
+
+    def header_good(self) -> bool:
+        with open(self.filepath, "r") as f:
+            header = f.readline()
+        return "fundcenter,fund,fy,quarter,amount,note\n" == header
+
+    def dataframe(self):
+        return pd.read_csv(self.filepath).fillna("")
+
+    def as_dict(self, df: pd.DataFrame) -> dict:
+        return df.to_dict("records")
+
+    def _check_line_data(self, data, line_counter) -> dict:
+        clean = {
+            "fundcenter": None,
+            "fund": None,
+            "fy": None,
+            "quarter": None,
+            "note": None,
+        }
+        clean["fundcenter"] = self._check_fund_center(data["fundcenter"], line_counter)
+        clean["fund"] = self._check_fund(data["fund"], line_counter)
+        clean["fy"] = self._check_fy(data["fy"], line_counter)
+        clean["quarter"] = self._check_quarter(data["quarter"], line_counter)
+        clean["amount"] = self._check_amount(data["amount"], line_counter)
+        clean["note"] = self._check_note(data["note"], line_counter)
+        return clean
+
+    def _check_fund_center(self, fundcenter: str, counter: int) -> FundCenter | None:
+        fundcenter = FundCenterManager().fundcenter(fundcenter)
+        if not fundcenter:
+            print(f"WARNING: Skipping line {counter}, fundcenter {fundcenter} not found")
+            return None
+        return fundcenter
+
+    def _check_fund(self, fund: str, counter: int) -> Fund | None:
+        fund = FundManager().fund(fund)
+        if not fund:
+            print(f"WARNING: Skipping line {counter}, fundcenter {fund} not found")
+            return None
+        return fund
+
+    def _check_fy(self, fy: int, counter: int) -> int:
+        fy = int(fy)
+        if fy not in YEAR_VALUES:
+            print(f"WARNING: skipping line {counter}, FY {fy} not found in {YEAR_VALUES}")
+            return None
+        return fy
+
+    def _check_quarter(self, quarter: str, counter: int) -> int | None:
+        quarter = str(quarter)
+        if quarter not in QUARTERKEYS:
+            print(f"WARNING: skipping line {counter}, quarter {quarter} not found in {QUARTERKEYS}")
+            return None
+        return quarter
+
+    def _check_amount(self, amount: int, counter: int) -> int | None:
+        if amount < 0:
+            print(f"WARNING: skipping line {counter}, amount {amount} not valid")
+            return None
+        return amount
+
+    def _check_note(self, note: str, counter: int) -> str | None:
+        if len(note) == 0:
+            return " "
+        if not isinstance(note, str):
+            print(f"WARNING: skipping line {counter}, note not valid")
+            return None
+
+        note = note.strip()
+        return note
+
+    def main(self):
+        if not self.header_good():
+            raise ValueError("Allocation file has an invalid header")
+        df = self.dataframe()
+        _dict = self.as_dict(df)
+        counter = 0
+        fundcenter = fund = fy = quarter = note = None
+        for item in _dict:
+            counter += 1
+            clean = self._check_line_data(item, counter)
+            if all(clean.values()):
+                alloc = FundCenterAllocation(**clean)
+                alloc.save()
