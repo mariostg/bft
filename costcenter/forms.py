@@ -103,9 +103,11 @@ class ForecastadjustmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ForecastadjustmentForm, self).__init__(*args, **kwargs)
 
-        self.fields["note"] = forms.CharField(
-            widget=forms.Textarea(attrs={"class": "input"})
-        )
-        self.fields["amount"] = forms.CharField(
-            widget=forms.TextInput(attrs={"class": "input"})
-        )
+        self.fields["note"] = forms.CharField(widget=forms.Textarea(attrs={"class": "input"}))
+        self.fields["amount"] = forms.CharField(widget=forms.TextInput(attrs={"class": "input"}))
+
+
+class FundCenterAllocationUploadForm(forms.Form):
+    quarter = forms.CharField(label="Quarter", max_length=1, initial=None)
+    fy = forms.CharField(label="Fiscal Year", initial=None)
+    source_file = forms.FileField()

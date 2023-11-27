@@ -1,5 +1,7 @@
 from datetime import datetime
 import numpy as np
+
+np.set_printoptions(suppress=True)
 from django.contrib import messages
 from django.db import models, IntegrityError
 from django.db.models import QuerySet
@@ -7,9 +9,13 @@ from django.conf import settings
 from django.forms.models import model_to_dict
 import pandas as pd
 from pandas.io.formats.style import Styler
-from bft.conf import YEAR_CHOICES, QUARTERS, QUARTERKEYS
+from bft.conf import YEAR_CHOICES, QUARTERS, QUARTERKEYS, YEAR_VALUES
 from bft import exceptions
 from utils.dataframe import BFTDataFrame
+from users.models import BftUser
+import logging
+
+logger = logging.getLogger("uploadcsv")
 
 
 class FundManager(models.Manager):
@@ -938,8 +944,11 @@ class AllocationProcessor:
 
     """AllocationProcess is a utility class that allows for uploading of allocation in the BFT."""
 
-    def __init__(self, filepath) -> None:
+    def __init__(self, filepath, fy, quarter, user: BftUser) -> None:
         self.filepath = filepath
+        self.fy = fy
+        self.quarter = quarter
+        self.user = user
 
     def header_good(self) -> bool:
         with open(self.filepath, "r") as f:
@@ -952,76 +961,132 @@ class AllocationProcessor:
     def as_dict(self, df: pd.DataFrame) -> dict:
         return df.to_dict("records")
 
-    def _check_line_data(self, data, line_counter) -> dict:
-        clean = {
-            "fundcenter": None,
-            "fund": None,
-            "fy": None,
-            "quarter": None,
-            "note": None,
-        }
-        clean["fundcenter"] = self._check_fund_center(data["fundcenter"], line_counter)
-        clean["fund"] = self._check_fund(data["fund"], line_counter)
-        clean["fy"] = self._check_fy(data["fy"], line_counter)
-        clean["quarter"] = self._check_quarter(data["quarter"], line_counter)
-        clean["amount"] = self._check_amount(data["amount"], line_counter)
-        clean["note"] = self._check_note(data["note"], line_counter)
-        return clean
+    def _check_fund_center(self, data: pd.Series):
+        expected = np.array(FundCenter.objects.all().values_list("fundcenter", flat=True))
+        provided = data.str.upper().to_numpy()
+        mask = np.isin(provided, expected, invert=True)
+        if mask.any():
+            msg = f"Fund centers not found during check fund centers {provided[mask]}"
+            logger.error(msg)
+            raise ValueError(msg)
+        else:
+            logger.info("Fund centers check success.")
 
-    def _check_fund_center(self, fundcenter: str, counter: int) -> FundCenter | None:
-        fundcenter = FundCenterManager().fundcenter(fundcenter)
-        if not fundcenter:
-            print(f"WARNING: Skipping line {counter}, fundcenter {fundcenter} not found")
-            return None
-        return fundcenter
+    def _check_fund(self, data: pd.Series):
+        expected = np.array(Fund.objects.all().values_list("fund", flat=True))
+        provided = data.str.upper().to_numpy()
+        mask = np.isin(provided, expected, invert=True)
+        if mask.any():
+            msg = f"Fund(s) not found during check fund {provided[mask]}"
+            logger.error(msg)
+            raise ValueError(msg)
+        else:
+            logger.info("Funds check success.")
 
-    def _check_fund(self, fund: str, counter: int) -> Fund | None:
-        fund = FundManager().fund(fund)
-        if not fund:
-            print(f"WARNING: Skipping line {counter}, fundcenter {fund} not found")
-            return None
-        return fund
+    def _check_fy(self, data: pd.Series):
+        fys = data.to_numpy()
+        unique = (fys[0] == fys).all()
+        if not unique:
+            logger.error(f"Error allocation upload by {self.user.username}, {self.fy}, {self.quarter}")
+            raise ValueError("Fiscal year data are not all the same")
+        elif int(fys[0]) != int(self.fy):
+            logger.error(
+                f"Error allocation upload by {self.user.username}, FY data does not match request ({fys[0]} does not match {self.fy})"
+            )
+            raise ValueError("FY request does not match dataset")
+        else:
+            logger.info(
+                f"Validated FY match for allocation upload by {self.user.username}, {self.fy}, {self.quarter}"
+            )
 
-    def _check_fy(self, fy: int, counter: int) -> int:
-        fy = int(fy)
-        if fy not in YEAR_VALUES:
-            print(f"WARNING: skipping line {counter}, FY {fy} not found in {YEAR_VALUES}")
-            return None
-        return fy
+    def _check_quarter(self, data: pd.Series):
+        """Make sure all quarter are unique.  Make sure the quarter is in QUARTERKEYS. Make sure the unique quarter in the uploaded file matches the form request.
 
-    def _check_quarter(self, quarter: str, counter: int) -> int | None:
-        quarter = str(quarter)
-        if quarter not in QUARTERKEYS:
-            print(f"WARNING: skipping line {counter}, quarter {quarter} not found in {QUARTERKEYS}")
-            return None
-        return quarter
+        Args:
+            data (pd.Series): Pandas Series of quarters to validate
 
-    def _check_amount(self, amount: int, counter: int) -> int | None:
-        if amount < 0:
-            print(f"WARNING: skipping line {counter}, amount {amount} not valid")
-            return None
-        return amount
+        Raises:
+            ValueError: Raised of quarter not in QUARTERKEYS.
+            ValueError: Raised if quarters are not unique.
+            ValueError: Raised if quarter does not match form request.
+        """
+        if self.quarter not in QUARTERKEYS:
+            msg = f"Invalid quarter {self.quarter}, expected one of {QUARTERKEYS}. {self.user.username}"
+            logger.error(msg)
+            raise ValueError(msg)
 
-    def _check_note(self, note: str, counter: int) -> str | None:
-        if len(note) == 0:
-            return " "
-        if not isinstance(note, str):
-            print(f"WARNING: skipping line {counter}, note not valid")
-            return None
+        quarters = data.to_numpy()
+        unique = (quarters[0] == quarters).all()
+        if not unique:
+            msg = f"Quarters not all matching. {self.user.username}, {self.fy}, {self.quarter}"
+            logger.error(msg)
+            raise ValueError(msg)
+        elif int(quarters[0]) != int(self.quarter):
+            msg = f"Error allocation upload by {self.user.username}, Quarter data does not match request ({quarters[0]} does not match {self.quarter})"
+            logger.error(msg)
+            raise ValueError(msg)
+        else:
+            logger.info(
+                f"Validated Quarter match for allocation upload by {self.user.username}, {self.fy}, {self.quarter}"
+            )
 
-        note = note.strip()
-        return note
+    def _check_amount(self, data: pd.Series):
+        """Make sure all amounts are either int of float and that amounts are greater that zero
 
-    def main(self):
+        Args:
+            data (pd.Series): Pandas Series of amounts to validate.
+
+        Raises:
+            ValueError: If any amount is of invalid data type
+            ValueError: If any amount is less that or equal to zero.
+        """
+        amount = data.to_numpy()
+        if amount.dtype not in ["int64", "float64"]:
+            msg = f"Allocation upload by {self.user.username}, allocation amount of invalid type"
+            logger.error(msg)
+            raise ValueError(msg)
+        mask = amount <= 0
+        if mask.any():
+            too_small = amount[mask]
+            msg = f"Allocation uploadby {self.user.username}, allocation amount of 0 or less found."
+            if len(too_small) > 10:
+                msg += f" First 10 are {too_small[0:9]}"
+            else:
+                msg += f" Values are {str(too_small)}"
+            raise ValueError(msg)
+
+    def main(self, request=None):
         if not self.header_good():
-            raise ValueError("Allocation file has an invalid header")
+            logger.error(f"Error allocation upload by {self.user.username}, Invalid columns header")
+            if request:
+                messages.error(request, "Allocation file has an invalid header")
+                return
         df = self.dataframe()
+        checks = [
+            {"check": self._check_fund, "param": df["fund"]},
+            {"check": self._check_fund_center, "param": df["fundcenter"]},
+            {"check": self._check_fy, "param": df["fy"]},
+            {"check": self._check_quarter, "param": df["quarter"]},
+            {"check": self._check_amount, "param": df["amount"]},
+        ]
+        for item in checks:
+            try:
+                item["check"](item["param"])
+            except ValueError as err:
+                logger.warn(err)
+                if request:
+                    messages.error(request, err)
+                return
         _dict = self.as_dict(df)
-        counter = 0
-        fundcenter = fund = fy = quarter = note = None
         for item in _dict:
-            counter += 1
-            clean = self._check_line_data(item, counter)
-            if all(clean.values()):
-                alloc = FundCenterAllocation(**clean)
+            item["fund"] = FundManager().fund(item["fund"])
+            item["fundcenter"] = FundCenterManager().fundcenter(item["fundcenter"])
+            item["owner"] = self.user
+            alloc = FundCenterAllocation(**item)
+            try:
                 alloc.save()
+            except IntegrityError:
+                msg = f"Saving {item} would create duplicate entry."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)

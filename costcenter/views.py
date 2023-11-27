@@ -3,6 +3,7 @@ from django.db import IntegrityError
 from django.db.models import RestrictedError
 from django.contrib import messages
 from .models import (
+    AllocationProcessor,
     Fund,
     Source,
     FundCenter,
@@ -19,13 +20,20 @@ from .forms import (
     SourceForm,
     FundCenterForm,
     FundCenterAllocationForm,
+    FundCenterAllocationUploadForm,
     CostCenterForm,
     CostCenterAllocationForm,
     ForecastadjustmentForm,
 )
 from bft.models import BftStatusManager
+from main.settings import UPLOADS
 from utils import getrequestfilter
-from .filters import CostCenterFilter, CostCenterAllocationFilter, FundCenterFilter, FundCenterAllocationFilter
+from .filters import (
+    CostCenterFilter,
+    CostCenterAllocationFilter,
+    FundCenterFilter,
+    FundCenterAllocationFilter,
+)
 
 
 def fund_page(request):
@@ -240,6 +248,33 @@ def fundcenter_allocation_delete(request, pk):
         return redirect("fundcenter-allocation-table")
     context = {"object": item, "back": "fundcenter-allocation-table"}
     return render(request, "core/delete-object.html", context)
+
+
+def fundcenter_allocation_upload(request):
+    """Process the valid request by importing a file containing fund center allocations inside the database.
+
+    Args:
+        request (HttpRequest): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    if request.method == "POST":
+        form = FundCenterAllocationUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            data = form.cleaned_data
+            fy = data["fy"]
+            quarter = data["quarter"]
+            user = request.user
+            filepath = f"{UPLOADS}/fund-center-upload-{user}.csv"
+            with open(filepath, "wb+") as destination:
+                for chunk in request.FILES["source_file"].chunks():
+                    destination.write(chunk)
+            ap = AllocationProcessor(filepath, fy, quarter, user)
+            ap.main(request)
+    else:
+        form = FundCenterAllocationUploadForm
+    return render(request, "costcenter/fundcenter-allocation-upload-form.html", {"form": form})
 
 
 def costcenter_page(request):

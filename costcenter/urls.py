@@ -26,13 +26,24 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    path("fundcenter-allocation-table/", views.fundcenter_allocation_page, name="fundcenter-allocation-table"),
+    path(
+        "fundcenter-allocation-table/", views.fundcenter_allocation_page, name="fundcenter-allocation-table"
+    ),
     path("fundcenter-allocation-add/", views.fundcenter_allocation_add, name="fundcenter-allocation-add"),
     path(
-        "fundcenter-allocation-update/<int:pk>", views.fundcenter_allocation_update, name="fundcenter-allocation-update"
+        "fundcenter-allocation-update/<int:pk>",
+        views.fundcenter_allocation_update,
+        name="fundcenter-allocation-update",
     ),
     path(
-        "fundcenter-allocation-delete/<int:pk>", views.fundcenter_allocation_delete, name="fundcenter-allocation-delete"
+        "fundcenter-allocation-delete/<int:pk>",
+        views.fundcenter_allocation_delete,
+        name="fundcenter-allocation-delete",
+    ),
+    path(
+        "fundcenter-allocation-upload",
+        views.fundcenter_allocation_upload,
+        name="fundcenter-allocation-upload",
     ),
 ]
 
@@ -44,19 +55,33 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    path("costcenter-allocation-table/", views.costcenter_allocation_page, name="costcenter-allocation-table"),
+    path(
+        "costcenter-allocation-table/", views.costcenter_allocation_page, name="costcenter-allocation-table"
+    ),
     path("costcenter-allocation-add/", views.costcenter_allocation_add, name="costcenter-allocation-add"),
     path(
-        "costcenter-allocation-update/<int:pk>", views.costcenter_allocation_update, name="costcenter-allocation-update"
+        "costcenter-allocation-update/<int:pk>",
+        views.costcenter_allocation_update,
+        name="costcenter-allocation-update",
     ),
     path(
-        "costcenter-allocation-delete/<int:pk>", views.costcenter_allocation_delete, name="costcenter-allocation-delete"
+        "costcenter-allocation-delete/<int:pk>",
+        views.costcenter_allocation_delete,
+        name="costcenter-allocation-delete",
     ),
 ]
 
 urlpatterns += [
     path("forecast-adjustment-table", views.forecast_adjustment_page, name="forecast-adjustment-table"),
     path("forecast-adjustment-add", views.forecast_adjustment_add, name="forecast-adjustment-add"),
-    path("forecast-adjustment-update/<int:pk>", views.forecast_adjustment_update, name="forecast-adjustment-update"),
-    path("forecast-adjustments-delete/<int:pk>", views.forecast_adjustment_delete, name="forecast-adjustment-delete"),
+    path(
+        "forecast-adjustment-update/<int:pk>",
+        views.forecast_adjustment_update,
+        name="forecast-adjustment-update",
+    ),
+    path(
+        "forecast-adjustments-delete/<int:pk>",
+        views.forecast_adjustment_delete,
+        name="forecast-adjustment-delete",
+    ),
 ]
