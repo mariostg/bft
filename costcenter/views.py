@@ -4,16 +4,12 @@ from django.db.models import RestrictedError
 from django.contrib import messages
 from .models import (
     Fund,
-    FundProcessor,
     Source,
-    SourceProcessor,
     FundCenter,
-    FundCenterAllocationProcessor,
     FundCenterManager,
     CostCenter,
     CostCenterManager,
     CostCenterAllocation,
-    CostCenterAllocationProcessor,
     FundCenterAllocation,
     ForecastAdjustment,
     FinancialStructureManager,
@@ -31,8 +27,13 @@ from .forms import (
     UploadForm,
 )
 from bft.models import BftStatusManager
+from bft.uploadprocessor import (
+    CostCenterAllocationProcessor,
+    FundCenterAllocationProcessor,
+    FundProcessor,
+    SourceProcessor,
+)
 from main.settings import UPLOADS
-from utils import getrequestfilter
 from .filters import (
     CostCenterFilter,
     CostCenterAllocationFilter,
