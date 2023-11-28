@@ -50,14 +50,8 @@ class Command(BaseCommand):
             print("This capability is only available when DEBUG is True")
 
     def set_fund(self):
-        items = [
-            {"fund": "C113", "name": "National Procurement", "vote": "1"},
-            {"fund": "C503", "name": "Fund C503", "vote": "5"},
-            {"fund": "C116", "name": "Kitchen Procurement", "vote": "5"},
-            {"fund": "C523", "name": "Basement Procurement", "vote": "1"},
-            {"fund": "CXXX", "name": "Bedroom Procurement", "vote": "1"},
-            {"fund": "L101", "name": "Attic Procurement", "vote": "1"},
-        ]
+        df = pd.read_csv("drmis_data/funds.csv")
+        items = df.to_dict("records")
         for item in items:
             try:
                 found = Fund.objects.get(fund=item["fund"])
