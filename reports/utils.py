@@ -429,22 +429,12 @@ class AllocationStatusReport:
         if not fundcenter or not fund or not fy or not quarter:
             return ""
         fcm = FundCenterManager()
-        ccm = CostCenterManager()
         root = fcm.fundcenter(fundcenter)
         if not root:
             return ""
 
-        fc = FundCenter.objects.filter(sequence__startswith=root.sequence)
-        fc_list = list(fc.values_list("fundcenter", flat=True))
-        alloc_fc = fcm.allocation(fundcenter=fc_list, fund=fund, fy=fy, quarter=quarter)
-
-        cc = CostCenter.objects.filter(sequence__startswith=root.sequence)
-        cc_list = list(cc.values_list("costcenter", flat=True))
-        alloc_cc = ccm.allocation(costcenter=cc_list, fund=fund, fy=fy, quarter=quarter)
-
-        data_fc = self.fund_center_alloc_to_dict(alloc_fc)
-        data_cc = self.cost_center_alloc_to_dict(alloc_cc)
-        data = self.fund_center_set_sub_id({**data_fc, **data_cc})
+        alloc_data = CostCenterScreeningReport().cost_element_allocations(fundcenter, fund, fy, quarter)
+        data = self.fund_center_set_sub_id({**alloc_data})
 
         for v in data.values():
             ce = v.get("Cost Element")
