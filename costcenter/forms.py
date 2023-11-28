@@ -107,13 +107,15 @@ class ForecastadjustmentForm(forms.ModelForm):
         self.fields["amount"] = forms.CharField(widget=forms.TextInput(attrs={"class": "input"}))
 
 
-class FundCenterAllocationUploadForm(forms.Form):
-    quarter = forms.CharField(label="Quarter", max_length=1, initial=None)
-    fy = forms.CharField(label="Fiscal Year", initial=None)
+class UploadForm(forms.Form):
     source_file = forms.FileField()
 
 
-class CostCenterAllocationUploadForm(forms.Form):
+class FundCenterAllocationUploadForm(UploadForm):
     quarter = forms.CharField(label="Quarter", max_length=1, initial=None)
     fy = forms.CharField(label="Fiscal Year", initial=None)
-    source_file = forms.FileField()
+
+
+class CostCenterAllocationUploadForm(UploadForm):
+    quarter = forms.CharField(label="Quarter", max_length=1, initial=None)
+    fy = forms.CharField(label="Fiscal Year", initial=None)

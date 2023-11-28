@@ -4,7 +4,9 @@ from django.db.models import RestrictedError
 from django.contrib import messages
 from .models import (
     Fund,
+    FundProcessor,
     Source,
+    SourceProcessor,
     FundCenter,
     FundCenterAllocationProcessor,
     FundCenterManager,
@@ -26,6 +28,7 @@ from .forms import (
     CostCenterForm,
     CostCenterAllocationForm,
     ForecastadjustmentForm,
+    UploadForm,
 )
 from bft.models import BftStatusManager
 from main.settings import UPLOADS
@@ -81,9 +84,24 @@ def fund_delete(request, pk):
     return render(request, "core/delete-object.html", context)
 
 
+def fund_upload(request):
+    if request.method == "POST":
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            filepath = f"{UPLOADS}/fund-upload-{user}.csv"
+            with open(filepath, "wb+") as destination:
+                for chunk in request.FILES["source_file"].chunks():
+                    destination.write(chunk)
+            processor = FundProcessor(filepath, user)
+            processor.main(request)
+    else:
+        form = UploadForm
+    return render(request, "core/form-upload.html", {"form": form, "form_title": "Fund Upload"})
+
+
 def source_page(request):
     data = Source.objects.all()
-    return render(request, "costcenter/source-table.html", context={"sources": data})
     return render(request, "costcenter/source-table.html", context={"sources": data})
 
 
@@ -127,6 +145,22 @@ def source_delete(request, pk):
         return redirect("source-table")
     context = {"object": source, "back": "source-table"}
     return render(request, "core/delete-object.html", context)
+
+
+def source_upload(request):
+    if request.method == "POST":
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            filepath = f"{UPLOADS}/source-upload-{user}.csv"
+            with open(filepath, "wb+") as destination:
+                for chunk in request.FILES["source_file"].chunks():
+                    destination.write(chunk)
+            processor = SourceProcessor(filepath, user)
+            processor.main(request)
+    else:
+        form = UploadForm
+    return render(request, "core/form-upload.html", {"form": form, "form_title": "Source Upload"})
 
 
 def fundcenter_page(request):
@@ -276,7 +310,7 @@ def fundcenter_allocation_upload(request):
             ap.main(request)
     else:
         form = FundCenterAllocationUploadForm
-    return render(request, "costcenter/fundcenter-allocation-upload-form.html", {"form": form})
+    return render(request, "core/form-upload.html", {"form": form, "form_title": "Fund Centers Upload"})
 
 
 def costcenter_page(request):
@@ -428,7 +462,7 @@ def costcenter_allocation_upload(request):
             ap.main(request)
     else:
         form = CostCenterAllocationUploadForm
-    return render(request, "costcenter/costcenter-allocation-upload-form.html", {"form": form})
+    return render(request, "core/form-upload.html", {"form": form, "form_title": "Cost Centers Upload"})
 
 
 def forecast_adjustment_page(request):

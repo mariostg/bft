@@ -1,4 +1,5 @@
 from datetime import datetime
+from abc import abstractmethod
 import numpy as np
 
 np.set_printoptions(suppress=True)
@@ -940,7 +941,32 @@ class FundCenterAllocation(Allocation):
         ]
 
 
-class AllocationProcessor:
+class UploadProcessor:
+    class Meta:
+        abstract = True
+
+    def __init__(self, filepath, user: BftUser) -> None:
+        self.filepath = filepath
+        self.user = user
+        self.header = None
+
+    def header_good(self) -> bool:
+        with open(self.filepath, "r") as f:
+            header = f.readline()
+        return self.header == header
+
+    def dataframe(self):
+        return pd.read_csv(self.filepath).fillna("")
+
+    def as_dict(self, df: pd.DataFrame) -> dict:
+        return df.to_dict("records")
+
+    @abstractmethod
+    def main(self):
+        pass
+
+
+class AllocationProcessor(UploadProcessor):
 
     """AllocationProcess is a utility class that allows for uploading of allocation in the BFT."""
 
@@ -948,10 +974,9 @@ class AllocationProcessor:
         abstract = True
 
     def __init__(self, filepath, fy, quarter, user: BftUser) -> None:
-        self.filepath = filepath
+        UploadProcessor.__init__(self, filepath, user)
         self.fy = fy
         self.quarter = quarter
-        self.user = user
 
     def dataframe(self):
         return pd.read_csv(self.filepath).fillna("")
@@ -1044,10 +1069,9 @@ class AllocationProcessor:
 
 
 class FundCenterAllocationProcessor(AllocationProcessor):
-    def header_good(self) -> bool:
-        with open(self.filepath, "r") as f:
-            header = f.readline()
-        return "fundcenter,fund,fy,quarter,amount,note\n" == header
+    def __init__(self, filepath, fy, quarter, user: BftUser):
+        AllocationProcessor.__init__(self, filepath, fy, quarter, user)
+        self.header = "fundcenter,fund,fy,quarter,amount,note\n"
 
     def _check_fund_center(self, data: pd.Series):
         expected = np.array(FundCenter.objects.all().values_list("fundcenter", flat=True))
@@ -1099,10 +1123,9 @@ class FundCenterAllocationProcessor(AllocationProcessor):
 
 
 class CostCenterAllocationProcessor(AllocationProcessor):
-    def header_good(self) -> bool:
-        with open(self.filepath, "r") as f:
-            header = f.readline()
-        return "costcenter,fund,fy,quarter,amount,note\n" == header
+    def __init__(self, filepath, fy, quarter, user: BftUser):
+        AllocationProcessor.__init__(self, filepath, fy, quarter, user)
+        self.header = "costcenter,fund,fy,quarter,amount,note\n"
 
     def _check_cost_center(self, data: pd.Series):
         expected = np.array(CostCenter.objects.all().values_list("costcenter", flat=True))
@@ -1148,6 +1171,56 @@ class CostCenterAllocationProcessor(AllocationProcessor):
                 alloc.save()
             except IntegrityError:
                 msg = f"Saving cost center {item} would create duplicate entry."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+
+
+class FundProcessor(UploadProcessor):
+    def __init__(self, filepath, user: BftUser) -> None:
+        UploadProcessor.__init__(self, filepath, user)
+        self.header = "fund,name,vote\n"
+
+    def main(self, request=None):
+        if not self.header_good():
+            msg = f"Fund upload by {self.user.username}, Invalid columns header"
+            logger.error(msg)
+            if request:
+                messages.error(request, msg)
+                return
+        df = self.dataframe()
+        _dict = self.as_dict(df)
+        for item in _dict:
+            fund = Fund(**item)
+            try:
+                fund.save()
+            except IntegrityError:
+                msg = f"Saving fund {item} would create duplicate entry."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+
+
+class SourceProcessor(UploadProcessor):
+    def __init__(self, filepath, user: BftUser) -> None:
+        UploadProcessor.__init__(self, filepath, user)
+        self.header = "source\n"
+
+    def main(self, request=None):
+        if not self.header_good():
+            msg = f"Source upload by {self.user.username}, Invalid columns header"
+            logger.error(msg)
+            if request:
+                messages.error(request, msg)
+                return
+        df = self.dataframe()
+        _dict = self.as_dict(df)
+        for item in _dict:
+            source = Source(**item)
+            try:
+                source.save()
+            except IntegrityError:
+                msg = f"Saving source {item} would create duplicate entry."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)

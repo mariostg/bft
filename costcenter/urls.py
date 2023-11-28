@@ -9,6 +9,7 @@ urlpatterns += [
     path("fund-add/", views.fund_add, name="fund-add"),
     path("fund-update/<int:pk>/", views.fund_update, name="fund-update"),
     path("fund-delete/<int:pk>/", views.fund_delete, name="fund-delete"),
+    path("fund-upload", views.fund_upload, name="fund-upload"),
 ]
 
 urlpatterns += [
@@ -16,6 +17,7 @@ urlpatterns += [
     path("source-add/", views.source_add, name="source-add"),
     path("source-update/<int:pk>/", views.source_update, name="source-update"),
     path("source-delete/<int:pk>/", views.source_delete, name="source-delete"),
+    path("source-upload", views.source_upload, name="source-upload"),
 ]
 
 urlpatterns += [
