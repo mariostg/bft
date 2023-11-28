@@ -69,6 +69,11 @@ urlpatterns += [
         views.costcenter_allocation_delete,
         name="costcenter-allocation-delete",
     ),
+    path(
+        "costcenter-allocation-upload",
+        views.costcenter_allocation_upload,
+        name="costcenter-allocation-upload",
+    ),
 ]
 
 urlpatterns += [

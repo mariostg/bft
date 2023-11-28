@@ -944,33 +944,20 @@ class AllocationProcessor:
 
     """AllocationProcess is a utility class that allows for uploading of allocation in the BFT."""
 
+    class Meta:
+        abstract = True
+
     def __init__(self, filepath, fy, quarter, user: BftUser) -> None:
         self.filepath = filepath
         self.fy = fy
         self.quarter = quarter
         self.user = user
 
-    def header_good(self) -> bool:
-        with open(self.filepath, "r") as f:
-            header = f.readline()
-        return "fundcenter,fund,fy,quarter,amount,note\n" == header
-
     def dataframe(self):
         return pd.read_csv(self.filepath).fillna("")
 
     def as_dict(self, df: pd.DataFrame) -> dict:
         return df.to_dict("records")
-
-    def _check_fund_center(self, data: pd.Series):
-        expected = np.array(FundCenter.objects.all().values_list("fundcenter", flat=True))
-        provided = data.str.upper().to_numpy()
-        mask = np.isin(provided, expected, invert=True)
-        if mask.any():
-            msg = f"Fund centers not found during check fund centers {provided[mask]}"
-            logger.error(msg)
-            raise ValueError(msg)
-        else:
-            logger.info("Fund centers check success.")
 
     def _check_fund(self, data: pd.Series):
         expected = np.array(Fund.objects.all().values_list("fund", flat=True))
@@ -1055,11 +1042,30 @@ class AllocationProcessor:
                 msg += f" Values are {str(too_small)}"
             raise ValueError(msg)
 
+
+class FundCenterAllocationProcessor(AllocationProcessor):
+    def header_good(self) -> bool:
+        with open(self.filepath, "r") as f:
+            header = f.readline()
+        return "fundcenter,fund,fy,quarter,amount,note\n" == header
+
+    def _check_fund_center(self, data: pd.Series):
+        expected = np.array(FundCenter.objects.all().values_list("fundcenter", flat=True))
+        provided = data.str.upper().to_numpy()
+        mask = np.isin(provided, expected, invert=True)
+        if mask.any():
+            msg = f"Fund centers not found during check fund centers {provided[mask]}"
+            logger.error(msg)
+            raise ValueError(msg)
+        else:
+            logger.info("Fund centers check success.")
+
     def main(self, request=None):
         if not self.header_good():
-            logger.error(f"Error allocation upload by {self.user.username}, Invalid columns header")
+            msg = f"Fund center allocation upload by {self.user.username}, Invalid columns header"
+            logger.error(msg)
             if request:
-                messages.error(request, "Allocation file has an invalid header")
+                messages.error(request, msg)
                 return
         df = self.dataframe()
         checks = [
@@ -1086,7 +1092,62 @@ class AllocationProcessor:
             try:
                 alloc.save()
             except IntegrityError:
-                msg = f"Saving {item} would create duplicate entry."
+                msg = f"Saving fund center {item} would create duplicate entry."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+
+
+class CostCenterAllocationProcessor(AllocationProcessor):
+    def header_good(self) -> bool:
+        with open(self.filepath, "r") as f:
+            header = f.readline()
+        return "costcenter,fund,fy,quarter,amount,note\n" == header
+
+    def _check_cost_center(self, data: pd.Series):
+        expected = np.array(CostCenter.objects.all().values_list("costcenter", flat=True))
+        provided = data.str.upper().to_numpy()
+        mask = np.isin(provided, expected, invert=True)
+        if mask.any():
+            msg = f"Cost centers not found during check cost centers {provided[mask]}"
+            logger.error(msg)
+            raise ValueError(msg)
+        else:
+            logger.info("Cost centers check success.")
+
+    def main(self, request=None):
+        if not self.header_good():
+            msg = f"Cost center allocation upload by {self.user.username}, Invalid columns header"
+            logger.error(msg)
+            if request:
+                messages.error(request, msg)
+                return
+        df = self.dataframe()
+        checks = [
+            {"check": self._check_fund, "param": df["fund"]},
+            {"check": self._check_cost_center, "param": df["costcenter"]},
+            {"check": self._check_fy, "param": df["fy"]},
+            {"check": self._check_quarter, "param": df["quarter"]},
+            {"check": self._check_amount, "param": df["amount"]},
+        ]
+        for item in checks:
+            try:
+                item["check"](item["param"])
+            except ValueError as err:
+                logger.warn(err)
+                if request:
+                    messages.error(request, err)
+                return
+        _dict = self.as_dict(df)
+        for item in _dict:
+            item["fund"] = FundManager().fund(item["fund"])
+            item["costcenter"] = CostCenterManager().cost_center(item["costcenter"])
+            item["owner"] = self.user
+            alloc = CostCenterAllocation(**item)
+            try:
+                alloc.save()
+            except IntegrityError:
+                msg = f"Saving cost center {item} would create duplicate entry."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)

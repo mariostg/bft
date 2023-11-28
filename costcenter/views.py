@@ -3,19 +3,21 @@ from django.db import IntegrityError
 from django.db.models import RestrictedError
 from django.contrib import messages
 from .models import (
-    AllocationProcessor,
     Fund,
     Source,
     FundCenter,
+    FundCenterAllocationProcessor,
     FundCenterManager,
     CostCenter,
     CostCenterManager,
     CostCenterAllocation,
+    CostCenterAllocationProcessor,
     FundCenterAllocation,
     ForecastAdjustment,
     FinancialStructureManager,
 )
 from .forms import (
+    CostCenterAllocationUploadForm,
     FundForm,
     SourceForm,
     FundCenterForm,
@@ -270,7 +272,7 @@ def fundcenter_allocation_upload(request):
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
-            ap = AllocationProcessor(filepath, fy, quarter, user)
+            ap = FundCenterAllocationProcessor(filepath, fy, quarter, user)
             ap.main(request)
     else:
         form = FundCenterAllocationUploadForm
@@ -400,6 +402,33 @@ def costcenter_allocation_delete(request, pk):
         return redirect("costcenter-allocation-table")
     context = {"object": item, "back": "costcenter-allocation-table"}
     return render(request, "core/delete-object.html", context)
+
+
+def costcenter_allocation_upload(request):
+    """Process the valid request by importing a file containing cost center allocations inside the database.
+
+    Args:
+        request (HttpRequest): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    if request.method == "POST":
+        form = CostCenterAllocationUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            data = form.cleaned_data
+            fy = data["fy"]
+            quarter = data["quarter"]
+            user = request.user
+            filepath = f"{UPLOADS}/cost-center-upload-{user}.csv"
+            with open(filepath, "wb+") as destination:
+                for chunk in request.FILES["source_file"].chunks():
+                    destination.write(chunk)
+            ap = CostCenterAllocationProcessor(filepath, fy, quarter, user)
+            ap.main(request)
+    else:
+        form = CostCenterAllocationUploadForm
+    return render(request, "costcenter/costcenter-allocation-upload-form.html", {"form": form})
 
 
 def forecast_adjustment_page(request):

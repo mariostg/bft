@@ -111,3 +111,9 @@ class FundCenterAllocationUploadForm(forms.Form):
     quarter = forms.CharField(label="Quarter", max_length=1, initial=None)
     fy = forms.CharField(label="Fiscal Year", initial=None)
     source_file = forms.FileField()
+
+
+class CostCenterAllocationUploadForm(forms.Form):
+    quarter = forms.CharField(label="Quarter", max_length=1, initial=None)
+    fy = forms.CharField(label="Fiscal Year", initial=None)
+    source_file = forms.FileField()
