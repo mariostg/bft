@@ -55,6 +55,7 @@ urlpatterns += [
     path("costcenter-add/", views.costcenter_add, name="costcenter-add"),
     path("costcenter-update/<int:pk>", views.costcenter_update, name="costcenter-update"),
     path("costcenter-delete/<int:pk>", views.costcenter_delete, name="costcenter-delete"),
+    path("costcenter-upload", views.costcenter_upload, name="costcenter-upload"),
 ]
 
 urlpatterns += [

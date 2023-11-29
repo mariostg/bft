@@ -28,6 +28,7 @@ from .forms import (
 )
 from bft.models import BftStatusManager
 from bft.uploadprocessor import (
+    CostCenterProcessor,
     FundCenterProcessor,
     CostCenterAllocationProcessor,
     FundCenterAllocationProcessor,
@@ -401,6 +402,22 @@ def costcenter_delete(request, pk):
         return redirect("costcenter-table")
     context = {"object": costcenter, "back": "costcenter-table"}
     return render(request, "core/delete-object.html", context)
+
+
+def costcenter_upload(request):
+    if request.method == "POST":
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            filepath = f"{UPLOADS}/costcenter-upload-{user}.csv"
+            with open(filepath, "wb+") as destination:
+                for chunk in request.FILES["source_file"].chunks():
+                    destination.write(chunk)
+            processor = CostCenterProcessor(filepath, user)
+            processor.main(request)
+    else:
+        form = UploadForm
+    return render(request, "core/form-upload.html", {"form": form, "form_title": "Cost Center Upload"})
 
 
 def costcenter_allocation_page(request):

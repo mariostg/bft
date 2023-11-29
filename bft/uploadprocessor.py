@@ -16,6 +16,7 @@ from costcenter.models import (
     FundCenterManager,
     FundManager,
     Source,
+    SourceManager,
 )
 
 logger = logging.getLogger("uploadcsv")
@@ -330,6 +331,36 @@ class FundCenterProcessor(UploadProcessor):
                 item_obj.save()
             except IntegrityError:
                 msg = f"Saving fund center {item} would create duplicate entry."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+
+
+class CostCenterProcessor(UploadProcessor):
+    def __init__(self, filepath, user: BftUser) -> None:
+        UploadProcessor.__init__(self, filepath, user)
+        self.header = "costcenter_parent,costcenter,shortname,isforecastable,isupdatable,source,fund\n"
+
+    def main(self, request=None):
+        if not self.header_good():
+            msg = f"Cost Centers upload by {self.user.username}, Invalid columns header"
+            logger.error(msg)
+            if request:
+                messages.error(request, msg)
+                return
+        df = self.dataframe()
+        _dict = self.as_dict(df)
+        for item in _dict:
+            if item["costcenter"] == "6399LT":
+                print("WOOOOOO")
+            item["costcenter_parent"] = FundCenterManager().fundcenter(item["costcenter_parent"])
+            item["fund"] = FundManager().fund(item["fund"])
+            item["source"] = SourceManager().source(item["source"])
+            item_obj = CostCenter(**item)
+            try:
+                item_obj.save()
+            except IntegrityError:
+                msg = f"Saving cost center {item} would create duplicate entry."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
