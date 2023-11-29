@@ -25,6 +25,7 @@ urlpatterns += [
     path("fundcenter-add/", views.fundcenter_add, name="fundcenter-add"),
     path("fundcenter-update/<int:pk>", views.fundcenter_update, name="fundcenter-update"),
     path("fundcenter-delete/<int:pk>", views.fundcenter_delete, name="fundcenter-delete"),
+    path("fundcenter-upload", views.fundcenter_upload, name="fundcenter-upload"),
 ]
 
 urlpatterns += [

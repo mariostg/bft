@@ -28,6 +28,7 @@ from .forms import (
 )
 from bft.models import BftStatusManager
 from bft.uploadprocessor import (
+    FundCenterProcessor,
     CostCenterAllocationProcessor,
     FundCenterAllocationProcessor,
     FundProcessor,
@@ -236,6 +237,22 @@ def fundcenter_delete(request, pk):
     return render(request, "core/delete-object.html", context)
 
 
+def fundcenter_upload(request):
+    if request.method == "POST":
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            filepath = f"{UPLOADS}/fundcenter-upload-{user}.csv"
+            with open(filepath, "wb+") as destination:
+                for chunk in request.FILES["source_file"].chunks():
+                    destination.write(chunk)
+            processor = FundCenterProcessor(filepath, user)
+            processor.main(request)
+    else:
+        form = UploadForm
+    return render(request, "core/form-upload.html", {"form": form, "form_title": "Fund Center Upload"})
+
+
 def fundcenter_allocation_page(request):
     if not request.GET:
         data = FundCenterAllocation.objects.none()
@@ -311,7 +328,9 @@ def fundcenter_allocation_upload(request):
             ap.main(request)
     else:
         form = FundCenterAllocationUploadForm
-    return render(request, "core/form-upload.html", {"form": form, "form_title": "Fund Centers Upload"})
+    return render(
+        request, "core/form-upload.html", {"form": form, "form_title": "Fund Centers Allocation Upload"}
+    )
 
 
 def costcenter_page(request):

@@ -83,7 +83,7 @@ class Command(BaseCommand):
                 print(f"Created Source {new_item}")
 
     def set_fund_center(self):
-        df = pd.read_csv("drmis_data/fundcenters.csv", delimiter="\t")
+        df = pd.read_csv("drmis_data/fundcenters.csv")
         df = df.replace(np.nan, None)
         df["shortname"] = df["shortname"].apply(lambda x: x.strip())
         items = df.to_dict("records")
@@ -100,7 +100,7 @@ class Command(BaseCommand):
                 print(f"Created Fund Center {new_item}")
 
     def set_cost_center(self):
-        df = pd.read_csv("drmis_data/costcenters-test.csv", delimiter="\t")
+        df = pd.read_csv("drmis_data/costcenters-test.csv")
         df.loc[df.isupdatable.eq(-1), "isupdatable"] = True
         df.loc[df.isupdatable.ne(True), "isupdatable"] = False
         df.loc[df.isforecastable.eq(-1), "isforecastable"] = True

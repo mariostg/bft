@@ -304,3 +304,32 @@ class SourceProcessor(UploadProcessor):
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
+
+
+class FundCenterProcessor(UploadProcessor):
+    def __init__(self, filepath, user: BftUser) -> None:
+        UploadProcessor.__init__(self, filepath, user)
+        self.header = "fundcenter_parent,fundcenter,shortname\n"
+
+    def main(self, request=None):
+        if not self.header_good():
+            msg = f"Fund Centers upload by {self.user.username}, Invalid columns header"
+            logger.error(msg)
+            if request:
+                messages.error(request, msg)
+                return
+        df = self.dataframe()
+        _dict = self.as_dict(df)
+        for item in _dict:
+            if item["fundcenter_parent"] == "":
+                item["fundcenter_parent"] = None
+            else:
+                item["fundcenter_parent"] = FundCenterManager().fundcenter(item["fundcenter_parent"])
+            item_obj = FundCenter(**item)
+            try:
+                item_obj.save()
+            except IntegrityError:
+                msg = f"Saving fund center {item} would create duplicate entry."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
