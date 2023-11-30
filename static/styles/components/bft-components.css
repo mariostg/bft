@@ -430,8 +430,11 @@ textarea {
 .errorlist {
     list-style-type: none;
     color: firebrick;
-    margin-left: 2rem;
-    margin-bottom: -33px;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-bottom: -20px;
+    background-color: antiquewhite;
+    opacity: 0.9;
 }
 .checkbox-label {
     line-height: 1.1;
