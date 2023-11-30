@@ -351,8 +351,6 @@ class CostCenterProcessor(UploadProcessor):
         df = self.dataframe()
         _dict = self.as_dict(df)
         for item in _dict:
-            if item["costcenter"] == "6399LT":
-                print("WOOOOOO")
             item["costcenter_parent"] = FundCenterManager().fundcenter(item["costcenter_parent"])
             item["fund"] = FundManager().fund(item["fund"])
             item["source"] = SourceManager().source(item["source"])
