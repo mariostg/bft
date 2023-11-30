@@ -196,8 +196,8 @@ class FundCenterAllocationProcessor(AllocationProcessor):
             alloc = FundCenterAllocation(**item)
             try:
                 alloc.save()
-            except IntegrityError:
-                msg = f"Saving fund center {item} would create duplicate entry."
+            except IntegrityError as err:
+                msg = f"Saving fund center allocation {item} generates {err}"
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
@@ -250,8 +250,8 @@ class CostCenterAllocationProcessor(AllocationProcessor):
             alloc = CostCenterAllocation(**item)
             try:
                 alloc.save()
-            except IntegrityError:
-                msg = f"Saving cost center {item} would create duplicate entry."
+            except IntegrityError as err:
+                msg = f"Saving cost center allocation {item} generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
@@ -275,8 +275,8 @@ class FundProcessor(UploadProcessor):
             fund = Fund(**item)
             try:
                 fund.save()
-            except IntegrityError:
-                msg = f"Saving fund {item} would create duplicate entry."
+            except IntegrityError as err:
+                msg = f"Saving fund {item} generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
@@ -300,8 +300,8 @@ class SourceProcessor(UploadProcessor):
             source = Source(**item)
             try:
                 source.save()
-            except IntegrityError:
-                msg = f"Saving source {item} would create duplicate entry."
+            except IntegrityError as err:
+                msg = f"Saving source {item} generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
@@ -329,8 +329,8 @@ class FundCenterProcessor(UploadProcessor):
             item_obj = FundCenter(**item)
             try:
                 item_obj.save()
-            except IntegrityError:
-                msg = f"Saving fund center {item} would create duplicate entry."
+            except IntegrityError as err:
+                msg = f"Saving fund center {item}  generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
@@ -357,8 +357,8 @@ class CostCenterProcessor(UploadProcessor):
             item_obj = CostCenter(**item)
             try:
                 item_obj.save()
-            except IntegrityError:
-                msg = f"Saving cost center {item} would create duplicate entry."
+            except IntegrityError as err:
+                msg = f"Saving cost center {item} generates {err}"
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
