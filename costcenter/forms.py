@@ -9,6 +9,7 @@ from costcenter.models import (
     FundCenterAllocation,
     ForecastAdjustment,
 )
+from bft.forms import UploadForm
 
 
 class FundForm(forms.ModelForm):
@@ -105,10 +106,6 @@ class ForecastadjustmentForm(forms.ModelForm):
 
         self.fields["note"] = forms.CharField(widget=forms.Textarea(attrs={"class": "input"}))
         self.fields["amount"] = forms.CharField(widget=forms.TextInput(attrs={"class": "input"}))
-
-
-class UploadForm(forms.Form):
-    source_file = forms.FileField()
 
 
 class FundCenterAllocationUploadForm(UploadForm):

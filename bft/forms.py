@@ -10,3 +10,7 @@ class BftForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(BftForm, self).__init__(*args, **kwargs)
+
+
+class UploadForm(forms.Form):
+    source_file = forms.FileField()
