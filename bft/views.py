@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from bft.models import BftStatus
 from bft.conf import QUARTERS, PERIODS
-from bft.forms import BftForm
+from bft.forms import BftStatusForm
 
 
 class HomeView(TemplateView):
@@ -30,10 +30,10 @@ def _bft_status_update(request, status):
         data = BftStatus.objects.get(status=status)
     except BftStatus.DoesNotExist:
         data = BftStatus(status=status, value=None)
-    form = BftForm(instance=data)
+    form = BftStatusForm(instance=data)
 
     if request.method == "POST":
-        form = BftForm(request.POST, instance=data)
+        form = BftStatusForm(request.POST, instance=data)
         if form.is_valid():
             try:
                 form.save()
