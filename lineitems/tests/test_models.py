@@ -1,9 +1,12 @@
 from django.test import TestCase
+import os
+from main.settings import BASE_DIR
 import pytest
 from django.db.models import Sum
-from lineitems.models import LineItem, LineForecast, LineForecastManager
-from encumbrance.models import EncumbranceImport, Encumbrance
+from lineitems.models import LineItem, LineForecast, LineForecastManager, LineItemImport
+from bft.uploadprocessor import LineItemProcessor
 from bft.management.commands import populate, uploadcsv
+from main.settings import BASE_DIR
 
 
 @pytest.mark.django_db
@@ -43,19 +46,19 @@ class LineItemImportTest(TestCase):
     def setUpTestData(cls):
         filldata = populate.Command()
         filldata.handle()
-        runner = Encumbrance("encumbrance_2184a3.txt")
-        runner.run_all()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
     def test_insert_line_item_from_encumbrance_line(self):
         obj = LineItem()
-        enc = EncumbranceImport.objects.first()
+        enc = LineItemImport.objects.first()
         retval = obj.insert_line_item(enc)
 
-        self.assertEqual(1, retval)
+        self.assertEqual(8, retval)
 
     def test_update_line_item_from_encumbrance_line(self):
         obj = LineItem()
-        enc = EncumbranceImport.objects.first()
+        enc = LineItemImport.objects.first()
         retval = obj.insert_line_item(enc)
 
         enc.workingplan = enc.workingplan + 10000
@@ -68,7 +71,7 @@ class LineItemImportTest(TestCase):
 
     def test_update_line_item_bogus_cost_center(self):
         obj = LineItem()
-        enc = EncumbranceImport.objects.first()
+        enc = LineItemImport.objects.first()
         retval = obj.insert_line_item(enc)
 
         li = LineItem.objects.get(pk=retval)
@@ -128,8 +131,8 @@ class LineItemManagementTest(TestCase):
     def setUpTestData(cls):
         filldata = populate.Command()
         filldata.handle()
-        runner = Encumbrance("encumbrance_2184a3.txt")
-        runner.run_all()
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
     def test_line_item_fund_center_wrong(self):
         # bring lines in and assign a bogus fund center
@@ -209,3 +212,113 @@ class TestLineForecastModel:
         docno = "XXXX"
         lf = LineForecast()
         assert 0 == lf.forecast_line_by_line(docno, 1000)
+
+
+class TestLineItemImport(TestCase):
+    GOODFILE = "encumbrance_small.txt"
+    WRONGFC = "encumbrance_wrong_fc.txt"
+    WRONGFY = "encumbrance_wrong_fy.txt"
+    WRONGLAYOUT = "encumbrance_wrong_layout.txt"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.path = os.path.join(BASE_DIR, "drmis_data")
+
+    def test_drmis_data_folder_exists(self):
+        self.assertTrue(os.path.exists(self.path), "Drmis data directory not found")
+
+    def test_exception_raised_if_no_file_provided(self):
+        with self.assertRaises(TypeError):
+            LineItemProcessor()
+
+    def test_exception_raised_if_file_not_found(self):
+        with self.assertRaises(FileNotFoundError):
+            LineItemProcessor("Fakefile", None)
+
+    def test_find_fund_center_line_good(self):
+        er = LineItemProcessor(self.GOODFILE, None)
+        fc = er.find_fund_center("|Funds Center        |2184AA |")
+        self.assertEqual(fc, "2184AA")
+
+    def test_find_fundcenter_line_bad(self):
+        er = LineItemProcessor(self.WRONGFC, None)
+        fc = er.find_fund_center("Funds Center        |2184AA |")
+        self.assertNotEqual(fc, "2184AA")
+
+    def test_find_fy_line_good(self):
+        er = LineItemProcessor(self.GOODFILE, None)
+        fy = er.find_base_fy("|Base Fiscal Year    |2023   |")
+        self.assertEqual(fy, "2023")
+
+    def test_find_fy_line_bad(self):
+        er = LineItemProcessor(self.WRONGFY, None)
+        fy = er.find_base_fy("Base Fiscal Year    |2023   |")
+        self.assertNotEqual(fy, "2023")
+
+    def test_find_layout_line_good(self):
+        er = LineItemProcessor(self.GOODFILE, None)
+        fy = er.find_layout("|Layout              |/BFT_NP|")
+        self.assertEqual(fy, "/BFT_NP")
+
+    def test_find_layout_line_bad(self):
+        er = LineItemProcessor(self.WRONGLAYOUT, None)
+        fy = er.find_layout("Layout              |/BFT_NP|")
+        self.assertNotEqual(fy, "/BFT_NP")
+
+    def test_is_dnd_cost_center_report(self):
+        er = LineItemProcessor("encumbrance_P1a.txt", None)
+        ok = er.is_dnd_cost_center_report()
+        self.assertTrue(ok)
+
+    def test_is_not_dnd_cost_center_report(self):
+        fname = os.path.join(self.path, "encumbrance_errors.txt")
+        er = LineItemProcessor(fname, None)
+        ok = er.is_dnd_cost_center_report()
+        self.assertFalse(ok)
+
+    def test_clean_header(self):
+        header = "|Document N|Line Numbe|AcctAssNo.| Cur Year s|    Cur YR Bal|    Total Cur.|Funds Cent|Fund|Cost Cente|Order       |Document T|Encumbrance Type     |Line Text                                         |Prd.doc.no|Pred doc.i|Reference       |G/L Accoun|Due date  |Vendor nam                         |Created by  |"
+        header = header.split("|")
+        er = LineItemProcessor(self.GOODFILE, None)
+        er.clean_header(header)
+        self.assertEqual(len(er.data["header"]), er.COLUMNS - 2)
+
+    def test_find_header_line_returns_zero_on_failure(self):
+        er = LineItemProcessor("encumbrance_no_line_header.txt", None)
+        lineno = er.find_header_line()
+        self.assertEqual(lineno, 0)
+
+    def test_find_header_line_returns_non_zero_on_success(self):
+        er = LineItemProcessor(self.GOODFILE, None)
+        lineno = er.find_header_line()
+        self.assertGreater(lineno, 0)
+
+    def test_is_data_line(self):
+        er = LineItemProcessor(self.GOODFILE, None)
+        lines = [
+            {"line": "|14518705  |       240|", "result": True},
+            {"line": "|1451870511|       240|", "result": True},
+            {"line": "|1451-8705 |       240|", "result": False},
+            {"line": "|Docum     |       240|", "result": False},
+            {"line": "Funds Center          ", "result": False},
+        ]
+        for line in lines:
+            self.assertEqual(er.is_data_line(line["line"]), line["result"])
+
+    def test_line_to_csv_returns_list_or_none(self):
+        er = LineItemProcessor(self.GOODFILE, None)
+        result_ok = er.line_to_csv(
+            "|col1|col2|col3|col4|col5|col6|col7|col8|col9|col10|col11|col12|col13|col14|col15|col16|col17|col18|col19|col20|"
+        )
+        result_bad = er.line_to_csv(
+            "|col1|col2|col3|col4|col5|col6|col7|col8|col9|col10|col11|col12|col13|col14|col15|col16|col17|col18|col19|"
+        )
+
+        self.assertEqual(20, len(result_ok), "List does not contain 20 elements")
+        self.assertTrue(type(result_ok) is list, "Argument does not return a list")
+
+        self.assertIsNone(result_bad, "Must returns none when list is not good")
+
+    def test_run_all_stops_on_bad_cost_center_report(self):
+        er = LineItemProcessor(self.GOODFILE, None)
+        self.assertFalse(er.main())

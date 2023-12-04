@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 import os
-from encumbrance.models import Encumbrance, EncumbranceImport
+from lineitems.models import LineItemImport
+from bft.uploadprocessor import LineItemProcessor
 from lineitems.models import LineItem, LineForecastManager
 from main.settings import BASE_DIR
 
@@ -24,14 +25,14 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        EncumbranceImport.objects.all().delete()
+        LineItemImport.objects.all().delete()
         rawtextfile = options["encumbrancefile"]
 
         if os.path.exists(rawtextfile):
             logger.info("-- BFT Download starts")
             rawtextfile = os.path.realpath(rawtextfile)
-            er = Encumbrance(rawtextfile)
-            if er.run_all():
+            er = LineItemProcessor(rawtextfile, None)
+            if er.main():
                 logger.info("Encumbrance data saved as csv and import raw table filled")
                 li = LineItem()
                 li.import_lines()

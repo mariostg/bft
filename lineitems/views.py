@@ -8,6 +8,9 @@ import logging
 from .models import LineItem, LineForecast
 from .forms import LineForecastForm, DocumentNumberForm, CostCenterForecastForm
 from lineitems.filters import LineItemFilter
+from lineitems.forms import LineItemUploadForm
+from main.settings import UPLOADS
+from bft.uploadprocessor import LineItemProcessor
 
 logger = logging.getLogger("django")
 
@@ -30,7 +33,9 @@ def lineitem_page(request):
         data = LineItem.objects.all().order_by("docno")
         has_filter = True
     search_filter = LineItemFilter(request.GET, queryset=data)
-    return render(request, "lineitems/lineitem-table.html", {"filter": search_filter, "has_filter": has_filter})
+    return render(
+        request, "lineitems/lineitem-table.html", {"filter": search_filter, "has_filter": has_filter}
+    )
 
 
 def line_forecast_add(request, pk):
@@ -42,7 +47,9 @@ def line_forecast_add(request, pk):
             line_forecast.lineitem_id = pk  # LineItems(id=pk)
             if line_forecast.above_working_plan(request, lineitem):
                 line_forecast.forecastamount = lineitem.workingplan
-                messages.info(request, f"Forecast above working plan, created with amount of {lineitem.workingplan}")
+                messages.info(
+                    request, f"Forecast above working plan, created with amount of {lineitem.workingplan}"
+                )
             elif line_forecast.below_spent(request, lineitem):
                 line_forecast.forecastamount = lineitem.spent
                 messages.info(request, f"Forecast below spent, created with amount of {lineitem.spent}")
@@ -132,6 +139,22 @@ def line_item_delete(request, pk):
     else:
         messages.warning(request, "Only owner can delete a line item.")
     return redirect("lineitem-page")
+
+
+def lineitem_upload(request):
+    if request.method == "POST":
+        form = LineItemUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            filepath = f"{UPLOADS}/lineitem-upload-{user}.csv"
+            with open(filepath, "wb+") as destination:
+                for chunk in request.FILES["source_file"].chunks():
+                    destination.write(chunk)
+            processor = LineItemProcessor(filepath, request)
+            processor.main()
+    else:
+        form = LineItemUploadForm
+    return render(request, "lineitems/lineitem-upload-form.html", {"form": form, "form_title": "Fund Upload"})
 
 
 def document_forecast(request, docno):

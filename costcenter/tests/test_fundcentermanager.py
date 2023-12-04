@@ -70,7 +70,7 @@ class TestFundCenterManager:
         hnd.handle()
         parent = FundCenterManager().fundcenter(fundcenter="2184DA")
         descendants = FundCenterManager().get_direct_descendants(parent)
-        assert 6 == len(descendants)
+        assert 3 == len(descendants)
 
     def test_get_direct_descendants_empty(self, setup):
         parent = FundCenterManager().fundcenter(fundcenter="2222BB")

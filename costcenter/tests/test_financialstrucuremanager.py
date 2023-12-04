@@ -91,13 +91,13 @@ class TestFinancialStructureManager:
 
     def test_get_sequence_direct_descendants(self, populate):
         parent = "1"
-        assert 2 == len(FinancialStructureManager().get_sequence_direct_descendants(parent))
+        assert 1 == len(FinancialStructureManager().get_sequence_direct_descendants(parent))
 
         parent = "1.1.1.1"
-        assert 2 == len(FinancialStructureManager().get_sequence_direct_descendants(parent))
+        assert 3 == len(FinancialStructureManager().get_sequence_direct_descendants(parent))
 
-        parent = FundCenterManager().fundcenter("2184da")
-        assert 6 == len(FinancialStructureManager().get_sequence_direct_descendants(parent.sequence))
+        parent = FundCenterManager().fundcenter("2184a3")
+        assert 3 == len(FinancialStructureManager().get_sequence_direct_descendants(parent.sequence))
 
         parent = "2"
         with pytest.raises(ParentDoesNotExistError):
@@ -110,7 +110,7 @@ class TestFinancialStructureManager:
     def test_create_child_of_root(self, populate):
         root = FinancialStructureManager().FundCenters(fundcenter="0162ND").first()
         child = FinancialStructureManager().set_parent(root)
-        assert "1.3" == child  # 1.1 and 1.2 alreadey set
+        assert "1.2" == child  # 1.1 alreadey set
 
     def test_create_child_using_parent(self, populate):
         parent_obj = self.fsm.FundCenters(fundcenter="2184A3").first()
@@ -120,27 +120,27 @@ class TestFinancialStructureManager:
     def test_move_fundcenter_to_another_one(self, populate):
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
 
-        # create a fundcenter and assign it to SOFCOM
-        parent = FundCenter.objects.get(fundcenter="2184BT")
+        # create a fundcenter and assign it to 2184DA
+        parent = FundCenter.objects.get(fundcenter="2184A3")
         new_fc = FundCenter.objects.create(fundcenter="0000AA", shortname="AA", fundcenter_parent=parent)
         family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
         assert new_fc.sequence in family
 
         # move fund center from 1.1.1.12.2 to 1.1.2
-        fc = FundCenter.objects.get(fundcenter="2184A3")
-        parent = FundCenter.objects.get(fundcenter="2184BT")
+        fc = FundCenter.objects.get(fundcenter="0000AA")
+        parent = FundCenter.objects.get(fundcenter="2184DA")
         fc.fundcenter_parent = parent
         fc.save()
-        saved_fc = FundCenter.objects.get(fundcenter="2184A3")
+        saved_fc = FundCenter.objects.get(fundcenter="0000AA")
         assert fc.sequence == saved_fc.sequence
 
     def test_set_parent(self, populate):
-        parent = self.fsm.FundCenters(fundcenter="2184BT").first()
+        parent = self.fsm.FundCenters(fundcenter="2184AA").first()
         p = self.fsm.set_parent(fundcenter_parent=parent)
-        assert parent.sequence + ".1" == p
+        assert parent.sequence + ".3" == p
 
     def test_set_parent_of_cost_center(self, populate):
-        parent = FundCenterManager().fundcenter("2184BT")
+        parent = FundCenterManager().fundcenter("2184A3")
         cc = CostCenterManager().cost_center("8484WA")
         cc.costcenter_parent = parent
         cc.save()

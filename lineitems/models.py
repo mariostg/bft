@@ -3,7 +3,6 @@ from django.db.models import F
 from django.contrib import messages
 import logging
 from costcenter.models import CostCenter, CostCenterManager
-from encumbrance.models import EncumbranceImport
 from users.models import BftUser
 from utils.dataframe import BFTDataFrame
 from django.forms.models import model_to_dict
@@ -107,7 +106,7 @@ class LineItem(models.Model):
         encumbrance table.
         """
         lines = set(LineItem.objects.values_list("docno", "lineno"))
-        enc = set(EncumbranceImport.objects.values_list("docno", "lineno"))
+        enc = set(LineItemImport.objects.values_list("docno", "lineno"))
         orphans = lines.difference(enc)
         logger.info(f"Found {len(orphans)} orphan lines.")
         return orphans
@@ -132,7 +131,7 @@ class LineItem(models.Model):
                 logger.info(f"LineItem {docno} - {lineno} does not exist")
         LineForecast.objects.filter(lineitem__status="orphan").update(forecastamount=0)
 
-    def insert_line_item(self, ei: EncumbranceImport):
+    def insert_line_item(self, ei: "LineItemImport"):
         """
         Insert the encumbrance line in line item table.  Such line is set as new in the
         status field.
@@ -146,7 +145,7 @@ class LineItem(models.Model):
         target.save()
         return target.id
 
-    def update_line_item(self, li: "LineItem", ei: EncumbranceImport):
+    def update_line_item(self, li: "LineItem", ei: "LineItemImport"):
         """
         Update line items fields using values from encumbrance line.
         """
@@ -183,7 +182,7 @@ class LineItem(models.Model):
         orphan = self.get_orphan_lines()
         self.mark_orphan_lines(orphan)
 
-        encumbrance = EncumbranceImport.objects.all()
+        encumbrance = LineItemImport.objects.all()
         logger.info(f"Retreived {encumbrance.count()} encumbrance lines.")
         for e in encumbrance:
             try:
@@ -400,3 +399,32 @@ class LineForecast(models.Model):
                 li_fcst = LineForecast(lineitem=li, forecastamount=float(li.workingplan) * ratio)
                 li_fcst.save()
         return len(lines)
+
+
+class LineItemImport(models.Model):
+    """
+    LineItemImport class defines the model that represents the DND cost
+    center encumbrance report single line item.  Each line read from the
+    encumbrance report during the uploadcsv command must match this model
+    """
+
+    docno = models.CharField(max_length=10)
+    lineno = models.CharField(max_length=7)  # lineno : acctassno
+    # acctassno = models.CharField(max_length=3, null=True, blank=True)
+    spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    workingplan = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    fundcenter = models.CharField(max_length=6)
+    fund = models.CharField(max_length=4)
+    costcenter = models.CharField(max_length=6)
+    internalorder = models.CharField(max_length=7, null=True, blank=True)
+    doctype = models.CharField(max_length=2, null=True, blank=True)
+    enctype = models.CharField(max_length=21)
+    linetext = models.CharField(max_length=50, null=True, blank=True, default="")
+    predecessordocno = models.CharField(max_length=20, null=True, blank=True, default="")
+    predecessorlineno = models.CharField(max_length=3, null=True, blank=True, default="")
+    reference = models.CharField(max_length=16, null=True, blank=True, default="")
+    gl = models.CharField(max_length=5)
+    duedate = models.DateField(null=True, blank=True)
+    vendor = models.CharField(max_length=50, null=True, blank=True)
+    createdby = models.CharField(max_length=50, null=True, blank=True, default="")

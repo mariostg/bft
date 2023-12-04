@@ -39,6 +39,23 @@ class LineForecastAdmin(admin.ModelAdmin):
     )
 
 
+class LineItemImportAdmin(admin.ModelAdmin):
+    list_display = (
+        "docno",
+        "lineno",
+        "fund",
+        "costcenter",
+        "fundcenter",
+        "doctype",
+        "enctype",
+        "spent",
+        "balance",
+        "workingplan",
+        "linetext",
+    )
+
+
 # Register your models here.
 admin.site.register(models.LineItem, LineItemAdmin)
 admin.site.register(models.LineForecast, LineForecastAdmin)
+admin.site.register(models.LineItemImport, LineItemImportAdmin)

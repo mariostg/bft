@@ -89,7 +89,7 @@ class TestFundCenterAllocationManager:
         assert 1 == allocation.count()
 
     def test_fundcenter_allocation_when_fundcenter_valid_and_no_allocation(self, populate):
-        allocation = self.FCA.objects.fundcenter("2184BC")
+        allocation = self.FCA.objects.fundcenter("2184BE")
         assert 0 == allocation.count()
 
     def test_fundcenter_allocation_when_fundcenter_invalid(self, populate):

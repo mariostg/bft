@@ -83,7 +83,7 @@ class Command(BaseCommand):
                 print(f"Created Source {new_item}")
 
     def set_fund_center(self):
-        df = pd.read_csv("drmis_data/fundcenters.csv")
+        df = pd.read_csv("drmis_data/fundcenters-test.csv")
         df = df.replace(np.nan, None)
         df["shortname"] = df["shortname"].apply(lambda x: x.strip())
         items = df.to_dict("records")
