@@ -3,47 +3,42 @@
 {% block  content %}
 <h1>BFT Home</h1>
 
-<section class="columns c3">
-    <div class='columns'>
-        <div class="form">
-            {% if user.is_authenticated %}
-            <div class="form__header">Update Data</div>
-            {% else %}
-            <div class="form__header">View Data</div>
-            {% endif %}
-            <div class="form__body">
-                <a class='btn' href="{% url 'bft-status' %}">BFT Status</a>
-                <a class='btn' href="{% url 'fund-table' %}">Funds</a>
-                <a class='btn'  href="{% url 'source-table' %}">Sources</a>
-                <a class='btn'  href="{% url 'costcenter-table' %}">CostCenters</a>
-                <a class='btn'  href="{% url 'fundcenter-table' %}">FundCenters</a>
-                <a class='btn'  href="{% url 'forecast-adjustment-table' %}">Forecast Adjustments</a>
-                <a class='btn'  href="{% url 'costcenter-allocation-table' %}">Allocations - Cost Centers</a>
-                <a class='btn'  href="{% url 'fundcenter-allocation-table' %}">Allocations - Fund Centers</a>
-                <a class='btn'  href="{% url 'user-table' %}">Users</a>
-                {% comment %} <a class='btn'  href="{% url 'line-forecast-table' %}">Line Item forecasts</a> {% endcomment %}
-            </div>
-        </div>
+<section class="columns c4">
+    <div class="form">
         {% if user.is_authenticated %}
-        <div class="columns">
-            <div class="form">
-                <div class="form__header">Upload Data</div>
-                <div class="form__body">
-                    <a class='btn'  href="{% url 'fund-upload' %}">Funds</a>
-                    <a class='btn'  href="{% url 'source-upload' %}">Sources</a>
-                    <a class='btn'  href="{% url 'costcenter-upload' %}">Cost Centers</a>
-                    <a class='btn'  href="{% url 'fundcenter-upload' %}">Fund Centers</a>
-                    <a class='btn'  href="{% url 'cost-center-charges-upload' %}">Cost Center Charges</a>
-                    <a class='btn'  href="{% url 'costcenter-allocation-upload' %}">Allocations - Cost Centers</a>
-                    <a class='btn'  href="{% url 'fundcenter-allocation-upload' %}">Allocations - Fund Centers</a>
-                    <a class='btn'  href="{% url 'lineitem-upload' %}">Line Items</a>
-                </div>
+        <div class="form__header">Update Data</div>
+        {% else %}
+        <div class="form__header">View Data</div>
+        {% endif %}
+        <div class="form__body">
+            <a class='btn' href="{% url 'bft-status' %}">BFT Status</a>
+            <a class='btn' href="{% url 'fund-table' %}">Funds</a>
+            <a class='btn'  href="{% url 'source-table' %}">Sources</a>
+            <a class='btn'  href="{% url 'costcenter-table' %}">CostCenters</a>
+            <a class='btn'  href="{% url 'fundcenter-table' %}">FundCenters</a>
+            <a class='btn'  href="{% url 'forecast-adjustment-table' %}">Forecast Adjustments</a>
+            <a class='btn'  href="{% url 'costcenter-allocation-table' %}">Allocations - Cost Centers</a>
+            <a class='btn'  href="{% url 'fundcenter-allocation-table' %}">Allocations - Fund Centers</a>
+            <a class='btn'  href="{% url 'user-table' %}">Users</a>
+            {% comment %} <a class='btn'  href="{% url 'line-forecast-table' %}">Line Item forecasts</a> {% endcomment %}
+        </div>
+    </div>
+    {% if user.is_authenticated %}
+        <div class="form">
+            <div class="form__header">Upload Data</div>
+            <div class="form__body">
+                <a class='btn'  href="{% url 'fund-upload' %}">Funds</a>
+                <a class='btn'  href="{% url 'source-upload' %}">Sources</a>
+                <a class='btn'  href="{% url 'costcenter-upload' %}">Cost Centers</a>
+                <a class='btn'  href="{% url 'fundcenter-upload' %}">Fund Centers</a>
+                <a class='btn'  href="{% url 'cost-center-charges-upload' %}">Cost Center Charges</a>
+                <a class='btn'  href="{% url 'costcenter-allocation-upload' %}">Allocations - Cost Centers</a>
+                <a class='btn'  href="{% url 'fundcenter-allocation-upload' %}">Allocations - Fund Centers</a>
+                <a class='btn'  href="{% url 'lineitem-upload' %}">Line Items</a>
             </div>
         </div>
-        {% endif %}
-    </div>
+    {% endif %}
     {% if user.is_authenticated%}
-    <div class="columns">
     <div class='form'>
         <div class="form__header"> Create Data </div>
         <div class="form__body">
@@ -57,19 +52,16 @@
             <a class='btn'  href="{% url 'user-add' %}">BFT User</a>
         </div>
     </div>
-    <div class="columns">
-        <div class="form">
-            <div class="form__header">Reports</div>
-            <div class="form__body">
-                <a class='btn'  href="{% url 'bmt-screening-report' %}">BMT Screening</a>
-                <a class='btn'  href="{% url 'costcenter-monthly-data' %}">Current Cost Center Monthly</a>
-                <a class='btn'  href="{% url 'allocation-status-report' %}">Allocation Status</a>
-                <a class='btn'  href="{% url 'lineitem-report' %}">Line Items</a>
-                <a class='btn'  href="{% url 'financial-structure-report' %}">Financial Structure</a>
-            </div>
+    <div class="form">
+        <div class="form__header">Reports</div>
+        <div class="form__body">
+            <a class='btn'  href="{% url 'bmt-screening-report' %}">BMT Screening</a>
+            <a class='btn'  href="{% url 'costcenter-monthly-data' %}">Current Cost Center Monthly</a>
+            <a class='btn'  href="{% url 'allocation-status-report' %}">Allocation Status</a>
+            <a class='btn'  href="{% url 'lineitem-report' %}">Line Items</a>
+            <a class='btn'  href="{% url 'financial-structure-report' %}">Financial Structure</a>
         </div>
     </div>
-</div>
         {% endif %}
     {% endblock  %}
 </section>
