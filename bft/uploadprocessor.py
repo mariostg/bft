@@ -349,6 +349,42 @@ class CostCenterProcessor(UploadProcessor):
         UploadProcessor.__init__(self, filepath, user)
         self.header = "costcenter_parent,costcenter,shortname,isforecastable,isupdatable,source,fund\n"
 
+    def _assign_fundcenter(self, costcenters: dict, request=None) -> dict | None:
+        for item in costcenters:  # assign parent, fund and source to everyone before saving
+            parent = FundCenterManager().fundcenter(item["costcenter_parent"])
+            if not parent:
+                msg = f"Cost center {item['costcenter']} parent ({item['costcenter_parent']}) does not exist, no cost centers have been recorded."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+                return
+            item["costcenter_parent"] = parent
+        return costcenters
+
+    def _assign_fund(self, costcenters: dict, request=None) -> dict | None:
+        for item in costcenters:  # assign parent, fund and source to everyone before saving
+            fund = FundManager().fund(item["fund"])
+            if not fund:
+                msg = f"Cost center {item['costcenter']} fund ({item['fund']}) does not exist, no cost centers have been recorded."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+                return
+            item["fund"] = fund
+        return costcenters
+
+    def _assign_source(self, costcenters: dict, request=None) -> dict | None:
+        for item in costcenters:  # assign parent, fund and source to everyone before saving
+            source = SourceManager().source(item["source"])
+            if not source:
+                msg = f"Cost center {item['costcenter']} source ({item['source']}) does not exist, no cost centers have been recorded."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+                return
+            item["source"] = source
+        return costcenters
+
     def main(self, request=None):
         if not self.header_good():
             msg = f"Cost Centers upload by {self.user.username}, Invalid columns header"
@@ -358,10 +394,14 @@ class CostCenterProcessor(UploadProcessor):
                 return
         df = self.dataframe()
         _dict = self.as_dict(df)
+        if not self._assign_fundcenter(_dict, request):
+            return
+        if not self._assign_fund(_dict, request):
+            return
+        if not self._assign_source(_dict, request):
+            return
+
         for item in _dict:
-            item["costcenter_parent"] = FundCenterManager().fundcenter(item["costcenter_parent"])
-            item["fund"] = FundManager().fund(item["fund"])
-            item["source"] = SourceManager().source(item["source"])
             item_obj = CostCenter(**item)
             try:
                 item_obj.save()
