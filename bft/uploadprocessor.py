@@ -293,15 +293,19 @@ class FundProcessor(UploadProcessor):
             return
 
         _dict = self.as_dict(df)
+        counter = 0
         for item in _dict:
             fund = Fund(**item)
             try:
                 fund.save()
+                counter += 1
             except IntegrityError as err:
                 msg = f"Saving fund {item} generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
+        if counter:
+            messages.info(request, f"{counter} item(s) have been recorded.")
 
 
 class SourceProcessor(UploadProcessor):
@@ -331,15 +335,19 @@ class SourceProcessor(UploadProcessor):
             return
 
         _dict = self.as_dict(df)
+        counter = 0
         for item in _dict:
             source = Source(**item)
             try:
                 source.save()
+                counter += 1
             except IntegrityError as err:
                 msg = f"Saving source {item} generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
+        if counter:
+            messages.info(request, f"{counter} item(s) have been recorded.")
 
 
 class FundCenterProcessor(UploadProcessor):
@@ -369,6 +377,7 @@ class FundCenterProcessor(UploadProcessor):
             return
 
         _dict = self.as_dict(df)
+        counter = 0
         for item in _dict:
             if item["fundcenter_parent"] == "":
                 item["fundcenter_parent"] = None
@@ -377,11 +386,14 @@ class FundCenterProcessor(UploadProcessor):
             item_obj = FundCenter(**item)
             try:
                 item_obj.save()
+                counter += 1
             except IntegrityError as err:
                 msg = f"Saving fund center {item}  generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
+        if counter:
+            messages.info(request, f"{counter} item(s) have been recorded.")
 
 
 class CostCenterProcessor(UploadProcessor):
@@ -455,15 +467,19 @@ class CostCenterProcessor(UploadProcessor):
         if not self._assign_source(_dict, request):
             return
 
+        counter = 0
         for item in _dict:
             item_obj = CostCenter(**item)
             try:
                 item_obj.save()
+                counter += 1
             except IntegrityError as err:
                 msg = f"Saving cost center {item} generates {err}"
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
+        if counter:
+            messages.info(request, f"{counter} item(s) have been recorded.")
 
 
 class LineItemProcessor(UploadProcessor):
