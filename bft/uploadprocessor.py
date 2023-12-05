@@ -270,10 +270,10 @@ class FundProcessor(UploadProcessor):
         UploadProcessor.__init__(self, filepath, user)
         self.header = "fund,name,vote\n"
 
-    def _find_duplicate_fund(self, funds: pd.DataFrame) -> list | None:
+    def _find_duplicate_fund(self, funds: pd.DataFrame) -> pd.DataFrame:
         duplicates = funds[funds.duplicated(subset=["fund"], keep=False) == True]
         if duplicates.empty:
-            return None
+            return pd.DataFrame
         else:
             return duplicates
 
@@ -308,6 +308,13 @@ class SourceProcessor(UploadProcessor):
         UploadProcessor.__init__(self, filepath, user)
         self.header = "source\n"
 
+    def _find_duplicate_source(self, sources: pd.DataFrame) -> pd.DataFrame:
+        duplicates = sources[sources.duplicated(subset=["source"], keep=False) == True]
+        if duplicates.empty:
+            return pd.DataFrame
+        else:
+            return duplicates
+
     def main(self, request=None):
         if not self.header_good():
             msg = f"Source upload by {self.user.username}, Invalid columns header"
@@ -316,6 +323,11 @@ class SourceProcessor(UploadProcessor):
                 messages.error(request, msg)
                 return
         df = self.dataframe()
+        duplicates = self._find_duplicate_source(df)
+        if not duplicates.empty and request:
+            messages.error(request, f"Duplicate sources have been detected: {duplicates.to_html()}")
+            return
+
         _dict = self.as_dict(df)
         for item in _dict:
             source = Source(**item)
