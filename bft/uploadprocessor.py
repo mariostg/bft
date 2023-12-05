@@ -270,6 +270,13 @@ class FundProcessor(UploadProcessor):
         UploadProcessor.__init__(self, filepath, user)
         self.header = "fund,name,vote\n"
 
+    def _find_duplicate_fund(self, funds: pd.DataFrame) -> list | None:
+        duplicates = funds[funds.duplicated(subset=["fund"], keep=False) == True]
+        if duplicates.empty:
+            return None
+        else:
+            return duplicates
+
     def main(self, request=None):
         if not self.header_good():
             msg = f"Fund upload by {self.user.username}, Invalid columns header"
@@ -277,7 +284,13 @@ class FundProcessor(UploadProcessor):
             if request:
                 messages.error(request, msg)
                 return
+
         df = self.dataframe()
+        duplicates = self._find_duplicate_fund(df)
+        if not duplicates.empty and request:
+            messages.error(request, f"Duplicate funds have been detected: {duplicates.to_html()}")
+            return
+
         _dict = self.as_dict(df)
         for item in _dict:
             fund = Fund(**item)
