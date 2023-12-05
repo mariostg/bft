@@ -271,6 +271,7 @@ class FundProcessor(UploadProcessor):
         self.header = "fund,name,vote\n"
 
     def _find_duplicate_fund(self, funds: pd.DataFrame) -> pd.DataFrame:
+        funds["fund"] = funds["fund"].str.lower()
         duplicates = funds[funds.duplicated(subset=["fund"], keep=False) == True]
         if duplicates.empty:
             return pd.DataFrame
@@ -309,6 +310,7 @@ class SourceProcessor(UploadProcessor):
         self.header = "source\n"
 
     def _find_duplicate_source(self, sources: pd.DataFrame) -> pd.DataFrame:
+        sources["source"] = sources["source"].str.lower()
         duplicates = sources[sources.duplicated(subset=["source"], keep=False) == True]
         if duplicates.empty:
             return pd.DataFrame
@@ -345,6 +347,14 @@ class FundCenterProcessor(UploadProcessor):
         UploadProcessor.__init__(self, filepath, user)
         self.header = "fundcenter_parent,fundcenter,shortname\n"
 
+    def _find_duplicate_fundcenters(self, fundcenters: pd.DataFrame) -> pd.DataFrame:
+        fundcenters["fundcenter"] = fundcenters["fundcenter"].str.lower()
+        duplicates = fundcenters[fundcenters.duplicated(subset=["fundcenter"], keep=False) == True]
+        if duplicates.empty:
+            return pd.DataFrame
+        else:
+            return duplicates
+
     def main(self, request=None):
         if not self.header_good():
             msg = f"Fund Centers upload by {self.user.username}, Invalid columns header"
@@ -353,6 +363,11 @@ class FundCenterProcessor(UploadProcessor):
                 messages.error(request, msg)
                 return
         df = self.dataframe()
+        duplicates = self._find_duplicate_fundcenters(df)
+        if not duplicates.empty and request:
+            messages.error(request, f"Duplicate fund centers have been detected: {duplicates.to_html()}")
+            return
+
         _dict = self.as_dict(df)
         for item in _dict:
             if item["fundcenter_parent"] == "":
