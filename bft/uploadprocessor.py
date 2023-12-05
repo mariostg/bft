@@ -389,6 +389,14 @@ class CostCenterProcessor(UploadProcessor):
         UploadProcessor.__init__(self, filepath, user)
         self.header = "costcenter_parent,costcenter,shortname,isforecastable,isupdatable,source,fund\n"
 
+    def _find_duplicate_costcenters(self, costcenters: pd.DataFrame) -> pd.DataFrame:
+        costcenters["costcenter"] = costcenters["costcenter"].str.lower()
+        duplicates = costcenters[costcenters.duplicated(subset=["costcenter"], keep=False) == True]
+        if duplicates.empty:
+            return pd.DataFrame
+        else:
+            return duplicates
+
     def _assign_fundcenter(self, costcenters: dict, request=None) -> dict | None:
         for item in costcenters:  # assign parent, fund and source to everyone before saving
             parent = FundCenterManager().fundcenter(item["costcenter_parent"])
@@ -432,7 +440,13 @@ class CostCenterProcessor(UploadProcessor):
             if request:
                 messages.error(request, msg)
                 return
+
         df = self.dataframe()
+        duplicates = self._find_duplicate_costcenters(df)
+        if not duplicates.empty and request:
+            messages.error(request, f"Duplicate cost centers have been detected: {duplicates.to_html()}")
+            return
+
         _dict = self.as_dict(df)
         if not self._assign_fundcenter(_dict, request):
             return
