@@ -35,7 +35,9 @@ def _orphan_forecast_adjustments(request, allocations, forecast_adjustment):
 
 
 def bmt_screening_report(request):
-    fundcenter = fund = fy = quarter = ""
+    fundcenter = fund = ""
+    fy = BftStatus.current.fy()
+    quarter = BftStatus.current.quarter()
     query_string = None
     table = None
     form_filter = True
@@ -62,7 +64,7 @@ def bmt_screening_report(request):
     initial = {
         "fundcenter": fundcenter,
         "fund": fund,
-        "fy": BftStatus.current.fy(),
+        "fy": fy,
         "quarter": quarter,
     }
 
