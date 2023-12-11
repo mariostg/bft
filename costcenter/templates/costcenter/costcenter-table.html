@@ -16,8 +16,8 @@
         </div>
         {% endif %}
     </div>
-
-    {% for elem in filter.qs  %}
+    {% include 'paginator.html' %}
+    {% for elem in data  %}
     <section class='summary'>
         <div class='summary__header'>
             <span><strong>{{elem.costcenter}} </strong>- {{elem.shortname}} - {{elem.costcenter_parent}}</span>

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.db.models import RestrictedError
 from django.contrib import messages
+from django.core.paginator import Paginator
 from .models import (
     Fund,
     Source,
@@ -343,11 +344,14 @@ def costcenter_page(request):
         data = CostCenter.objects.all()
         has_filter = True
     search_filter = CostCenterFilter(request.GET, queryset=data)
+    paginator = Paginator(search_filter.qs, 25)
+    page_number = request.GET.get("page")
     return render(
         request,
         "costcenter/costcenter-table.html",
         {
             "filter": search_filter,
+            "data": paginator.get_page(page_number),
             "status": status,
             "has_filter": has_filter,
         },
