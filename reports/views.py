@@ -24,6 +24,16 @@ from bft.conf import QUARTERKEYS
 from utils.getrequestfilter import set_query_string
 
 
+def _orphan_forecast_adjustments(request, allocations, forecast_adjustment):
+    # for fcst_adj_path, fcst_adj_item in forecast_adjustment.items():
+    alloc_paths = allocations.keys()
+    for fcst_path, fcst_item in forecast_adjustment.items():
+        if fcst_path not in alloc_paths:
+            messages.warning(
+                request, f"Cost center {fcst_item['Cost Element']} has forecast adjustment but no allocation"
+            )
+
+
 def bmt_screening_report(request):
     fundcenter = fund = fy = quarter = ""
     query_string = None
@@ -65,6 +75,8 @@ def bmt_screening_report(request):
         alloc = r.id_to_sequence(alloc)
         fcst_adj = ForecastAdjustmentManager().fundcenter_descendants(fundcenter, fund)
         fcst_adj = r.id_to_sequence(fcst_adj)
+
+        _orphan_forecast_adjustments(request, alloc, fcst_adj)
         # Integrate Encumbrance and forecast
         columns = ["Spent", "Balance", "Working Plan", "CO", "PC", "FR", "Forecast"]
         for alloc_path, alloc_item in alloc.items():
