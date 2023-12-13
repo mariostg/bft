@@ -27,7 +27,6 @@
         <div class="summary__body">
             {{elem.note|linebreaksbr}}
         </div>
-        {% if user.is_authenticated %}
         <div class="summary__footer">
             <span class="tag {% if elem.isforecastable %}yes"> {%else%} no"> Not{%endif%} Forecastable</span>
             <span class="tag {% if elem.isupdatable %} yes"> {%else%} no"> Not {%endif%} Updatable</span>
@@ -35,10 +34,11 @@
             {% if status.fy and status.period %}
             <a class='btn btn-view' href="{% url 'costcenter-charges' elem.costcenter status.fy status.period %}">Current charges</a>
             {% endif %}
+            {% if user.is_authenticated %}
             <a class="btn btn-edit" href="{% url 'costcenter-update' elem.id %}" ></a>
             <a class="btn btn-delete" href="{% url 'costcenter-delete' elem.pk %}" ></a >
+                {% endif %}
         </div>
-        {% endif %}
     </section>
     {% endfor %}
 
