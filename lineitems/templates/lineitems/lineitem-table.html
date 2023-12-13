@@ -37,20 +37,20 @@
     <div class='lineitem__footer'>
 
         <div class="padded">Spent:{{line.spent|intcomma }}
-            {% if line.spent > line.fcst.spent %}
-                <span class="rising-green"></span>
-            {% elif line.spent < line.fcst.spent %}
-                <span class="decreasing-red"></span>
+            {% if line.spent > line.fcst.spent_initial %}
+                <span class="rising-green"  title="{{line.fcst.spent_initial|intcomma}}"></span>
+            {% elif line.spent < line.fcst.spent_initial %}
+                <span class="decreasing-red"  title="{{line.fcst.spent_initial|intcomma}}"></span>
             {% endif %}
         </div>
 
         <div>Balance:{{line.balance|intcomma }}</div>
 
         <div>Working Plan:{{line.workingplan|intcomma}}
-        {% if line.workingplan < line.fcst.workingplan%}
-            <span class="decreasing-green">
-        {% elif line.workingplan > line.fcst.workingplan%}
-            <span class="rising-red">
+        {% if line.workingplan < line.fcst.workingplan_initial%}
+            <span class="decreasing-green" title="{{line.fcst.workingplan_initial|intcomma}}"></span>
+        {% elif line.workingplan > line.fcst.workingplan_initial%}
+            <span class="rising-red" title="{{line.fcst.workingplan_initial|intcomma}}"></span>
         {%endif%}
         </div>
 
