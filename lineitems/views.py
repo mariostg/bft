@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
-from django.db.models import Sum
+from django.db.models import Sum, F
+from django.db.models.lookups import GreaterThan
 from django.core.paginator import Paginator
 import logging
 from .models import LineItem, LineForecast
@@ -30,7 +31,11 @@ def lineitem_page(request):
     if not request.GET:
         data = LineItem.objects.none()
     else:
-        data = LineItem.objects.all().order_by("docno")
+        data = (
+            LineItem.objects.all()
+            .order_by("docno")
+            .annotate(wp_rising=GreaterThan(F("workingplan"), F("fcst__workingplan_initial")))
+        )
         has_filter = True
     search_filter = LineItemFilter(request.GET, queryset=data)
     return render(
