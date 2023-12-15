@@ -402,7 +402,12 @@ def costcenter_update(request, pk):
 def costcenter_delete(request, pk):
     costcenter = CostCenter.objects.get(id=pk)
     if request.method == "POST":
-        costcenter.delete()
+        try:
+            costcenter.delete()
+        except RestrictedError:
+            messages.warning(
+                request, f"Cannot delete {costcenter.costcenter} because it contains dependants elements"
+            )
         return redirect("costcenter-table")
     context = {"object": costcenter, "back": "costcenter-table"}
     return render(request, "core/delete-object.html", context)
