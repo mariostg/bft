@@ -37,7 +37,7 @@
     <div class='lineitem__footer'>
         <div class="padded">
             {% if line.workingplan == 0 %}
-                <a class="icon-delete" title="Delete this line item" href="{% url 'line-item-delete' line.id %}"></a>
+                <a class="btn btn-delete" title="Delete this line item" href="{% url 'line-item-delete' line.id %}"></a>
             {% endif %}
 
             Spent:{{line.spent|intcomma }}
@@ -110,6 +110,7 @@
         <div class="cantoggle line-item-text">
                 {% if line.fcst.description %}
                 <div>{{line.fcst.description}}</div>
+                <hr class="hr--thin">
                 {% endif %}
                 {% if line.fcst.comment %}
                 <div>{{line.fcst.comment}}</div>
