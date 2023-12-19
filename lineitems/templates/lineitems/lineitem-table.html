@@ -15,7 +15,7 @@
     {% endif %}
 
 {% include 'paginator.html' %}
-
+<button id='comment-toggler'>Toggle long text view</button>
 {% for line in filter.qs  %}
 <article class="container lineitem">
     <div class='lineitem__header'>
@@ -35,8 +35,12 @@
         <div>{% if line.predecessordocno%} Predecessor: {{line.predecessordocno|default:'' }} {{line.predecessorlineno|default:''}}{% endif %}</div>
     </div>
     <div class='lineitem__footer'>
+        <div class="padded">
+            {% if line.workingplan == 0 %}
+                <a class="icon-delete" title="Delete this line item" href="{% url 'line-item-delete' line.id %}"></a>
+            {% endif %}
 
-        <div class="padded">Spent:{{line.spent|intcomma }}
+            Spent:{{line.spent|intcomma }}
             {% if line.spent > line.fcst.spent_initial %}
                 <span class="rising-green"  title="{{line.fcst.spent_initial|intcomma}}"></span>
             {% elif line.spent < line.fcst.spent_initial %}
@@ -58,9 +62,6 @@
         <div class="{% if line.fcst.forecastamount < 0%} hint-too-low {% elif line.fcst.forecastamount > line.workingplan %} hint-warning{% endif %}"> Forecast:{{line.fcst.forecastamount|intcomma}}</div>
         {% endif %}
 
-        {% if line.workingplan == 0 %}
-        <a class="btn btn--link-small btn-delete" href="{% url 'line-item-delete' line.id %}">Delete Line</a>
-        {% endif %}
     </div>
 
         {% if not line.fcst.id %}
@@ -106,10 +107,18 @@
             </div>
         </div>
         {% endif %}
-
+        <div class="cantoggle line-item-text">
+                {% if line.fcst.description %}
+                <div>{{line.fcst.description}}</div>
+                {% endif %}
+                {% if line.fcst.comment %}
+                <div>{{line.fcst.comment}}</div>
+                {% endif %}
+        </div>
 </article>
 {% endfor %}
 </section>
 </main>
 <script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
+<script type="text/javascript" src="{% static 'js/toggler.js'%}" ></script>
 {% endblock content %}

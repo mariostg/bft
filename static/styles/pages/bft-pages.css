@@ -67,10 +67,10 @@ aside {
     align-items: center;
     gap: 4px;
 }
-.lineitems .lineitem > div > div:last-child {
+.lineitem__part > div:last-child,
+.lineitem__footer > div:last-child {
     text-align: right;
 }
-
 .half {
     flex: 0 0 50%;
 }
