@@ -138,9 +138,41 @@ def line_forecast_delete(request, pk):
 
 
 def line_item_delete(request, pk):
+    """A line item can be delete when the working plan is zero.  By definition, it means that
+    the line item is no longer in DRMIS encumbrance report.
+    In addition, a line item can only be deleted if the current user is the procurement officer assigned to the cost center le line item belongs to.
+    """
     target = LineItem.objects.get(pk=pk)
-    if target.createdby == request.user:
-        print(f"This is the current user {request.user}.  Owner is {target.createdby}")
+
+    if target.costcenter.procurement_officer != request.user:
+        messages.warning(request, "Only owner can delete a line item.")
+        return redirect("lineitem-page")
+
+    if request.method == "POST":
+        if target.costcenter.procurement_officer != request.user:
+            messages.warning(request, "Only owner can delete a line item.")
+        else:
+            messages.success(request, f"line item {target.linetext} has been deleted")
+            target.delete()
+        return redirect("lineitem-page")
+
+    context = {
+        "object": target.linetext,
+        "back": "lineitem-page",
+    }
+    return render(request, "core/delete-object.html", context)
+
+    print(
+        f"Created by {target.createdby}, \n current user is {request.user},\n forecast owner is {target.fcst.owner}, \n procurement cost center owner {target.costcenter.procurement_officer}"
+    )
+    if target.costcenter.procurement_officer == request.user:
+        print(f"This is the current user {request.user}.  Owner is {target.costcenter.procurement_officer}")
+        context = {
+            "object": "Line item target to delete " + target.linetext,
+            "back": "lineitem-page",
+        }
+        return render(request, "core/delete-object.html", context)
+
     else:
         messages.warning(request, "Only owner can delete a line item.")
     return redirect("lineitem-page")
