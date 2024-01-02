@@ -60,6 +60,12 @@
     min-width: fit-content;
     background-color: #404040;
 }
+.btn.btn-forecast {
+    background: url(../../images/forecast.svg) 5px 1px no-repeat;
+    background-size: 2rem;
+    min-width: fit-content;
+    background-color: #404040;
+}
 .btn.btn-view {
     background: url(../../images/icon-viewlink.svg) 5px 1px no-repeat;
     background-size: 2.4rem;
