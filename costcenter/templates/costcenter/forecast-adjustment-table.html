@@ -18,9 +18,9 @@
     {% for item in data %}
     <section class='summary'>
         <div class='summary__header'>
-            <span>2184BR - {{item.costcenter}}</span>
+            <span>{{item.costcenter.costcenter_parent}} | {{item.costcenter}}</span>
             <span>{{item.fund}}</span>
-            <span>Ammo</span>
+            <span>{{item.costcenter.source}}</span>
         </div>
         <div class="summary__body">
             <span>{{item.amount}}</span>
