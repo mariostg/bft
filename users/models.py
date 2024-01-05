@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import datetime
 from django.contrib.auth.base_user import BaseUserManager
+from costcenter.models import CostCenter, FundCenter
 
 
 class BftUserManager(BaseUserManager):
@@ -14,8 +15,6 @@ class BftUserManager(BaseUserManager):
     def normalize_user(cls, obj: "BftUser"):
         obj.first_name = obj.first_name.capitalize()
         obj.last_name = obj.last_name.capitalize()
-        obj.default_fc = obj.default_fc.upper()
-        obj.default_cc = obj.default_cc.upper()
         return obj
 
     @classmethod
@@ -82,7 +81,11 @@ class BftUserManager(BaseUserManager):
 
 
 class BftUser(AbstractUser):
-    default_fc = models.CharField("Default FC", max_length=6, blank=True)
-    default_cc = models.CharField("Default CC", max_length=6, blank=True)
+    default_fc = models.OneToOneField(
+        FundCenter, on_delete=models.RESTRICT, verbose_name="Default FC", blank=True, null=True
+    )
+    default_cc = models.OneToOneField(
+        CostCenter, on_delete=models.RESTRICT, verbose_name="Default CC", blank=True, null=True
+    )
     procurement_officer = models.BooleanField(default=False)
     objects = BftUserManager()
