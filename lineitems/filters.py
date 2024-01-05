@@ -26,9 +26,9 @@ class LineItemFilter(django_filters.FilterSet):
         }
 
     def filter_has_no_forecast(self, queryset, name, value):
+        """Allow filter of line items that have no forecast."""
         if value:
             lookup = "__".join([name, "isnull"])
-            print(lookup, name, value)
             return queryset.filter(**{lookup: True})
         else:
             return queryset
