@@ -14,6 +14,11 @@ class UserSelfRegisterForm(UserCreationForm):
 
 
 class BftUserForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(BftUserForm, self).__init__(*args, **kwargs)
+        if "instance" in kwargs:
+            self.fields.pop("password")
+
     class Meta:
         model = BftUser
         fields = [
