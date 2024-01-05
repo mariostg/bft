@@ -24,4 +24,5 @@ class BftUserForm(forms.ModelForm):
             "email",
             "is_active",
             "procurement_officer",
+            "password",
         ]

@@ -70,6 +70,7 @@ def user_add(request):
                 _user = form.save(commit=False)
                 _user.username = BftUserManager.make_username(_user.email)
                 _user = BftUserManager.normalize_user(_user)
+                _user.set_password(_user.password)
                 _user.save()
                 return redirect("user-table")
         except ValueError as e:
