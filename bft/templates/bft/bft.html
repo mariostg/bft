@@ -42,14 +42,32 @@
     <div class='form'>
         <div class="form__header"> Create Data </div>
         <div class="form__body">
+            {%if perms.costcenter.add_fund%}
             <a class='btn'  href="{% url 'fund-add' %}">Fund</a>
-            <a class='btn'  href="{% url 'source-add' %}">Source</a>
+            {% endif %}
+
+            {%if perms.costcenter.add_source%}
+                <a class='btn'  href="{% url 'source-add' %}">Source</a>
+            {% endif %}
+
+            {%if perms.costcenter.add_costcenter%}
             <a class='btn'  href="{% url 'costcenter-add' %}">Cost Center</a>
+            {% endif %}
+            {%if perms.costcenter.add_fundcenter%}
             <a class='btn'  href="{% url 'fundcenter-add' %}">Fund Center</a>
+            {% endif %}
+            {%if perms.costcenter.add_forecast_adjustment%}
             <a class='btn'  href="{% url 'forecast-adjustment-add' %}">Forecast Adjustment</a>
+            {% endif %}
+            {%if perms.costcenter.add_costcenter_allocation%}
             <a class='btn'  href="{% url 'costcenter-allocation-add' %}">Cost Center Allocation</a>
+            {% endif %}
+            {%if perms.costcenter.add_fundcenter_allocation%}
             <a class='btn'  href="{% url 'fundcenter-allocation-add' %}">Fund Center Allocation</a>
+            {% endif %}
+            {%if perms.user.add_user%}
             <a class='btn'  href="{% url 'user-add' %}">BFT User</a>
+            {% endif %}
         </div>
     </div>
     <div class="form">
