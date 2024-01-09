@@ -49,11 +49,11 @@
             <td>{{elem.date_joined|date:"Y-m-d"}}</td>
             <td class="center {%if elem.is_active %} yes {% else %}  no {% endif %}>"</td>
             <td class="center {%if elem.procurement_officer %}yes {% else %} no {% endif %}>"</td>
-            <td>
+            <td class='btn__row'>
                 {% if user.is_authenticated %}
                 <a class='btn btn-edit'href="{% url "user-update" elem.id %}"> </a>
                 <a class='btn btn-delete' href="{% url "user-delete" elem.id %}"></a>
-                <a class='btn' href="{% url "user-password-reset" elem.id %}"></a>
+                <a class='btn btn-password-reset' href="{% url "user-password-reset" elem.id %}"></a>
             </td>
             {% endif %}
         </tr>
