@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.db import IntegrityError
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from users.forms import UserSelfRegisterForm, BftUserForm
+from users.forms import UserSelfRegisterForm, BftUserForm, PasswordResetForm
 
 from users.models import BftUser, BftUserManager
 
@@ -107,3 +107,21 @@ def user_delete(request, pk):
         return redirect("user-table")
     context = {"object": BftUser, "back": "user-table"}
     return render(request, "core/delete-object.html", context)
+
+
+def user_password_reset(request, pk):
+    _user = BftUser.objects.get(id=pk)
+    # print("INITIAL:", _user.password)
+    form = PasswordResetForm(instance=_user)
+
+    if request.method == "POST":
+        form = PasswordResetForm(request.POST, instance=_user)
+        if form.is_valid():
+            _user = form.save(commit=False)
+            # print("FORM 1:", _user.password)
+            _user.set_password(_user.password)
+            # print("FORM 2:", _user.password)
+            _user.save()
+            return redirect("user-table")
+
+    return render(request, "users/user-password-reset-form.html", {"form": form, "username": _user.username})

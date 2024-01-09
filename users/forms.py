@@ -31,3 +31,18 @@ class BftUserForm(forms.ModelForm):
             "procurement_officer",
             "password",
         ]
+
+
+class PasswordResetForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(PasswordResetForm, self).__init__(*args, **kwargs)
+
+    password = forms.CharField(widget=forms.PasswordInput())
+    username = forms.CharField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = BftUser
+        fields = [
+            "username",
+            "password",
+        ]
