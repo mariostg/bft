@@ -23,7 +23,7 @@
             {% comment %} <a class='btn'  href="{% url 'line-forecast-table' %}">Line Item forecasts</a> {% endcomment %}
         </div>
     </div>
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and perms.user.upload_data%}
         <div class="form">
             <div class="form__header">Upload Data</div>
             <div class="form__body">
@@ -38,7 +38,7 @@
             </div>
         </div>
     {% endif %}
-    {% if user.is_authenticated%}
+    {% if user.is_authenticated and perms.user.create_data%}
     <div class='form'>
         <div class="form__header"> Create Data </div>
         <div class="form__body">
@@ -70,6 +70,8 @@
             {% endif %}
         </div>
     </div>
+    {% endif %}
+    {% if user.is_authenticated %}
     <div class="form">
         <div class="form__header">Reports</div>
         <div class="form__body">
@@ -80,6 +82,6 @@
             <a class='btn'  href="{% url 'financial-structure-report' %}">Financial Structure</a>
         </div>
     </div>
-        {% endif %}
+    {% endif %}
     {% endblock  %}
 </section>

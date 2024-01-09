@@ -89,3 +89,9 @@ class BftUser(AbstractUser):
     )
     procurement_officer = models.BooleanField(default=False)
     objects = BftUserManager()
+
+    class Meta:
+        permissions = (
+            ("create_data", "can create data"),
+            ("upload_data", "can upload data"),
+        )
