@@ -373,6 +373,7 @@ def costcenter_add(request):
                 obj.save()
             except IntegrityError as e:
                 messages.error(request, f"{e}.  Cost center {obj.costcenter} exists")
+                return render(request, "costcenter/costcenter-form.html", {"form": form})
             return redirect("costcenter-table")
     else:
         form = CostCenterForm
