@@ -109,12 +109,7 @@ def source_add(request):
     if request.method == "POST":
         form = SourceForm(request.POST)
         if form.is_valid():
-            try:
-                obj = form.save(commit=False)
-                obj.save()
-            except IntegrityError:
-                messages.error(request, f"Source {obj.source} exists.")
-                return render(request, "costcenter/source-form.html", {"form": form})
+            form.save()
             return redirect("source-table")
     else:
         form = SourceForm

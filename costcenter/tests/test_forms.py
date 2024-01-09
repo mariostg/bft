@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from costcenter.forms import FundForm
+from costcenter.models import Fund
 
 
 class FundFormTest(TestCase):
@@ -38,3 +39,11 @@ class FundFormTest(TestCase):
         form = FundForm(data=data)
         msg = f"Ensure this value has at most 4 characters (it has {len(data['fund'])})."
         self.assertEqual(form.errors["fund"], [msg])
+
+    def test_fund_exists(self):
+        data = {"fund": "C113", "vote": "1", "name": "NP"}
+        fund = Fund(**data)
+        fund.save()
+
+        frm = FundForm(data=data)
+        self.assertFalse(frm.is_valid())

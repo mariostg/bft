@@ -44,6 +44,12 @@ class SourceForm(forms.ModelForm):
         model = Source
         fields = ["source"]
 
+    def clean_source(self):
+        source = self.cleaned_data["source"]
+        if not source.isupper() or source.islower():
+            source = source.capitalize()
+        return source
+
     def __init__(self, *args, **kwargs):
         super(SourceForm, self).__init__(*args, **kwargs)
 
