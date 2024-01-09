@@ -26,7 +26,7 @@ class FundForm(forms.ModelForm):
         return vote
 
     def clean_fund(self):
-        fund = self.cleaned_data["fund"]
+        fund = self.cleaned_data["fund"].upper()
         if not fund:
             return fund
         if not fund[0].isalpha():

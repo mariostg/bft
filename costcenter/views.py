@@ -76,7 +76,6 @@ def fund_update(request, pk):
         form = FundForm(request.POST, instance=fund)
         if form.is_valid():
             fund = form.save(commit=False)
-            fund.fund = fund.fund.upper()
             fund.save()
             return redirect("fund-table")
 
@@ -137,11 +136,11 @@ def source_update(request, pk):
     if request.method == "POST":
         form = SourceForm(request.POST, instance=source)
         if form.is_valid():
-            try:
-                form.save()
-            except IntegrityError:
-                messages.error(request, "Saving this record would create duplicate entry.")
-                return render(request, "costcenter/source-form.html", {"form": form})
+            # try:
+            form.save()
+            # except IntegrityError:
+            # messages.error(request, "Saving this record would create duplicate entry.")
+            # return render(request, "costcenter/source-form.html", {"form": form})
             return redirect("source-table")
 
     return render(request, "costcenter/source-form.html", {"form": form})
