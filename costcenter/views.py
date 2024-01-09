@@ -56,7 +56,11 @@ def fund_add(request):
         if form.is_valid():
             fund = form.save(commit=False)
             fund.fund = fund.fund.upper()
-            fund.save()
+            try:
+                fund.save()
+            except IntegrityError:
+                messages.error(request, f"Fund {fund.fund} exists.")
+                return render(request, "costcenter/fund-form.html", {"form": form})
             return redirect("fund-table")
     else:
         form = FundForm
@@ -114,9 +118,10 @@ def source_add(request):
         form = SourceForm(request.POST)
         if form.is_valid():
             try:
-                form.save()
+                obj = form.save(commit=False)
+                obj.save()
             except IntegrityError:
-                messages.error(request, "Saving this record would create duplicate entry.")
+                messages.error(request, f"Source {obj.source} exists.")
                 return render(request, "costcenter/source-form.html", {"form": form})
             return redirect("source-table")
     else:
@@ -194,7 +199,7 @@ def fundcenter_add(request):
             try:
                 obj.save()
             except IntegrityError:
-                messages.error(request, "Duplicate entry cannot be saved")
+                messages.error(request, f"Fund center {obj.fundcenter} exists.")
                 return render(request, "costcenter/fundcenter-form.html", {"form": form})
 
             return redirect("fundcenter-table")
