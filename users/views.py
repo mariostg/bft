@@ -24,7 +24,6 @@ def user_login(request):
 
         if user is not None:
             login(request, user)
-            request.session["greeting"] = "Hello"
             return redirect(request.GET["next"] if "next" in request.GET else "bft")
         else:
             messages.error(request, "Username OR password is incorrect")

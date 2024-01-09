@@ -541,3 +541,9 @@ input[type="checkbox"]:disabled {
 .hide {
     display: none;
 }
+.username {
+    color: #4b5544;
+}
+.btn:hover > .username {
+    color: #fff;
+}
