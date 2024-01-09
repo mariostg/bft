@@ -369,7 +369,10 @@ def costcenter_add(request):
             obj.costcenter = obj.costcenter.upper()
             if obj.shortname:
                 obj.shortname = obj.shortname.upper()
-            obj.save()
+            try:
+                obj.save()
+            except IntegrityError as e:
+                messages.error(request, f"{e}.  Cost center {obj.costcenter} exists")
             return redirect("costcenter-table")
     else:
         form = CostCenterForm
