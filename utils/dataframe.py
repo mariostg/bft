@@ -9,6 +9,14 @@ from bft.exceptions import BFTDataFrameExceptionError
 class BFTDataFrame(pd.DataFrame):
     """This class creates a Pandas DataFrame using either a Django QuerySet, a Django Model instance, or a dictionary.  Column names are renamed according to the django_model passed in the __init__ method.  If field method does not have a verbose name, the column name will be capitalized.
 
+    Typical usage:
+    from costcenter.models import FundCenter
+    from utils import dataframe
+
+    fc = FundCenter.objects.all()
+    df = dataframe.BFTDataFrame(FundCenter).build(fc)
+    print(df)
+
     Args:
         django_model (django.db.models.Model): The model that the dataframe will be built upon.
 
