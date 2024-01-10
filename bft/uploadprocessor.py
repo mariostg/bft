@@ -492,9 +492,13 @@ class LineItemProcessor(UploadProcessor):
         FileNotFoundError: If the encumbrance file is not found
     """
 
+    #: Number of columns expected in the DND Cost Center Encumbrance Report
     COLUMNS = 22  # Includes empty columns at beginning and end of row
+    #: Location where the csv version of the DND Cost Center Encumbrance Report is saved.
     CSVFILE = os.path.join(BASE_DIR, "drmis_data/encumbrance.csv")
+    #: Location where DRMIS reports are saved.
     DRMIS_DIR = os.path.join(BASE_DIR, "drmis_data")
+    #: Columnc names and order as found in the DND Cost Center Encumbrance report and used to create the CSV file.
     CSVFIELDS = "|docno|lineno|acctassno|spent|balance|workingplan|fundcenter|fund|costcenter|internalorder|doctype|enctype|linetext|predecessordocno|predecessorlineno|reference|gl|duedate|vendor|createdby|"
 
     def __init__(self, filepath, request=None):
@@ -724,6 +728,8 @@ class LineItemProcessor(UploadProcessor):
         return df["costcenter"].unique()
 
     def csv2table(self):
+        """Import CSV Encumbrance file in the LineItemImport Table"""
+
         def str2float(n):
             try:
                 return locale.atof(n)
