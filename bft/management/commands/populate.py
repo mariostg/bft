@@ -17,6 +17,7 @@ from costcenter.models import (
 from charges.models import CostCenterChargeImport, CostCenterChargeMonthly
 from lineitems.models import LineForecast, LineItem
 from bft.models import BftStatus, BftStatusManager
+from users.models import BftUser
 
 from bft import finstructure
 
@@ -30,6 +31,7 @@ class Command(BaseCommand):
         if DEBUG:
             LineForecast.objects.all().delete()
             LineItem.objects.all().delete()
+            BftUser.objects.update(default_cc="", default_fc="")  # So we can delete FC and CC
             CostCenter.objects.all().delete()
             Source.objects.all().delete()
             Fund.objects.all().delete()

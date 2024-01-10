@@ -595,7 +595,6 @@ class LineItemProcessor(UploadProcessor):
         for i, e in enumerate(header):
             e = e.strip()
             self.data["header"] += [e]
-        print("cleaned header")
 
     def find_header_line(self) -> int:
         """Attemps to find the row that contains the column header based on self.hint['header']
@@ -820,24 +819,27 @@ class LineItemProcessor(UploadProcessor):
 
     def _fundcenter_matches_report(self):
         if not self.request:
-            logger.error("http request not available")
-            return False
+            return True  # This means that we are uploading through the command line.
         if self.fundcenter != self.data["fc"]:
             msg = f"{self.fundcenter} does not match report found in dataset: {self.data['fc']}"
             logger.error(msg)
-            messages.error(self.request, msg)
+            if self.request:
+                messages.error(self.request, msg)
             return False
         return True
 
     def main(self) -> bool:
         logger.info(f"Begin Upload processing by {self.user}")
         if not self._set_data():
+            logger.warn("Failed to set data")
             return False
 
         if not self._fundcenter_matches_report():
+            logger.error("Fund center report does not match")
             return False
 
         if not self.is_dnd_cost_center_report():
+            logger.error("We do not have a DND Cost center encumbrance report")
             return False
 
         logger.info("We have a DND Cost center encumbrance report.")
@@ -868,4 +870,5 @@ class LineItemProcessor(UploadProcessor):
         LineForecastManager().set_overforecasted()
         msg = "BFT dowload complete"
         logger.info(msg)
-        messages.info(self.request, msg)
+        if self.request:
+            messages.info(self.request, msg)
