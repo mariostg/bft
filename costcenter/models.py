@@ -270,7 +270,6 @@ class FinancialStructureManager(models.Manager):
             except FundCenter.DoesNotExist:
                 return False
             return self.is_sequence_child_of(_parent.sequence, _child.sequence)
-            # return _parent.fundcenter == _child.fundcenter_parent.fundcenter
         elif isinstance(child, CostCenter):
             try:
                 _parent = FundCenter.objects.get(fundcenter=parent.fundcenter)
@@ -715,10 +714,6 @@ class CostCenter(models.Model):
             self.sequence = FinancialStructureManager().set_parent(
                 self.costcenter_parent, costcenter_child=True
             )
-        # if self.costcenter_parent and self.costcenter == self.costcenter_parent.fundcenter:
-        #     raise IntegrityError(
-        #         f"Children Fund center cannot assign itself as parent {self.costcenter_parent.fundcenter}"
-        #     )
 
         self.costcenter = self.costcenter.upper()
         if self.shortname:
