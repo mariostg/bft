@@ -676,6 +676,9 @@ class CostCenterManager(models.Manager):
             parent = FundCenterManager().fundcenter(fundcenter=parent)
         return CostCenter.objects.filter(costcenter_parent=parent)
 
+    def exists(self, costcenter: str) -> bool:
+        return CostCenter.objects.filter(costcenter=costcenter).exists()
+
 
 class CostCenter(models.Model):
     costcenter = models.CharField("Cost Center", max_length=6, unique=True)

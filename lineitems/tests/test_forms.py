@@ -1,0 +1,46 @@
+import pytest
+from lineitems.forms import CostCenterLineItemUploadForm
+from django.core.files.uploadedfile import SimpleUploadedFile
+from main import settings
+from bft.management.commands import populate
+from django.core.exceptions import ValidationError
+
+
+@pytest.mark.django_db
+class TestCostCenterLineItemUpload:
+    @pytest.fixture
+    def setup(self):
+        self.data = {
+            "fundcenter": "2184DA",
+            "costcenter": "8484wa",
+        }
+        self.files = {
+            "source_file": SimpleUploadedFile("file.txt", b"file-content", content_type="text/plain")
+        }
+
+    @pytest.fixture
+    def populate(self):
+        hnd = populate.Command()
+        hnd.handle()
+
+    def test_form_is_valid(self, setup, populate):
+        f = CostCenterLineItemUploadForm(data=self.data, files=self.files)
+        assert f.is_valid()
+
+    def test_form_invalid_fund_center(self, setup, populate):
+        self.data = {
+            "fundcenter": "2184XA",
+            "costcenter": "8484wa",
+        }
+        f = CostCenterLineItemUploadForm(data=self.data, files=self.files)
+        assert "Fund Center 2184XA does not exist" in f.errors["fundcenter"]
+        assert f.is_valid() == False
+
+    def test_form_invalid_cost_center(self, setup, populate):
+        self.data = {
+            "fundcenter": "2184DA",
+            "costcenter": "8484UU",
+        }
+        f = CostCenterLineItemUploadForm(data=self.data, files=self.files)
+        assert "Cost Center 8484UU does not exist" in f.errors["costcenter"]
+        assert f.is_valid() == False

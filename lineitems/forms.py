@@ -1,5 +1,7 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from .models import LineForecast, LineItem
+from costcenter.models import FundCenterManager, CostCenterManager
 from bft.forms import UploadForm
 
 
@@ -37,3 +39,20 @@ class CostCenterForecastForm(forms.Form):
 
 class LineItemUploadForm(UploadForm):
     fundcenter = forms.CharField(label="Fund center", max_length=6, initial=None)
+
+
+class CostCenterLineItemUploadForm(UploadForm):
+    def validate_fundcenter_exists(fc: str):
+        if not FundCenterManager().exists(fc):
+            raise ValidationError(f"Fund Center {fc} does not exist", "invalid")
+
+    def validate_costcenter_exists(cc: str):
+        if not CostCenterManager().exists(cc):
+            raise ValidationError(f"Cost Center {cc} does not exist", "invalid")
+
+    fundcenter = forms.CharField(
+        label="Fund center", max_length=6, initial=None, validators=[validate_fundcenter_exists]
+    )
+    costcenter = forms.CharField(
+        label="cost center", max_length=6, initial=None, validators=[validate_costcenter_exists]
+    )
