@@ -9,7 +9,7 @@ import logging
 from .models import LineItem, LineForecast
 from .forms import LineForecastForm, DocumentNumberForm, CostCenterForecastForm, CostCenterLineItemUploadForm
 from lineitems.filters import LineItemFilter
-from lineitems.forms import LineItemUploadForm
+from lineitems.forms import FundCenterLineItemUploadForm
 from main.settings import UPLOADS
 from bft.uploadprocessor import LineItemProcessor
 
@@ -180,7 +180,7 @@ def line_item_delete(request, pk):
 
 def fundcenter_lineitem_upload(request):
     if request.method == "POST":
-        form = LineItemUploadForm(request.POST, request.FILES)
+        form = FundCenterLineItemUploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
             filepath = f"{UPLOADS}/lineitem-upload-{user}.csv"
@@ -190,7 +190,7 @@ def fundcenter_lineitem_upload(request):
             processor = LineItemProcessor(filepath, request)
             processor.main()
     else:
-        form = LineItemUploadForm
+        form = FundCenterLineItemUploadForm
     return render(
         request, "lineitems/fundcenter-lineitem-upload-form.html", {"form": form, "form_title": "Fund Upload"}
     )

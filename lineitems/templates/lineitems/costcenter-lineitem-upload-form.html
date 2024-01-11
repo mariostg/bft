@@ -7,10 +7,6 @@
         <form enctype="multipart/form-data" method="POST">
             {% csrf_token %}
             <div>
-                {{ form.errors }}
-                {{ form.non_field_errors }}
-            </div>
-            <div>
                 {{ form }}
             </div>
             <div class="block block--spaced">
