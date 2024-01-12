@@ -49,6 +49,19 @@ class TestFundCenterManager:
         r = FundCenter
         assert 0 == len(r.objects.fund_center_dataframe(r.objects))
 
+    def test_a_given_fund_center_exists(self, setup):
+        assert True == FundCenterManager().exists("1111aa")
+
+    def test_a_given_fund_center_does_not_exists(self, setup):
+        assert False == FundCenterManager().exists("9999aa")
+
+    def test_no_fund_center_exists(self):
+        assert False == FundCenterManager().exists()
+
+    def test_fund_center_exists(self, setup):
+        a = FundCenterManager().exists()
+        assert True == FundCenterManager().exists()
+
     # Fund Center Tests
     def test_fund_center_dataframe(self):
         hnd = populate.Command()

@@ -7,9 +7,9 @@ from django.db.models.lookups import GreaterThan
 from django.core.paginator import Paginator
 import logging
 from .models import LineItem, LineForecast
-from .forms import LineForecastForm, DocumentNumberForm, CostCenterForecastForm
+from .forms import LineForecastForm, DocumentNumberForm, CostCenterForecastForm, CostCenterLineItemUploadForm
 from lineitems.filters import LineItemFilter
-from lineitems.forms import LineItemUploadForm
+from lineitems.forms import FundCenterLineItemUploadForm
 from main.settings import UPLOADS
 from bft.uploadprocessor import LineItemProcessor
 
@@ -178,9 +178,9 @@ def line_item_delete(request, pk):
     return redirect("lineitem-page")
 
 
-def lineitem_upload(request):
+def fundcenter_lineitem_upload(request):
     if request.method == "POST":
-        form = LineItemUploadForm(request.POST, request.FILES)
+        form = FundCenterLineItemUploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
             filepath = f"{UPLOADS}/lineitem-upload-{user}.csv"
@@ -190,8 +190,29 @@ def lineitem_upload(request):
             processor = LineItemProcessor(filepath, request)
             processor.main()
     else:
-        form = LineItemUploadForm
-    return render(request, "lineitems/lineitem-upload-form.html", {"form": form, "form_title": "Fund Upload"})
+        form = FundCenterLineItemUploadForm
+    return render(
+        request, "lineitems/fundcenter-lineitem-upload-form.html", {"form": form, "form_title": "Fund Upload"}
+    )
+
+
+def costcenter_lineitem_upload(request):
+    """This function handles the uploading of line items for a given cost center.  This means that the encumbrance must contain only one cost center and one fund center."""
+    if request.method == "POST":
+        form = CostCenterLineItemUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            filepath = f"{UPLOADS}/lineitem-upload-{user}.csv"
+            with open(filepath, "wb+") as destination:
+                for chunk in request.FILES["source_file"].chunks():
+                    destination.write(chunk)
+            processor = LineItemProcessor(filepath, request)
+            processor.main()
+    else:
+        form = CostCenterLineItemUploadForm
+    return render(
+        request, "lineitems/costcenter-lineitem-upload-form.html", {"form": form, "form_title": "Fund Upload"}
+    )
 
 
 def document_forecast(request, docno):

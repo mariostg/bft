@@ -1,5 +1,13 @@
 import pytest
-from costcenter.models import CostCenter, CostCenterManager, CostCenterAllocation, Fund, ForecastAdjustment
+from costcenter.models import (
+    CostCenter,
+    CostCenterManager,
+    CostCenterAllocation,
+    Fund,
+    ForecastAdjustment,
+    FundCenter,
+    Source,
+)
 from bft.management.commands import populate
 import pandas as pd
 
@@ -7,11 +15,39 @@ import pandas as pd
 @pytest.mark.django_db
 class TestCostCenterManager:
     @pytest.fixture
+    def setup(self):
+        fc = {"fundcenter": "1111aa", "shortname": "bedroom", "sequence": "1"}
+        parent = FundCenter.objects.create(**fc)
+        fund = {"fund": "C113"}
+        fund = Fund.objects.create(**fund)
+        source = Source.objects.create(**{"source": "kitchen"})
+        cc = {
+            "costcenter": "8484ZZ",
+            "shortname": "bedroom",
+            "sequence": "1",
+            "costcenter_parent": parent,
+            "fund": fund,
+            "source": source,
+        }
+        CostCenter.objects.create(**cc)
+
+    @pytest.fixture
     def populate(self):
         hnd = populate.Command()
         hnd.handle()
 
     # Cost Center Tests
+    def test_a_given_cost_center_exists(self, setup):
+        assert True == CostCenterManager().exists("8484ZZ")
+
+    def test_a_given_cost_center_does_not_exists(self, setup):
+        assert False == CostCenterManager().exists("9999aa")
+
+    def test_no_cost_center_exists(self):
+        assert False == CostCenterManager().exists()
+
+    def test_cost_center_exists(self, setup):
+        assert True == CostCenterManager().exists()
 
     def test_cost_center_dataframe_empty(self):
         r = CostCenterManager()

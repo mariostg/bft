@@ -197,8 +197,11 @@ class FundCenterManager(models.Manager):
             parent = self.fundcenter(parent)
         return list(CostCenter.objects.filter(costcenter_parent=parent).values())
 
-    def exists(self, fundcenter: str) -> bool:
-        return FundCenter.objects.filter(fundcenter=fundcenter).exists()
+    def exists(self, fundcenter: str = None) -> bool:
+        if fundcenter:
+            return FundCenter.objects.filter(fundcenter=fundcenter.upper()).exists()
+        else:
+            return FundCenter.objects.count() > 0
 
     def get_request(self, request) -> str | None:
         fundcenter = request.GET.get("fundcenter")
@@ -675,6 +678,12 @@ class CostCenterManager(models.Manager):
         if type(parent) == str:
             parent = FundCenterManager().fundcenter(fundcenter=parent)
         return CostCenter.objects.filter(costcenter_parent=parent)
+
+    def exists(self, costcenter: str = None) -> bool:
+        if costcenter:
+            return CostCenter.objects.filter(costcenter=costcenter).exists()
+        else:
+            return CostCenter.objects.count() > 0
 
 
 class CostCenter(models.Model):
