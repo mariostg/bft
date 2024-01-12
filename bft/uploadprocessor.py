@@ -501,7 +501,7 @@ class LineItemProcessor(UploadProcessor):
     #: Columnc names and order as found in the DND Cost Center Encumbrance report and used to create the CSV file.
     CSVFIELDS = "|docno|lineno|acctassno|spent|balance|workingplan|fundcenter|fund|costcenter|internalorder|doctype|enctype|linetext|predecessordocno|predecessorlineno|reference|gl|duedate|vendor|createdby|"
 
-    def __init__(self, filepath, request=None):
+    def __init__(self, filepath=None, request=None):
         locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
         if filepath == None:
             raise ValueError("No file name provided")
@@ -519,15 +519,13 @@ class LineItemProcessor(UploadProcessor):
             self.request = None
 
         self.hint = {
-            "fy": "|Base Fiscal Year",
-            "fund_center": "|Funds Center",
-            "layout": "|Layout",
+            "fy": "Base Fiscal Year :",
+            "fund_center": "Funds Center :",
             "header": "|Document N|Line Numbe|",
             "report": "DND Cost Center Encumbrance Report",
         }
         self.data = {
             "fy": None,  # FY read on report header
-            "layout": None,  # LAyout read on report header
             "fc": None,  # Fund center read on report header
             "header": [],  # Columns header values read on report
             "lineno": 0,  # Linenumber where first column header was found
@@ -546,9 +544,9 @@ class LineItemProcessor(UploadProcessor):
         """
         self.data["fc"] = None
         if line.startswith(self.hint["fund_center"]):
-            parts = line.split("|")
-            if len(parts) == 4:
-                self.data["fc"] = parts[2].strip().upper()
+            parts = line.split(":")
+            if len(parts) == 2:
+                self.data["fc"] = parts[1].strip().split(" ")[0].upper()
         # print(f"{self.find_fund.__name__}:Found fund {self.data['fc']}")
         return self.data["fc"]
 
@@ -563,28 +561,11 @@ class LineItemProcessor(UploadProcessor):
         """
         self.data["fy"] = None
         if line.startswith(self.hint["fy"]):
-            parts = line.split("|")
-            if len(parts) == 4:
-                self.data["fy"] = parts[2].strip()
+            parts = line.split(":")
+            if len(parts) == 2:
+                self.data["fy"] = parts[1].strip()
         # print(f"Foud FY {self.data['fy']}")
         return self.data["fy"]
-
-    def find_layout(self, line: str) -> str | None:
-        """Verify if whether or not a line contains the report layout as defined in self.hint['layout']
-
-        Args:
-            line (str): The line to test.
-
-        Returns:
-            str|None: The report layout found in self.hint['layout'], none if not found.
-        """
-        self.data["layout"] = None
-        if line.startswith(self.hint["layout"]):
-            parts = line.split("|")
-            if len(parts) == 4:
-                self.data["layout"] = parts[2].strip()
-        # print(f"Foud layout {self.data['layout']}")
-        return self.data["layout"]
 
     def clean_header(self, header: list) -> None:
         """Strips empty first and last column and strips all blanks in column elements
@@ -802,22 +783,19 @@ class LineItemProcessor(UploadProcessor):
             raise ValueError("Encumbrance report not defined.")
 
         with open(self.filepath, encoding="windows-1252") as lines:
-            is_set = [False, False, False]
+            is_set = [False, False]
             for line in lines:
                 if self.data["fy"] == None:
                     is_set[0] = self.find_base_fy(line)
                 if self.data["fc"] == None:
                     is_set[1] = self.find_fund_center(line)
-                if self.data["layout"] == None:
-                    is_set[2] = self.find_layout(line)
-                if line == "":
+                if all(is_set):
                     break
 
             logger.info(f"Fiscal Year : {self.data['fy']}")
             logger.info(f"Fund Center : {self.data['fc']}")
-            logger.info(f"Report Layout : {self.data['layout']}")
             if not all(is_set):
-                msg = f"Line Items upload by {self.user}.  Could not find FY, FC or report Layout in report header."
+                msg = f"Line Items upload by {self.user}.  Could not find FY, FC or report in report header."
                 logger.error(msg)
                 if self.request:
                     messages.error(self.request, msg)
@@ -841,6 +819,68 @@ class LineItemProcessor(UploadProcessor):
             return False
 
         if not self._fundcenter_matches_report():
+            return False
+
+        if not self.is_dnd_cost_center_report():
+            return False
+
+        logger.info("We have a DND Cost center encumbrance report.")
+
+        if self.find_header_line() == 0:
+            return False
+
+        if self.write_encumbrance_file_as_csv() == 0:
+            return False
+
+        if self.missing_fund():
+            return False
+
+        if self.missing_costcenters():
+            return False
+
+        self.csv2table()
+        linecount = LineItemImport.objects.count()
+        logger.info(f"{linecount} lines have been written to Encumbrance import table")
+
+        li = LineItem()
+        li.import_lines()
+        li.set_fund_center_integrity()
+        li.set_doctype()
+        LineForecastManager().set_encumbrance_history_record()
+        # LineForecastManager().set_unforecasted_to_spent()
+        LineForecastManager().set_underforecasted()
+        LineForecastManager().set_overforecasted()
+        msg = "BFT dowload complete"
+        logger.info(msg)
+        if self.request:
+            messages.info(self.request, msg)
+
+
+class CostCenterLineItemProcessor(LineItemProcessor):
+    def __init__(self, filepath, costcenter: str, fundcenter: str, request=None):
+        super().__init__(filepath, request)
+        self.costcenter = costcenter.upper()
+        self.fundcenter = fundcenter.upper()
+
+    def all_costcenter_are_equals(self) -> bool:
+        """Ensures the the encumbrance report lines are related to one single cost center.  Verification is done from the csv file."""
+        df = pd.read_csv(BASE_DIR / "drmis_data/encumbrance.csv")
+        cc = df["costcenter"]
+        cc_set = set(cc.to_list())
+        if len(cc_set) > 1:
+            msg = "There are more that one cost center in the report."
+            logger.error(msg)
+            if self.request:
+                messages.error(self.request, msg)
+        return len(cc_set) == 1
+
+    def main(self) -> bool:
+        logger.info(f"Begin Cost Center Upload processing by {self.user}")
+        if not self._set_data():
+            logger.warning("Failed to set data")
+            return False
+
+        if not self._fundcenter_matches_report():
             logger.error("Fund center report does not match")
             return False
 
@@ -857,6 +897,9 @@ class LineItemProcessor(UploadProcessor):
             return False
 
         if self.missing_fund():
+            return False
+
+        if not self.all_costcenter_are_equals():
             return False
 
         if self.missing_costcenters():
