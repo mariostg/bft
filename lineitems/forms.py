@@ -71,8 +71,16 @@ class CostCenterLineItemUploadForm(UploadForm):
                 raise ValidationError(f"{cc} is not a direct descendant of {fc}", code="invalid")
 
     fundcenter = forms.CharField(
-        label="Fund center", max_length=6, initial=None, validators=[validate_fundcenter_exists]
+        label="Fund center",
+        max_length=6,
+        initial=None,
+        validators=[validate_fundcenter_exists],
+        help_text="Fund center must be direct parent of cost center.",
     )
     costcenter = forms.CharField(
-        label="cost center", max_length=6, initial=None, validators=[validate_costcenter_exists]
+        label="cost center",
+        max_length=6,
+        initial=None,
+        validators=[validate_costcenter_exists],
+        help_text="Cost center must be unique in encumbrance report.",
     )

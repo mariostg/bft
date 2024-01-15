@@ -11,7 +11,7 @@ from .forms import LineForecastForm, DocumentNumberForm, CostCenterForecastForm,
 from lineitems.filters import LineItemFilter
 from lineitems.forms import FundCenterLineItemUploadForm
 from main.settings import UPLOADS
-from bft.uploadprocessor import LineItemProcessor
+from bft.uploadprocessor import LineItemProcessor, CostCenterLineItemProcessor
 
 logger = logging.getLogger("django")
 
@@ -202,11 +202,14 @@ def costcenter_lineitem_upload(request):
         form = CostCenterLineItemUploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
+            fundcenter = request.POST.get("fundcenter")
+            costcenter = request.POST.get("costcenter")
+            print("DATA:", fundcenter, costcenter)
             filepath = f"{UPLOADS}/lineitem-upload-{user}.csv"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
-            processor = LineItemProcessor(filepath, request)
+            processor = CostCenterLineItemProcessor(filepath, costcenter, fundcenter, request)
             processor.main()
     else:
         form = CostCenterLineItemUploadForm

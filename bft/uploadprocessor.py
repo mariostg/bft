@@ -867,12 +867,17 @@ class CostCenterLineItemProcessor(LineItemProcessor):
         df = pd.read_csv(BASE_DIR / "drmis_data/encumbrance.csv")
         cc = df["costcenter"]
         cc_set = set(cc.to_list())
-        if len(cc_set) > 1:
-            msg = "There are more that one cost center in the report."
+        set_size = len(cc_set)
+        msg = None
+        if set_size > 10:
+            msg = "There are more that 10 different cost centers in the report."
+        elif set_size > 1:
+            msg = f"There are more that one cost center in the report. Found {', '.join(cc_set)}"
+        if msg:
             logger.error(msg)
             if self.request:
                 messages.error(self.request, msg)
-        return len(cc_set) == 1
+        return set_size == 1
 
     def main(self) -> bool:
         logger.info(f"Begin Cost Center Upload processing by {self.user}")
@@ -894,6 +899,8 @@ class CostCenterLineItemProcessor(LineItemProcessor):
             return False
 
         if self.write_encumbrance_file_as_csv() == 0:
+            return False
+        if not self.all_costcenter_are_equals():
             return False
 
         if self.missing_fund():
