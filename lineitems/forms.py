@@ -29,12 +29,16 @@ class LineForecastForm(forms.ModelForm):
 
 
 class DocumentNumberForm(forms.Form):
-    docno = forms.CharField(label="Document Number", max_length=24)
+    docno = forms.CharField(
+        label="Document Number", max_length=24, widget=forms.TextInput(attrs={"disabled": "disbled"})
+    )
     forecastamount = forms.DecimalField(label="Forecast Amount", max_digits=10, decimal_places=2)
 
 
 class CostCenterForecastForm(forms.Form):
-    costcenter = forms.CharField(label="Cost Center", max_length=6)
+    costcenter = forms.CharField(
+        label="Cost Center", max_length=6, widget=forms.TextInput(attrs={"disabled": "disbled"})
+    )
     forecastamount = forms.DecimalField(label="Forecast Amount", max_digits=10, decimal_places=2)
 
 
