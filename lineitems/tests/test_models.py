@@ -228,7 +228,7 @@ class TestLineItemImport(TestCase):
         self.assertTrue(os.path.exists(self.path), "Drmis data directory not found")
 
     def test_exception_raised_if_no_file_provided(self):
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             LineItemProcessor()
 
     def test_exception_raised_if_file_not_found(self):
@@ -237,7 +237,7 @@ class TestLineItemImport(TestCase):
 
     def test_find_fund_center_line_good(self):
         er = LineItemProcessor(self.GOODFILE, None)
-        fc = er.find_fund_center("|Funds Center        |2184AA |")
+        fc = er.find_fund_center("Funds Center :     2184AA")
         self.assertEqual(fc, "2184AA")
 
     def test_find_fundcenter_line_bad(self):
@@ -247,23 +247,13 @@ class TestLineItemImport(TestCase):
 
     def test_find_fy_line_good(self):
         er = LineItemProcessor(self.GOODFILE, None)
-        fy = er.find_base_fy("|Base Fiscal Year    |2023   |")
+        fy = er.find_base_fy("Base Fiscal Year :2023 ")
         self.assertEqual(fy, "2023")
 
     def test_find_fy_line_bad(self):
         er = LineItemProcessor(self.WRONGFY, None)
         fy = er.find_base_fy("Base Fiscal Year    |2023   |")
         self.assertNotEqual(fy, "2023")
-
-    def test_find_layout_line_good(self):
-        er = LineItemProcessor(self.GOODFILE, None)
-        fy = er.find_layout("|Layout              |/BFT_NP|")
-        self.assertEqual(fy, "/BFT_NP")
-
-    def test_find_layout_line_bad(self):
-        er = LineItemProcessor(self.WRONGLAYOUT, None)
-        fy = er.find_layout("Layout              |/BFT_NP|")
-        self.assertNotEqual(fy, "/BFT_NP")
 
     def test_is_dnd_cost_center_report(self):
         er = LineItemProcessor("encumbrance_P1a.txt", None)
