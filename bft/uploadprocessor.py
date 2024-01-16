@@ -843,6 +843,10 @@ class LineItemProcessor(UploadProcessor):
         logger.info(f"{linecount} lines have been written to Encumbrance import table")
 
         li = LineItem()
+
+        orphan = li.get_orphan_lines()
+        li.mark_orphan_lines(orphan)
+
         li.import_lines()
         li.set_fund_center_integrity()
         li.set_doctype()
@@ -861,6 +865,7 @@ class CostCenterLineItemProcessor(LineItemProcessor):
         super().__init__(filepath, request)
         self.costcenter = costcenter.upper()
         self.fundcenter = fundcenter.upper()
+        self.costcenter_obj = CostCenter.objects.get(costcenter=self.costcenter)
 
     def all_costcenter_are_equals(self) -> bool:
         """Ensures the the encumbrance report lines are related to one single cost center.  Verification is done from the csv file."""
@@ -917,13 +922,17 @@ class CostCenterLineItemProcessor(LineItemProcessor):
         logger.info(f"{linecount} lines have been written to Encumbrance import table")
 
         li = LineItem()
+
+        orphan = li.get_orphan_lines(costcenter=self.costcenter_obj)
+        li.mark_orphan_lines(orphan)
+
         li.import_lines()
         li.set_fund_center_integrity()
         li.set_doctype()
-        LineForecastManager().set_encumbrance_history_record()
+        LineForecastManager().set_encumbrance_history_record(self.costcenter_obj)
         # LineForecastManager().set_unforecasted_to_spent()
-        LineForecastManager().set_underforecasted()
-        LineForecastManager().set_overforecasted()
+        LineForecastManager().set_underforecasted(self.costcenter_obj)
+        LineForecastManager().set_overforecasted(self.costcenter_obj)
         msg = "BFT dowload complete"
         logger.info(msg)
         if self.request:
