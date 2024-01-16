@@ -51,7 +51,7 @@ Base Fiscal Year : 2024
 
     def test_find_base_fy(self, setup):
         p = LineItemProcessor(self.source_file)
-        assert "2020" == p.find_base_fy("Fiscal Year: 2020")
+        assert "2020" == p.find_base_fy("Base Fiscal Year : 2020")
 
     def test_report_does_not_match_post_request(self, setup, populate):
         c = Client()
