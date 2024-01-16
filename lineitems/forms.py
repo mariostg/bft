@@ -36,9 +36,7 @@ class DocumentNumberForm(forms.Form):
 
 
 class CostCenterForecastForm(forms.Form):
-    costcenter = forms.CharField(
-        label="Cost Center", max_length=6, widget=forms.TextInput(attrs={"disabled": "disbled"})
-    )
+    costcenter_pk = forms.CharField(label="Cost Center", widget=forms.HiddenInput())
     forecastamount = forms.DecimalField(label="Forecast Amount", max_digits=10, decimal_places=2)
 
 

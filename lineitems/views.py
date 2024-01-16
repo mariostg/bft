@@ -7,6 +7,7 @@ from django.db.models.lookups import GreaterThan
 from django.core.paginator import Paginator
 import logging
 from .models import LineItem, LineForecast
+from costcenter.models import CostCenter
 from .forms import LineForecastForm, DocumentNumberForm, CostCenterForecastForm, CostCenterLineItemUploadForm
 from lineitems.filters import LineItemFilter
 from lineitems.forms import FundCenterLineItemUploadForm
@@ -245,28 +246,30 @@ def document_forecast(request, docno):
     return render(request, "lineitems/document-item-forecast-form.html", context)
 
 
-def costcenter_forecast(request, costcenter):
+def costcenter_forecast(request, costcenter_pk):
     context = {"back": "lineitem-page"}
-    context["costcenter"] = costcenter
+    context["costcenter_pk"] = costcenter_pk
+    costcenter = CostCenter.objects.get(pk=costcenter_pk)
     if request.method == "POST":
         form = CostCenterForecastForm(request.POST)
         if form.is_valid():
-            costcenter = request.POST.get("costcenter")
+            costcenter_pk = request.POST.get("costcenter_pk")
             forecast = request.POST.get("forecastamount")
-            lf = LineForecast().forecast_costcenter_lines(costcenter, float(forecast))
-            return redirect(reverse("lineitem-page") + f"?costcenter={costcenter}")
-    doc = LineItem.objects.filter(costcenter=costcenter)
+            LineForecast().forecast_costcenter_lines(costcenter_pk, float(forecast))
+            return redirect(reverse("lineitem-page") + f"?costcenter={costcenter_pk}")
+    doc = LineItem.objects.filter(costcenter=costcenter_pk)
     agg = doc.aggregate(Sum("workingplan"), Sum("spent"))
     agg["workingplan__sum"] = round(agg["workingplan__sum"], 2)
     agg["spent__sum"] = round(agg["spent__sum"], 2)
     form = CostCenterForecastForm(
         initial={
-            "costcenter": costcenter,
+            "costcenter_pk": costcenter_pk,
             "forecastamount": agg["workingplan__sum"],
         }
     )
     context["form"] = form
     context["agg"] = agg
+    context["costcenter"] = costcenter
     if doc.count() == 0:
         messages.warning(request, f"Requested cost center was not found : {costcenter} ")
     return render(request, "lineitems/costcenter-item-forecast-form.html", context)
