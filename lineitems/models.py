@@ -100,15 +100,29 @@ class LineItem(models.Model):
         ordering = ["-docno", "lineno"]
         verbose_name_plural = "Line Items"
 
-    def get_orphan_lines(self):
+    def get_orphan_lines(self, costcenter: str | CostCenter = None):
         """
         Compare the docno and lineno combination in both line item table and
-        encumbrance table.
+        encumbrance table.  When specifying costcenter, only the lines of the specified cost center will be considered.
         """
-        lines = set(LineItem.objects.values_list("docno", "lineno"))
+        if costcenter:
+            if isinstance(costcenter, str):
+                try:
+                    costcenter = CostCenter.objects.get(costcenter=costcenter.upper())
+                except CostCenter.DoesNotExist:
+                    return None
+            lines = set(LineItem.objects.filter(costcenter=costcenter).values_list("docno", "lineno"))
+        else:
+            lines = set(LineItem.objects.values_list("docno", "lineno"))
+
         enc = set(LineItemImport.objects.values_list("docno", "lineno"))
         orphans = lines.difference(enc)
-        logger.info(f"Found {len(orphans)} orphan lines.")
+
+        if costcenter:
+            logger.info(f"Found {len(orphans)} orphan lines for cost center {costcenter}.")
+        else:
+            logger.info(f"Found {len(orphans)} orphan lines considering all cost centers.")
+
         return orphans
 
     def mark_orphan_lines(self, orphans: set):
@@ -178,9 +192,6 @@ class LineItem(models.Model):
 
         count = LineItem.objects.all().update(status="old")
         logger.info(f"Set {count} lines to old.")
-
-        orphan = self.get_orphan_lines()
-        self.mark_orphan_lines(orphan)
 
         encumbrance = LineItemImport.objects.all()
         logger.info(f"Retreived {encumbrance.count()} encumbrance lines.")
@@ -265,9 +276,11 @@ class LineForecastManager(models.Manager):
         if lines:
             return lines.update(owner=new_owner)
 
-    def set_underforecasted(self) -> int:
+    def set_underforecasted(self, costcenter: CostCenter = None) -> int:
         """Adjust the forecast of line items to match the spent if the forecast is lower than the spent"""
         lines = LineForecast.objects.filter(lineitem__spent__gt=F("forecastamount"))
+        if costcenter:
+            lines = lines.filter(lineitem__costcenter=costcenter)
         maxlines = lines.count()
         logger.info(f"{maxlines} lines with spent greater than forecast.")
         for li in lines:
@@ -276,9 +289,11 @@ class LineForecastManager(models.Manager):
         logger.info(f"Forecasted to spent {affected} out of {maxlines} lines")
         return affected
 
-    def set_overforecasted(self) -> int:
+    def set_overforecasted(self, costcenter: CostCenter | str = None) -> int:
         """Adjust the forecast of line items to match the working plan if the forecast is highr than the working plan"""
         lines = LineForecast.objects.filter(lineitem__workingplan__lt=F("forecastamount"))
+        if costcenter:
+            lines = lines.filter(lineitem__costcenter=costcenter)
         maxlines = lines.count()
         logger.info(f"{maxlines} lines with working plan less than forecast.")
         for li in lines:
@@ -287,13 +302,15 @@ class LineForecastManager(models.Manager):
         logger.info(f"Forecasted to working plan {affected} out of {maxlines} lines")
         return affected
 
-    def set_encumbrance_history_record(self) -> int:
+    def set_encumbrance_history_record(self, costcenter: CostCenter = None) -> int:
         """Primarily used during line import, set the working plans, spent and balance values in the LineForecast model for historical purpose.  These will remain uneditable.
 
         Returns:
             int: Number of lines affected.
         """
         lines = LineItem.objects.filter(status="New")
+        if costcenter:
+            lines = lines.filter(costcenter=costcenter)
         maxlines = lines.count()
         logger.info(f"{maxlines} new lines need encumbrance record history to be set.")
         counter = 0

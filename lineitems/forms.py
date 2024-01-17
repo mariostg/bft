@@ -29,12 +29,14 @@ class LineForecastForm(forms.ModelForm):
 
 
 class DocumentNumberForm(forms.Form):
-    docno = forms.CharField(label="Document Number", max_length=24)
+    docno = forms.CharField(
+        label="Document Number", max_length=24, widget=forms.TextInput(attrs={"disabled": "disbled"})
+    )
     forecastamount = forms.DecimalField(label="Forecast Amount", max_digits=10, decimal_places=2)
 
 
 class CostCenterForecastForm(forms.Form):
-    costcenter = forms.CharField(label="Cost Center", max_length=6)
+    costcenter_pk = forms.CharField(label="Cost Center", widget=forms.HiddenInput())
     forecastamount = forms.DecimalField(label="Forecast Amount", max_digits=10, decimal_places=2)
 
 
@@ -71,8 +73,16 @@ class CostCenterLineItemUploadForm(UploadForm):
                 raise ValidationError(f"{cc} is not a direct descendant of {fc}", code="invalid")
 
     fundcenter = forms.CharField(
-        label="Fund center", max_length=6, initial=None, validators=[validate_fundcenter_exists]
+        label="Fund center",
+        max_length=6,
+        initial=None,
+        validators=[validate_fundcenter_exists],
+        help_text="Fund center must be direct parent of cost center.",
     )
     costcenter = forms.CharField(
-        label="cost center", max_length=6, initial=None, validators=[validate_costcenter_exists]
+        label="cost center",
+        max_length=6,
+        initial=None,
+        validators=[validate_costcenter_exists],
+        help_text="Cost center must be unique in encumbrance report.",
     )

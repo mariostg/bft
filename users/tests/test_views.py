@@ -10,6 +10,7 @@ class TestBftUserViews:
             "first_name": "Cardinal",
             "last_name": "Rouge",
             "email": "cardinal@forces.gc.ca",
+            "password": "HelloYou!!",
         }
         response = Client().post("/users/user-add/", data=data)
         assert response.status_code == 302

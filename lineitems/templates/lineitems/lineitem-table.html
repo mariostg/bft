@@ -96,12 +96,6 @@
                     {% endif %}
 
                     <a class="btn btn--link-small" href="{% url 'line-forecast-update' line.fcst.id %}">Form input</a>
-
-                    {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
-                    <a class="btn btn-delete"
-                        href="{% url 'line-forecast-delete' line.fcst.id %}" ></a >
-                    {% endif %}
-
                 </div>
 
             </div>

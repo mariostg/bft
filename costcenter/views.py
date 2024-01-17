@@ -133,7 +133,15 @@ def source_update(request, pk):
 def source_delete(request, pk):
     source = Source.objects.pk(pk)
     if request.method == "POST":
-        source.delete()
+        try:
+            source.delete()
+        except RestrictedError as e:
+            msg = e.args[0].split(":")[0] + " : "
+            fkeys = []
+            for fk in e.restricted_objects:
+                fkeys.append(fk.costcenter)
+            msg = msg + ", ".join(fkeys)
+            messages.warning(request, msg)
         return redirect("source-table")
     context = {"object": source, "back": "source-table"}
     return render(request, "core/delete-object.html", context)

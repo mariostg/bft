@@ -35,7 +35,7 @@ class TestLineItemManager:
 
     def test_line_item_dataframe_single_doctype(self, populate, upload):
         df = LineItemManager().line_item_dataframe(doctype="co")
-        assert 2 == len(df)
+        assert 3 == len(df)
         assert "Lineitem_ID" in df.columns
         assert "Costcenter_ID" in df.columns
 
@@ -60,7 +60,7 @@ class TestLineItemManager:
 
     def test_line_item_detailed_dataframe_single_doctype(self, populate, upload):
         df = LineItemManager().line_item_detailed_dataframe(doctype="co")
-        assert 2 == len(df)
+        assert 3 == len(df)
         assert "Lineitem_ID" in df.columns
         assert "Costcenter_ID" in df.columns
 
