@@ -78,7 +78,15 @@ def fund_update(request, pk):
 def fund_delete(request, pk):
     fund = Fund.objects.get(id=pk)
     if request.method == "POST":
-        fund.delete()
+        try:
+            fund.delete()
+        except RestrictedError as e:
+            msg = e.args[0].split(":")[0] + " : "
+            fkeys = []
+            for fk in e.restricted_objects:
+                fkeys.append(fk.costcenter)
+            msg = msg + ", ".join(fkeys)
+            messages.warning(request, msg)
         return redirect("fund-table")
     context = {"object": fund, "back": "fund-table"}
     return render(request, "core/delete-object.html", context)
@@ -229,7 +237,12 @@ def fundcenter_delete(request, pk):
         try:
             fundcenter.delete()
         except RestrictedError as e:
-            messages.error(request, e)
+            msg = e.args[0].split(":")[0] + " : "
+            fkeys = []
+            for fk in e.restricted_objects:
+                fkeys.append(fk.fundcenter_parent.fundcenter)
+            msg = msg + ", ".join(fkeys)
+            messages.warning(request, msg)
         return redirect("fundcenter-table")
     context = {"object": fundcenter, "back": "fundcenter-table"}
     return render(request, "core/delete-object.html", context)
