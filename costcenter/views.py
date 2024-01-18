@@ -521,7 +521,9 @@ def costcenter_allocation_upload(request):
             ap.main(request)
     else:
         form = CostCenterAllocationUploadForm
-    return render(request, "core/form-upload.html", {"form": form, "form_title": "Cost Centers Upload"})
+    return render(
+        request, "core/form-upload.html", {"form": form, "form_title": "Cost Center Allocation Upload"}
+    )
 
 
 def forecast_adjustment_page(request):
