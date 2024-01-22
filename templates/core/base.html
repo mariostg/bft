@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="{% static 'styles/all.css' %}" />
     {% block extracss %}{% endblock extracss %}
     <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js'%}" ></script>
+
     <title>
     {% block title %}Business Forecasting Tool{% endblock title %}
     </title>
@@ -29,12 +30,18 @@
 
 </html>
 <script>
-    $(document).ready(function(){
+    {% comment %} $(document).ready(function(){
         window.setTimeout(function() {
             $(".alert").fadeTo(500, 0).slideUp(500, function(){
                 $(this).remove();
             });
         }, 5000);
-    });
+    }); {% endcomment %}
+
+    var alerts = document.querySelector('.alert')
+    alerts.addEventListener('click',(event)=>{alerts.remove()})
+
+
+
 </script>
 {% block extrajs %}{% endblock extrajs %}
