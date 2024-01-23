@@ -119,7 +119,7 @@ def allocation_status_report(request):
         request (HtpRequest): _description_
 
     Returns:
-        HttpResponse: Content to display the Allocation Status Report
+        Content to display the Allocation Status Report
     """
 
     fundcenter = fund = fy = quarter = ""

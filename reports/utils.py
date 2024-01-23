@@ -214,7 +214,6 @@ class CostCenterScreeningReport:
 
         Args:
             fundcenter (str): Parent Fund center.
-            costcenter (str): Cost center.
             fund (str): Fund.
             doctype (str, optional): Document Type. Defaults to None.
 

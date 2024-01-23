@@ -321,8 +321,6 @@ def fundcenter_allocation_upload(request):
     Args:
         request (HttpRequest): _description_
 
-    Returns:
-        _type_: _description_
     """
     if request.method == "POST":
         form = FundCenterAllocationUploadForm(request.POST, request.FILES)
@@ -503,8 +501,6 @@ def costcenter_allocation_upload(request):
     Args:
         request (HttpRequest): _description_
 
-    Returns:
-        _type_: _description_
     """
     if request.method == "POST":
         form = CostCenterAllocationUploadForm(request.POST, request.FILES)

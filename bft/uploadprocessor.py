@@ -667,7 +667,7 @@ class LineItemProcessor(UploadProcessor):
         """
         if line == "" or len(line) < 2:
             return False
-        if len(line) > 0 and re.search("^\|[A-Z0-9 ]{10}\|[\s\d]{10}\|", line):
+        if len(line) > 0 and re.search(r"^\|[A-Z0-9 ]{10}\|[\s\d]{10}\|", line):
             return True
 
         return False

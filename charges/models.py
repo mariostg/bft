@@ -49,7 +49,7 @@ class CostCenterChargeMonthlyManager(models.Manager):
         res = CostCenterChargeMonthly.objects.filter(fy=fy, period=period).delete()
         return res[0]
 
-    def insert_current(self, fy, period):
+    def insert_current(self, fy, period) -> int:
         """Insert in the monthly cost center charges table lines taken from charges import.  Insert selection is executed based on the provided fy and period equals to or less than provided period.  This is to ensure there is a rollup of charges on a monthly basis.
 
         Returns:
