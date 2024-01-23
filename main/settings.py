@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     "bft.apps.BftConfig",
     "costcenter.apps.CostcenterConfig",
     "lineitems.apps.LineitemsConfig",
-    "encumbrance.apps.EncumbranceConfig",
     "reports.apps.ReportsConfig",
     "charges.apps.ChargesConfig",
     "users.apps.UsersConfig",
