@@ -1,0 +1,4 @@
+costcenter_parent,costcenter,shortname,isforecastable,isupdatable,source,fund
+2184A3,8484WA,Basement,True,False,Ammo,C113
+2184A3,8484XA,Kitchen,True,True,Ammo,C113
+2184A3,8484YA,cellar,False,True,Ammo,C113

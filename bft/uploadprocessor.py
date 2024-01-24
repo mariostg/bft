@@ -96,9 +96,7 @@ class AllocationProcessor(UploadProcessor):
             )
             raise ValueError("FY request does not match dataset")
         else:
-            logger.info(
-                f"Validated FY match for allocation upload by {self.user.username}, {self.fy}, {self.quarter}"
-            )
+            logger.info(f"Validated FY match for allocation upload, {self.fy}, {self.quarter}")
 
     def _check_quarter(self, data: pd.Series):
         """Make sure all quarter are unique.  Make sure the quarter is in QUARTERKEYS. Make sure the unique quarter in the uploaded file matches the form request.
@@ -112,7 +110,7 @@ class AllocationProcessor(UploadProcessor):
             ValueError: Raised if quarter does not match form request.
         """
         if self.quarter not in QUARTERKEYS:
-            msg = f"Invalid quarter {self.quarter}, expected one of {QUARTERKEYS}. {self.user.username}"
+            msg = f"Invalid quarter {self.quarter}, expected one of {QUARTERKEYS}."
             logger.error(msg)
             raise ValueError(msg)
 
@@ -123,13 +121,11 @@ class AllocationProcessor(UploadProcessor):
             logger.error(msg)
             raise ValueError(msg)
         elif int(quarters[0]) != int(self.quarter):
-            msg = f"Error allocation upload by {self.user.username}, Quarter data does not match request ({quarters[0]} does not match {self.quarter})"
+            msg = f"Error allocation upload. Quarter data does not match request ({quarters[0]} does not match {self.quarter})"
             logger.error(msg)
             raise ValueError(msg)
         else:
-            logger.info(
-                f"Validated Quarter match for allocation upload by {self.user.username}, {self.fy}, {self.quarter}"
-            )
+            logger.info(f"Validated Quarter match for allocation upload, {self.fy}, {self.quarter}")
 
     def _check_amount(self, data: pd.Series):
         """Make sure all amounts are either int of float and that amounts are greater that zero
@@ -197,6 +193,7 @@ class FundCenterAllocationProcessor(AllocationProcessor):
                     messages.error(request, err)
                 return
         _dict = self.as_dict(df)
+        counter = 0
         for item in _dict:
             item["fund"] = FundManager().fund(item["fund"])
             item["fundcenter"] = FundCenterManager().fundcenter(item["fundcenter"])
@@ -204,11 +201,19 @@ class FundCenterAllocationProcessor(AllocationProcessor):
             alloc = FundCenterAllocation(**item)
             try:
                 alloc.save()
+                counter += 1
+                logger.info(f"Uploaded fund center allocation {alloc.fundcenter} - ${alloc.amount}.")
             except IntegrityError as err:
                 msg = f"Saving fund center allocation {item} generates {err}"
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
+        if counter:
+            msg = f"{counter} fund center allocation(s) have been uploaded."
+            if request:
+                messages.info(request, msg)
+            else:
+                print(msg)
 
 
 class CostCenterAllocationProcessor(AllocationProcessor):
@@ -251,6 +256,7 @@ class CostCenterAllocationProcessor(AllocationProcessor):
                     messages.error(request, err)
                 return
         _dict = self.as_dict(df)
+        counter = 0
         for item in _dict:
             item["fund"] = FundManager().fund(item["fund"])
             item["costcenter"] = CostCenterManager().cost_center(item["costcenter"])
@@ -258,11 +264,19 @@ class CostCenterAllocationProcessor(AllocationProcessor):
             alloc = CostCenterAllocation(**item)
             try:
                 alloc.save()
+                counter += 1
+                logger.info(f"Uploaded cost center allocation {alloc.costcenter} - ${alloc.amount}.")
             except IntegrityError as err:
                 msg = f"Saving cost center allocation {item} generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
+        if counter:
+            msg = f"{counter} cost center allocation(s) have been uploaded."
+            if request:
+                messages.info(request, msg)
+            else:
+                print(msg)
 
 
 class FundProcessor(UploadProcessor):
@@ -299,13 +313,18 @@ class FundProcessor(UploadProcessor):
             try:
                 fund.save()
                 counter += 1
+                logger.info(f"Uploaded Fund {fund.fund}.")
             except IntegrityError as err:
                 msg = f"Saving fund {item} generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
         if counter:
-            messages.info(request, f"{counter} item(s) have been recorded.")
+            msg = f"{counter} funds(s) have been uploaded."
+            if request:
+                messages.info(request, msg)
+            else:
+                print(msg)
 
 
 class SourceProcessor(UploadProcessor):
@@ -341,13 +360,18 @@ class SourceProcessor(UploadProcessor):
             try:
                 source.save()
                 counter += 1
+                logger.info(f"Uploaded Source {source.source}.")
             except IntegrityError as err:
                 msg = f"Saving source {item} generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
         if counter:
-            messages.info(request, f"{counter} item(s) have been recorded.")
+            msg = f"{counter} sources(s) have been uploaded."
+            if request:
+                messages.info(request, msg)
+            else:
+                print(msg)
 
 
 class FundCenterProcessor(UploadProcessor):
@@ -387,13 +411,18 @@ class FundCenterProcessor(UploadProcessor):
             try:
                 item_obj.save()
                 counter += 1
+                logger.info(f"Uploaded fund center {item_obj.fundcenter}.")
             except IntegrityError as err:
                 msg = f"Saving fund center {item}  generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
         if counter:
-            messages.info(request, f"{counter} item(s) have been recorded.")
+            msg = f"{counter} fund center(s) have been uploaded."
+            if request:
+                messages.info(request, msg)
+            else:
+                print(msg)
 
 
 class CostCenterProcessor(UploadProcessor):
@@ -473,13 +502,18 @@ class CostCenterProcessor(UploadProcessor):
             try:
                 item_obj.save()
                 counter += 1
+                logger.info(f"Uploaded cost center {item_obj.costcenter}.")
             except IntegrityError as err:
                 msg = f"Saving cost center {item} generates {err}"
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
         if counter:
-            messages.info(request, f"{counter} item(s) have been recorded.")
+            msg = f"{counter} cost center(s) have been uploaded."
+            if request:
+                messages.info(request, msg)
+            else:
+                print(msg)
 
 
 class LineItemProcessor(UploadProcessor):

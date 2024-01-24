@@ -19,7 +19,7 @@ from lineitems.models import LineForecast, LineItem
 from bft.models import BftStatus, BftStatusManager
 from users.models import BftUser
 
-from bft import finstructure
+from bft import finstructure, uploadprocessor
 
 
 class Command(BaseCommand):
@@ -52,91 +52,16 @@ class Command(BaseCommand):
             print("This capability is only available when DEBUG is True")
 
     def set_fund(self):
-        df = pd.read_csv("drmis_data/funds.csv")
-        items = df.to_dict("records")
-        for item in items:
-            try:
-                found = Fund.objects.get(fund=item["fund"])
-                if found:
-                    print(f"Fund {found} exists")
-            except Fund.DoesNotExist:
-                new_item = Fund.objects.create(**item)
-                print(f"Created fund {new_item}")
+        uploadprocessor.FundProcessor("test-data/funds.csv", None).main()
 
     def set_source(self):
-        items = [
-            {"source": "Kitchen"},
-            {"source": "Army"},
-            {"source": "O&M"},
-            {"source": "Ammo"},
-            {"source": "Capital Program"},
-            {"source": "Common"},
-            {"source": "Disposal"},
-            {"source": "Unknown"},
-        ]
-
-        for item in items:
-            try:
-                found = Source.objects.get(source=item["source"])
-                if found:
-                    print(f"Source {found} exists")
-            except Source.DoesNotExist:
-                new_item = Source.objects.create(**item)
-                print(f"Created Source {new_item}")
+        uploadprocessor.SourceProcessor("test-data/source.csv", None).main()
 
     def set_fund_center(self):
-        df = pd.read_csv("drmis_data/fundcenters-test.csv")
-        df = df.replace(np.nan, None)
-        df["shortname"] = df["shortname"].apply(lambda x: x.strip())
-        items = df.to_dict("records")
-        for item in items:
-            print("ITEM", item)
-            found = FundCenterManager().fundcenter(item["fundcenter"])
-            if found:
-                print(f"Fund Center {found} exists")
-            else:
-                parent = item["fundcenter_parent"]
-                if parent:
-                    item["fundcenter_parent"] = FundCenterManager().fundcenter(item["fundcenter_parent"])
-                new_item = FundCenter.objects.create(**item)
-                print(f"Created Fund Center {new_item}")
+        uploadprocessor.FundCenterProcessor("test-data/fundcenters.csv", None).main()
 
     def set_cost_center(self):
-        df = pd.read_csv("drmis_data/costcenters-test.csv")
-        df.loc[df.isupdatable.eq(-1), "isupdatable"] = True
-        df.loc[df.isupdatable.ne(True), "isupdatable"] = False
-        df.loc[df.isforecastable.eq(-1), "isforecastable"] = True
-        df.loc[df.isforecastable.ne(True), "isforecastable"] = False
-        df.loc[df.fund.eq("----"), "fund"] = "L101"
-        df["shortname"] = df["shortname"].apply(lambda x: x.strip())
-        for f in df["fund"].unique():
-            try:
-                Fund.objects.get(fund=f)
-            except Fund.DoesNotExist:
-                print(f"Fund {f} not found.  Cannot set cost centers")
-                exit()
-
-        for f in df["costcenter_parent"].unique():
-            try:
-                FundCenter.objects.get(fundcenter=f)
-            except FundCenter.DoesNotExist:
-                print(f"Fund Center {f} not found.  Cannot set cost centers")
-                exit()
-
-        items = df.to_dict("records")
-        for item in items:
-            fund = item["fund"]
-            source = item["source"]
-            cc_parent = item["costcenter_parent"]
-            item["fund"] = Fund.objects.fund(fund)
-            item["source"] = Source.objects.source(source)
-            item["costcenter_parent"] = FundCenterManager().fundcenter(cc_parent)
-            found = CostCenterManager().cost_center(item["costcenter"])
-            if found:
-                print(f"Cost Center {found} exists")
-            else:
-                new_item = CostCenter.objects.create(**item)
-                print(f"Created Cost Center {new_item}")
+        uploadprocessor.CostCenterProcessor("test-data/costcenters.csv", None).main()
 
     def set_bft_status(self):
         bs = BftStatus()
@@ -156,29 +81,11 @@ class Command(BaseCommand):
         print(f"Set Period to {BftStatusManager().period()}")
 
     def set_fund_center_allocation(self):
-        root_fundcenter = "2184DA"
-        fy = 2023
-        quarter = "1"
-
-        root_fc = FundCenterManager().fundcenter(root_fundcenter)
-        fund = FundManager().fund("C113")
-
-        a = FundCenterAllocation.objects.create(
-            fundcenter=root_fc, amount=1000, fy=fy, quarter=quarter, fund=fund
-        )
-        print("Created Allocation", a)
-        a = FundCenterAllocation.objects.create(
-            fundcenter=FundCenterManager().fundcenter("2184A3"), amount=500, fy=fy, quarter=quarter, fund=fund
-        )
-        print("Created Allocation", a)
+        uploadprocessor.FundCenterAllocationProcessor(
+            "test-data/fundcenter-allocations.csv", 2023, "1", None
+        ).main()
 
     def set_cost_center_allocation(self):
-        fund = Fund.objects.fund("C113")
-
-        cc = CostCenter.objects.cost_center("8484WA")
-        a = CostCenterAllocation.objects.create(costcenter=cc, fund=fund, fy=2023, quarter="1", amount=1000)
-        print("Created Allocation", a)
-
-        cc = CostCenter.objects.cost_center("8484XA")
-        a = CostCenterAllocation.objects.create(costcenter=cc, fund=fund, fy=2023, quarter="1", amount=250)
-        print("Created Allocation", a)
+        uploadprocessor.CostCenterAllocationProcessor(
+            "test-data/costcenter-allocations.csv", 2023, "1", None
+        ).main()
