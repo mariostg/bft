@@ -223,7 +223,6 @@ class CostCenterScreeningReport:
         lines = LineItem.objects.all()
         fc = FundCenter.objects.get(fundcenter=fundcenter.upper())
         path = fc.sequence
-        ccs = list(CostCenter.objects.filter(sequence__startswith=path).values_list("costcenter", flat=True))
         ccs = CostCenter.objects.filter(sequence__startswith=path)
         lines = lines.filter(costcenter__in=ccs)
         lines = lines.filter(fund=fund.upper())
