@@ -20,7 +20,7 @@ class TestCostCenterManager:
         parent = FundCenter.objects.create(**fc)
         fund = {"fund": "C113"}
         fund = Fund.objects.create(**fund)
-        source = Source.objects.create(**{"source": "kitchen"})
+        source = Source.objects.create(**{"source": "Basement"})
         cc = {
             "costcenter": "8484ZZ",
             "shortname": "bedroom",

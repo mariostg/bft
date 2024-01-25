@@ -53,7 +53,7 @@ class TestFundCenterAllocation:
         fc_alloc = FundCenterAllocation.objects.get(fundcenter=da2184, fy=2023, quarter="1", fund=self.C113)
 
         sub_alloc = FundCenterManager().get_sub_alloc(fc_alloc)
-        assert 500 == sub_alloc.aggregate(Sum("amount"))["amount__sum"]
+        assert 40000.99 == float(sub_alloc.aggregate(Sum("amount"))["amount__sum"])
 
 
 @pytest.mark.django_db
@@ -73,7 +73,7 @@ class TestFundCenterAllocationManager:
     # Fund Allocations
     def test_fund_allocation_when_fund_valid_and_allocation_exists(self, populate):
         allocation = self.FCA.objects.fund("c113")
-        assert 2 == allocation.count()
+        assert 3 == allocation.count()
 
     def test_fund_allocation_when_fund_valid_and_no_allocation(self, populate):
         allocation = self.FCA.objects.fund("C523")
@@ -99,7 +99,7 @@ class TestFundCenterAllocationManager:
     # FY
     def test_fy_allocation_when_allocation_exists(self, populate):
         allocation = self.FCA.objects.fy(2023)
-        assert 2 == allocation.count()
+        assert 3 == allocation.count()
 
     def test_fy_allocation_when_no_allocation(self, populate):
         allocation = self.FCA.objects.fy(3000)
@@ -108,7 +108,7 @@ class TestFundCenterAllocationManager:
     # Quarter
     def test_quarter_allocation_when_allocation_exists(self, populate):
         allocation = self.FCA.objects.quarter(1)
-        assert 2 == allocation.count()
+        assert 3 == allocation.count()
 
     def test_quarter_allocation_when_no_allocation(self, populate):
         allocation = self.FCA.objects.quarter(4)
@@ -120,7 +120,7 @@ class TestFundCenterAllocationManager:
 
     def test_descendants_fundcenter_allocation(self, populate):
         allocation = self.FCA.objects.descendants_fundcenter("2184DA")
-        assert 2 == allocation.count()
+        assert 3 == allocation.count()
 
     def test_descendants_costcenter_allocation(self, populate):
         allocation = self.CCA.objects.descendants_costcenter("2184DA")

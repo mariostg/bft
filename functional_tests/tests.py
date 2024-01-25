@@ -87,7 +87,7 @@ class CostElementSourceFormTest(StaticLiveServerTestCase):
 
         # input the fund information
         fundbox = self.browser.find_element(By.ID, "id_source")
-        fundbox.send_keys("Kitchen")
+        fundbox.send_keys("Basement")
         fundbox.send_keys(Keys.TAB)
         fundbox.send_keys(Keys.ENTER)
 
@@ -152,9 +152,7 @@ class CostElementFundCenterFormTest(StaticLiveServerTestCase):
         # Mario notices the page title and Form mention Create Fund
         self.assertIn("Fund Center Form", self.browser.title)
         form_header = self.browser.find_element(By.CLASS_NAME, "form__header").text
-        self.assertIn(
-            "Fund Center Entry Form", form_header, "\nFund Center form not found"
-        )
+        self.assertIn("Fund Center Entry Form", form_header, "\nFund Center form not found")
 
     def test_can_input_and_save_fund(self):
         # Need to add a new fund, visit the fund form page
@@ -162,10 +160,10 @@ class CostElementFundCenterFormTest(StaticLiveServerTestCase):
 
         # input the fund information
         fundbox = self.browser.find_element(By.ID, "id_fundcenter")
-        fundbox.send_keys("0000rr")
+        fundbox.send_keys("Basement")
         fundbox.send_keys(Keys.TAB)
         fundbox = self.browser.find_element(By.ID, "id_shortname")
-        fundbox.send_keys("kitchen")
+        fundbox.send_keys("Basement")
         fundbox.send_keys(Keys.TAB)
         fundbox.send_keys(Keys.ENTER)
 

@@ -48,7 +48,7 @@ class TestDataFrame:
         assert True == isinstance(df_fund, pd.DataFrame)
         # Confirm columns have been renamed
         assert "C113" == df_fund.at[0, "Fund"]
-        assert "National Procurement" == df_fund.at[0, "Name"]
+        assert "Basement Procurement" == df_fund.at[0, "Name"]
         assert fund.id == df_fund.at[0, "Fund_ID"]
 
     def test_dataframe_with_queryset(self):

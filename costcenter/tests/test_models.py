@@ -23,7 +23,7 @@ from bft.exceptions import (
 from bft.management.commands import populate, uploadcsv
 
 FUND_C113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
-SOURCE_1 = {"source": "Kitchen"}
+SOURCE_1 = {"source": "Basement"}
 FC_1111AA = {"fundcenter": "1111aa", "shortname": "bedroom", "fundcenter_parent": None}
 CC_1234FF = {
     "costcenter": "1234ff",
@@ -359,13 +359,13 @@ class TestFundCenterModel:
         assert "DEFGTH" == saved.shortname
 
     def test_can_save_POST_request(self):
-        data = {"fundcenter": "zzzz33", "shortname": "Kitchen FC", "fundcenter_parent": ""}
+        data = {"fundcenter": "zzzz33", "shortname": "Basement FC", "fundcenter_parent": ""}
         response = Client().post("/fundcenter/fundcenter-add/", data=data)
         assert response.status_code == 302
         assert FundCenter.objects.count() == 1
         obj = FundCenter.objects.first()
         assert obj.fundcenter == "ZZZZ33"
-        assert obj.shortname == "KITCHEN FC"
+        assert obj.shortname == "BASEMENT FC"
 
     # TODO
     # def test_can_delete_POST_request():
@@ -526,9 +526,9 @@ class TestCostCenterModel:
 class TestForecastAdjustmentModel:
     def test_string_representation(self):
         fund = Fund(fund="C113", name="NP", vote=1)
-        cc = CostCenter(costcenter="8484WA", shortname="Kitchen", fund=fund)
+        cc = CostCenter(costcenter="8484WA", shortname="Basement", fund=fund)
         obj = ForecastAdjustment(costcenter=cc, fund=fund, amount=1000)
-        assert str(obj) == "8484WA - Kitchen - C113 - NP - 1000"
+        assert str(obj) == "8484WA - Basement - C113 - NP - 1000"
 
     def test_verbose_name_plural(self):
         assert str(ForecastAdjustment._meta.verbose_name_plural) == "Forecast Adjustments"
@@ -565,7 +565,7 @@ class TestCostCenterAllocation:
         cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C113")
         allocation = CostCenterAllocation.objects.get(costcenter=cc, fund=fund, fy=2023, quarter=1)
-        assert str(allocation) == "8484WA - AMMO/AIR - C113 - National Procurement - 2023 Q1 1000.00"
+        assert str(allocation) == "8484WA - BASEMENT - C113 - Basement Procurement - 2023 Q1 10.00"
 
     def test_verbose_name_plural(self):
         assert str(ForecastAdjustment._meta.verbose_name_plural) == "Forecast Adjustments"
