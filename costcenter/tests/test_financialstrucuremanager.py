@@ -149,7 +149,7 @@ class TestFinancialStructureManager:
     def test_sequence_on_create_cost_center_under_level_2(self, populate):
         parent = FundCenterManager().fundcenter("2184AA")
         fund = FundManager().fund("C113")
-        source = SourceManager().source("Kitchen")
+        source = SourceManager().source("Basement")
         cc = {"costcenter": "2222zz", "fund": fund, "source": source, "costcenter_parent": parent}
         costcenter = CostCenter.objects.create(**cc)
         assert "1.1.1.0.1" == costcenter.sequence
