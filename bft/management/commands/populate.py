@@ -10,19 +10,13 @@ Populate command uses the data available from the test-data folder.  This folder
     populate command is only available in DEBUG mode.  It will overwrite all existing data in the system.
 
 """
-import os
-from django.core.management.base import BaseCommand, CommandError
-from main.settings import BASE_DIR, DEBUG
-import pandas as pd
-import numpy as np
+from django.core.management.base import BaseCommand
+from main.settings import DEBUG
 from costcenter.models import (
     Fund,
-    FundManager,
     Source,
     CostCenter,
-    CostCenterManager,
     FundCenter,
-    FundCenterManager,
     FundCenterAllocation,
     CostCenterAllocation,
 )
@@ -31,7 +25,7 @@ from lineitems.models import LineForecast, LineItem
 from bft.models import BftStatus, BftStatusManager
 from users.models import BftUser
 
-from bft import finstructure, uploadprocessor
+from bft import uploadprocessor
 
 
 class Command(BaseCommand):
