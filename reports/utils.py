@@ -245,7 +245,7 @@ class CostCenterScreeningReport:
         line_dict = {}
         for item in lines:
             d = {
-                # "Cost Center": item["costcenter__costcenter"],
+                "Cost Element": item["costcenter__costcenter"],
                 "Costcenter_ID": item["costcenter"],
                 "Working Plan": item["Working_plan"],
                 "Spent": item["Spent"],

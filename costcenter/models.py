@@ -525,8 +525,12 @@ class FinancialStructureManager(models.Manager):
         )
         return data
 
-    def CostCenters(self):
-        pass
+    def CostCenters(self, fundcenter: "str|FundCenter"):
+        if isinstance(fundcenter, str):
+            fundcenter = FundCenterManager().fundcenter(fundcenter)
+        if fundcenter:
+            return CostCenter.objects.filter(sequence__startswith=fundcenter.sequence)
+        return None
 
     def all(self):
         pass
