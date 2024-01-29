@@ -846,7 +846,7 @@ class LineItemProcessor(UploadProcessor):
             return False
         return True
 
-    def main(self) -> bool:
+    def _do_preliminary_checks(self) -> bool:
         logger.info(f"Begin Upload processing by {self.user}")
         if not self._set_data():
             logger.warn("Failed to set data")
@@ -870,6 +870,12 @@ class LineItemProcessor(UploadProcessor):
             return False
 
         if self.missing_costcenters():
+            return False
+
+        return True
+
+    def main(self) -> bool:
+        if not self._do_preliminary_checks():
             return False
 
         self.csv2table()
