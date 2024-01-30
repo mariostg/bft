@@ -350,7 +350,6 @@ class LineForecast(models.Model):
     )
     updated = models.DateTimeField(auto_now=True, null=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
-    status = models.CharField(max_length=10, default="", blank=True, null=True)
 
     def __str__(self):
         text = ""

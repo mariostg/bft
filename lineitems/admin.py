@@ -34,7 +34,6 @@ class LineForecastAdmin(admin.ModelAdmin):
         "buyer",
         "updated",
         "created",
-        "status",
         "owner",
     )
 
