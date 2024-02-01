@@ -45,18 +45,72 @@ class TestLineItemManager:
 
     def test_line_item_detailed_dataframe(self, populate, upload):
         li_df = LineItemManager().line_item_detailed_dataframe()
-        assert "Lineitem_ID" in li_df.columns
-        assert "Costcenter_ID" in li_df.columns
-        assert "Cost Center" in li_df.columns
-        assert "Fund Center" in li_df.columns
-        assert "Costcenter_ID" in li_df.columns
-        assert "Fundcenter_ID" in li_df.columns
-        assert "Source_ID" in li_df.columns
-        assert "Fund_ID" in li_df.columns
-        assert "Forecast" in li_df.columns
+        print(li_df.columns)
         assert "int" == li_df.dtypes.Spent
         assert "int" == li_df.dtypes.Forecast
-        assert 0 < len(li_df)
+        expected_columns = [
+            "Lineitem_ID",
+            "Docno",
+            "Lineno",
+            "Spent",
+            "Balance",
+            "Workingplan",
+            "Fundcenter",
+            "Fund",
+            "Costcenter_ID",
+            "Internalorder",
+            "Doctype",
+            "Enctype",
+            "Linetext",
+            "Predecessordocno",
+            "Predecessorlineno",
+            "Reference",
+            "Gl",
+            "Duedate",
+            "Vendor",
+            "Createdby",
+            "Status",
+            "Fcintegrity",
+            "CO",
+            "PC",
+            "FR",
+            "Lineforecast_ID",
+            "Forecast",
+            "spent initial",
+            "balance initial",
+            "workingplan initial",
+            "Description",
+            "Comment",
+            "Delivery Date",
+            "Delivered",
+            "Buyer",
+            "Owner_ID",
+            "Updated",
+            "Created",
+            "Cost Center",
+            "Cost Center Name",
+            "Fund_ID",
+            "Source_ID",
+            "Is Forecastable",
+            "Is Updatable",
+            "Note",
+            "CC Path",
+            "Costcenter_parent_ID",
+            "Procurement_officer_ID",
+            "Fundcenter_ID",
+            "Fund Center",
+            "Fund Center Name",
+            "FC Path",
+            "Level",
+            "Fundcenter_parent_ID",
+        ]
+
+        columns_found = li_df.columns
+
+        for c in expected_columns:
+            assert c in columns_found
+        for c in columns_found:
+            assert c in expected_columns
 
     def test_line_item_detailed_dataframe_single_doctype(self, populate, upload):
         df = LineItemManager().line_item_detailed_dataframe(doctype="co")
