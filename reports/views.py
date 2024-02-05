@@ -69,7 +69,10 @@ def bmt_screening_report(request):
     }
 
     if query_string and (has_cc_allocation or has_fc_allocation):
-        sr = screeningreport.ScreeningReport("2184da", "c113", fy, quarter)
+        fund = FundManager().fund(fund)
+        fundcenter = FundCenterManager().fundcenter(fundcenter)
+    if fundcenter and fund:
+        sr = screeningreport.ScreeningReport(fundcenter, fund, fy, quarter)
         sr.main()
         table = sr.html()
 

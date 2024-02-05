@@ -6,6 +6,7 @@ from django.db.models import Sum
 from costcenter.models import (
     FundCenterManager,
     FundManager,
+    Fund,
     FundCenter,
     CostCenter,
     CostCenterAllocation,
@@ -21,9 +22,9 @@ def caster(value):
 
 
 class ScreeningReport:
-    def __init__(self, top_fc: str, fund: str, fy: int, quarter: int):
-        self.top_fc = FundCenterManager().fundcenter(top_fc)
-        self.fund = FundManager().fund(fund)
+    def __init__(self, top_fc: FundCenter, fund: Fund, fy: int, quarter: int):
+        self.top_fc = top_fc
+        self.fund = fund
         self.fy = fy
         self.quarter = quarter
 
@@ -48,7 +49,7 @@ class ScreeningReport:
 
         lines = LineItem.objects.filter(costcenter__in=self.cc_children, fund=self.fund.fund)
         if len(lines) == 0:
-            return None
+            return pd.DataFrame
         lines = lines.values(*line_fields).annotate(
             Spent=caster(Sum("spent")),
             Balance=caster(Sum("balance")),
