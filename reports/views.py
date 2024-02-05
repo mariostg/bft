@@ -21,6 +21,7 @@ from charges.models import CostCenterChargeMonthly
 from reports.forms import SearchAllocationAnalysisForm, SearchCostCenterScreeningReportForm
 from bft.models import BftStatus
 from bft.conf import QUARTERKEYS
+from bft.exceptions import LineItemsDoNotExistError
 from utils.getrequestfilter import set_query_string
 
 
@@ -73,8 +74,12 @@ def bmt_screening_report(request):
         fundcenter = FundCenterManager().fundcenter(fundcenter)
     if fundcenter and fund:
         sr = screeningreport.ScreeningReport(fundcenter, fund, fy, quarter)
-        sr.main()
-        table = sr.html()
+        try:
+            sr.main()
+            table = sr.html()
+        except LineItemsDoNotExistError:
+            messages.warning(request, f"No lines items found for {fund} and {fundcenter}")
+            table = ""
 
     form = SearchCostCenterScreeningReportForm(initial=initial)
     context = {
