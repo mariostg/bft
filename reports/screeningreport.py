@@ -5,6 +5,7 @@ from django.db.models import IntegerField
 from django.db.models import Sum
 from costcenter.models import (
     FundCenterManager,
+    FundManager,
     FundCenter,
     CostCenter,
     CostCenterAllocation,
@@ -22,7 +23,7 @@ def caster(value):
 class ScreeningReport:
     def __init__(self, top_fc: str, fund: str, fy: int, quarter: int):
         self.top_fc = FundCenterManager().fundcenter(top_fc)
-        self.fund = fund.upper()
+        self.fund = FundManager().fund(fund)
         self.fy = fy
         self.quarter = quarter
 
@@ -33,6 +34,7 @@ class ScreeningReport:
         self.fcst_adj = pd.DataFrame
         self.allocations_without_encumbrance = pd.DataFrame  # Keep track for reporting purposes
         self.line_item_with_allocations = None
+        self.report = pd.DataFrame
         self.grand_total = pd.DataFrame
 
     def get_lineitems_grouping(self) -> pd.DataFrame:
@@ -44,7 +46,7 @@ class ScreeningReport:
             "costcenter__costcenter",
         ]
 
-        lines = LineItem.objects.filter(costcenter__in=self.cc_children, fund=self.fund)
+        lines = LineItem.objects.filter(costcenter__in=self.cc_children, fund=self.fund.fund)
         if len(lines) == 0:
             return None
         lines = lines.values(*line_fields).annotate(
@@ -72,7 +74,7 @@ class ScreeningReport:
         ]
         costcenters = CostCenter.objects.filter(sequence__startswith=self.top_fc.sequence)
         allocations = CostCenterAllocation.objects.filter(
-            costcenter__in=costcenters, fy=self.fy, quarter=self.quarter
+            costcenter__in=costcenters, fy=self.fy, quarter=self.quarter, fund=self.fund
         ).values(*allocation_fields)
         df = pd.DataFrame(allocations)
         df = df.rename(
@@ -100,7 +102,7 @@ class ScreeningReport:
         ]
         fundcenters = FundCenter.objects.filter(sequence__startswith=self.top_fc.sequence)
         allocations = FundCenterAllocation.objects.filter(
-            fundcenter__in=fundcenters, fy=self.fy, quarter=self.quarter
+            fundcenter__in=fundcenters, fy=self.fy, quarter=self.quarter, fund=self.fund
         ).values(*allocation_fields)
         df = pd.DataFrame(allocations)
         df = df.rename(
@@ -122,7 +124,9 @@ class ScreeningReport:
             "costcenter__costcenter_parent__fundcenter",
             "fund__fund",
         ]
-        self.fcst_adj = ForecastAdjustment.objects.filter(costcenter__in=costcenters).values(*fcst_fields)
+        self.fcst_adj = ForecastAdjustment.objects.filter(costcenter__in=costcenters, fund=self.fund).values(
+            *fcst_fields
+        )
         df = pd.DataFrame(self.fcst_adj)
         df = df.rename(
             columns={
@@ -162,6 +166,24 @@ class ScreeningReport:
         report = report.set_index(["sequence", "fundcenter", "costcenter", "fund"]).sort_index()
         return report
 
+    def html(self):
+        rows = self.report.reset_index()
+        data_dict = {}
+        tdrows = []
+        th = []
+        for c in rows.columns:
+            data_dict[c] = (rows[c].to_numpy()).tolist()
+            th.append(f"<th>{c}</th>")
+
+        thead = f"<thead>{('').join(th)}</thead>"
+        for i, v in enumerate(data_dict["sequence"]):
+            td = ""
+            for c in rows.columns:
+                td += f"<td>{data_dict[c][i]}</td>"
+            level = len(v.split("."))
+            tdrows.append(f"<tr class='level{level}'>{td}</tr>")
+        return f"<table id='screeningreport'>{thead}{('').join(tdrows)}</table>"
+
     def main(self):
         self.report_lines = self.get_lineitems_grouping()
         if self.report_lines.empty:
@@ -189,11 +211,6 @@ class ScreeningReport:
         )
 
         report = report.set_index(["sequence", "fundcenter", "costcenter", "fund"]).sort_index()
-        report = self.report_subtotals(report)
-
+        self.report = self.report_subtotals(report)
         # Grand Total
         self.grand_total = self.grand_total_by_fund(self.report_lines)
-
-        print("\n****** Grand Total *********\n", self.grand_total)
-        print("\n****** Report with subtotals ********\n", report)
-        print("\n****** Allocations without encumbrance***\n", self.allocations_without_encumbrance)

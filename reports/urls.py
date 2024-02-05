@@ -14,5 +14,7 @@ urlpatterns = [
     path("lineitems/", views.line_items, name="lineitem-report"),
     path("lineitems-csv/", views.csv_line_items, name="lineitem-csv"),
     path("costcenter-monthly-data/", views.costcenter_monthly_data, name="costcenter-monthly-data"),
-    path("charges/<str:cc>/<int:fy>/<int:period>/", views.cost_center_charge_table, name="costcenter-charges"),
+    path(
+        "charges/<str:cc>/<int:fy>/<int:period>/", views.cost_center_charge_table, name="costcenter-charges"
+    ),
 ]

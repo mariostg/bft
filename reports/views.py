@@ -7,7 +7,7 @@ from django.contrib import messages
 import csv
 
 from lineitems.models import LineItem
-from reports import utils
+from reports import utils, screeningreport
 
 from costcenter.models import (
     CostCenterAllocation,
@@ -69,36 +69,9 @@ def bmt_screening_report(request):
     }
 
     if query_string and (has_cc_allocation or has_fc_allocation):
-        r = utils.CostCenterScreeningReport()
-
-        lines = r.cost_element_line_items(fundcenter=fundcenter, fund=fund)
-        lines = r.id_to_sequence(lines)
-        alloc = r.cost_element_allocations(fundcenter, fund, fy, quarter)
-        alloc = r.id_to_sequence(alloc)
-        fcst_adj = ForecastAdjustmentManager().fundcenter_descendants(fundcenter, fund)
-        fcst_adj = r.id_to_sequence(fcst_adj)
-
-        _orphan_forecast_adjustments(request, alloc, fcst_adj)
-        # Integrate Encumbrance and forecast
-        columns = ["Spent", "Balance", "Working Plan", "CO", "PC", "FR", "Forecast"]
-        for alloc_path, alloc_item in alloc.items():
-            alloc[alloc_path] = r.init_fin_values(alloc_item)
-
-            for line_path, line_item in lines.items():
-                if alloc_path in line_path:
-                    for col in columns:
-                        alloc[alloc_path][col] += line_item[col]
-
-            for fcst_adj_path, fcst_Adj_item in fcst_adj.items():
-                if alloc_path in fcst_adj_path:
-                    alloc[alloc_path]["Forecast Adjustment"] += fcst_Adj_item["Forecast Adjustment"]
-
-        # integrate variance and forecast total
-        for _, item in alloc.items():
-            item["Variance"] = item["Forecast"] - item["Allocation"]
-            item["Forecast Total"] = item["Forecast"] + item["Forecast Adjustment"]
-
-        table = r.dict_html_table(alloc)
+        sr = screeningreport.ScreeningReport("2184da", "c113", fy, quarter)
+        sr.main()
+        table = sr.html()
 
     form = SearchCostCenterScreeningReportForm(initial=initial)
     context = {
