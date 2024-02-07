@@ -94,3 +94,7 @@ urlpatterns += [
         name="forecast-adjustment-delete",
     ),
 ]
+
+urlpatterns += [
+    path("capital-project-upload", views.capital_project_upload, name="capital-project-upload"),
+]

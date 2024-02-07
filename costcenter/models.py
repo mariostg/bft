@@ -734,6 +734,80 @@ class CostCenter(models.Model):
         super(CostCenter, self).save(*args, **kwargs)
 
 
+class CapitalProject(models.Model):
+    project_no = models.CharField("Project No", max_length=8, unique=True)
+    shortname = models.CharField("Project Name", max_length=35, blank=True)
+    isupdatable = models.BooleanField("Is Updatable", default=False)
+    note = models.TextField(null=True, blank=True)
+    sequence = models.CharField("CC Path", max_length=25, unique=True, default="")
+    fundcenter = models.ForeignKey(
+        FundCenter,
+        on_delete=models.RESTRICT,
+        default="0",
+        related_name="capital_projects",
+        verbose_name="Fund Center",
+    )
+    procurement_officer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.RESTRICT,
+        limit_choices_to={"procurement_officer": True},
+    )
+    objects = CostCenterManager()
+
+    def __str__(self):
+        return f"{self.project_no.upper()} - {self.shortname}"
+
+    class Meta:
+        ordering = ["project_no"]
+        verbose_name_plural = "Capital Projects"
+
+
+class CapitalForecasting(models.Model):
+    fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
+    fy = models.PositiveSmallIntegerField("Fiscal Year", choices=YEAR_CHOICES, default=datetime.now().year)
+    capital_project = models.ForeignKey(
+        CapitalProject, on_delete=models.CASCADE, null=True, verbose_name="Capital Project"
+    )
+    commit_item = models.PositiveSmallIntegerField(default=0)
+    initial_allocation = models.PositiveIntegerField(default=0)
+    q1_allocation = models.PositiveIntegerField(default=0)
+    q2_allocation = models.PositiveIntegerField(default=0)
+    q3_allocation = models.PositiveIntegerField(default=0)
+    q4_allocation = models.PositiveIntegerField(default=0)
+    q1_forecast = models.PositiveIntegerField(default=0)
+    q2_forecast = models.PositiveIntegerField(default=0)
+    q3_forecast = models.PositiveIntegerField(default=0)
+    q4_forecast = models.PositiveIntegerField(default=0)
+    q1_le = models.PositiveIntegerField(default=0)
+    q2_le = models.PositiveIntegerField(default=0)
+    q3_le = models.PositiveIntegerField(default=0)
+    q4_le = models.PositiveIntegerField(default=0)
+    q1_he = models.PositiveIntegerField(default=0)
+    q2_he = models.PositiveIntegerField(default=0)
+    q3_he = models.PositiveIntegerField(default=0)
+    q4_he = models.PositiveIntegerField(default=0)
+    q1_spent = models.PositiveIntegerField(default=0)
+    q2_spent = models.PositiveIntegerField(default=0)
+    q3_spent = models.PositiveIntegerField(default=0)
+    q4_spent = models.PositiveIntegerField(default=0)
+    q1_co = models.PositiveIntegerField(default=0)
+    q2_co = models.PositiveIntegerField(default=0)
+    q3_co = models.PositiveIntegerField(default=0)
+    q4_co = models.PositiveIntegerField(default=0)
+    q1_pc = models.PositiveIntegerField(default=0)
+    q2_pc = models.PositiveIntegerField(default=0)
+    q3_pc = models.PositiveIntegerField(default=0)
+    q4_pc = models.PositiveIntegerField(default=0)
+    q1_fr = models.PositiveIntegerField(default=0)
+    q2_fr = models.PositiveIntegerField(default=0)
+    q3_fr = models.PositiveIntegerField(default=0)
+    q4_fr = models.PositiveIntegerField(default=0)
+    ye_spent = models.PositiveIntegerField(default=0)
+    notes = models.TextField()
+
+
 class ForecastAdjustmentManager(models.Manager):
     def fundcenter_descendants(self, fundcenter: str, fund: str = None) -> dict:
         """Produce a dictionay of Forecast Adjustments including all descendants of the specified fund center.  The key element of each entry is the id of the cost center.

@@ -14,6 +14,7 @@ import numpy as np
 from bft.conf import QUARTERKEYS
 from main.settings import BASE_DIR
 from costcenter.models import (
+    CapitalProject,
     CostCenter,
     CostCenterAllocation,
     CostCenterManager,
@@ -419,6 +420,69 @@ class FundCenterProcessor(UploadProcessor):
                     messages.error(request, msg)
         if counter:
             msg = f"{counter} fund center(s) have been uploaded."
+            if request:
+                messages.info(request, msg)
+            else:
+                print(msg)
+
+
+class CapitalProjectProcessor(UploadProcessor):
+    def __init__(self, filepath, user: BftUser) -> None:
+        UploadProcessor.__init__(self, filepath, user)
+        self.header = "project_no,shortname,fundcenter,note\n"
+
+    def _find_duplicate_project_no(self, projects: pd.DataFrame) -> pd.DataFrame:
+        projects["project_no"] = projects["project_no"].str.lower()
+        duplicates = projects[projects.duplicated(subset=["project_no"], keep=False) == True]
+        if duplicates.empty:
+            return pd.DataFrame
+        else:
+            return duplicates
+
+    def _assign_fundcenter(self, projects: dict, request=None) -> dict | None:
+        for item in projects:  # assign parent, fund and source to everyone before saving
+            parent = FundCenterManager().fundcenter(item["fundcenter"])
+            if not parent:
+                msg = f"Capaital Project {item['project_no']} parent ({item['fundcenter']}) does not exist, no capital projects have been recorded."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+                return
+            item["fundcenter"] = parent
+        return projects
+
+    def main(self, request=None):
+        if not self.header_good():
+            msg = f"Capaital project upload by {self.user.username}, Invalid columns header"
+            logger.error(msg)
+            if request:
+                messages.error(request, msg)
+                return
+
+        df = self.dataframe()
+        duplicates = self._find_duplicate_project_no(df)
+        if not duplicates.empty and request:
+            messages.error(request, f"Duplicate project numbers have been detected: {duplicates.to_html()}")
+            return
+
+        _dict = self.as_dict(df)
+        if not self._assign_fundcenter(_dict, request):
+            return
+
+        counter = 0
+        for item in _dict:
+            item_obj = CapitalProject(**item)
+            try:
+                item_obj.save()
+                counter += 1
+                logger.info(f"Uploaded capital project {item_obj.project_no}.")
+            except IntegrityError as err:
+                msg = f"Saving capital project {item} generates {err}"
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+        if counter:
+            msg = f"{counter} capital project(s) have been uploaded."
             if request:
                 messages.info(request, msg)
             else:

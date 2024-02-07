@@ -29,6 +29,7 @@ from .forms import (
 )
 from bft.models import BftStatusManager
 from bft.uploadprocessor import (
+    CapitalProjectProcessor,
     CostCenterProcessor,
     FundCenterProcessor,
     CostCenterAllocationProcessor,
@@ -340,6 +341,22 @@ def fundcenter_allocation_upload(request):
     return render(
         request, "core/form-upload.html", {"form": form, "form_title": "Fund Centers Allocation Upload"}
     )
+
+
+def capital_project_upload(request):
+    if request.method == "POST":
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            filepath = f"{UPLOADS}/capital-project-upload-{user}.csv"
+            with open(filepath, "wb+") as destination:
+                for chunk in request.FILES["source_file"].chunks():
+                    destination.write(chunk)
+            processor = CapitalProjectProcessor(filepath, user)
+            processor.main(request)
+    else:
+        form = UploadForm
+    return render(request, "core/form-upload.html", {"form": form, "form_title": "Capital Project Upload"})
 
 
 def costcenter_page(request):
