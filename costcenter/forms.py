@@ -139,3 +139,7 @@ class FundCenterAllocationUploadForm(UploadForm):
 class CostCenterAllocationUploadForm(UploadForm):
     quarter = forms.CharField(label="Quarter", max_length=1, initial=None)
     fy = forms.CharField(label="Fiscal Year", initial=None)
+
+
+class CapitalProjectForecastUploadForm(UploadForm):
+    pass

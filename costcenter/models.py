@@ -779,6 +779,9 @@ class CapitalForecasting(models.Model):
     capital_project = models.ForeignKey(
         CapitalProject, on_delete=models.CASCADE, null=True, verbose_name="Capital Project"
     )
+    fundcenter = models.ForeignKey(
+        FundCenter, on_delete=models.CASCADE, null=True, verbose_name="Fund Center"
+    )
     commit_item = models.PositiveSmallIntegerField(default=0)
     initial_allocation = models.PositiveIntegerField(default=0)
     q1_allocation = models.PositiveIntegerField(default=0)

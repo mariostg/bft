@@ -101,4 +101,9 @@ urlpatterns += [
     path("capital-project-update/<int:pk>", views.capital_project_update, name="capital-project-update"),
     path("capital-project-delete/<int:pk>", views.capital_project_delete, name="capital-project-delete"),
     path("capital-project-upload", views.capital_project_upload, name="capital-project-upload"),
+    path(
+        "capital-project-forecast-upload",
+        views.capital_project_forecast_upload,
+        name="capital-project-forecast-upload",
+    ),
 ]

@@ -15,6 +15,7 @@ from bft.conf import QUARTERKEYS
 from main.settings import BASE_DIR
 from costcenter.models import (
     CapitalProject,
+    CapitalForecasting,
     CostCenter,
     CostCenterAllocation,
     CostCenterManager,
@@ -483,6 +484,93 @@ class CapitalProjectProcessor(UploadProcessor):
                     messages.error(request, msg)
         if counter:
             msg = f"{counter} capital project(s) have been uploaded."
+            if request:
+                messages.info(request, msg)
+            else:
+                print(msg)
+
+
+class CapitalProjectForecastProcessor(UploadProcessor):
+    def __init__(self, filepath, user: BftUser) -> None:
+        UploadProcessor.__init__(self, filepath, user)
+        self.header = "fund,fy,capital_project,fundcenter,commit_item,initial_allocation,q1_allocation,q2_allocation,q3_allocation,q4_allocation,q1_forecast,q2_forecast,q3_forecast,q4_forecast,q1_le,q2_le,q3_le,q4_le,q1_he,q2_he,q3_he,q4_he,q1_spent,q2_spent,q3_spent,q4_spent,q1_co,q2_co,q3_co,q4_co,q1_pc,q2_pc,q3_pc,q4_pc,q1_fr,q2_fr,q3_fr,q4_fr,ye_spent,notes\n"
+
+    def _find_duplicates(self, df: pd.DataFrame):
+        return pd.DataFrame
+
+    def _assign_capital_project(self, capital_forecasts: dict, request=None) -> dict | None:
+        for item in capital_forecasts:  # assign fund center to everyone before saving
+            obj = CapitalProject.objects.get(project_no=item["capital_project"])
+            if not obj:
+                msg = f"Project {item['capital_project']} does not exist, no capital forecasts have been recorded."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+                return
+            item["capital_project"] = obj
+        return capital_forecasts
+
+    def _assign_fundcenter(self, capital_forecasts: dict, request=None) -> dict | None:
+        for item in capital_forecasts:  # assign fund center to everyone before saving
+            print("ITEM : ", item["fundcenter"])
+            fc = FundCenterManager().fundcenter(item["fundcenter"])
+            if not fc:
+                msg = f"Project {item['project_no']} fund center ({item['fundcenter']}) does not exist, no capital forecasts have been recorded."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+                return
+            item["fundcenter"] = fc
+        return capital_forecasts
+
+    def _assign_fund(self, capital_forecasts: dict, request=None) -> dict | None:
+        for item in capital_forecasts:  # assign fund to everyone before saving
+            fund = FundManager().fund(item["fund"])
+            if not fund:
+                msg = f"Project {item['project_no']} fund ({item['fund']}) does not exist, no capital Forecasts have been recorded."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+                return
+            item["fund"] = fund
+        return capital_forecasts
+
+    def main(self, request=None):
+        if not self.header_good():
+            msg = f"Capital project forecast upload by {self.user.username}, Invalid columns header"
+            logger.error(msg)
+            if request:
+                messages.error(request, msg)
+                return
+
+        df = self.dataframe()
+        duplicates = self._find_duplicates(df)
+        if not duplicates.empty and request:
+            messages.error(request, f"Duplicate Fund-FY-Project have been detected: {duplicates.to_html()}")
+            return
+
+        _dict = self.as_dict(df)
+        if not self._assign_capital_project(_dict, request):
+            return
+        if not self._assign_fundcenter(_dict, request):
+            return
+        if not self._assign_fund(_dict, request):
+            return
+
+        counter = 0
+        for item in _dict:
+            obj = CapitalForecasting(**item)
+            try:
+                obj.save()
+                counter += 1
+                logger.info(f"Uploaded Capital Forecasting {obj.fund}.")
+            except IntegrityError as err:
+                msg = f"Saving Capital Forecasting {item} generates {err}."
+                logger.warn(msg)
+                if request:
+                    messages.error(request, msg)
+        if counter:
+            msg = f"{counter} Capital Forecasts(s) have been uploaded."
             if request:
                 messages.info(request, msg)
             else:
