@@ -8,6 +8,7 @@ from .models import (
     Source,
     FundCenter,
     FundCenterManager,
+    CapitalProject,
     CostCenter,
     CostCenterManager,
     CostCenterAllocation,
@@ -40,6 +41,7 @@ from bft.uploadprocessor import (
 from main.settings import UPLOADS
 from .filters import (
     CostCenterFilter,
+    CapitalProjectFilter,
     CostCenterAllocationFilter,
     FundCenterFilter,
     FundCenterAllocationFilter,
@@ -341,6 +343,51 @@ def fundcenter_allocation_upload(request):
     return render(
         request, "core/form-upload.html", {"form": form, "form_title": "Fund Centers Allocation Upload"}
     )
+
+
+def capital_project_page(request):
+    has_filter = False
+    status = {"fy": BftStatusManager().fy(), "period": BftStatusManager().period}
+    if not request.GET:
+        data = None
+    else:
+        data = CapitalProject.objects.all()
+        has_filter = True
+    search_filter = CapitalProjectFilter(request.GET, queryset=data)
+    paginator = Paginator(search_filter.qs, 25)
+    page_number = request.GET.get("page")
+    return render(
+        request,
+        "costcenter/capitalproject-table.html",
+        {
+            "filter": search_filter,
+            "data": paginator.get_page(page_number),
+            "status": status,
+            "has_filter": has_filter,
+        },
+    )
+
+
+def capital_project_add(request):
+    pass
+
+
+def capital_project_update(request):
+    pass
+
+
+def capital_project_delete(request, pk):
+    obj = CapitalProject.objects.get(id=pk)
+    if request.method == "POST":
+        try:
+            obj.delete()
+        except RestrictedError:
+            messages.warning(
+                request, f"Cannot delete {obj.project_no} because it contains dependants elements"
+            )
+        return redirect("capital-project-table")
+    context = {"object": obj, "back": "capital-project-table"}
+    return render(request, "core/delete-object.html", context)
 
 
 def capital_project_upload(request):

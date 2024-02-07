@@ -96,5 +96,9 @@ urlpatterns += [
 ]
 
 urlpatterns += [
+    path("capital-project-table/", views.capital_project_page, name="capital-project-table"),
+    path("capital-project-add/", views.capital_project_add, name="capital-project-add"),
+    path("capital-project-update/<int:pk>", views.capital_project_update, name="capital-project-update"),
+    path("capital-project-delete/<int:pk>", views.capital_project_delete, name="capital-project-delete"),
     path("capital-project-upload", views.capital_project_upload, name="capital-project-upload"),
 ]

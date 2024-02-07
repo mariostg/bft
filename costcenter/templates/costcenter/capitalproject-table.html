@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Capital Project Table{% endblock title %}
+{% block content %}
+{% include "core/form-filter.html" %}
+<main class="block block--centered">
+    <div class="container">
+        <header class=''>
+            <h2>Capital Projects</h2>
+        </header>
+        {% if user.is_authenticated %}
+        <div class=''>
+            <div class="action-bar block">
+                <a class='btn btn-add' href="{% url 'capital-project-add' %}"></a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% include 'paginator.html' %}
+    {% for elem in data  %}
+    <section class='summary'>
+        <div class='summary__header'>
+            <span><strong>{{elem.project_no}} </strong>- {{elem.shortname}} - {{elem.fundcenter}}</span>
+        </div>
+        <div class="summary__body">
+            {{elem.note|linebreaksbr}}
+        </div>
+        <div class="summary__footer">
+            <span class="tag {% if elem.isupdatable %} yes"> {%else%} no"> Not {%endif%} Updatable</span>
+            {% if user.is_authenticated %}
+            <a class="btn btn-edit" href="{% url 'capital-project-update' elem.id %}" ></a>
+            <a class="btn btn-delete" href="{% url 'capital-project-delete' elem.pk %}" ></a >
+                {% endif %}
+        </div>
+    </section>
+    {% endfor %}
+
+</main>
+
+<script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
+{% endblock content %}

@@ -1,4 +1,10 @@
-from costcenter.models import CostCenter, CostCenterAllocation, FundCenter, FundCenterAllocation
+from costcenter.models import (
+    CostCenter,
+    CostCenterAllocation,
+    FundCenter,
+    FundCenterAllocation,
+    CapitalProject,
+)
 import django_filters
 
 
@@ -10,6 +16,17 @@ class FundCenterFilter(django_filters.FilterSet):
             "shortname": ["icontains"],
             "fundcenter_parent__shortname": ["icontains"],
             "fundcenter_parent__fundcenter": ["icontains"],
+        }
+
+
+class CapitalProjectFilter(django_filters.FilterSet):
+    class Meta:
+        model = CapitalProject
+        fields = {
+            "project_no": ["icontains"],
+            "shortname": ["icontains"],
+            "fundcenter__shortname": ["icontains"],
+            "fundcenter__fundcenter": ["icontains"],
         }
 
 

@@ -739,7 +739,7 @@ class CapitalProject(models.Model):
     shortname = models.CharField("Project Name", max_length=35, blank=True)
     isupdatable = models.BooleanField("Is Updatable", default=False)
     note = models.TextField(null=True, blank=True)
-    sequence = models.CharField("CC Path", max_length=25, unique=True, default="")
+    # sequence = models.CharField("CC Path", max_length=25, unique=True, default="")
     fundcenter = models.ForeignKey(
         FundCenter,
         on_delete=models.RESTRICT,
@@ -762,6 +762,15 @@ class CapitalProject(models.Model):
     class Meta:
         ordering = ["project_no"]
         verbose_name_plural = "Capital Projects"
+
+    def save(self, *args, **kwargs):
+        # if not FinancialStructureManager().is_child_of(self.fundcenter, self):
+        # self.sequence = FinancialStructureManager().set_parent(self.fundcenter, costcenter_child=True)
+
+        self.project_no = self.project_no.upper()
+        if self.shortname:
+            self.shortname = self.shortname.upper()
+        super(CapitalProject, self).save(*args, **kwargs)
 
 
 class CapitalForecasting(models.Model):
