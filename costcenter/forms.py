@@ -5,6 +5,7 @@ from costcenter.models import (
     Source,
     FundCenter,
     CostCenter,
+    CapitalProject,
     CostCenterAllocation,
     FundCenterAllocation,
     ForecastAdjustment,
@@ -71,6 +72,22 @@ class FundCenterAllocationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FundCenterAllocationForm, self).__init__(*args, **kwargs)
+
+
+class CapitalProjectForm(forms.ModelForm):
+    class Meta:
+        model = CapitalProject
+        fields = [
+            "project_no",
+            "shortname",
+            "fundcenter",
+            "isupdatable",
+            "procurement_officer",
+            "note",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(CapitalProjectForm, self).__init__(*args, **kwargs)
 
 
 class CostCenterForm(forms.ModelForm):

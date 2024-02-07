@@ -24,6 +24,7 @@ from .forms import (
     FundCenterAllocationForm,
     FundCenterAllocationUploadForm,
     CostCenterForm,
+    CapitalProjectForm,
     CostCenterAllocationForm,
     ForecastadjustmentForm,
     UploadForm,
@@ -369,11 +370,40 @@ def capital_project_page(request):
 
 
 def capital_project_add(request):
-    pass
+    if request.method == "POST":
+        form = CapitalProjectForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.project_no = obj.project_no.upper()
+            if obj.shortname:
+                obj.shortname = obj.shortname.upper()
+            try:
+                obj.save()
+            except IntegrityError as e:
+                messages.error(request, f"{e}.  Capital Project {obj.project_no} exists")
+                return render(request, "costcenter/capitalproject-form.html", {"form": form})
+            return redirect("capital-project-table")
+    else:
+        form = CapitalProjectForm
+
+    return render(request, "costcenter/capitalproject-form.html", {"form": form})
 
 
-def capital_project_update(request):
-    pass
+def capital_project_update(request, pk):
+    capital_project = CapitalProject.objects.get(pk=pk)
+    print(capital_project)
+    form = CapitalProjectForm(instance=capital_project)
+
+    if request.method == "POST":
+        form = CapitalProjectForm(request.POST, instance=capital_project)
+        if form.is_valid():
+            try:
+                form.save()
+            except IntegrityError:
+                messages.error(request, "Duplicate entry cannot be saved")
+            return redirect("capital-project-table")
+
+    return render(request, "costcenter/capitalproject-form.html", {"form": form})
 
 
 def capital_project_delete(request, pk):
