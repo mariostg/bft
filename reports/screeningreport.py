@@ -175,12 +175,15 @@ class ScreeningReport:
         for c in rows.columns:
             data_dict[c] = (rows[c].to_numpy()).tolist()
             th.append(f"<th>{c}</th>")
-
         thead = f"<thead>{('').join(th)}</thead>"
         for i, v in enumerate(data_dict["sequence"]):
             td = ""
             for c in rows.columns:
-                td += f"<td>{data_dict[c][i]}</td>"
+                try:
+                    val = f"{round(data_dict[c][i]):,}"
+                except:
+                    val = data_dict[c][i]
+                td += f"<td>{val}</td>"
             level = len(v.split("."))
             tdrows.append(f"<tr class='level{level}'>{td}</tr>")
         return f"<table id='screeningreport'>{thead}{('').join(tdrows)}</table>"
