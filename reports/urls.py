@@ -17,4 +17,5 @@ urlpatterns = [
     path(
         "charges/<str:cc>/<int:fy>/<int:period>/", views.cost_center_charge_table, name="costcenter-charges"
     ),
+    path("capital-forecasting-table", views.capital_forecasting_table, name="capital-forecasting-table"),
 ]

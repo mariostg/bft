@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+{% load humanize %}
+{% block title %}Capital Forecasting Table{% endblock title %}
+{% block content %}
+<main class='block block--centered'>
+    {% if not table %}
+    <div class="alert alert--info">There are no data to display</div>
+    {% endif %}
+
+    <h1>Capital Forecasting Table</h1>
+    {% if form_filter %}
+    {% endif %}
+{{table|safe}}
+</main>
+
+
+{% endblock content %}

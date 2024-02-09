@@ -16,6 +16,7 @@ from costcenter.models import (
     FundCenterManager,
     FinancialStructureManager,
     ForecastAdjustmentManager,
+    CapitalForecasting,
 )
 from charges.models import CostCenterChargeMonthly
 from reports.forms import SearchAllocationAnalysisForm, SearchCostCenterScreeningReportForm
@@ -214,3 +215,11 @@ def cost_center_charge_table(request, cc: str, fy: int, period: int):
     else:
         messages.info(request, f"There are no charges agains {cc} for FY {fy} and period {period}")
     return render(request, "costcenter-monthly-charge-data.html", {"table": table})
+
+
+def capital_forecasting_table(request):
+    data = CapitalForecasting.objects.all()
+    df = utils.BFTDataFrame(CapitalForecasting).build(data)  # .set_index(["fundcenter", "fy", "fund"])
+    print(df)
+    table = df.to_html()
+    return render(request, "capital-forecasting-table.html", {"table": table})
