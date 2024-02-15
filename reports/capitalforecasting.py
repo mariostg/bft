@@ -3,7 +3,6 @@ from costcenter.models import CapitalForecasting, CapitalProject, FundCenterMana
 from bft.models import BftStatusManager
 import pandas as pd
 import plotly.express as px
-from main import settings
 
 
 class CapitalReport:
