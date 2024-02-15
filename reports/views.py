@@ -7,7 +7,7 @@ from django.contrib import messages
 import csv
 
 from lineitems.models import LineItem
-from reports import utils, screeningreport
+from reports import utils, screeningreport, capitalforecasting
 
 from costcenter.models import (
     CostCenterAllocation,
@@ -24,6 +24,7 @@ from bft.models import BftStatus
 from bft.conf import QUARTERKEYS
 from bft.exceptions import LineItemsDoNotExistError
 from utils.getrequestfilter import set_query_string
+from main import settings
 
 
 def _orphan_forecast_adjustments(request, allocations, forecast_adjustment):
@@ -217,9 +218,38 @@ def cost_center_charge_table(request, cc: str, fy: int, period: int):
     return render(request, "costcenter-monthly-charge-data.html", {"table": table})
 
 
-def capital_forecasting_table(request):
-    data = CapitalForecasting.objects.all()
-    df = utils.BFTDataFrame(CapitalForecasting).build(data)  # .set_index(["fundcenter", "fy", "fund"])
-    print(df)
-    table = df.to_html()
-    return render(request, "capital-forecasting-table.html", {"table": table})
+def capital_forecasting_estimates(request):
+    estimates = capitalforecasting.EstimateReport("2184da", "C113", 2023, "C.999999")
+
+    return render(
+        request,
+        "capital-forecasting-estimates.html",
+        {
+            "table": estimates.to_html(),
+            "estimate_chart": estimates.chart().to_html(),
+        },
+    )
+
+
+def capital_forecasting_quarterly(request):
+    quarterly = capitalforecasting.QuarterReport("2184da", "C113", 2023, "C.999999")
+    data = {
+        "fundcenter": quarterly.fundcenter,
+        "fund": quarterly.fund.fund,
+        "fy": quarterly.fy,
+        "project_no": quarterly.capital_project,
+    }
+    html = quarterly.to_html()
+    return render(request, "capital-forecasting-quarterly.html", {"table": html, "data": data})
+
+
+def capital_historical_outlook(request):
+    outlook = capitalforecasting.HistoricalOutlookReport("2184da", "C113", "C.999999")
+    return render(
+        request,
+        "capital-historical-outlook.html",
+        {
+            "table": outlook.to_html(),
+            "chart": outlook.chart().to_html(),
+        },
+    )

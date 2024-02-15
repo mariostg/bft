@@ -17,5 +17,21 @@ urlpatterns = [
     path(
         "charges/<str:cc>/<int:fy>/<int:period>/", views.cost_center_charge_table, name="costcenter-charges"
     ),
-    path("capital-forecasting-table", views.capital_forecasting_table, name="capital-forecasting-table"),
+]
+urlpatterns += [
+    path(
+        "capital-forecasting-estimates",
+        views.capital_forecasting_estimates,
+        name="capital-forecasting-estimates",
+    ),
+    path(
+        "capital-forecasting-quarterly",
+        views.capital_forecasting_quarterly,
+        name="capital-forecasting-quarterly",
+    ),
+    path(
+        "capital-historical-outlook",
+        views.capital_historical_outlook,
+        name="capital-historical-outlook",
+    ),
 ]

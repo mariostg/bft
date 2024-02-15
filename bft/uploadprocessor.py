@@ -512,7 +512,6 @@ class CapitalProjectForecastProcessor(UploadProcessor):
 
     def _assign_fundcenter(self, capital_forecasts: dict, request=None) -> dict | None:
         for item in capital_forecasts:  # assign fund center to everyone before saving
-            print("ITEM : ", item["fundcenter"])
             fc = FundCenterManager().fundcenter(item["fundcenter"])
             if not fc:
                 msg = f"Project {item['project_no']} fund center ({item['fundcenter']}) does not exist, no capital forecasts have been recorded."

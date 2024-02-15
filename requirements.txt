@@ -7,3 +7,4 @@ django-filter==23.3
 mkdocs==1.5.3
 mkdocstrings-python==1.8.0
 mkdocs-material==9.5.4
+matplotlib==3.8.2
