@@ -240,7 +240,16 @@ def capital_forecasting_quarterly(request):
         "project_no": quarterly.capital_project,
     }
     html = quarterly.to_html()
-    return render(request, "capital-forecasting-quarterly.html", {"table": html, "data": data})
+    chart = quarterly.chart_bullet().to_html()
+    return render(
+        request,
+        "capital-forecasting-quarterly.html",
+        {
+            "table": html,
+            "data": data,
+            "chart": chart,
+        },
+    )
 
 
 def capital_historical_outlook(request):

@@ -3,6 +3,7 @@ from costcenter.models import CapitalForecasting, CapitalProject, FundCenterMana
 from bft.models import BftStatusManager
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 
 class CapitalReport:
@@ -112,6 +113,58 @@ class QuarterReport(CapitalReport):
         return self.df.to_html(
             formatters=fmt_dict,
         )
+
+    def chart_bullet(self):
+        self.dataframe()
+        _m1 = self.df[["allocation", "forecast"]].max(axis=1).max(axis=0)
+        _m2 = self.df[["co", "pc", "fr", "spent"]].sum(axis=1).max()
+        max_axis = max(_m1, _m2)
+        df = self.df.reset_index()
+
+        fig = go.Figure()
+
+        y = [[0.05, 0.15], [0.3, 0.4], [0.55, 0.65], [0.8, 0.9]]
+        axis_visible = [True, False, False, False]
+        for i in range(0, 4):
+            data = df.iloc[i]
+            step0 = data.spent
+            step1 = step0 + data.co
+            step2 = step1 + data.pc
+            step3 = step2 + data.fr
+            domain = {"x": [0.25, 1], "y": y[i]}
+            fig.add_trace(
+                go.Indicator(
+                    mode="gauge",  # +number+delta
+                    value=data.allocation,
+                    # delta={"reference": data.forecast},
+                    domain=domain,
+                    title={"text": f"Q{df.iloc[i]['Quarter']}"},
+                    gauge={
+                        "shape": "bullet",
+                        "axis": {
+                            "visible": axis_visible[i],
+                            "range": [None, max_axis],
+                            "tickfont": {"size": 14},
+                        },
+                        "threshold": {
+                            "line": {"color": "green", "width": 3},
+                            "thickness": 0.75,
+                            "value": data.forecast,
+                        },
+                        "steps": [
+                            {"range": [0, step0], "color": "#882255"},
+                            {"range": [step0, step1], "color": "#ddcc77"},
+                            {"range": [step1, step2], "color": "#afeeee"},
+                            {"range": [step2, step3], "color": "#fa8072"},
+                        ],
+                        "bar": {"color": "black"},
+                    },
+                )
+            )
+
+        fig.update_layout(height=300, width=400, margin={"t": 40, "b": 20, "l": 0})
+
+        return fig
 
 
 class EstimateReport(CapitalReport):
