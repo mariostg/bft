@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import Sum, Value
 from costcenter.models import CapitalForecasting, CapitalProject, FundCenterManager, FundManager
 from bft.models import BftStatusManager
 import pandas as pd
@@ -17,6 +17,8 @@ class CapitalReport:
                 return None
         self.fundcenter = FundCenterManager().fundcenter(fundcenter)
         self.fund = FundManager().fund(fund)
+        self.chart_height = 400
+        self.chart_width = 400
 
 
 class HistoricalOutlookReport(CapitalReport):
@@ -58,7 +60,7 @@ class HistoricalOutlookReport(CapitalReport):
             x="fy",
             y=["initial_allocation", "q1_forecast", "q2_forecast", "q3_forecast", "ye_spent"],
             title=f"historical outlook <br><sup>{self.capital_project}, {self.fund.fund}</sup>",
-            height=300,
+            height=self.chart_height,
             barmode="group",
         )
 
@@ -162,7 +164,7 @@ class QuarterReport(CapitalReport):
                 )
             )
 
-        fig.update_layout(height=300, width=400, margin={"t": 40, "b": 20, "l": 0})
+        fig.update_layout(height=self.chart_height, width=self.chart_width, margin={"t": 40, "b": 20, "l": 0})
 
         return fig
 
@@ -196,6 +198,7 @@ class EstimateReport(CapitalReport):
                 Q2_HE=Sum("q2_he"),
                 Q3_HE=Sum("q3_he"),
                 Q4_HE=Sum("q4_he"),
+                working_plan=Value(3000),
             )
         )[0]
 
@@ -219,17 +222,26 @@ class EstimateReport(CapitalReport):
             _dataset["Q3_HE"],
             _dataset["Q4_HE"],
         ]
+        self.working_plan = _dataset["working_plan"]
 
     def dataframe(self):
         self.dataset()
         self.quarterly()
-        self.df = pd.DataFrame({"Quarters": self.quarters, "MLE": self.mle, "HE": self.he, "LE": self.le})
+        self.df = pd.DataFrame(
+            {
+                "Quarters": self.quarters,
+                "MLE": self.mle,
+                "HE": self.he,
+                "LE": self.le,
+                "working_plan": self.working_plan,
+            }
+        )
 
     def to_html(self):
         self.dataframe()
         fmt = "{:,.0f}".format
         fmt_dict = {}
-        for field in ["MLE", "HE", "LE"]:
+        for field in ["MLE", "HE", "LE", "working_plan"]:
             fmt_dict[field] = fmt
         return self.df.to_html(
             formatters=fmt_dict,
@@ -241,6 +253,11 @@ class EstimateReport(CapitalReport):
             x="Quarters",
             y=["MLE", "HE", "LE"],
             title=f"Quarterly Estimates {self.fy} <br><sup>{self.capital_project}, {self.fund.fund}</sup>",
-            height=300,
+            height=self.chart_height,
             barmode="group",
+        ).add_hline(
+            self.working_plan,
+            line_dash="dash",
+            annotation_text="Working Plan",
+            annotation_position="top",
         )
