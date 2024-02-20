@@ -262,3 +262,28 @@ def capital_historical_outlook(request):
             "chart": outlook.chart().to_html(),
         },
     )
+
+
+def capital_forecasting_dashboard(request):
+    estimates = capitalforecasting.EstimateReport("2184da", "C113", 2023, "C.999999")
+    estimates.dataframe()
+    estimate_chart = estimates.chart().to_html()
+
+    quarterly = capitalforecasting.QuarterReport("2184da", "C113", 2023, "C.999999")
+    quarterly.dataframe()
+    quarterly_chart = quarterly.chart_bullet().to_html()
+
+    outlook = capitalforecasting.HistoricalOutlookReport("2184da", "C113", "C.999999")
+    outlook.dataframe()
+    outlook_chart = outlook.chart().to_html()
+
+    return render(
+        request,
+        "capital-forecasting-dashboard.html",
+        {
+            "estimate_chart": estimate_chart,
+            "quarterly_chart": quarterly_chart,
+            "outlook_chart": outlook_chart,
+            "table": " ",
+        },
+    )

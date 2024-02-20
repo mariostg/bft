@@ -19,6 +19,8 @@ class CapitalReport:
         self.fund = FundManager().fund(fund)
         self.chart_height = 400
         self.chart_width = 400
+        self.layout_margin = dict(l=20, r=20, t=70, b=20)
+        self.paper_bgcolor = "LightSteelBlue"
 
 
 class HistoricalOutlookReport(CapitalReport):
@@ -59,9 +61,18 @@ class HistoricalOutlookReport(CapitalReport):
             self.df,
             x="fy",
             y=["initial_allocation", "q1_forecast", "q2_forecast", "q3_forecast", "ye_spent"],
-            title=f"historical outlook <br><sup>{self.capital_project}, {self.fund.fund}</sup>",
+            title=f"Historical Outlook - {self.capital_project}, {self.fund.fund}",
             height=self.chart_height,
             barmode="group",
+        ).update_layout(
+            margin=self.layout_margin,
+            paper_bgcolor=self.paper_bgcolor,
+            legend={
+                "orientation": "h",
+                "yanchor": "bottom",
+                "y": 100,
+            },
+            legend_title_text=None,
         )
 
 
@@ -154,7 +165,7 @@ class QuarterReport(CapitalReport):
                             "value": data.forecast,
                         },
                         "steps": [
-                            {"range": [0, step0], "color": "#882255"},
+                            {"range": [0, step0], "color": "#882255", "name": "Spent"},
                             {"range": [step0, step1], "color": "#ddcc77"},
                             {"range": [step1, step2], "color": "#afeeee"},
                             {"range": [step2, step3], "color": "#fa8072"},
@@ -164,7 +175,23 @@ class QuarterReport(CapitalReport):
                 )
             )
 
-        fig.update_layout(height=self.chart_height, width=self.chart_width, margin={"t": 40, "b": 20, "l": 0})
+        fig.update_layout(
+            height=self.chart_height,
+            width=self.chart_width,
+            margin={"t": 40, "b": 20, "l": 0},
+            paper_bgcolor=self.paper_bgcolor,
+            title="Forecast, Encumbrance, Allocation <br>Relationship (FEAR)",
+            legend=(
+                dict(
+                    orientation="h",
+                    x=0,
+                    y=1,
+                    bgcolor="Blue",
+                    bordercolor="Black",
+                    borderwidth=2,
+                )
+            ),
+        )
 
         return fig
 
@@ -248,16 +275,22 @@ class EstimateReport(CapitalReport):
         )
 
     def chart(self):
-        return px.bar(
+        fig = px.bar(
             self.df,
             x="Quarters",
             y=["MLE", "HE", "LE"],
-            title=f"Quarterly Estimates {self.fy} <br><sup>{self.capital_project}, {self.fund.fund}</sup>",
+            title=f"Quarterly Estimates - {self.fy}{self.capital_project}, {self.fund.fund}",
             height=self.chart_height,
             barmode="group",
-        ).add_hline(
+        )
+        fig.update_layout(
+            margin=self.layout_margin,
+            paper_bgcolor=self.paper_bgcolor,
+        )
+        fig.add_hline(
             self.working_plan,
             line_dash="dash",
             annotation_text="Working Plan",
             annotation_position="top",
         )
+        return fig

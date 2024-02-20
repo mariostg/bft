@@ -34,4 +34,9 @@ urlpatterns += [
         views.capital_historical_outlook,
         name="capital-historical-outlook",
     ),
+    path(
+        "capital-forecasting-dashboard",
+        views.capital_forecasting_dashboard,
+        name="capital-forecasting-dashboard",
+    ),
 ]
