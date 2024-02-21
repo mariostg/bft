@@ -25,6 +25,9 @@ from bft.conf import QUARTERKEYS
 from bft.exceptions import LineItemsDoNotExistError
 from utils.getrequestfilter import set_query_string
 from main import settings
+from reports.plotter import Plotter
+
+import pandas as pd
 
 
 def _orphan_forecast_adjustments(request, allocations, forecast_adjustment):
@@ -232,7 +235,7 @@ def capital_forecasting_estimates(request):
 
 
 def capital_forecasting_quarterly(request):
-    quarterly = capitalforecasting.QuarterReport("2184da", "C113", 2023, "C.999999")
+    quarterly = capitalforecasting.FEARStatusReport("2184da", "C113", 2023, "C.999999")
     data = {
         "fundcenter": quarterly.fundcenter,
         "fund": quarterly.fund.fund,
@@ -267,23 +270,26 @@ def capital_historical_outlook(request):
 def capital_forecasting_dashboard(request):
     estimates = capitalforecasting.EstimateReport("2184da", "C113", 2023, "C.999999")
     estimates.dataframe()
-    estimate_chart = estimates.chart().to_html()
+    estimate_chart = estimates.chart()
 
-    quarterly = capitalforecasting.QuarterReport("2184da", "C113", 2023, "C.999999")
+    quarterly = capitalforecasting.FEARStatusReport("2184da", "C113", 2023, "C.999999")
     quarterly.dataframe()
-    quarterly_chart = quarterly.chart_bullet().to_html()
+    quarterly_chart = quarterly.chart_bullet()
 
     outlook = capitalforecasting.HistoricalOutlookReport("2184da", "C113", "C.999999")
     outlook.dataframe()
-    outlook_chart = outlook.chart().to_html()
+    outlook_chart = outlook.chart()
+    chart_ye_ratios = outlook.chart_ye_ratios()
+    # # Quarterly Estimates
 
     return render(
         request,
         "capital-forecasting-dashboard.html",
         {
-            "estimate_chart": estimate_chart,
             "quarterly_chart": quarterly_chart,
             "outlook_chart": outlook_chart,
+            "chart_ye_ratios": chart_ye_ratios,
+            "estimate_chart": estimate_chart,
             "table": " ",
         },
     )

@@ -2,8 +2,7 @@ from django.db.models import Sum, Value
 from costcenter.models import CapitalForecasting, CapitalProject, FundCenterManager, FundManager
 from bft.models import BftStatusManager
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
+from reports.plotter import Plotter
 
 
 class CapitalReport:
@@ -17,10 +16,10 @@ class CapitalReport:
                 return None
         self.fundcenter = FundCenterManager().fundcenter(fundcenter)
         self.fund = FundManager().fund(fund)
-        self.chart_height = 400
         self.chart_width = 400
         self.layout_margin = dict(l=20, r=20, t=70, b=20)
         self.paper_bgcolor = "LightSteelBlue"
+        self.plotter = Plotter()
 
 
 class HistoricalOutlookReport(CapitalReport):
@@ -45,6 +44,16 @@ class HistoricalOutlookReport(CapitalReport):
     def dataframe(self):
         """Create a dataframe of annual data, one row per year for given fundcenter, project and fund"""
         self.df = pd.DataFrame.from_dict(self.dataset())
+        self.df.rename(
+            columns={
+                "initial_allocation": "Initial Allocation",
+                "q1_forecast": "Q1 Forecast",
+                "q2_forecast": "Q2 Forecast",
+                "q3_forecast": "Q3 Forecast",
+                "ye_spent": "YE Spent",
+            },
+            inplace=True,
+        )
 
     def to_html(self):
         self.dataframe()
@@ -57,26 +66,32 @@ class HistoricalOutlookReport(CapitalReport):
         )
 
     def chart(self):
-        return px.bar(
+        fig = self.plotter.bar_chart(
             self.df,
             x="fy",
-            y=["initial_allocation", "q1_forecast", "q2_forecast", "q3_forecast", "ye_spent"],
-            title=f"Historical Outlook - {self.capital_project}, {self.fund.fund}",
-            height=self.chart_height,
-            barmode="group",
-        ).update_layout(
-            margin=self.layout_margin,
-            paper_bgcolor=self.paper_bgcolor,
-            legend={
-                "orientation": "h",
-                "yanchor": "bottom",
-                "y": 100,
-            },
-            legend_title_text=None,
+            y=["Initial Allocation", "Q1 Forecast", "Q2 Forecast", "Q3 Forecast", "YE Spent"],
+            fig_title=f"Historical Outlook - {self.capital_project}, {self.fund.fund}",
         )
+        return fig
+
+    def chart_ye_ratios(self):
+        self.df["YE vs Initial Allocation"] = self.df["YE Spent"] / self.df["Initial Allocation"]
+        self.df["YE vs Q1"] = self.df["YE Spent"] / self.df["Q1 Forecast"]
+        self.df["YE vs Q2"] = self.df["YE Spent"] / self.df["Q2 Forecast"]
+        self.df["YE vs Q3"] = self.df["YE Spent"] / self.df["Q3 Forecast"]
+
+        fig = self.plotter.bar_chart(
+            self.df,
+            "fy",
+            ["YE vs Initial Allocation", "YE vs Q1", "YE vs Q2", "YE vs Q3"],
+            "Annual YE Spent Ratios",
+            hline=1,
+            hline_annotation="100%",
+        )
+        return fig
 
 
-class QuarterReport(CapitalReport):
+class FEARStatusReport(CapitalReport):
     """This class handles all quarter related fields"""
 
     def __init__(self, fundcenter: str, fund: str, fy: int = None, capital_project: str = None):
@@ -101,10 +116,10 @@ class QuarterReport(CapitalReport):
                 forecast=Sum(f"q{quarter}_forecast"),
                 le=Sum(f"q{quarter}_le"),
                 he=Sum(f"q{quarter}_he"),
-                spent=Sum(f"q{quarter}_spent"),
-                co=Sum(f"q{quarter}_co"),
-                pc=Sum(f"q{quarter}_pc"),
-                fr=Sum(f"q{quarter}_fr"),
+                Spent=Sum(f"q{quarter}_spent"),
+                CO=Sum(f"q{quarter}_co"),
+                PC=Sum(f"q{quarter}_pc"),
+                FR=Sum(f"q{quarter}_fr"),
             )
         )
 
@@ -113,9 +128,9 @@ class QuarterReport(CapitalReport):
         self.df = pd.DataFrame()
         for q in [1, 2, 3, 4]:
             df = pd.DataFrame.from_dict(self.dataset(q))
-            df["Quarter"] = q
+            df["Quarters"] = q
             self.df = pd.concat([self.df, df])
-        self.df = self.df.set_index(["Quarter"])
+        self.df = self.df.set_index(["Quarters"])
 
     def to_html(self):
         self.dataframe()
@@ -129,70 +144,20 @@ class QuarterReport(CapitalReport):
 
     def chart_bullet(self):
         self.dataframe()
-        _m1 = self.df[["allocation", "forecast"]].max(axis=1).max(axis=0)
-        _m2 = self.df[["co", "pc", "fr", "spent"]].sum(axis=1).max()
-        max_axis = max(_m1, _m2)
-        df = self.df.reset_index()
-
-        fig = go.Figure()
-
-        y = [[0.05, 0.15], [0.3, 0.4], [0.55, 0.65], [0.8, 0.9]]
-        axis_visible = [True, False, False, False]
-        for i in range(0, 4):
-            data = df.iloc[i]
-            step0 = data.spent
-            step1 = step0 + data.co
-            step2 = step1 + data.pc
-            step3 = step2 + data.fr
-            domain = {"x": [0.25, 1], "y": y[i]}
-            fig.add_trace(
-                go.Indicator(
-                    mode="gauge",  # +number+delta
-                    value=data.allocation,
-                    # delta={"reference": data.forecast},
-                    domain=domain,
-                    title={"text": f"Q{df.iloc[i]['Quarter']}"},
-                    gauge={
-                        "shape": "bullet",
-                        "axis": {
-                            "visible": axis_visible[i],
-                            "range": [None, max_axis],
-                            "tickfont": {"size": 14},
-                        },
-                        "threshold": {
-                            "line": {"color": "green", "width": 3},
-                            "thickness": 0.75,
-                            "value": data.forecast,
-                        },
-                        "steps": [
-                            {"range": [0, step0], "color": "#882255", "name": "Spent"},
-                            {"range": [step0, step1], "color": "#ddcc77"},
-                            {"range": [step1, step2], "color": "#afeeee"},
-                            {"range": [step2, step3], "color": "#fa8072"},
-                        ],
-                        "bar": {"color": "black"},
-                    },
-                )
-            )
-
-        fig.update_layout(
-            height=self.chart_height,
-            width=self.chart_width,
-            margin={"t": 40, "b": 20, "l": 0},
-            paper_bgcolor=self.paper_bgcolor,
-            title="Forecast, Encumbrance, Allocation <br>Relationship (FEAR)",
-            legend=(
-                dict(
-                    orientation="h",
-                    x=0,
-                    y=1,
-                    bgcolor="Blue",
-                    bordercolor="Black",
-                    borderwidth=2,
-                )
-            ),
+        plotter = Plotter()
+        # # FEAR Chart
+        fig = plotter.bullet_chart(
+            self.df.reset_index(),
+            fig_title="FEAR Status (Forecast Encumbrance Allocation Relationship)",
+            x_values=["Spent", "CO", "PC", "FR"],
+            y="Quarters",
+            piston="forecast",
+            piston_name="Forecast",
+            diamond="allocation",
+            diamond_name="Allocation",
+            # v_line=1111,  # self.df.working_plan[0],
+            # v_line_text="Working Plan",
         )
-
         return fig
 
 
@@ -257,9 +222,9 @@ class EstimateReport(CapitalReport):
         self.df = pd.DataFrame(
             {
                 "Quarters": self.quarters,
+                "LE": self.le,
                 "MLE": self.mle,
                 "HE": self.he,
-                "LE": self.le,
                 "working_plan": self.working_plan,
             }
         )
@@ -275,22 +240,13 @@ class EstimateReport(CapitalReport):
         )
 
     def chart(self):
-        fig = px.bar(
-            self.df,
+        plotter = Plotter()
+        fig = plotter.bar_chart(
+            df=self.df,
             x="Quarters",
-            y=["MLE", "HE", "LE"],
-            title=f"Quarterly Estimates - {self.fy}{self.capital_project}, {self.fund.fund}",
-            height=self.chart_height,
-            barmode="group",
-        )
-        fig.update_layout(
-            margin=self.layout_margin,
-            paper_bgcolor=self.paper_bgcolor,
-        )
-        fig.add_hline(
-            self.working_plan,
-            line_dash="dash",
-            annotation_text="Working Plan",
-            annotation_position="top",
+            y=["LE", "MLE", "HE"],
+            fig_title=f"Quarterly Estimates - {self.fy}{self.capital_project}, {self.fund.fund}",
+            hline=self.df.working_plan[0],
+            hline_annotation="Working Plan",
         )
         return fig
