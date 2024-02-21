@@ -19,6 +19,7 @@ from costcenter.models import (
     FundCenter,
     FundCenterAllocation,
     CostCenterAllocation,
+    CapitalProject,
 )
 from charges.models import CostCenterChargeImport, CostCenterChargeMonthly
 from lineitems.models import LineForecast, LineItem
@@ -35,6 +36,7 @@ class Command(BaseCommand):
             LineItem.objects.all().delete()
             BftUser.objects.update(default_cc="", default_fc="")  # So we can delete FC and CC
             CostCenter.objects.all().delete()
+            CapitalProject.objects.all().delete()
             Source.objects.all().delete()
             Fund.objects.all().delete()
             FundCenter.objects.all().delete()
@@ -48,6 +50,7 @@ class Command(BaseCommand):
             self.set_source()
             self.set_fund_center()
             self.set_cost_center()
+            self.set_capital_project()
             self.set_cost_center_allocation()
             self.set_fund_center_allocation()
         else:
@@ -75,10 +78,16 @@ class Command(BaseCommand):
 
     def set_cost_center(self):
         """Populate the database with all fund centers contained in the csv file.
-        All funds, sources and fund centers the the coste centers relies on must be contained in the
+        All funds, sources and fund centers the the cost centers relies on must be contained in the
         related csv file.
         """
         uploadprocessor.CostCenterProcessor("test-data/costcenters.csv", None).main()
+
+    def set_capital_project(self):
+        """Populate the database with all the capital projects contained in the csv file.
+        All funds and fund centers that the capital projects relies on must be contained in the
+        related csv file."""
+        uploadprocessor.CapitalProjectProcessor("test-data/capital-projects.csv", None).main()
 
     def set_bft_status(self):
         """
