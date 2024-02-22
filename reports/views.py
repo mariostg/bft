@@ -229,7 +229,7 @@ def capital_forecasting_estimates(request):
         "capital-forecasting-estimates.html",
         {
             "table": estimates.to_html(),
-            "estimate_chart": estimates.chart().to_html(),
+            "estimate_chart": estimates.chart(),
         },
     )
 
@@ -243,7 +243,7 @@ def capital_forecasting_quarterly(request):
         "project_no": quarterly.capital_project,
     }
     html = quarterly.to_html()
-    chart = quarterly.chart_bullet().to_html()
+    chart = quarterly.chart_bullet()
     return render(
         request,
         "capital-forecasting-quarterly.html",
@@ -262,7 +262,7 @@ def capital_historical_outlook(request):
         "capital-historical-outlook.html",
         {
             "table": outlook.to_html(),
-            "chart": outlook.chart().to_html(),
+            "chart": outlook.chart(),
         },
     )
 
