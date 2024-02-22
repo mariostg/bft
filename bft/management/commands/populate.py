@@ -20,6 +20,7 @@ from costcenter.models import (
     FundCenterAllocation,
     CostCenterAllocation,
     CapitalProject,
+    CapitalForecasting,
 )
 from charges.models import CostCenterChargeImport, CostCenterChargeMonthly
 from lineitems.models import LineForecast, LineItem
@@ -37,6 +38,7 @@ class Command(BaseCommand):
             BftUser.objects.update(default_cc="", default_fc="")  # So we can delete FC and CC
             CostCenter.objects.all().delete()
             CapitalProject.objects.all().delete()
+            CapitalForecasting.objects.all().delete()
             Source.objects.all().delete()
             Fund.objects.all().delete()
             FundCenter.objects.all().delete()
@@ -51,6 +53,7 @@ class Command(BaseCommand):
             self.set_fund_center()
             self.set_cost_center()
             self.set_capital_project()
+            self.set_capital_forecasting()
             self.set_cost_center_allocation()
             self.set_fund_center_allocation()
         else:
@@ -88,6 +91,9 @@ class Command(BaseCommand):
         All funds and fund centers that the capital projects relies on must be contained in the
         related csv file."""
         uploadprocessor.CapitalProjectProcessor("test-data/capital-projects.csv", None).main()
+
+    def set_capital_forecasting(self):
+        uploadprocessor.CapitalProjectForecastProcessor("test-data/capital_forecast.csv", None).main()
 
     def set_bft_status(self):
         """
