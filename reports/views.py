@@ -17,9 +17,14 @@ from costcenter.models import (
     FinancialStructureManager,
     ForecastAdjustmentManager,
     CapitalForecasting,
+    CapitalProjectManager,
 )
 from charges.models import CostCenterChargeMonthly
-from reports.forms import SearchAllocationAnalysisForm, SearchCostCenterScreeningReportForm
+from reports.forms import (
+    SearchAllocationAnalysisForm,
+    SearchCostCenterScreeningReportForm,
+    SearchCapitalForecstingDashboardForm,
+)
 from bft.models import BftStatus
 from bft.conf import QUARTERKEYS
 from bft.exceptions import LineItemsDoNotExistError
@@ -268,19 +273,46 @@ def capital_historical_outlook(request):
 
 
 def capital_forecasting_dashboard(request):
-    estimates = capitalforecasting.EstimateReport("2184da", "C113", 2023, "C.999999")
-    estimates.dataframe()
-    estimate_chart = estimates.chart()
+    fundcenter = (
+        fund
+    ) = capital_project = quarterly_chart = estimate_chart = outlook_chart = chart_ye_ratios = ""
+    form_filter = True
 
-    quarterly = capitalforecasting.FEARStatusReport("2184da", "C113", 2023, "C.999999")
-    quarterly.dataframe()
-    quarterly_chart = quarterly.chart_bullet()
+    if len(request.GET):
+        fundcenter = FundCenterManager().get_request(request)
+        fund = FundManager().get_request(request)
+        capital_project = CapitalProjectManager().get_request(request)
+        quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
+        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
 
-    outlook = capitalforecasting.HistoricalOutlookReport("2184da", "C113", "C.999999")
-    outlook.dataframe()
-    outlook_chart = outlook.chart()
-    chart_ye_ratios = outlook.chart_ye_ratios()
-    # # Quarterly Estimates
+        if str(quarter) not in QUARTERKEYS:
+            messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
+
+        estimates = capitalforecasting.EstimateReport(fundcenter, fund, fy, capital_project)
+        estimates.dataframe()
+        estimate_chart = estimates.chart()
+
+        quarterly = capitalforecasting.FEARStatusReport(fundcenter, fund, fy, capital_project)
+        quarterly.dataframe()
+        quarterly_chart = quarterly.chart_bullet()
+
+        outlook = capitalforecasting.HistoricalOutlookReport(fundcenter, fund, capital_project)
+        outlook.dataframe()
+        outlook_chart = outlook.chart()
+        chart_ye_ratios = outlook.chart_ye_ratios()
+
+    else:
+        fy = BftStatus.current.fy()
+        quarter = BftStatus.current.quarter()
+
+    initial = {
+        "fundcenter": fundcenter,
+        "fund": fund,
+        "capital_project": capital_project,
+        "fy": fy,
+        "quarter": quarter,
+    }
+    form = SearchCapitalForecstingDashboardForm(initial=initial)
 
     return render(
         request,
@@ -291,5 +323,7 @@ def capital_forecasting_dashboard(request):
             "chart_ye_ratios": chart_ye_ratios,
             "estimate_chart": estimate_chart,
             "table": " ",
+            "form": form,
+            "form_filter": form_filter,
         },
     )

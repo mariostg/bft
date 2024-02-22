@@ -7,8 +7,10 @@
     <div class="alert alert--info">There are no data to display</div>
     {% endif %}
 
-    <h1>Capital Forecasting Dashboard</h1>
     {% if form_filter %}
+    {% include 'capital-forecasting-dashboard-filter-form.html' %}
+    {% else %}
+    <h1>Capital Forecasting Dashboard</h1>
     {% endif %}
 {% autoescape off %}
 <div class="block-wrap">

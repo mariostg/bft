@@ -734,6 +734,24 @@ class CostCenter(models.Model):
         super(CostCenter, self).save(*args, **kwargs)
 
 
+class CapitalProjectManager(models.Manager):
+    def exists(self, capital_project: str = None) -> bool:
+        if capital_project:
+            return CapitalProject.objects.filter(project_no=capital_project.upper()).exists()
+        else:
+            return CapitalProject.objects.count() > 0
+
+    def get_request(self, request) -> str | None:
+        capital_project = request.GET.get("capital_project")
+        if capital_project:
+            capital_project = capital_project.upper()
+            if not CapitalProjectManager().exists(capital_project):
+                messages.info(request, f"Capital Project {capital_project} does not exist.")
+            return capital_project
+        else:
+            return None
+
+
 class CapitalProject(models.Model):
     project_no = models.CharField("Project No", max_length=8, unique=True)
     shortname = models.CharField("Project Name", max_length=35, blank=True)
@@ -754,7 +772,7 @@ class CapitalProject(models.Model):
         on_delete=models.RESTRICT,
         limit_choices_to={"procurement_officer": True},
     )
-    objects = CostCenterManager()
+    objects = CapitalProjectManager()
 
     def __str__(self):
         return f"{self.project_no.upper()} - {self.shortname}"
