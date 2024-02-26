@@ -809,6 +809,17 @@ class CapitalForecasting(models.Model):
 
     class Meta:
         abstract = True
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "fund",
+                    "capital_project",
+                    "commit_item",
+                    "fy",
+                ),
+                name="%(app_label)s_%(class)s_is_unique",
+            )
+        ]
 
     def __str__(self):
         return f"{self.capital_project} - {self.fy} - {self.fund.fund}"
