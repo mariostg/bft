@@ -32,8 +32,9 @@ from .forms import (
 )
 from bft.models import BftStatusManager
 from bft.uploadprocessor import (
-    CapitalProjectProcessor,
+    CapitalProjectNewYearProcessor,
     CapitalProjectInYearProcessor,
+    CapitalProjectYearEndProcessor,
     CostCenterProcessor,
     FundCenterProcessor,
     CostCenterAllocationProcessor,
@@ -438,26 +439,64 @@ def capital_project_upload(request):
     return render(request, "core/form-upload.html", {"form": form, "form_title": "Capital Project Upload"})
 
 
-def capital_project_forecast_upload(request):
-    """Process the valid request by importing a file containing capital project forecasts inside the database.
-
-    Args:
-        request (HttpRequest):
-
-    """
+def capital_forecasting_new_year_upload(request):
     if request.method == "POST":
-        form = CapitalProjectForecastUploadForm(request.POST, request.FILES)
+        form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/capital-project-forecast-upload-{user}.csv"
+            filepath = f"{UPLOADS}/capital-forecasting-new-year-upload-{user}.csv"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
-            processor = CapitalProjectForecastProcessor(filepath, user)
+            processor = CapitalProjectNewYearProcessor(filepath, user)
             processor.main(request)
     else:
-        form = CapitalProjectForecastUploadForm
-    return render(request, "core/form-upload.html", {"form": form, "form_title": "Fund Upload"})
+        form = UploadForm
+    return render(
+        request,
+        "core/form-upload.html",
+        {"form": form, "form_title": "Capital Project New Year Upload", "back": "bft"},
+    )
+
+
+def capital_forecasting_in_year_upload(request):
+    if request.method == "POST":
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            filepath = f"{UPLOADS}/capital-forecasting-in-year-upload-{user}.csv"
+            with open(filepath, "wb+") as destination:
+                for chunk in request.FILES["source_file"].chunks():
+                    destination.write(chunk)
+            processor = CapitalProjectInYearProcessor(filepath, user)
+            processor.main(request)
+    else:
+        form = UploadForm
+    return render(
+        request,
+        "core/form-upload.html",
+        {"form": form, "form_title": "Capital Project In Year Upload", "back": "bft"},
+    )
+
+
+def capital_forecasting_year_end_upload(request):
+    if request.method == "POST":
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            filepath = f"{UPLOADS}/capital-forecasting-year-end-upload-{user}.csv"
+            with open(filepath, "wb+") as destination:
+                for chunk in request.FILES["source_file"].chunks():
+                    destination.write(chunk)
+            processor = CapitalProjectYearEndProcessor(filepath, user)
+            processor.main(request)
+    else:
+        form = UploadForm
+    return render(
+        request,
+        "core/form-upload.html",
+        {"form": form, "form_title": "Capital Project Year End Upload", "back": "bft"},
+    )
 
 
 def costcenter_page(request):

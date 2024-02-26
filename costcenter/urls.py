@@ -102,8 +102,18 @@ urlpatterns += [
     path("capital-project-delete/<int:pk>", views.capital_project_delete, name="capital-project-delete"),
     path("capital-project-upload", views.capital_project_upload, name="capital-project-upload"),
     path(
-        "capital-project-forecast-upload",
-        views.capital_project_forecast_upload,
-        name="capital-project-forecast-upload",
+        "capital-forecasting-new-year-upload",
+        views.capital_forecasting_new_year_upload,
+        name="capital-forecasting-new-year-upload",
+    ),
+    path(
+        "capital-forecasting-in-year-upload",
+        views.capital_forecasting_in_year_upload,
+        name="capital-forecasting-in-year-upload",
+    ),
+    path(
+        "capital-forecasting-year-end-upload",
+        views.capital_forecasting_year_end_upload,
+        name="capital-forecasting-year-end-upload",
     ),
 ]
