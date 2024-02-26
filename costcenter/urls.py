@@ -122,6 +122,26 @@ urlpatterns += [
         name="capital-forecasting-in-year-delete",
     ),
     path(
+        "capital-forecasting-year-end-table",
+        views.capital_forecasting_year_end_table,
+        name="capital-forecasting-year-end-table",
+    ),
+    path(
+        "capital-forecasting-year-end-add",
+        views.capital_forecasting_year_end_add,
+        name="capital-forecasting-year-end-add",
+    ),
+    path(
+        "capital-forecasting-year-end-update/<int:pk>",
+        views.capital_forecasting_year_end_update,
+        name="capital-forecasting-year-end-update",
+    ),
+    path(
+        "capital-forecasting-year-end-delete/<int:pk>",
+        views.capital_forecasting_year_end_delete,
+        name="capital-forecasting-year-end-delete",
+    ),
+    path(
         "capital-forecasting-new-year-upload",
         views.capital_forecasting_new_year_upload,
         name="capital-forecasting-new-year-upload",

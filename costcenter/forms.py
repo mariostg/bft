@@ -117,6 +117,19 @@ class CapitalForecastingInYearForm(forms.ModelForm):
         super(CapitalForecastingInYearForm, self).__init__(*args, **kwargs)
 
 
+class CapitalForecastingYearEndForm(forms.ModelForm):
+    class Meta:
+        model = CapitalYearEnd
+        fields = [
+            "capital_project",
+            "commit_item",
+            "fund",
+            "fy",
+            "ye_spent",
+            "notes",
+        ]
+
+
 class CostCenterForm(forms.ModelForm):
     class Meta:
         model = CostCenter

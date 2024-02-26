@@ -42,6 +42,15 @@ class CapitalInYearFilter(django_filters.FilterSet):
         }
 
 
+class CapitalYearEndFilter(django_filters.FilterSet):
+    class Meta:
+        model = CapitalYearEnd
+        fields = {
+            "capital_project__project_no": ["icontains"],
+            "fund__fund": ["iexact"],
+        }
+
+
 class CostCenterFilter(django_filters.FilterSet):
     class Meta:
         model = CostCenter
