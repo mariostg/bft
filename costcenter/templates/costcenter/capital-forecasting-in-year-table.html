@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Capital Forecasting In Year Table{% endblock title %}
+{% block content %}
+{% include "core/form-filter.html" %}
+<main class="block block--centered">
+    <div class="container">
+        <header class=''>
+            <h2>Capital In Year Table</h2>
+        </header>
+        {% if user.is_authenticated %}
+        <div class=''>
+            <div class="action-bar block">
+                <a class='btn btn-add' href="{% url 'capital-forecasting-in-year-add' %}"></a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% include 'paginator.html' %}
+    {% for elem in data  %}
+    <section class='summary'>
+        <div class='summary__header'>
+            <span><strong>{{elem.capital_project}} </strong> - {{elem.capital_project.fundcenter}}</span>
+            <span>{{elem.fund}}</span>
+            <span>FY{{elem.fy|stringformat:'s'}}</span>
+            <span>Q{{elem.quarter}}</span>
+        </div>
+        <div class="summary__body">
+            <span>Allocation:{{elem.allocation}}</span>
+            <span>LE:{{elem.le}}</span>
+            <span>MLE:{{elem.mle}}</span>
+            <span>HE:{{elem.he}}</span>
+            <span>{{elem.spent}}</span>
+            <span>CO:{{elem.co}}</span>
+            <span>PC:{{elem.pc}}</span>
+            <span>FR:{{elem.fr}}</span>
+            {{elem.note|linebreaksbr}}
+        </div>
+        <div class="summary__footer">
+            {% if user.is_authenticated %}
+            <a class="btn btn-edit" href="{% url 'capital-forecasting-in-year-update' elem.id %}" ></a>
+            <a class="btn btn-delete" href="{% url 'capital-forecasting-in-year-delete' elem.pk %}" ></a >
+                {% endif %}
+        </div>
+    </section>
+    {% endfor %}
+
+</main>
+
+<script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
+{% endblock content %}

@@ -4,6 +4,9 @@ from costcenter.models import (
     FundCenter,
     FundCenterAllocation,
     CapitalProject,
+    CapitalInYear,
+    CapitalNewYear,
+    CapitalYearEnd,
 )
 import django_filters
 
@@ -27,6 +30,15 @@ class CapitalProjectFilter(django_filters.FilterSet):
             "shortname": ["icontains"],
             "fundcenter__shortname": ["icontains"],
             "fundcenter__fundcenter": ["icontains"],
+        }
+
+
+class CapitalInYearFilter(django_filters.FilterSet):
+    class Meta:
+        model = CapitalInYear
+        fields = {
+            "capital_project__project_no": ["icontains"],
+            "fund__fund": ["iexact"],
         }
 
 

@@ -6,6 +6,9 @@ from costcenter.models import (
     FundCenter,
     CostCenter,
     CapitalProject,
+    CapitalInYear,
+    CapitalNewYear,
+    CapitalYearEnd,
     CostCenterAllocation,
     FundCenterAllocation,
     ForecastAdjustment,
@@ -88,6 +91,30 @@ class CapitalProjectForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(CapitalProjectForm, self).__init__(*args, **kwargs)
+
+
+class CapitalForecastingInYearForm(forms.ModelForm):
+    class Meta:
+        model = CapitalInYear
+        fields = [
+            "capital_project",
+            "commit_item",
+            "fund",
+            "quarter",
+            "fy",
+            "allocation",
+            "spent",
+            "co",
+            "pc",
+            "fr",
+            "le",
+            "mle",
+            "he",
+            "notes",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(CapitalForecastingInYearForm, self).__init__(*args, **kwargs)
 
 
 class CostCenterForm(forms.ModelForm):
