@@ -33,7 +33,6 @@ class FundManager(models.Manager):
         return Fund.objects.filter(fund=fund).exists()
 
     def get_request(self, request) -> str | None:
-        print(request)
         fund = request.GET.get("fund")
         if fund:
             fund = fund.upper()
