@@ -33,8 +33,7 @@ class SearchCostCenterScreeningReportForm(forms.ModelForm):
         )
 
 
-class SearchCapitalForecstingDashboardForm(forms.Form):
-    fundcenter = forms.CharField(required=False)
+class SearchCapitalForecastingDashboardForm(forms.Form):
     capital_project = forms.CharField(required=False)
     fund = forms.CharField(required=False)
     fy = forms.CharField(required=False)

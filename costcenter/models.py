@@ -735,6 +735,14 @@ class CostCenter(models.Model):
 
 
 class CapitalProjectManager(models.Manager):
+    def project(self, capital_project: str) -> "CapitalProject | None":
+        capital_project = capital_project.upper()
+        try:
+            obj = CapitalProject.objects.get(project_no__iexact=capital_project)
+        except CapitalProject.DoesNotExist:
+            return None
+        return obj
+
     def exists(self, capital_project: str = None) -> bool:
         if capital_project:
             return CapitalProject.objects.filter(project_no=capital_project.upper()).exists()
@@ -797,45 +805,43 @@ class CapitalForecasting(models.Model):
     capital_project = models.ForeignKey(
         CapitalProject, on_delete=models.CASCADE, null=True, verbose_name="Capital Project"
     )
-    fundcenter = models.ForeignKey(
-        FundCenter, on_delete=models.CASCADE, null=True, verbose_name="Fund Center"
-    )
     commit_item = models.PositiveSmallIntegerField(default=0)
-    initial_allocation = models.PositiveIntegerField(default=0)
-    q1_allocation = models.PositiveIntegerField(default=0)
-    q2_allocation = models.PositiveIntegerField(default=0)
-    q3_allocation = models.PositiveIntegerField(default=0)
-    q4_allocation = models.PositiveIntegerField(default=0)
-    q1_forecast = models.PositiveIntegerField(default=0)
-    q2_forecast = models.PositiveIntegerField(default=0)
-    q3_forecast = models.PositiveIntegerField(default=0)
-    q4_forecast = models.PositiveIntegerField(default=0)
-    q1_le = models.PositiveIntegerField(default=0)
-    q2_le = models.PositiveIntegerField(default=0)
-    q3_le = models.PositiveIntegerField(default=0)
-    q4_le = models.PositiveIntegerField(default=0)
-    q1_he = models.PositiveIntegerField(default=0)
-    q2_he = models.PositiveIntegerField(default=0)
-    q3_he = models.PositiveIntegerField(default=0)
-    q4_he = models.PositiveIntegerField(default=0)
-    q1_spent = models.PositiveIntegerField(default=0)
-    q2_spent = models.PositiveIntegerField(default=0)
-    q3_spent = models.PositiveIntegerField(default=0)
-    q4_spent = models.PositiveIntegerField(default=0)
-    q1_co = models.PositiveIntegerField(default=0)
-    q2_co = models.PositiveIntegerField(default=0)
-    q3_co = models.PositiveIntegerField(default=0)
-    q4_co = models.PositiveIntegerField(default=0)
-    q1_pc = models.PositiveIntegerField(default=0)
-    q2_pc = models.PositiveIntegerField(default=0)
-    q3_pc = models.PositiveIntegerField(default=0)
-    q4_pc = models.PositiveIntegerField(default=0)
-    q1_fr = models.PositiveIntegerField(default=0)
-    q2_fr = models.PositiveIntegerField(default=0)
-    q3_fr = models.PositiveIntegerField(default=0)
-    q4_fr = models.PositiveIntegerField(default=0)
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f"{self.capital_project} - {self.fy} - {self.fund.fund}"
+
+    def save(self, *args, **kwargs):
+        if self.fy not in [v[0] for v in YEAR_CHOICES]:
+            raise exceptions.InvalidFiscalYearException(
+                f"Fiscal year {self.fy} invalid, must be one of {','.join([v[1] for v in YEAR_CHOICES])}"
+            )
+        if not self.fund:
+            raise ValueError("Allocation cannot be saved without Fund")
+        super().save(*args, **kwargs)
+
+
+class CapitalYearEnd(CapitalForecasting):
     ye_spent = models.PositiveIntegerField(default=0)
-    notes = models.TextField()
+
+
+class CapitalNewYear(CapitalForecasting):
+    initial_allocation = models.PositiveIntegerField("Initial allocation", default=0)
+
+
+class CapitalInYear(CapitalForecasting):
+    quarter = models.CharField(max_length=1, choices=QUARTERS, default="0")
+    allocation = models.PositiveIntegerField(default=0)
+    spent = models.PositiveIntegerField(default=0)
+    co = models.PositiveIntegerField(default=0)
+    pc = models.PositiveIntegerField(default=0)
+    fr = models.PositiveIntegerField(default=0)
+    le = models.PositiveIntegerField(default=0)
+    mle = models.PositiveIntegerField(default=0)
+    he = models.PositiveIntegerField(default=0)
 
 
 class ForecastAdjustmentManager(models.Manager):

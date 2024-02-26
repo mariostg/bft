@@ -6,7 +6,9 @@ from costcenter.models import (
     Source,
     FundCenter,
     CostCenterAllocation,
-    CapitalForecasting,
+    CapitalInYear,
+    CapitalNewYear,
+    CapitalYearEnd,
 )
 
 
@@ -38,6 +40,8 @@ class CostCenterAllocationAdmin(admin.ModelAdmin):
 admin.site.register(Fund, FundAdmin)
 admin.site.register(CostCenter, CostCenterAdmin)
 admin.site.register(Source)
-admin.site.register(CapitalForecasting)
+admin.site.register(CapitalYearEnd)
+admin.site.register(CapitalInYear)
+admin.site.register(CapitalNewYear)
 admin.site.register(FundCenter, FundCenterAdmin)
 admin.site.register(CostCenterAllocation, CostCenterAllocationAdmin)

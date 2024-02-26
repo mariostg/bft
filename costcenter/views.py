@@ -33,7 +33,7 @@ from .forms import (
 from bft.models import BftStatusManager
 from bft.uploadprocessor import (
     CapitalProjectProcessor,
-    CapitalProjectForecastProcessor,
+    CapitalProjectInYearProcessor,
     CostCenterProcessor,
     FundCenterProcessor,
     CostCenterAllocationProcessor,
