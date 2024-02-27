@@ -273,7 +273,9 @@ def capital_historical_outlook(request):
 
 
 def capital_forecasting_dashboard(request):
-    fund = capital_project = quarterly_chart = estimate_chart = outlook_chart = chart_ye_ratios = ""
+    fund = (
+        capital_project
+    ) = quarterly_chart = estimate_chart = outlook_chart = chart_ye_ratios = pie_chart = ""
     form_filter = True
 
     if len(request.GET):
@@ -298,6 +300,10 @@ def capital_forecasting_dashboard(request):
         outlook_chart = outlook.chart()
         chart_ye_ratios = outlook.chart_ye_ratios()
 
+        pie = capitalforecasting.EncumbranceStatusReport(fund, fy, quarter, capital_project)
+        pie.dataframe()
+        pie_chart = pie.chart()
+
     else:
         fy = BftStatus.current.fy()
         quarter = BftStatus.current.quarter()
@@ -318,6 +324,7 @@ def capital_forecasting_dashboard(request):
             "outlook_chart": outlook_chart,
             "chart_ye_ratios": chart_ye_ratios,
             "estimate_chart": estimate_chart,
+            "pie_chart": pie_chart,
             "table": " ",
             "form": form,
             "form_filter": form_filter,

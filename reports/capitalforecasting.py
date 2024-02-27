@@ -203,6 +203,68 @@ class FEARStatusReport(CapitalReport):
         return fig
 
 
+class EncumbranceStatusReport(CapitalReport):
+    def __init__(self, fund: Fund | str, fy: int, quarter: int, capital_project: CapitalProject | str = None):
+        self.spent = self.co = self.pc = self.fr = 0
+        self.quarter = quarter
+
+        super().__init__(fund, capital_project, fy)
+
+    def dataset(self):
+        return (
+            CapitalInYear.objects.filter(fy=self.fy, fund=self.fund, quarter=self.quarter)
+            .values(
+                "capital_project",
+                "fund",
+                "quarter",
+                "capital_project__project_no",
+                "capital_project__fundcenter__fundcenter",
+            )
+            .order_by(
+                "capital_project",
+                "fund",
+                "quarter",
+                "capital_project__project_no",
+                "capital_project__fundcenter__fundcenter",
+            )
+            .annotate(
+                CO=Sum("co"),
+                PC=Sum("pc"),
+                FR=Sum("fr"),
+                Spent=Sum("spent"),
+            )
+        )
+
+    def dataframe(self):
+        self.df = pd.DataFrame.from_dict(self.dataset()).rename(
+            columns={
+                "capital_project__fundcenter__fundcenter": "Fund Center",
+                "capital_project__project_no": "Project No",
+            }
+        )
+
+    def to_html(self):
+        self.dataframe()
+        if self.df.empty:
+            return "Dataframe is empty."
+        fmt = "{:,.0f}".format
+        fmt_dict = {}
+        for field in ["CO", "PC", "FR", "Spent"]:
+            fmt_dict[field] = fmt
+        return self.df.to_html(
+            formatters=fmt_dict,
+        )
+
+    def chart(self):
+        labels = ["CO", "PC", "FR", "Spent"]
+        if self.df.empty:
+            return "Estimate report has no data to plot."
+        values = [self.df.CO[0], self.df.PC[0], self.df.FR[0], self.df.Spent[0]]
+        plotter = Plotter()
+        fig = plotter.pie_chart(labels=labels, values=values)
+        return fig
+
+
 class EstimateReport(CapitalReport):
     """This class handles the LE, MLE, and HE of for the Capital Forecasting."""
 
