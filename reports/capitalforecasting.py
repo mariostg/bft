@@ -237,7 +237,13 @@ class EstimateReport(CapitalReport):
         )
 
     def dataframe(self):
-        self.df = pd.DataFrame.from_dict(self.dataset())
+        self.df = pd.DataFrame.from_dict(self.dataset()).rename(
+            columns={
+                "capital_project__fundcenter__fundcenter": "Fund Center",
+                "capital_project__project_no": "Project No",
+                "working_plan": "Working Plan",
+            }
+        )
 
     def to_html(self):
         self.dataframe()
@@ -260,7 +266,7 @@ class EstimateReport(CapitalReport):
             x="quarter",
             y=["LE", "MLE", "HE"],
             fig_title=f"Quarterly Estimates - {self.fy}{self.capital_project}, {self.fund.fund}",
-            hline=self.df.working_plan[0],
+            hline=self.df["Working Plan"][0],
             hline_annotation="Working Plan",
         )
         return fig
