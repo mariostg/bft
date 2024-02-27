@@ -18,7 +18,6 @@ if (text_toggler) {
     text_toggler.addEventListener("click", (event) => {
         let comment_hidden = !JSON.parse(sessionStorage.getItem("comment_hidden"));
         sessionStorage.setItem("comment_hidden", comment_hidden);
-        console.log(comment_hidden);
         toggle_comments();
     });
 }
