@@ -30,11 +30,11 @@
             <span>LE:{{elem.le}}</span>
             <span>MLE:{{elem.mle}}</span>
             <span>HE:{{elem.he}}</span>
-            <span>{{elem.spent}}</span>
+            <span>Spent:{{elem.spent}}</span>
             <span>CO:{{elem.co}}</span>
             <span>PC:{{elem.pc}}</span>
             <span>FR:{{elem.fr}}</span>
-            {{elem.note|linebreaksbr}}
+            {{elem.notes|linebreaksbr}}
         </div>
         <div class="summary__footer">
             {% if user.is_authenticated %}
