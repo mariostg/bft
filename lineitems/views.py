@@ -40,7 +40,9 @@ def lineitem_page(request):
         has_filter = True
     search_filter = LineItemFilter(request.GET, queryset=data)
     return render(
-        request, "lineitems/lineitem-table.html", {"filter": search_filter, "has_filter": has_filter}
+        request,
+        "lineitems/lineitem-table.html",
+        {"filter": search_filter, "has_filter": has_filter, "reset": "lineitem-page"},
     )
 
 

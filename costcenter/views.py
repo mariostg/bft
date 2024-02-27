@@ -201,10 +201,7 @@ def fundcenter_page(request):
     return render(
         request,
         "costcenter/fundcenter-table.html",
-        {
-            "filter": search_filter,
-            "has_filter": has_filter,
-        },
+        {"filter": search_filter, "has_filter": has_filter, "reset": "fundcenter-table"},
     )
 
 
@@ -745,6 +742,7 @@ def costcenter_page(request):
             "data": paginator.get_page(page_number),
             "status": status,
             "has_filter": has_filter,
+            "reset": "costcenter-table",
         },
     )
 
