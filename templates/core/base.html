@@ -39,7 +39,9 @@
     }); {% endcomment %}
 
     var alerts = document.querySelector('.alert')
-    alerts.addEventListener('click',(event)=>{alerts.remove()})
+    if (alerts){
+        alerts.addEventListener('click',(event)=>{alerts.remove()})
+    }
 
 
 
