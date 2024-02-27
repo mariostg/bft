@@ -21,6 +21,7 @@ from .models import (
 )
 from .forms import (
     CostCenterAllocationUploadForm,
+    CapitalForecastingNewYearForm,
     CapitalForecastingInYearForm,
     CapitalForecastingYearEndForm,
     FundForm,
@@ -50,6 +51,7 @@ from main.settings import UPLOADS
 from .filters import (
     CostCenterFilter,
     CapitalProjectFilter,
+    CapitalNewYearFilter,
     CapitalInYearFilter,
     CapitalYearEndFilter,
     CostCenterAllocationFilter,
@@ -443,6 +445,75 @@ def capital_project_upload(request):
     else:
         form = UploadForm
     return render(request, "core/form-upload.html", {"form": form, "form_title": "Capital Project Upload"})
+
+
+def capital_forecasting_new_year_table(request):
+    has_filter = False
+    status = {"fy": BftStatusManager().fy(), "period": BftStatusManager().period}
+    if not request.GET:
+        data = None
+    else:
+        data = CapitalNewYear.objects.all()
+        has_filter = True
+    search_filter = CapitalNewYearFilter(request.GET, queryset=data)
+    paginator = Paginator(search_filter.qs, 25)
+    page_number = request.GET.get("page")
+    return render(
+        request,
+        "costcenter/capital-forecasting-new-year-table.html",
+        {
+            "filter": search_filter,
+            "data": paginator.get_page(page_number),
+            "status": status,
+            "has_filter": has_filter,
+            "reset": "capital-forecasting-new-year-table",
+        },
+    )
+
+
+def capital_forecasting_new_year_add(request):
+    if request.method == "POST":
+        form = CapitalForecastingNewYearForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            try:
+                obj.save()
+            except IntegrityError as e:
+                messages.error(
+                    request, f"{e}.  Capital Forecasting {obj.project_no} {obj.fy} {obj.fund} exists"
+                )
+                return render(request, "costcenter/capital-forecasting-new-year-form.html", {"form": form})
+            return redirect("capital-forecasting-new-year-table")
+    else:
+        form = CapitalForecastingNewYearForm
+
+    return render(request, "costcenter/capital-forecasting-new-year-form.html", {"form": form})
+
+
+def capital_forecasting_new_year_update(request, pk):
+    obj = CapitalNewYear.objects.get(pk=pk)
+    print(obj)
+    form = CapitalForecastingNewYearForm(instance=obj)
+
+    if request.method == "POST":
+        form = CapitalForecastingNewYearForm(request.POST, instance=obj)
+        if form.is_valid():
+            try:
+                form.save()
+            except IntegrityError:
+                messages.error(request, "Duplicate entry cannot be saved")
+            return redirect("capital-forecasting-new-year-table")
+
+    return render(request, "costcenter/capital-forecasting-new-year-form.html", {"form": form})
+
+
+def capital_forecasting_new_year_delete(request, pk):
+    obj = CapitalNewYear.objects.get(id=pk)
+    if request.method == "POST":
+        obj.delete()
+        return redirect("capital-forecasting-new-year-table")
+    context = {"object": obj, "back": "capital-forecasting-new-year-table"}
+    return render(request, "core/delete-object.html", context)
 
 
 def capital_forecasting_in_year_table(request):

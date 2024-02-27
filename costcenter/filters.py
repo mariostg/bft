@@ -33,6 +33,15 @@ class CapitalProjectFilter(django_filters.FilterSet):
         }
 
 
+class CapitalNewYearFilter(django_filters.FilterSet):
+    class Meta:
+        model = CapitalNewYear
+        fields = {
+            "capital_project__project_no": ["icontains"],
+            "fund__fund": ["iexact"],
+        }
+
+
 class CapitalInYearFilter(django_filters.FilterSet):
     class Meta:
         model = CapitalInYear
