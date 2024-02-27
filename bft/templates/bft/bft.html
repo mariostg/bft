@@ -14,8 +14,9 @@
             <a class='btn' href="{% url 'bft-status' %}">BFT Status</a>
             <a class='btn' href="{% url 'fund-table' %}">Funds</a>
             <a class='btn'  href="{% url 'source-table' %}">Sources</a>
-            <a class='btn'  href="{% url 'costcenter-table' %}">CostCenters</a>
-            <a class='btn'  href="{% url 'fundcenter-table' %}">FundCenters</a>
+            <a class='btn'  href="{% url 'costcenter-table' %}">Cost Centers</a>
+            <a class='btn'  href="{% url 'fundcenter-table' %}">Fund Centers</a>
+            <a class='btn'  href="{% url 'capital-project-table' %}">Capital Projects</a>
             <a class='btn'  href="{% url 'forecast-adjustment-table' %}">Forecast Adjustments</a>
             <a class='btn'  href="{% url 'costcenter-allocation-table' %}">Allocations - Cost Centers</a>
             <a class='btn'  href="{% url 'fundcenter-allocation-table' %}">Allocations - Fund Centers</a>
@@ -60,6 +61,7 @@
 
             {%if perms.costcenter.add_costcenter%}
             <a class='btn'  href="{% url 'costcenter-add' %}">Cost Center</a>
+            <a class='btn'  href="{% url 'capital-project-add' %}">Capital Project</a>
             {% endif %}
             {%if perms.costcenter.add_fundcenter%}
             <a class='btn'  href="{% url 'fundcenter-add' %}">Fund Center</a>
