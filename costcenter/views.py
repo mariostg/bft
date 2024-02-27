@@ -120,7 +120,9 @@ def fund_upload(request):
             processor.main(request)
     else:
         form = UploadForm
-    return render(request, "core/form-upload.html", {"form": form, "form_title": "Fund Upload"})
+    return render(
+        request, "core/form-upload.html", {"form": form, "form_title": "Fund Upload", "back": "bft"}
+    )
 
 
 def source_page(request):
@@ -183,7 +185,9 @@ def source_upload(request):
             processor.main(request)
     else:
         form = UploadForm
-    return render(request, "core/form-upload.html", {"form": form, "form_title": "Source Upload"})
+    return render(
+        request, "core/form-upload.html", {"form": form, "form_title": "Source Upload", "back": "bft"}
+    )
 
 
 def fundcenter_page(request):
@@ -276,7 +280,9 @@ def fundcenter_upload(request):
             processor.main(request)
     else:
         form = UploadForm
-    return render(request, "core/form-upload.html", {"form": form, "form_title": "Fund Center Upload"})
+    return render(
+        request, "core/form-upload.html", {"form": form, "form_title": "Fund Center Upload", "back": "bft"}
+    )
 
 
 def fundcenter_allocation_page(request):
@@ -353,7 +359,9 @@ def fundcenter_allocation_upload(request):
     else:
         form = FundCenterAllocationUploadForm
     return render(
-        request, "core/form-upload.html", {"form": form, "form_title": "Fund Centers Allocation Upload"}
+        request,
+        "core/form-upload.html",
+        {"form": form, "form_title": "Fund Centers Allocation Upload", "back": "bft"},
     )
 
 
@@ -444,7 +452,11 @@ def capital_project_upload(request):
             processor.main(request)
     else:
         form = UploadForm
-    return render(request, "core/form-upload.html", {"form": form, "form_title": "Capital Project Upload"})
+    return render(
+        request,
+        "core/form-upload.html",
+        {"form": form, "form_title": "Capital Project Upload", "back": "bft"},
+    )
 
 
 def capital_forecasting_new_year_table(request):
@@ -809,7 +821,9 @@ def costcenter_upload(request):
             processor.main(request)
     else:
         form = UploadForm
-    return render(request, "core/form-upload.html", {"form": form, "form_title": "Cost Center Upload"})
+    return render(
+        request, "core/form-upload.html", {"form": form, "form_title": "Cost Center Upload", "back": "bft"}
+    )
 
 
 def costcenter_allocation_page(request):
@@ -890,7 +904,9 @@ def costcenter_allocation_upload(request):
     else:
         form = CostCenterAllocationUploadForm
     return render(
-        request, "core/form-upload.html", {"form": form, "form_title": "Cost Center Allocation Upload"}
+        request,
+        "core/form-upload.html",
+        {"form": form, "form_title": "Cost Center Allocation Upload", "back": "bft"},
     )
 
 
