@@ -853,6 +853,20 @@ class CapitalInYear(CapitalForecasting):
     mle = models.PositiveIntegerField(default=0)
     he = models.PositiveIntegerField(default=0)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "fund",
+                    "capital_project",
+                    "commit_item",
+                    "fy",
+                    "quarter",
+                ),
+                name="capital_in_year_is_unique",
+            )
+        ]
+
 
 class ForecastAdjustmentManager(models.Manager):
     def fundcenter_descendants(self, fundcenter: str, fund: str = None) -> dict:

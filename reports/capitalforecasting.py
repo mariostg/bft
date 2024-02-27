@@ -121,23 +121,18 @@ class HistoricalOutlookReport(CapitalReport):
             return "Historical Year End report has no data to plot."
         try:
             self.df["YE vs Initial Allocation"] = self.df["YE Spent"] / self.df["Initial Allocation"]
-            print(self.df)
         except:
             self.df["Initial Allocation"] = 0
-            print("@@@@@Initial allocation")
         try:
             self.df["YE vs Q1"] = self.df["YE Spent"] / self.df["Q1 MLE"]
         except:
             self.df["Q1 MLE"] = 0
-            print("@@@@@ Q1 MLE")
         try:
             self.df["YE vs Q2"] = self.df["YE Spent"] / self.df["Q2 MLE"]
         except:
             self.df["Q2 MLE"] = 0
-            print("@@@@@ Q2 MLE")
         try:
             self.df["YE vs Q3"] = self.df["YE Spent"] / self.df["Q3 MLE"]
-            print("@@@@@ Q3 MLE")
         except:
             self.df["Q3 MLE"] = 0
         fig = self.plotter.bar_chart(
