@@ -275,7 +275,7 @@ class EstimateReport(CapitalReport):
 
     def dataset(self):
         return (
-            CapitalInYear.objects.filter(fy=self.fy, fund=self.fund)
+            CapitalInYear.objects.filter(fy=self.fy, fund=self.fund, capital_project=self.capital_project)
             .values(
                 "capital_project",
                 "fund",
