@@ -11,7 +11,23 @@
     {% if form_filter %}
     {% endif %}
 {{table|safe}}
+<div id="chart_container"></div>
 {% autoescape off %}
+<script>data={{data|safe}}</script>
+<script type="module">
+    import { Chart } from "/static/js/barchart.js";
+    const data_estimates = data.map(function (e) {
+        return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
+    });
+    data_estimates.columns = Object.keys(data_estimates[0]);
+    var config = {
+        style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 300 },
+        legend: { visibility: "show", orient: "v" },
+        threshold: [{name:"Q4 Working Plan",value:d3.max(data.map((d) => parseFloat(d["Working Plan"])))}],
+    };
+    var c = Chart("chart_container", data_estimates, config);
+</script>
+
 {{estimate_chart}}
 {% endautoescape %}
 

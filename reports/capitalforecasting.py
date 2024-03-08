@@ -94,6 +94,7 @@ class HistoricalOutlookReport(CapitalReport):
 
         if not df.empty:
             self.df = df.rename(columns={"ye_spent": "YE Spent", "initial_allocation": "Initial Allocation"})
+            self.df = self.df.fillna(0)
 
     def to_html(self):
         self.dataframe()

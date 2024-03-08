@@ -229,12 +229,14 @@ def cost_center_charge_table(request, cc: str, fy: int, period: int):
 def capital_forecasting_estimates(request):
     estimates = capitalforecasting.EstimateReport("C113", 2020, "C.999999")
     estimates.dataframe()
+    data = estimates.df.to_json(orient="records")
     return render(
         request,
         "capital-forecasting-estimates.html",
         {
             "table": estimates.to_html(),
             "estimate_chart": estimates.chart(),
+            "data": data,
         },
     )
 
@@ -242,11 +244,12 @@ def capital_forecasting_estimates(request):
 def capital_forecasting_quarterly(request):
     quarterly = capitalforecasting.FEARStatusReport("C113", 2020, "C.999999")
     quarterly.dataframe()
-    data = {
-        "fund": quarterly.fund.fund,
-        "fy": quarterly.fy,
-        "project_no": quarterly.capital_project,
-    }
+    data = quarterly.df.to_json(orient="records")
+    # data = {
+    #     "fund": quarterly.fund.fund,
+    #     "fy": quarterly.fy,
+    #     "project_no": quarterly.capital_project,
+    # }
     html = quarterly.to_html()
     chart = quarterly.chart_bullet()
     return render(
@@ -262,12 +265,15 @@ def capital_forecasting_quarterly(request):
 
 def capital_historical_outlook(request):
     outlook = capitalforecasting.HistoricalOutlookReport("C113", 2021, "C.999999")
+    outlook.dataframe()
+    data = outlook.df.to_json(orient="records")
     return render(
         request,
         "capital-historical-outlook.html",
         {
             "table": outlook.to_html(),
             "chart": outlook.chart(),
+            "data": data,
         },
     )
 

@@ -1,0 +1,27 @@
+body {
+    margin: 0;
+}
+.legend {
+    font-size: 12px;
+}
+rect {
+    stroke-width: 2;
+}
+.canvas {
+    fill: lightsteelblue;
+}
+.markers {
+    fill: yellow;
+}
+.piston {
+    fill: pink;
+}
+.yaxis .domain {
+    stroke: none;
+}
+.yaxis line {
+    stroke: #def;
+}
+#chart_container {
+    background-color: antiquewhite;
+}

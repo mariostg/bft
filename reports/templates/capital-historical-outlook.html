@@ -11,7 +11,21 @@
     {% if form_filter %}
     {% endif %}
 {{table|safe}}
+<div id="chart_container"></div>
 {% autoescape off %}
+<script>data={{data}}</script>
+<script type="module">
+    import { Chart } from "/static/js/barchart.js";
+    const data_estimates = data.map(function (e) {
+        return { FY: e.fy, "Initial Allocation": e['Initial Allocation'],  'Q1 MLE': e['Q1 MLE'],'Q2 MLE': e['Q2 MLE'],'Q3 MLE': e['Q3 MLE'],'Q4 MLE': e['Q4 MLE'],'YE Spent':e['YE Spent'] };
+    });
+    data_estimates.columns = Object.keys(data_estimates[0]);
+    var config = {
+        style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
+        legend: { visibility: "show", orient: "v" }
+    };
+    var c = Chart("chart_container", data_estimates, config);
+</script>
 {{chart}}
 {% endautoescape %}
 
