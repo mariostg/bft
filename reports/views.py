@@ -283,7 +283,6 @@ def capital_forecasting_dashboard(request):
         capital_project
     ) = quarterly_chart = estimate_chart = outlook_chart = chart_ye_ratios = pie_chart = ""
     form_filter = True
-
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
@@ -295,14 +294,17 @@ def capital_forecasting_dashboard(request):
 
         estimates = capitalforecasting.EstimateReport(fund, fy, capital_project)
         estimates.dataframe()
+        source_estimates = estimates.df.to_json(orient="records")
         estimate_chart = estimates.chart()
 
         quarterly = capitalforecasting.FEARStatusReport(fund, fy, capital_project)
         quarterly.dataframe()
+        source_quarterly = quarterly.df.to_json(orient="records")
         quarterly_chart = quarterly.chart_bullet()
 
         outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
         outlook.dataframe()
+        source_outlook = outlook.df.to_json(orient="records")
         outlook_chart = outlook.chart()
         chart_ye_ratios = outlook.chart_ye_ratios()
 
@@ -334,5 +336,8 @@ def capital_forecasting_dashboard(request):
             "table": " ",
             "form": form,
             "form_filter": form_filter,
+            "source_estimates": source_estimates,
+            "source_quarterly": source_quarterly,
+            "source_outlook": source_outlook,
         },
     )
