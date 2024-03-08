@@ -14,7 +14,7 @@
     {% endif %}
 {% autoescape off %}
 
-<div id="chart_container"><div id="chart_estimates"></div><div id="chart_fearstatus"></div></div>
+<div class="chart_container"><div id="chart_estimates"></div><div id="chart_fearstatus"></div><div id="chart_outlook"></div><div id="chart_ye_ratios"></div></div>
 <script>
     source_estimates={{source_estimates}};
     source_quarterly={{source_quarterly}};
@@ -28,7 +28,7 @@
     });
     data_estimates.columns = Object.keys(data_estimates[0]);
     var config = {
-        style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 300 },
+        style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
         legend: { visibility: "show", orient: "v" },
         threshold: [{name:"Q4 Working Plan",value:d3.max(source_estimates.map((d) => parseFloat(d["Working Plan"])))}],
     };
@@ -54,7 +54,7 @@
         style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
         legend: { visibility: "show", orient: "v" }
     };
-    Chart("chart_container", data_outlook, config);
+    Chart("chart_outlook", data_outlook, config);
 
     const data_ye_ratios=source_outlook.map(function(e){ return {"FY":e.fy,
         "YE vs Initial Allocation":e['YE Spent']/e['Initial Allocation'],"YE vs Q1":e['YE Spent']/e['Q1 MLE'],"YE vs Q2":e['YE Spent']/e['Q2 MLE'],"YE vs Q3":e['YE Spent']/e['Q3 MLE'],"YE vs Q4":e['YE Spent']/e['Q4 MLE']
@@ -65,7 +65,7 @@
         legend: { visibility: "show", orient: "v" },
         threshold:[{name:'100%',value:1}]
     };
-    Chart("chart_container", data_ye_ratios, config);
+    Chart("chart_ye_ratios", data_ye_ratios, config);
 
 </script>
 {% endautoescape %}

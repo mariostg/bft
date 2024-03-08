@@ -65,7 +65,7 @@ const Chart = function (parent, data, chart_config) {
         data.stacked = null;
         data.groups = data.columns.slice(1);
         data.groupName = Object.keys(data[0])[0]; //For the X axis
-        if (chart_config.piston.name) {
+        if (chart_config?.piston?.name) {
             var piston_name = chart_config.piston.name;
             data.piston = data.map((d) => d[piston_name]);
             data.columns = data.columns.filter((e) => e != piston_name);

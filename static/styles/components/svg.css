@@ -22,6 +22,15 @@ rect {
 .yaxis line {
     stroke: #def;
 }
-#chart_container {
+.chart_container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+}
+#chart_estimates,
+#chart_fearstatus,
+#chart_outlook,
+#chart_ye_ratios {
     background-color: antiquewhite;
 }
