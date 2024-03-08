@@ -274,9 +274,7 @@ def capital_historical_outlook(request):
 
 
 def capital_forecasting_dashboard(request):
-    fund = (
-        capital_project
-    ) = quarterly_chart = estimate_chart = outlook_chart = chart_ye_ratios = pie_chart = ""
+    fund = capital_project = source_estimates = source_quarterly = source_outlook = ""
     form_filter = True
     if len(request.GET):
         fund = FundManager().get_request(request)
@@ -318,11 +316,6 @@ def capital_forecasting_dashboard(request):
         request,
         "capital-forecasting-dashboard.html",
         {
-            "quarterly_chart": quarterly_chart,
-            "outlook_chart": outlook_chart,
-            "chart_ye_ratios": chart_ye_ratios,
-            "estimate_chart": estimate_chart,
-            "pie_chart": pie_chart,
             "table": " ",
             "form": form,
             "form_filter": form_filter,
