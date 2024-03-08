@@ -10,7 +10,6 @@ from costcenter.models import (
 )
 from bft.models import BftStatusManager
 import pandas as pd
-from reports.plotter import Plotter
 
 
 class CapitalReport:
@@ -28,7 +27,6 @@ class CapitalReport:
         self.chart_width = 400
         self.layout_margin = dict(l=20, r=20, t=70, b=20)
         self.paper_bgcolor = "LightSteelBlue"
-        self.plotter = Plotter()
 
 
 class HistoricalOutlookReport(CapitalReport):
@@ -106,46 +104,6 @@ class HistoricalOutlookReport(CapitalReport):
             formatters=fmt_dict,
         )
 
-    def chart(self):
-        if self.df.empty:
-            return "Historical Outlook Report has not data to plot."
-        fig = self.plotter.bar_chart(
-            self.df,
-            x="fy",
-            y=["Initial Allocation", "Q1 MLE", "Q2 MLE", "Q3 MLE", "Q4 MLE", "YE Spent"],
-            fig_title=f"Historical Outlook - {self.capital_project}, {self.fund.fund}",
-        )
-        return fig
-
-    def chart_ye_ratios(self):
-        if self.df.empty:
-            return "Historical Year End report has no data to plot."
-        try:
-            self.df["YE vs Initial Allocation"] = self.df["YE Spent"] / self.df["Initial Allocation"]
-        except:
-            self.df["Initial Allocation"] = 0
-        try:
-            self.df["YE vs Q1"] = self.df["YE Spent"] / self.df["Q1 MLE"]
-        except:
-            self.df["Q1 MLE"] = 0
-        try:
-            self.df["YE vs Q2"] = self.df["YE Spent"] / self.df["Q2 MLE"]
-        except:
-            self.df["Q2 MLE"] = 0
-        try:
-            self.df["YE vs Q3"] = self.df["YE Spent"] / self.df["Q3 MLE"]
-        except:
-            self.df["Q3 MLE"] = 0
-        fig = self.plotter.bar_chart(
-            self.df,
-            "fy",
-            ["YE vs Initial Allocation", "YE vs Q1", "YE vs Q2", "YE vs Q3"],
-            "Annual YE Spent Ratios",
-            hline=1,
-            hline_annotation="100%",
-        )
-        return fig
-
 
 class FEARStatusReport(CapitalReport):
     """This class handles all quarter related fields"""
@@ -185,23 +143,6 @@ class FEARStatusReport(CapitalReport):
         return self.df.to_html(
             formatters=fmt_dict,
         )
-
-    def chart_bullet(self):
-        if self.df.empty:
-            return "FEAR Status report has not data to plot"
-        plotter = Plotter()
-        # # FEAR Chart
-        fig = plotter.bullet_chart(
-            self.df.reset_index(),
-            fig_title="FEAR Status (Forecast Encumbrance Allocation Relationship)",
-            x_values=["Spent", "CO", "PC", "FR"],
-            y="Quarters",
-            piston="MLE",
-            piston_name="Forecast",
-            diamond="allocation",
-            diamond_name="Allocation",
-        )
-        return fig
 
 
 class EncumbranceStatusReport(CapitalReport):
@@ -255,15 +196,6 @@ class EncumbranceStatusReport(CapitalReport):
         return self.df.to_html(
             formatters=fmt_dict,
         )
-
-    def chart(self):
-        labels = ["CO", "PC", "FR", "Spent"]
-        if self.df.empty:
-            return "Estimate report has no data to plot."
-        values = [self.df.CO[0], self.df.PC[0], self.df.FR[0], self.df.Spent[0]]
-        plotter = Plotter()
-        fig = plotter.pie_chart(labels=labels, values=values)
-        return fig
 
 
 class EstimateReport(CapitalReport):
@@ -319,17 +251,3 @@ class EstimateReport(CapitalReport):
         return self.df.to_html(
             formatters=fmt_dict,
         )
-
-    def chart(self):
-        if self.df.empty:
-            return "Estimate report has no data to plot."
-        plotter = Plotter()
-        fig = plotter.bar_chart(
-            df=self.df,
-            x="quarter",
-            y=["LE", "MLE", "HE"],
-            fig_title=f"Quarterly Estimates - {self.fy}{self.capital_project}, {self.fund.fund}",
-            hline=self.df["Working Plan"][0],
-            hline_annotation="Working Plan",
-        )
-        return fig

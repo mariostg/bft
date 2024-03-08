@@ -30,7 +30,6 @@ from bft.conf import QUARTERKEYS
 from bft.exceptions import LineItemsDoNotExistError
 from utils.getrequestfilter import set_query_string
 from main import settings
-from reports.plotter import Plotter
 
 import pandas as pd
 
@@ -235,7 +234,6 @@ def capital_forecasting_estimates(request):
         "capital-forecasting-estimates.html",
         {
             "table": estimates.to_html(),
-            "estimate_chart": estimates.chart(),
             "data": data,
         },
     )
@@ -251,14 +249,12 @@ def capital_forecasting_quarterly(request):
     #     "project_no": quarterly.capital_project,
     # }
     html = quarterly.to_html()
-    chart = quarterly.chart_bullet()
     return render(
         request,
         "capital-forecasting-quarterly.html",
         {
             "table": html,
             "data": data,
-            "chart": chart,
         },
     )
 
@@ -272,7 +268,6 @@ def capital_historical_outlook(request):
         "capital-historical-outlook.html",
         {
             "table": outlook.to_html(),
-            "chart": outlook.chart(),
             "data": data,
         },
     )
@@ -295,22 +290,17 @@ def capital_forecasting_dashboard(request):
         estimates = capitalforecasting.EstimateReport(fund, fy, capital_project)
         estimates.dataframe()
         source_estimates = estimates.df.to_json(orient="records")
-        estimate_chart = estimates.chart()
 
         quarterly = capitalforecasting.FEARStatusReport(fund, fy, capital_project)
         quarterly.dataframe()
         source_quarterly = quarterly.df.to_json(orient="records")
-        quarterly_chart = quarterly.chart_bullet()
 
         outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
         outlook.dataframe()
         source_outlook = outlook.df.to_json(orient="records")
-        outlook_chart = outlook.chart()
-        chart_ye_ratios = outlook.chart_ye_ratios()
 
         pie = capitalforecasting.EncumbranceStatusReport(fund, fy, quarter, capital_project)
         pie.dataframe()
-        pie_chart = pie.chart()
 
     else:
         fy = BftStatus.current.fy()
