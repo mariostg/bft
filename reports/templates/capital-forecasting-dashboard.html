@@ -35,7 +35,7 @@
 
 </script>
 <script type="module">
-    import { Chart } from "/static/js/barchart.js";
+    import { Chart,ChartHandler } from "/static/js/barchart.js";
     const data_estimates = source_estimates.map(function (e) {
         return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
     });
@@ -80,6 +80,8 @@
     };
     Chart("chart_ye_ratios", data_ye_ratios, config);
 
+
+    ChartHandler.ajust_chart_width()
 </script>
 {% endautoescape %}
 </main>

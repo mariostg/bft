@@ -18,7 +18,7 @@ const Chart = function (parent, data, chart_config) {
                     height: chart_config?.style?.height || 300,
                 },
                 margin: { top: 10, right: 30, bottom: 20, left: 50 },
-                legend: { position: "right", orient: "v", translate_x: 0, translate_y: 0, width: 80 }, //left,right,top,bottom,none
+                legend: { position: "right", orient: "v", translate_x: 0, translate_y: 0, width: 0 }, //left,right,top,bottom,none
             },
             figure: {},
             piston: { name: chart_config?.piston?.name || null, fill: chart_config?.piston?.fill || null },
@@ -411,4 +411,21 @@ const Chart = function (parent, data, chart_config) {
     }
 };
 
-export { Chart };
+const ChartHandler = {
+    max_legend_width: function () {
+        const legend_items = document.querySelectorAll(".legenditem");
+        let max_width = 0;
+        for (let i of legend_items) {
+            max_width = Math.max(max_width, i.getBBox().width);
+        }
+        return max_width;
+    },
+    ajust_chart_width: function () {
+        const mw = this.max_legend_width();
+        const charts = document.querySelectorAll("svg");
+        for (let c of charts) {
+            c.setAttribute("width", mw + parseFloat(c.getAttribute("width")));
+        }
+    },
+};
+export { Chart, ChartHandler };
