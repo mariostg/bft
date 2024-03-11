@@ -252,6 +252,12 @@ const Chart = function (parent, data, chart_config) {
         } else {
             chart_config.figure.yMax = data[0][chart_config.figure.yGroupName[0]];
         }
+        if (data.piston) {
+            chart_config.figure.yMax = Math.max(chart_config.figure.yMax, d3.max(data.piston));
+        }
+        if (data.marker) {
+            chart_config.figure.yMax = Math.max(chart_config.figure.yMax, d3.max(data.marker));
+        }
         chart_config.figure.yMin = chart_config.figure.yMax;
         if (chart_config.style.barmode == "stacked") {
             chart_config.figure.yMax = d3.max(data, (d) => {
@@ -259,7 +265,7 @@ const Chart = function (parent, data, chart_config) {
                 for (let k of data.groups) {
                     val += parseInt(d[k]);
                 }
-                return val;
+                return Math.max(chart_config.figure.yMax, val);
             });
         } else {
             for (let k of chart_config.figure.yGroupName) {
