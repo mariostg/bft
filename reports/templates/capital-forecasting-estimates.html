@@ -15,7 +15,7 @@
 {% autoescape off %}
 <script>data={{data|safe}}</script>
 <script type="module">
-    import { Chart } from "/static/js/barchart.js";
+    import { Chart,ChartHandler } from "/static/js/barchart.js";
     const data_estimates = data.map(function (e) {
         return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
     });
@@ -25,7 +25,8 @@
         legend: { visibility: "show", orient: "v" },
         threshold: [{name:"Q4 Working Plan",value:d3.max(data.map((d) => parseFloat(d["Working Plan"])))}],
     };
-    var c = Chart("chart_container", data_estimates, config);
+    Chart("chart_container", data_estimates, config);
+    ChartHandler.ajust_chart_width()
 </script>
 
 {{estimate_chart}}
