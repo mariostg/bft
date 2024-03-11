@@ -11,7 +11,9 @@
     {% if form_filter %}
     {% endif %}
 {{table|safe}}
-<div id="chart_container"></div>
+<div class="chart">
+    <div id="chart_outlook"><div class="chart__title">Historical Outlook</div></div>
+</div>
 {% autoescape off %}
 <script>data={{data}}</script>
 <script type="module">
@@ -24,7 +26,7 @@
         style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
         legend: { visibility: "show", orient: "v" }
     };
-    Chart("chart_container", data_estimates, config);
+    Chart("chart_outlook", data_estimates, config);
     ChartHandler.ajust_chart_width()
 </script>
 {{chart}}

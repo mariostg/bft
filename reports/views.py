@@ -239,26 +239,6 @@ def capital_forecasting_estimates(request):
     )
 
 
-def capital_forecasting_quarterly(request):
-    quarterly = capitalforecasting.FEARStatusReport("C113", 2020, "C.999999")
-    quarterly.dataframe()
-    data = quarterly.df.to_json(orient="records")
-    # data = {
-    #     "fund": quarterly.fund.fund,
-    #     "fy": quarterly.fy,
-    #     "project_no": quarterly.capital_project,
-    # }
-    html = quarterly.to_html()
-    return render(
-        request,
-        "capital-forecasting-quarterly.html",
-        {
-            "table": html,
-            "data": data,
-        },
-    )
-
-
 def capital_historical_outlook(request):
     outlook = capitalforecasting.HistoricalOutlookReport("C113", 2021, "C.999999")
     outlook.dataframe()
@@ -266,6 +246,20 @@ def capital_historical_outlook(request):
     return render(
         request,
         "capital-historical-outlook.html",
+        {
+            "table": outlook.to_html(),
+            "data": data,
+        },
+    )
+
+
+def capital_forecasting_ye_ratios(request):
+    outlook = capitalforecasting.HistoricalOutlookReport("C113", 2023, "C.999999")
+    outlook.dataframe()
+    data = outlook.df.to_json(orient="records")
+    return render(
+        request,
+        "capital-forecasting-ye-ratios.html",
         {
             "table": outlook.to_html(),
             "data": data,

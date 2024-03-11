@@ -25,9 +25,9 @@ urlpatterns += [
         name="capital-forecasting-estimates",
     ),
     path(
-        "capital-forecasting-quarterly",
-        views.capital_forecasting_quarterly,
-        name="capital-forecasting-quarterly",
+        "capital-forecasting-ye-ratios",
+        views.capital_forecasting_ye_ratios,
+        name="capital-forecasting-ye-ratios",
     ),
     path(
         "capital-historical-outlook",

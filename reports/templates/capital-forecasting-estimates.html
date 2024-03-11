@@ -11,7 +11,9 @@
     {% if form_filter %}
     {% endif %}
 {{table|safe}}
-<div id="chart_container"></div>
+<div class="chart">
+    <div id="chart_estimates"><div class="chart__title">Quarterly estimates</div></div>
+</div>
 {% autoescape off %}
 <script>data={{data|safe}}</script>
 <script type="module">
@@ -25,11 +27,9 @@
         legend: { visibility: "show", orient: "v" },
         threshold: [{name:"Q4 Working Plan",value:d3.max(data.map((d) => parseFloat(d["Working Plan"])))}],
     };
-    Chart("chart_container", data_estimates, config);
+    Chart("chart_estimates", data_estimates, config);
     ChartHandler.ajust_chart_width()
 </script>
-
-{{estimate_chart}}
 {% endautoescape %}
 
 </main>
