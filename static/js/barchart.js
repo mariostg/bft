@@ -320,14 +320,7 @@ const Chart = function (parent, data, chart_config) {
         const legendcontainer = svg
             .append("g")
             .attr("class", "legendcontainer")
-            .attr(
-                "transform",
-                "translate(" +
-                    chart_config.style.legend.translate_x +
-                    "," +
-                    chart_config.style.margin.top +
-                    ")"
-            );
+            .attr("transform", "translate(" + chart_config.style.legend.translate_x + ",0)");
         const legendRectSize = 18;
         const legendSpacing = 4;
         const legend = legendcontainer
@@ -339,9 +332,8 @@ const Chart = function (parent, data, chart_config) {
         if (chart_config.legend.orient == "v") {
             legend.attr("transform", function (d, i) {
                 var height = legendRectSize + legendSpacing;
-                var offset = (height * chart_config.figure.yGroupName.length) / 2;
                 var horz = -2 * legendRectSize;
-                var vert = i * height - offset + chart_config.style.margin.top;
+                var vert = i * height;
                 return "translate(" + horz + "," + vert + ")";
             });
         } else if (chart_config.legend.orient == "h") {
