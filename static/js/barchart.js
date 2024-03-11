@@ -66,14 +66,14 @@ const Chart = function (parent, data, chart_config) {
         data.groups = data.columns.slice(1);
         data.groupName = Object.keys(data[0])[0]; //For the X axis
         if (chart_config?.piston?.name) {
-            var piston_name = chart_config.piston.name;
+            const piston_name = chart_config.piston.name;
             data.piston = data.map((d) => d[piston_name]);
             data.columns = data.columns.filter((e) => e != piston_name);
             data.map((e) => delete e[piston_name]); //remove piston data
             data.groups.splice(data.groups.indexOf(piston_name), 1); //remove piston name
         }
         if (chart_config?.marker?.name) {
-            var marker_name = chart_config.marker.name;
+            const marker_name = chart_config.marker.name;
             data.marker = data.map((d) => d[marker_name]);
             data.columns = data.columns.filter((e) => e != marker_name);
             data.map((e) => delete e[marker_name]);
@@ -104,10 +104,8 @@ const Chart = function (parent, data, chart_config) {
 
     function drawMarker() {
         if (chart_config?.marker?.name) {
-            // const marker = "M0,0 L15,5 L30,0 L15,-5 Z";
             const marker = "M-20,0L0,-5L20,0L0,5Z";
-            // var marker = d3.symbol().type(d3.symbolDiamond).size(200);
-            var xTrans = function (i) {
+            let xTrans = function (i) {
                 let _x = chart_config.figure.xScale(data[i][data.groupName]);
                 return _x + chart_config.figure.xScale.bandwidth() / 2;
             };
@@ -331,16 +329,16 @@ const Chart = function (parent, data, chart_config) {
             .attr("class", "legenditem");
         if (chart_config.legend.orient == "v") {
             legend.attr("transform", function (d, i) {
-                var height = legendRectSize + legendSpacing;
-                var horz = -2 * legendRectSize;
-                var vert = i * height;
+                let height = legendRectSize + legendSpacing;
+                let horz = -2 * legendRectSize;
+                let vert = i * height;
                 return "translate(" + horz + "," + vert + ")";
             });
         } else if (chart_config.legend.orient == "h") {
             legend.attr("transform", function (d, i) {
-                var height = legendRectSize + legendSpacing;
-                var offset = (height * chart_config.figure.yGroupName.length) / 2;
-                var horz = legendRectSize + offset;
+                let height = legendRectSize + legendSpacing;
+                let offset = (height * chart_config.figure.yGroupName.length) / 2;
+                let horz = legendRectSize + offset;
                 return "translate(" + i * horz + "," + 0 + ")";
             });
         }
