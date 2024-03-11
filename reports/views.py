@@ -273,6 +273,20 @@ def capital_historical_outlook(request):
     )
 
 
+def capital_forecasting_fears(request):
+    outlook = capitalforecasting.FEARStatusReport("C113", 2020, "C.999999")
+    outlook.dataframe()
+    data = outlook.df.to_json(orient="records")
+    return render(
+        request,
+        "capital-forecasting-fears.html",
+        {
+            "table": outlook.to_html(),
+            "data": data,
+        },
+    )
+
+
 def capital_forecasting_dashboard(request):
     fund = capital_project = source_estimates = source_quarterly = source_outlook = ""
     form_filter = True
