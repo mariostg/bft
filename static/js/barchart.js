@@ -17,7 +17,7 @@ const Chart = function (parent, data, chart_config) {
                     width: chart_config?.style?.width || 200,
                     height: chart_config?.style?.height || 300,
                 },
-                margin: { top: 30, right: 30, bottom: 20, left: 50 },
+                margin: { top: 10, right: 30, bottom: 20, left: 50 },
                 legend: { position: "right", orient: "v", translate_x: 0, translate_y: 0, width: 80 }, //left,right,top,bottom,none
             },
             figure: {},

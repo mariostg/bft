@@ -14,7 +14,20 @@
     {% endif %}
 {% autoescape off %}
 
-<div class="chart_container"><div id="chart_estimates"></div><div id="chart_fearstatus"></div><div id="chart_outlook"></div><div id="chart_ye_ratios"></div></div>
+<div class="charts">
+    <div class="chart">
+        <div id="chart_estimates"><div class="chart__title">Quarterly Estimates</div></div>
+    </div>
+    <div class="chart">
+        <div id="chart_fearstatus"><div class="chart__title">FEAR Status (Forecast, Encumbrance, Allocation Relationship)</div></div>
+    </div>
+    <div class="chart">
+        <div id="chart_outlook"><div class="chart__title">Historical Outlook</div></div>
+    </div>
+    <div class="chart">
+        <div id="chart_ye_ratios"><div class="chart__title">Annual YE Spent ratios</div></div>
+    </div>
+</div>
 <script>
     source_estimates={{source_estimates}};
     source_quarterly={{source_quarterly}};
