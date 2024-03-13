@@ -10,10 +10,11 @@
     <h1>Capital Forecasting Quarterly</h1>
     <h2>{{data.project_no}} [{{data.fundcenter}}], {{data.fund}}, {{data.fy}}</h2>
     {% if form_filter %}
+    {% include "capital-forecasting-estimates-filter-form.html" %}
     {% endif %}
-    {{table|safe}}
 
     <div id="chart_container"></div>
+    {{table|safe}}
     {% autoescape off %}
     <script>data={{data}}</script>
     <script type="module">

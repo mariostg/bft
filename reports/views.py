@@ -24,6 +24,8 @@ from reports.forms import (
     SearchAllocationAnalysisForm,
     SearchCostCenterScreeningReportForm,
     SearchCapitalForecastingDashboardForm,
+    SearchCapitalEstimatesForm,
+    SearchCapitalQuarterlyForm,
 )
 from bft.models import BftStatus
 from bft.conf import QUARTERKEYS
@@ -40,7 +42,8 @@ def _orphan_forecast_adjustments(request, allocations, forecast_adjustment):
     for fcst_path, fcst_item in forecast_adjustment.items():
         if fcst_path not in alloc_paths:
             messages.warning(
-                request, f"Cost center {fcst_item['Cost Element']} has forecast adjustment but no allocation"
+                request,
+                f"Cost center {fcst_item['Cost Element']} has forecast adjustment but no allocation",
             )
 
 
@@ -226,34 +229,66 @@ def cost_center_charge_table(request, cc: str, fy: int, period: int):
 
 
 def capital_forecasting_estimates(request):
-    estimates = capitalforecasting.EstimateReport("C113", 2020, "C.999999")
-    estimates.dataframe()
-    data = estimates.df.to_json(orient="records")
+    fund = capital_project = fy = data = table = ""
+    form_filter = True
+    if len(request.GET):
+        fund = FundManager().get_request(request)
+        capital_project = CapitalProjectManager().get_request(request)
+        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        estimates = capitalforecasting.EstimateReport(fund, fy, capital_project)
+        estimates.dataframe()
+        data = estimates.df.to_json(orient="records")
+        table = estimates.to_html()
+    else:
+        fy = BftStatus.current.fy()
+
+    initial = {
+        "fund": fund,
+        "capital_project": capital_project,
+        "fy": fy,
+    }
+    form = SearchCapitalEstimatesForm(initial=initial)
+
     return render(
         request,
         "capital-forecasting-estimates.html",
         {
-            "table": estimates.to_html(),
+            "table": table,
+            "form": form,
+            "form_filter": form_filter,
             "data": data,
         },
     )
 
 
 def capital_forecasting_quarterly(request):
-    quarterly = capitalforecasting.FEARStatusReport("C113", 2020, "C.999999")
-    quarterly.dataframe()
-    data = quarterly.df.to_json(orient="records")
-    # data = {
-    #     "fund": quarterly.fund.fund,
-    #     "fy": quarterly.fy,
-    #     "project_no": quarterly.capital_project,
-    # }
-    html = quarterly.to_html()
+    fund = capital_project = fy = data = table = ""
+    form_filter = True
+    if len(request.GET):
+        fund = FundManager().get_request(request)
+        capital_project = CapitalProjectManager().get_request(request)
+        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        quarterly = capitalforecasting.FEARStatusReport(fund, fy, capital_project)
+        quarterly.dataframe()
+        data = quarterly.df.to_json(orient="records")
+        table = quarterly.to_html()
+    else:
+        fy = BftStatus.current.fy()
+
+    initial = {
+        "fund": fund,
+        "capital_project": capital_project,
+        "fy": fy,
+    }
+    form = SearchCapitalQuarterlyForm(initial=initial)
+
     return render(
         request,
         "capital-forecasting-quarterly.html",
         {
-            "table": html,
+            "table": table,
+            "form":form,
+            "form_filter":form_filter,
             "data": data,
         },
     )

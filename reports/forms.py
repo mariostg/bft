@@ -38,3 +38,15 @@ class SearchCapitalForecastingDashboardForm(forms.Form):
     fund = forms.CharField(required=False)
     fy = forms.CharField(required=False)
     quarter = forms.CharField(required=False)
+
+
+class SearchCapitalEstimatesForm(forms.Form):
+    capital_project = forms.CharField(required=False)
+    fund = forms.CharField(required=False)
+    fy = forms.CharField(required=False)
+
+
+class SearchCapitalQuarterlyForm(forms.Form):
+    capital_project = forms.CharField(required=False)
+    fund = forms.CharField(required=False)
+    fy = forms.CharField(required=False)
