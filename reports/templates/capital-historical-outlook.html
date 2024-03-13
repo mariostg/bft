@@ -11,14 +11,15 @@
     {% if form_filter %}
     {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
+{% if data %}
 {{table|safe}}
 <div class="chart">
-    <div id="chart_outlook"><div class="chart__title">Historical Outlook</div></div>
+    <div id="chart_outlook"><div class="chart__title">Historical Outlook {{capital_project}} {{fund}} FY {{fy}}</div></div>
 </div>
 {% autoescape off %}
-<script>data={{data}}</script>
 <script type="module">
     import { Chart, ChartHandler } from "/static/js/barchart.js";
+    const data={{data}}
     const data_estimates = data.map(function (e) {
         return { FY: e.fy, "Initial Allocation": e['Initial Allocation'],  'Q1 MLE': e['Q1 MLE'],'Q2 MLE': e['Q2 MLE'],'Q3 MLE': e['Q3 MLE'],'Q4 MLE': e['Q4 MLE'],'YE Spent':e['YE Spent'] };
     });
@@ -30,9 +31,8 @@
     Chart("chart_outlook", data_estimates, config);
     ChartHandler.ajust_chart_width()
 </script>
-{{chart}}
 {% endautoescape %}
-
+{% endif %}
 </main>
 
 

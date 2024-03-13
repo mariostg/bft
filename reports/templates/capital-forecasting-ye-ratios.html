@@ -11,14 +11,15 @@
     {% if form_filter %}
     {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
+{% if data %}
 {{table|safe}}
 <div class="chart">
-    <div id="chart_ye_ratios"><div class="chart__title">Annual Year end Ratios</div></div>
+    <div id="chart_ye_ratios"><div class="chart__title">Annual Year end Ratios {{capital_project}} - {{fund}}</div></div>
 </div>
 {% autoescape off %}
-<script>data={{data|safe}}</script>
 <script type="module">
     import { Chart,ChartHandler } from "/static/js/barchart.js";
+    const data={{data}}
     const data_ye_ratios=data.map(function(e){ return {"FY":e.fy,
         "YE vs Initial Allocation":e['YE Spent']/e['Initial Allocation'],"YE vs Q1":e['YE Spent']/e['Q1 MLE'],"YE vs Q2":e['YE Spent']/e['Q2 MLE'],"YE vs Q3":e['YE Spent']/e['Q3 MLE'],"YE vs Q4":e['YE Spent']/e['Q4 MLE']
     }});
@@ -33,7 +34,7 @@
     ChartHandler.ajust_chart_width()
 </script>
 {% endautoescape %}
-
+{% endif %}
 </main>
 
 

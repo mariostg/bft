@@ -10,27 +10,26 @@
     {% if form_filter %}
     {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
-<div id="chart_estimates"></div>
+{% if data %}
+<div id="chart_estimates"><div class="chart__title">Capital Forecasting Estimates {{capital_project}} {{fund}} FY {{fy}}</div></div>
 {{table|safe}}
 {% autoescape off %}
-<script>data={{data|safe}}</script>
-<script type="module">
-    import { Chart,ChartHandler } from "/static/js/barchart.js";
-    const data_estimates = data.map(function (e) {
-        return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
-    });
-    data_estimates.columns = Object.keys(data_estimates[0]);
-    var config = {
-        style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 300 },
-        legend: { visibility: "show", orient: "v" },
-        threshold: [{name:"Q4 Working Plan",value:d3.max(data.map((d) => parseFloat(d["Working Plan"])))}],
-    };
-    Chart("chart_estimates", data_estimates, config);
-    ChartHandler.ajust_chart_width()
-</script>
-{% endautoescape %}
-
+    <script type="module">
+        import { Chart,ChartHandler } from "/static/js/barchart.js";
+        const data={{data|safe}}
+        const data_estimates = data.map(function (e) {
+            return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
+        });
+        data_estimates.columns = Object.keys(data_estimates[0]);
+        var config = {
+            style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 300 },
+            legend: { visibility: "show", orient: "v" },
+            threshold: [{name:"Q4 Working Plan",value:d3.max(data.map((d) => parseFloat(d["Working Plan"])))}],
+        };
+        Chart("chart_estimates", data_estimates, config);
+        ChartHandler.ajust_chart_width()
+    </script>
+    {% endautoescape %}
+    {% endif %}
 </main>
-
-
 {% endblock content %}

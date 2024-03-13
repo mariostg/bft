@@ -250,6 +250,7 @@ def capital_forecasting_estimates(request):
         "fund": fund,
         "capital_project": capital_project,
         "fy": fy,
+        data: data,
     }
     form = SearchCapitalEstimatesForm(initial=initial)
 
@@ -257,7 +258,7 @@ def capital_forecasting_estimates(request):
         request,
         "capital-forecasting-estimates.html",
         {
-            "action_url": action_url,
+            **initial,
             "table": table,
             "form": form,
             "form_filter": form_filter,
@@ -293,7 +294,7 @@ def capital_forecasting_fears(request):
         request,
         "capital-forecasting-fears.html",
         {
-            "action_url": action_url,
+            **initial,
             "table": table,
             "form": form,
             "form_filter": form_filter,
@@ -328,7 +329,7 @@ def capital_historical_outlook(request):
         request,
         "capital-historical-outlook.html",
         {
-            "action_url": action_url,
+            **initial,
             "table": table,
             "form": form,
             "form_filter": form_filter,
@@ -363,7 +364,8 @@ def capital_forecasting_ye_ratios(request):
         request,
         "capital-forecasting-ye-ratios.html",
         {
-            "action_url": action_url,
+            **initial,
+            # "action_url": action_url,
             "table": table,
             "form": form,
             "form_filter": form_filter,
