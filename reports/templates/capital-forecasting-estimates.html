@@ -6,11 +6,11 @@
     {% if not table %}
     <div class="alert alert--info">There are no data to display</div>
     {% endif %}
-
+    <h1>Capital Forecasting Estimates</h1>
     {% if form_filter %}
     {% include "capital-forecasting-estimates-filter-form.html" %}
     {% endif %}
-<div id="chart_container"></div>
+<div id="chart_estimates"></div>
 {{table|safe}}
 {% autoescape off %}
 <script>data={{data|safe}}</script>

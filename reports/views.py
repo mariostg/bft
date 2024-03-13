@@ -25,7 +25,9 @@ from reports.forms import (
     SearchCostCenterScreeningReportForm,
     SearchCapitalForecastingDashboardForm,
     SearchCapitalEstimatesForm,
-    SearchCapitalQuarterlyForm,
+    SearchCapitalFearsForm,
+    SearchCapitalHistoricalForm,
+    SearchCapitalYeRatiosForm,
 )
 from bft.models import BftStatus
 from bft.conf import QUARTERKEYS
@@ -261,7 +263,7 @@ def capital_forecasting_estimates(request):
     )
 
 
-def capital_forecasting_quarterly(request):
+def capital_forecasting_fears(request):
     fund = capital_project = fy = data = table = ""
     form_filter = True
     if len(request.GET):
@@ -280,11 +282,11 @@ def capital_forecasting_quarterly(request):
         "capital_project": capital_project,
         "fy": fy,
     }
-    form = SearchCapitalQuarterlyForm(initial=initial)
+    form = SearchCapitalFearsForm(initial=initial)
 
     return render(
         request,
-        "capital-forecasting-quarterly.html",
+        "capital-forecasting-fears.html",
         {
             "table": table,
             "form": form,
@@ -295,42 +297,64 @@ def capital_forecasting_quarterly(request):
 
 
 def capital_historical_outlook(request):
-    outlook = capitalforecasting.HistoricalOutlookReport("C113", 2021, "C.999999")
-    outlook.dataframe()
-    data = outlook.df.to_json(orient="records")
+    fund = capital_project = fy = data = table = ""
+    form_filter = True
+    if len(request.GET):
+        fund = FundManager().get_request(request)
+        capital_project = CapitalProjectManager().get_request(request)
+        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
+        outlook.dataframe()
+        data = outlook.df.to_json(orient="records")
+        table = outlook.to_html()
+    else:
+        fy = BftStatus.current.fy()
+
+    initial = {
+        "fund": fund,
+        "capital_project": capital_project,
+        "fy": fy,
+    }
+    form = SearchCapitalHistoricalForm(initial=initial)
     return render(
         request,
         "capital-historical-outlook.html",
         {
-            "table": outlook.to_html(),
+            "table": table,
+            "form": form,
+            "form_filter": form_filter,
             "data": data,
         },
     )
 
 
 def capital_forecasting_ye_ratios(request):
-    outlook = capitalforecasting.HistoricalOutlookReport("C113", 2023, "C.999999")
-    outlook.dataframe()
-    data = outlook.df.to_json(orient="records")
+    fund = capital_project = fy = data = table = ""
+    form_filter = True
+    if len(request.GET):
+        fund = FundManager().get_request(request)
+        capital_project = CapitalProjectManager().get_request(request)
+        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
+        outlook.dataframe()
+        data = outlook.df.to_json(orient="records")
+        table = outlook.to_html()
+    else:
+        fy = BftStatus.current.fy()
+
+    initial = {
+        "fund": fund,
+        "capital_project": capital_project,
+        "fy": fy,
+    }
+    form = SearchCapitalYeRatiosForm(initial=initial)
     return render(
         request,
         "capital-forecasting-ye-ratios.html",
         {
-            "table": outlook.to_html(),
-            "data": data,
-        },
-    )
-
-
-def capital_forecasting_fears(request):
-    outlook = capitalforecasting.FEARStatusReport("C113", 2020, "C.999999")
-    outlook.dataframe()
-    data = outlook.df.to_json(orient="records")
-    return render(
-        request,
-        "capital-forecasting-fears.html",
-        {
-            "table": outlook.to_html(),
+            "table": table,
+            "form": form,
+            "form_filter": form_filter,
             "data": data,
         },
     )

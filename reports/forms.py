@@ -46,7 +46,19 @@ class SearchCapitalEstimatesForm(forms.Form):
     fy = forms.CharField(required=False)
 
 
-class SearchCapitalQuarterlyForm(forms.Form):
+class SearchCapitalFearsForm(forms.Form):
+    capital_project = forms.CharField(required=False)
+    fund = forms.CharField(required=False)
+    fy = forms.CharField(required=False)
+
+
+class SearchCapitalHistoricalForm(forms.Form):
+    capital_project = forms.CharField(required=False)
+    fund = forms.CharField(required=False)
+    fy = forms.CharField(required=False)
+
+
+class SearchCapitalYeRatiosForm(forms.Form):
     capital_project = forms.CharField(required=False)
     fund = forms.CharField(required=False)
     fy = forms.CharField(required=False)

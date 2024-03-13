@@ -9,6 +9,7 @@
 
     <h1>Capital Forecasting FEARS</h1>
     {% if form_filter %}
+    {% include "capital-forecasting-fears-filter-form.html" %}
     {% endif %}
 {{table|safe}}
 <div class="chart">
@@ -21,8 +22,10 @@
     const data_quarterly=data.map(function(e) {
         return {Quarters:e.Quarters,Spent:e.Spent, CO:e.CO, PC:e.PC, FR:e.FR,MLE:e.MLE,Allocation:e.allocation}
     });
+    const colors={MLE:'goldenrod',HE:'chocolate',LE:'coral',Spent:'#882255',CO:'#ddcc77',PC:'#afeeee',FR:'#fa8072'};
     data_quarterly.columns = Object.keys(data_quarterly[0]);
     var config = {
+        color:colors,
         style: { type: "bar", barmode: "stacked", orientation: "v", width: 500, height: 200 },
         piston: { name: "MLE", fill: "lightgrey" },
         marker: { name: "Allocation", fill: "yellow" },

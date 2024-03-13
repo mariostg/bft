@@ -7,8 +7,9 @@
     <div class="alert alert--info">There are no data to display</div>
     {% endif %}
 
-    <h1>Annual Year end Ratios Table</h1>
+    <h1>Capital Forecasting Annual Year end Ratios</h1>
     {% if form_filter %}
+    {% include "capital-forecasting-ye-ratios-filter-form.html" %}
     {% endif %}
 {{table|safe}}
 <div class="chart">

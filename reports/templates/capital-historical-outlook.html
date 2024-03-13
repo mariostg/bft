@@ -9,6 +9,7 @@
 
     <h1>Capital Historical Outlook</h1>
     {% if form_filter %}
+    {% include "capital-historical-outlook-filter-form.html" %}
     {% endif %}
 {{table|safe}}
 <div class="chart">
