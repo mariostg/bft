@@ -233,6 +233,7 @@ def cost_center_charge_table(request, cc: str, fy: int, period: int):
 def capital_forecasting_estimates(request):
     fund = capital_project = fy = data = table = ""
     form_filter = True
+    action_url = "capital-forecasting-estimates"
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
@@ -245,6 +246,7 @@ def capital_forecasting_estimates(request):
         fy = BftStatus.current.fy()
 
     initial = {
+        "action_url": action_url,
         "fund": fund,
         "capital_project": capital_project,
         "fy": fy,
@@ -255,6 +257,7 @@ def capital_forecasting_estimates(request):
         request,
         "capital-forecasting-estimates.html",
         {
+            "action_url": action_url,
             "table": table,
             "form": form,
             "form_filter": form_filter,
@@ -266,6 +269,7 @@ def capital_forecasting_estimates(request):
 def capital_forecasting_fears(request):
     fund = capital_project = fy = data = table = ""
     form_filter = True
+    action_url = "capital-forecasting-fears"
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
@@ -278,6 +282,7 @@ def capital_forecasting_fears(request):
         fy = BftStatus.current.fy()
 
     initial = {
+        "action_url": action_url,
         "fund": fund,
         "capital_project": capital_project,
         "fy": fy,
@@ -288,6 +293,7 @@ def capital_forecasting_fears(request):
         request,
         "capital-forecasting-fears.html",
         {
+            "action_url": action_url,
             "table": table,
             "form": form,
             "form_filter": form_filter,
@@ -299,6 +305,7 @@ def capital_forecasting_fears(request):
 def capital_historical_outlook(request):
     fund = capital_project = fy = data = table = ""
     form_filter = True
+    action_url = "capital-historical-outlook"
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
@@ -311,6 +318,7 @@ def capital_historical_outlook(request):
         fy = BftStatus.current.fy()
 
     initial = {
+        "action_url": action_url,
         "fund": fund,
         "capital_project": capital_project,
         "fy": fy,
@@ -320,6 +328,7 @@ def capital_historical_outlook(request):
         request,
         "capital-historical-outlook.html",
         {
+            "action_url": action_url,
             "table": table,
             "form": form,
             "form_filter": form_filter,
@@ -331,6 +340,7 @@ def capital_historical_outlook(request):
 def capital_forecasting_ye_ratios(request):
     fund = capital_project = fy = data = table = ""
     form_filter = True
+    action_url = "capital-forecasting-ye-ratios"
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
@@ -343,6 +353,7 @@ def capital_forecasting_ye_ratios(request):
         fy = BftStatus.current.fy()
 
     initial = {
+        "action_url": action_url,
         "fund": fund,
         "capital_project": capital_project,
         "fy": fy,
@@ -352,6 +363,7 @@ def capital_forecasting_ye_ratios(request):
         request,
         "capital-forecasting-ye-ratios.html",
         {
+            "action_url": action_url,
             "table": table,
             "form": form,
             "form_filter": form_filter,

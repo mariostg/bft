@@ -1,5 +1,5 @@
 <div class="form" id="filter-form">
-    <form action="{% url 'capital-forecasting-fears' %}" method="GET">
+    <form action="{% url action_url %}" method="GET">
         <div class="form__header">Search</div>
         <section class="form__fields-row">
                 <div class="form__field">
@@ -16,6 +16,7 @@
                     <label class="label" for="fy">FY</label>
                     {{form.fy}}
                 </div>
+                {% block extra_fields %}{% endblock extra_fields %}
         </section>
 
         <div class="block block--spaced">
