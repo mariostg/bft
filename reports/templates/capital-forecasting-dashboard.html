@@ -39,8 +39,10 @@
     const data_estimates = source_estimates.map(function (e) {
         return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
     });
+    const colors={MLE:'goldenrod',HE:'chocolate',LE:'coral',Spent:'#882255',CO:'#ddcc77',PC:'#afeeee',FR:'#fa8072'};
     data_estimates.columns = Object.keys(data_estimates[0]);
     var config = {
+        color:colors,
         style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
         legend: { visibility: "show", orient: "v" },
         threshold: [{name:"Q4 Working Plan",value:d3.max(source_estimates.map((d) => parseFloat(d["Working Plan"])))}],
@@ -52,6 +54,7 @@
     });
     data_quarterly.columns = Object.keys(data_quarterly[0]);
     var config = {
+        color:colors,
         style: { type: "bar", barmode: "stacked", orientation: "v", width: 500, height: 200 },
         piston: { name: "MLE", fill: "lightgrey" },
         marker: { name: "Allocation", fill: "yellow" },
@@ -64,6 +67,7 @@
     });
     data_outlook.columns = Object.keys(data_outlook[0]);
     var config = {
+        color:colors,
         style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
         legend: { visibility: "show", orient: "v" }
     };
@@ -74,6 +78,7 @@
     }});
     data_ye_ratios.columns = Object.keys(data_ye_ratios[0]);
     var config = {
+        color:colors,
         style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
         legend: { visibility: "show", orient: "v" },
         threshold:[{name:'100%',value:1}]

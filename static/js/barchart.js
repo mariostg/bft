@@ -20,7 +20,7 @@ const Chart = function (parent, data, chart_config) {
                 margin: { top: 10, right: 30, bottom: 20, left: 50 },
                 legend: { position: "right", orient: "v", translate_x: 0, translate_y: 0, width: 0 }, //left,right,top,bottom,none
             },
-            figure: {},
+            figure: { color: chart_config.color || {} }, //defined in setColors},
             piston: { name: chart_config?.piston?.name || null, fill: chart_config?.piston?.fill || null },
             marker: { name: chart_config?.marker?.name || null, fill: chart_config?.marker?.fill || null },
         };
@@ -308,10 +308,14 @@ const Chart = function (parent, data, chart_config) {
             .call(ax);
     }
     function setColors() {
-        chart_config.figure.color = {};
         let i = 0;
         for (const s of chart_config.figure.yGroupName) {
-            chart_config.figure.color[s] = d3.schemeCategory10[i++];
+            try {
+                if (Object.keys(chart_config.figure.color).indexOf(s) == -1) {
+                    // chart_config.figure.color[s] = d3.schemeCategory10[i++];
+                    chart_config.figure.color[s] = d3.schemeTableau10[i++];
+                }
+            } catch {}
         }
         if (chart_config?.piston?.fill) {
             chart_config.figure.color[chart_config.piston.name] = chart_config.piston.fill;
