@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% load humanize %}
+{% block title %}Capital Forecasting Quarterly{% endblock title %}
+{% block content %}
+<main class='block block--centered'>
+    {% if not table %}
+    <div class="alert alert--info">There are no data to display</div>
+    {% endif %}
+
+    <h1>Capital Forecasting Quarterly</h1>
+    <h2>{{data.project_no}} [{{data.fundcenter}}], {{data.fund}}, {{data.fy}}</h2>
+    {% if form_filter %}
+    {% include "capital-forecasting-estimates-filter-form.html" %}
+    {% endif %}
+
+    <div id="chart_container"></div>
+    {{table|safe}}
+    {% autoescape off %}
+    <script>data={{data}}</script>
+    <script type="module">
+        import { Chart } from "/static/js/barchart.js";
+        const data_quarterly=data.map(function(e){return {Quarters:e.Quarters,Spent:e.Spent, CO:e.CO, PC:e.PC, FR:e.FR,MLE:e.MLE,Allocation:e.allocation}});
+        console.log(data_quarterly)
+        data_quarterly.columns = Object.keys(data_quarterly[0]);
+        var config = {
+            style: { type: "bar", barmode: "stacked", orientation: "v", width: 500, height: 200 },
+            piston: { name: "MLE", fill: "lightgrey" },
+            marker: { name: "Allocation", fill: "yellow" },
+            legend: { visibility: "show", orient: "v" }
+        };
+        var c = Chart("chart_container", data_quarterly, config);
+    </script>
+    {{data}}
+    {{chart}}
+    {% endautoescape %}
+</main>
+
+
+{% endblock content %}
