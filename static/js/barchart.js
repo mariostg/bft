@@ -369,6 +369,9 @@ const Chart = function (parent, data, chart_config) {
     }
 
     function drawSvgContainer(parent) {
+        if (!document.getElementById(parent)) {
+            throw `Chart parent <${parent}> does not exist`;
+        }
         svg = d3
             .select("#" + parent)
             .append("svg")
