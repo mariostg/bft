@@ -52,10 +52,11 @@
     const source_estimates={{source_estimates}};
     const source_quarterly={{source_quarterly}};
     const source_outlook={{source_outlook}};
+    const colors={MLE:'goldenrod',HE:'chocolate',LE:'coral',Spent:'#882255',CO:'#ddcc77',PC:'#afeeee',FR:'#fa8072'};
     const data_estimates = source_estimates.map(function (e) {
         return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
     });
-    const colors={MLE:'goldenrod',HE:'chocolate',LE:'coral',Spent:'#882255',CO:'#ddcc77',PC:'#afeeee',FR:'#fa8072'};
+    if (data_estimates.length){
     data_estimates.columns = Object.keys(data_estimates[0]);
     var config = {
         color:colors,
@@ -64,10 +65,13 @@
         threshold: [{name:"Q4 Working Plan",value:d3.max(source_estimates.map((d) => parseFloat(d["Working Plan"])))}],
     };
     Chart("chart_estimates", data_estimates, config);
+    }
 
     const data_quarterly=source_quarterly.map(function(e) {
         return {Quarters:e.Quarters,Spent:e.Spent, CO:e.CO, PC:e.PC, FR:e.FR,MLE:e.MLE,Allocation:e.allocation}
     });
+
+    if(data_quarterly.length){
     data_quarterly.columns = Object.keys(data_quarterly[0]);
     var config = {
         color:colors,
@@ -77,10 +81,12 @@
         legend: { visibility: "show", orient: "v" }
     };
     Chart("chart_fearstatus", data_quarterly, config);
+    }
 
     const data_outlook = source_outlook.map(function (e) {
         return { FY: e.fy, "Initial Allocation": e['Initial Allocation'],  'Q1 MLE': e['Q1 MLE'],'Q2 MLE': e['Q2 MLE'],'Q3 MLE': e['Q3 MLE'],'Q4 MLE': e['Q4 MLE'],'YE Spent':e['YE Spent'] };
     });
+    if(data_outlook.length){
     data_outlook.columns = Object.keys(data_outlook[0]);
     var config = {
         color:colors,
@@ -88,10 +94,12 @@
         legend: { visibility: "show", orient: "v" }
     };
     Chart("chart_outlook", data_outlook, config);
+    }
 
     const data_ye_ratios=source_outlook.map(function(e){ return {"FY":e.fy,
         "YE vs Initial Allocation":e['YE Spent']/e['Initial Allocation'],"YE vs Q1":e['YE Spent']/e['Q1 MLE'],"YE vs Q2":e['YE Spent']/e['Q2 MLE'],"YE vs Q3":e['YE Spent']/e['Q3 MLE'],"YE vs Q4":e['YE Spent']/e['Q4 MLE']
     }});
+    if (data_ye_ratios.length){
     data_ye_ratios.columns = Object.keys(data_ye_ratios[0]);
     var config = {
         color:colors,
@@ -100,7 +108,7 @@
         threshold:[{name:'100%',value:1}]
     };
     Chart("chart_ye_ratios", data_ye_ratios, config);
-
+    }
 
     ChartHandler.ajust_chart_width()
 </script>
