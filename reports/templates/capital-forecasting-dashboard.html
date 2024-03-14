@@ -13,29 +13,45 @@
     <h1>Capital Forecasting Dashboard</h1>
     {% endif %}
 {% autoescape off %}
-
 <div class="charts">
     <div class="chart">
-        <div id="chart_estimates"><div class="chart__title">Quarterly Estimates</div></div>
+        <div id="chart_estimates"><div class="chart__title">
+            {% if source_estimates|length > 2 %}
+            Quarterly Estimates
+            {% else %}No Estimates data
+            {% endif %}
+        </div></div>
     </div>
     <div class="chart">
-        <div id="chart_fearstatus"><div class="chart__title">FEAR Status (Forecast, Encumbrance, Allocation Relationship)</div></div>
+        <div id="chart_fearstatus"><div class="chart__title">
+            {% if source_quarterly|length > 2 %}
+            FEAR Status (Forecast, Encumbrance, Allocation Relationship)
+            {% else %}No FEAR Status data
+            {% endif %}
+        </div></div>
     </div>
     <div class="chart">
-        <div id="chart_outlook"><div class="chart__title">Historical Outlook</div></div>
+        <div id="chart_outlook"><div class="chart__title">
+            {% if source_outlook|length > 2 %}
+            Historical Outlook
+            {% else %}No Historical Outlook data
+            {% endif %}
+        </div></div>
     </div>
     <div class="chart">
-        <div id="chart_ye_ratios"><div class="chart__title">Annual YE Spent ratios</div></div>
+        <div id="chart_ye_ratios"><div class="chart__title">
+            {% if source_outlook|length > 2 %}
+            Annual YE Spent ratios
+            {% else %}No Annual YE Spent data
+            {% endif %}
+        </div></div>
     </div>
 </div>
-<script>
-    source_estimates={{source_estimates}};
-    source_quarterly={{source_quarterly}};
-    source_outlook={{source_outlook}};
-
-</script>
 <script type="module">
     import { Chart,ChartHandler } from "/static/js/barchart.js";
+    const source_estimates={{source_estimates}};
+    const source_quarterly={{source_quarterly}};
+    const source_outlook={{source_outlook}};
     const data_estimates = source_estimates.map(function (e) {
         return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
     });
