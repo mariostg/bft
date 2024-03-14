@@ -10,13 +10,13 @@
     {% if form_filter %}
     {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
-{% if data %}
-<div id="chart_estimates"><div class="chart__title">Capital Forecasting Estimates {{capital_project}} {{fund}} FY {{fy}}</div></div>
-{{table|safe}}
 {% autoescape off %}
+{{table}}
+{% if data|length > 2 %}
+<div id="chart_estimates"><div class="chart__title">Capital Forecasting Estimates {{capital_project}} {{fund}} FY {{fy}}</div></div>
     <script type="module">
         import { Chart,ChartHandler } from "/static/js/barchart.js";
-        const data={{data|safe}}
+        const data={{data}}
         const data_estimates = data.map(function (e) {
             return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
         });
@@ -29,7 +29,7 @@
         Chart("chart_estimates", data_estimates, config);
         ChartHandler.ajust_chart_width()
     </script>
-    {% endautoescape %}
     {% endif %}
+    {% endautoescape %}
 </main>
 {% endblock content %}

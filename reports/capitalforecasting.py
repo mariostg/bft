@@ -96,6 +96,8 @@ class HistoricalOutlookReport(CapitalReport):
 
     def to_html(self):
         self.dataframe()
+        if self.df.empty:
+            return "Dataframe is empty."
         fmt = "{:,.0f}".format
         fmt_dict = {}
         for field in ["Initial Allocation", "Q1 MLE", "Q2 MLE", "Q3 MLE", "Q4 MLE", "YE Spent"]:
@@ -136,6 +138,8 @@ class FEARStatusReport(CapitalReport):
 
     def to_html(self):
         self.dataframe()
+        if self.df.empty:
+            return "Dataframe is empty."
         fmt = "{:,.0f}".format
         fmt_dict = {}
         for field in ["allocation", "forecast", "le", "he", "forecast", "co", "pc", "fr"]:

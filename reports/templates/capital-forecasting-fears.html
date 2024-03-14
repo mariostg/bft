@@ -11,12 +11,13 @@
     {% if form_filter %}
     {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
-{% if data %}
-{{table|safe}}
+
+{% autoescape off %}
+{{table}}
+{% if data|length > 2 %}
 <div class="chart">
     <div id="chart_fearstatus"><div class="chart__title">FEAR Status {{capital_project}} - {{fund}} FY {{fy}}</div></div>
 </div>
-{% autoescape off %}
 <script type="module">
     import { Chart, ChartHandler} from "/static/js/barchart.js";
     const data={{data}}
@@ -35,7 +36,7 @@
     Chart("chart_fearstatus", data_quarterly, config);
     ChartHandler.ajust_chart_width()
 </script>
-{% endautoescape %}
 {% endif %}
+{% endautoescape %}
 </main>
 {% endblock content %}

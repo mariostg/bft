@@ -11,12 +11,13 @@
     {% if form_filter %}
     {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
-{% if data %}
+
+{% autoescape off %}
 {{table|safe}}
+{% if data|length > 2 %}
 <div class="chart">
     <div id="chart_ye_ratios"><div class="chart__title">Annual Year end Ratios {{capital_project}} - {{fund}}</div></div>
 </div>
-{% autoescape off %}
 <script type="module">
     import { Chart,ChartHandler } from "/static/js/barchart.js";
     const data={{data}}
@@ -33,8 +34,8 @@
 
     ChartHandler.ajust_chart_width()
 </script>
-{% endautoescape %}
 {% endif %}
+{% endautoescape %}
 </main>
 
 
