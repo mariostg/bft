@@ -168,3 +168,9 @@ table table td {
     gap: 2rem;
     justify-content: center;
 }
+.bft-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+}
