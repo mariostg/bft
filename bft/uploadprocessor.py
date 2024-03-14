@@ -38,10 +38,11 @@ class UploadProcessor(ABC):
     class Meta:
         abstract = True
 
-    def __init__(self, filepath, user: BftUser) -> None:
+    def __init__(self, filepath, user: BftUser, request=None) -> None:
         self.filepath = filepath
         self.user = user
         self.header = None
+        self.request = request
 
     def header_good(self) -> bool:
         with open(self.filepath, "r") as f:
@@ -496,11 +497,27 @@ class CapitalProjectForecastProcessor(UploadProcessor):
     class Meta:
         abstract = True
 
-    def __init__(self, filepath, user: BftUser) -> None:
-        UploadProcessor.__init__(self, filepath, user)
+    def __init__(self, filepath, user: BftUser, request=None) -> None:
+        UploadProcessor.__init__(self, filepath, user, request)
 
-    def _find_duplicates(self, df: pd.DataFrame):
-        return pd.DataFrame
+    def _find_duplicates(self, df: pd.DataFrame, extra_subset: list = None) -> pd.DataFrame:
+        subset = ["capital_project", "fund", "fy", "commit_item"]
+        if extra_subset:
+            subset.extend(extra_subset)
+        duplicates = df[
+            df.duplicated(
+                keep=False,
+                subset=subset,
+            )
+        ]
+        if not duplicates.empty:
+            msg = "Duplicate Fund-FY-Project have been detected in source data:"
+            if self.request:
+                messages.error(self.request, f"{msg} {duplicates.to_html()}")
+            else:
+                print(msg)
+                print(duplicates)
+        return duplicates
 
     def _assign_capital_project(self, capital_forecasts: dict, request=None) -> dict | None:
         for item in capital_forecasts:  # assign fund center to everyone before saving
@@ -530,26 +547,27 @@ class CapitalProjectForecastProcessor(UploadProcessor):
 # CapitalProjectNewYearProcessor, CapitalProjectInYearProcessor, CapitalProjectYearEndProcessor are very much alike
 # Probably worth rework in one class at one point, but that works for now.
 class CapitalProjectNewYearProcessor(CapitalProjectForecastProcessor):
-    def __init__(self, filepath, user: BftUser) -> None:
-        CapitalProjectForecastProcessor.__init__(self, filepath, user)
+    def __init__(self, filepath, user: BftUser, request=None) -> None:
+        CapitalProjectForecastProcessor.__init__(self, filepath, user, request)
         self.header = "capital_project,fund,fy,commit_item,initial_allocation\n"
 
-    def main(self, request=None):
+    def main(self):
         if not self.header_good():
             msg = f"New year capital project forecast upload. Invalid columns header"
             logger.error(msg)
-            if request:
-                messages.error(request, msg)
+            if self.request:
+                messages.error(self.request, msg)
                 return
 
         df = self.dataframe()
         duplicates = self._find_duplicates(df)
-        if not duplicates.empty and request:
-            messages.error(request, f"Duplicate Fund-FY-Project have been detected: {duplicates.to_html()}")
+        if not duplicates.empty:
             return
 
         _dict = self.as_dict(df)
-        if not self._assign_capital_project(_dict, request) or not self._assign_fund(_dict, request):
+        if not self._assign_capital_project(_dict, self.request) or not self._assign_fund(
+            _dict, self.request
+        ):
             return
 
         counter = 0
@@ -562,37 +580,38 @@ class CapitalProjectNewYearProcessor(CapitalProjectForecastProcessor):
             except IntegrityError as err:
                 msg = f"Saving New Year Capital Forecasting {item} generates {err}."
                 logger.warn(msg)
-                if request:
-                    messages.error(request, msg)
+                if self.request:
+                    messages.error(self.request, msg)
         if counter:
             msg = f"{counter} New Year Capital Forecasts(s) have been uploaded."
-            if request:
-                messages.info(request, msg)
+            if self.request:
+                messages.info(self.request, msg)
             else:
                 print(msg)
 
 
 class CapitalProjectInYearProcessor(CapitalProjectForecastProcessor):
-    def __init__(self, filepath, user: BftUser) -> None:
-        CapitalProjectForecastProcessor.__init__(self, filepath, user)
+    def __init__(self, filepath, user: BftUser, request=None) -> None:
+        CapitalProjectForecastProcessor.__init__(self, filepath, user, request)
         self.header = "capital_project,fund,fy,quarter,commit_item,allocation,le,mle,he,spent,co,pc,fr\n"
 
-    def main(self, request=None):
+    def main(self):
         if not self.header_good():
             msg = f"Capital project forecast upload. Invalid columns header"
             logger.error(msg)
-            if request:
-                messages.error(request, msg)
+            if self.request:
+                messages.error(self.request, msg)
                 return
 
         df = self.dataframe()
-        duplicates = self._find_duplicates(df)
-        if not duplicates.empty and request:
-            messages.error(request, f"Duplicate Fund-FY-Project have been detected: {duplicates.to_html()}")
+        duplicates = self._find_duplicates(df, extra_subset=["quarter"])
+        if not duplicates.empty:
             return
 
         _dict = self.as_dict(df)
-        if not self._assign_capital_project(_dict, request) or not self._assign_fund(_dict, request):
+        if not self._assign_capital_project(_dict, self.request) or not self._assign_fund(
+            _dict, self.request
+        ):
             return
 
         counter = 0
@@ -605,37 +624,38 @@ class CapitalProjectInYearProcessor(CapitalProjectForecastProcessor):
             except IntegrityError as err:
                 msg = f"Saving In Year Capital Forecasting {item} generates {err}."
                 logger.warn(msg)
-                if request:
-                    messages.error(request, msg)
+                if self.request:
+                    messages.error(self.request, msg)
         if counter:
             msg = f"{counter} In Year Capital Forecasts(s) have been uploaded."
-            if request:
-                messages.info(request, msg)
+            if self.request:
+                messages.info(self.request, msg)
             else:
                 print(msg)
 
 
 class CapitalProjectYearEndProcessor(CapitalProjectForecastProcessor):
-    def __init__(self, filepath, user: BftUser) -> None:
-        CapitalProjectForecastProcessor.__init__(self, filepath, user)
+    def __init__(self, filepath, user: BftUser, request=None) -> None:
+        CapitalProjectForecastProcessor.__init__(self, filepath, user, request)
         self.header = "capital_project,fund,fy,commit_item,ye_spent\n"
 
-    def main(self, request=None):
+    def main(self):
         if not self.header_good():
             msg = f"Year end capital project forecast upload. Invalid columns header"
             logger.error(msg)
-            if request:
-                messages.error(request, msg)
+            if self.request:
+                messages.error(self.request, msg)
                 return
 
         df = self.dataframe()
         duplicates = self._find_duplicates(df)
-        if not duplicates.empty and request:
-            messages.error(request, f"Duplicate Fund-FY-Project have been detected: {duplicates.to_html()}")
+        if not duplicates.empty:
             return
 
         _dict = self.as_dict(df)
-        if not self._assign_capital_project(_dict, request) or not self._assign_fund(_dict, request):
+        if not self._assign_capital_project(_dict, self.request) or not self._assign_fund(
+            _dict, self.request
+        ):
             return
 
         counter = 0
@@ -648,12 +668,12 @@ class CapitalProjectYearEndProcessor(CapitalProjectForecastProcessor):
             except IntegrityError as err:
                 msg = f"Saving Year End Capital Forecasting {item} generates {err}."
                 logger.warn(msg)
-                if request:
-                    messages.error(request, msg)
+                if self.request:
+                    messages.error(self.request, msg)
         if counter:
             msg = f"{counter} {__class__.__name__} Year End Capital Forecasts(s) have been uploaded."
-            if request:
-                messages.info(request, msg)
+            if self.request:
+                messages.info(self.request, msg)
             else:
                 print(msg)
 

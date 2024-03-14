@@ -672,8 +672,8 @@ def capital_forecasting_new_year_upload(request):
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
-            processor = CapitalProjectNewYearProcessor(filepath, user)
-            processor.main(request)
+            processor = CapitalProjectNewYearProcessor(filepath, user, request)
+            processor.main()
     else:
         form = UploadForm
     return render(
@@ -692,8 +692,8 @@ def capital_forecasting_in_year_upload(request):
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
-            processor = CapitalProjectInYearProcessor(filepath, user)
-            processor.main(request)
+            processor = CapitalProjectInYearProcessor(filepath, user, request)
+            processor.main()
     else:
         form = UploadForm
     return render(
@@ -712,8 +712,8 @@ def capital_forecasting_year_end_upload(request):
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
-            processor = CapitalProjectYearEndProcessor(filepath, user)
-            processor.main(request)
+            processor = CapitalProjectYearEndProcessor(filepath, user, request)
+            processor.main()
     else:
         form = UploadForm
     return render(
