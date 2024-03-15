@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import Sum,QuerySet
 from costcenter.models import (
     CapitalInYear,
     CapitalProject,
@@ -36,7 +36,7 @@ class HistoricalOutlookReport(CapitalReport):
         super().__init__(fund, capital_project, fy)
         self.years = list(range(self.fy - 4, self.fy + 1))
 
-    def dataset(self):
+    def dataset(self)->dict[QuerySet]:
         in_year = CapitalInYear.objects.filter(
             fund=self.fund, capital_project=self.capital_project, fy__in=self.years
         ).values("fy", "quarter", "mle")
@@ -49,7 +49,7 @@ class HistoricalOutlookReport(CapitalReport):
 
         return dict(in_year=in_year, new_year=new_year, year_end=year_end)
 
-    def dataframe(self):
+    def dataframe(self)->int:
         """Create a dataframe of annual data, one row per year for given project and fund"""
 
         data = self.dataset()
@@ -82,17 +82,20 @@ class HistoricalOutlookReport(CapitalReport):
                 df = df.merge(df_q4, how="left", on="fy")
             else:
                 df["Q4 MLE"] = 0
+
         if any(data["year_end"]):
             df_year_end = pd.DataFrame.from_dict(data["year_end"])
-            df = df.merge(df_year_end, how="left", on="fy")
+            df = df.merge(df_year_end, how="outer", on="fy")
 
         if any(data["new_year"]):
             df_new_year = pd.DataFrame.from_dict(data["new_year"])
-            df = df.merge(df_new_year, how="left", on="fy")
+            print(df_new_year)
+            df = df.merge(df_new_year, how="outer", on="fy")
 
         if not df.empty:
             self.df = df.rename(columns={"ye_spent": "YE Spent", "initial_allocation": "Initial Allocation"})
             self.df = self.df.fillna(0)
+        return self.df.size
 
     def to_html(self):
         self.dataframe()
@@ -114,7 +117,7 @@ class FEARStatusReport(CapitalReport):
         self.quarters = [1, 2, 3, 4]
         super().__init__(fund, capital_project, fy)
 
-    def dataset(self):
+    def dataset(self)->QuerySet:
         return (
             CapitalInYear.objects.filter(fy=self.fy, fund=self.fund, capital_project=self.capital_project)
             .values("capital_project", "fund", "quarter")
@@ -131,10 +134,14 @@ class FEARStatusReport(CapitalReport):
             )
         )
 
-    def dataframe(self):
+    def dataframe(self)->int:
         """Create a dataframe of quarterly data, one row per quarter for given fundcenter, fund, and FY"""
-        self.df = pd.DataFrame.from_dict(self.dataset())
+        ds=self.dataset()
+        if not ds.count():
+            return 0
+        self.df = pd.DataFrame.from_dict(ds)
         self.df.rename(columns={"quarter": "Quarters"}, inplace=True)
+        return self.df.size
 
     def to_html(self):
         self.dataframe()
@@ -210,7 +217,7 @@ class EstimateReport(CapitalReport):
 
         super().__init__(fund, capital_project, fy)
 
-    def dataset(self):
+    def dataset(self)->QuerySet:
         return (
             CapitalInYear.objects.filter(fy=self.fy, fund=self.fund, capital_project=self.capital_project)
             .values(
@@ -235,14 +242,18 @@ class EstimateReport(CapitalReport):
             )
         )
 
-    def dataframe(self):
-        self.df = pd.DataFrame.from_dict(self.dataset()).rename(
+    def dataframe(self)->int:
+        ds=self.dataset()
+        if not ds.count():
+            return 0
+        self.df = pd.DataFrame.from_dict(ds).rename(
             columns={
                 "capital_project__fundcenter__fundcenter": "Fund Center",
                 "capital_project__project_no": "Project No",
                 "working_plan": "Working Plan",
             }
         )
+        return self.df.size
 
     def to_html(self):
         self.dataframe()

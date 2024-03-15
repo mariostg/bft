@@ -240,9 +240,12 @@ def capital_forecasting_estimates(request):
         fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
         estimates = capitalforecasting.EstimateReport(fund, fy, capital_project)
         estimates.dataframe()
-        estimates.df.quarter="Q"+estimates.df.quarter
-        data = estimates.df.to_json(orient="records")
-        table = estimates.to_html()
+        if estimates.df.size:
+            estimates.df.quarter="Q"+estimates.df.quarter
+            data = estimates.df.to_json(orient="records")
+            table = estimates.to_html()
+        else:
+            messages.warning(request,"Capital forecasting estimate is empty")
     else:
         fy = BftStatus.current.fy()
 
@@ -278,9 +281,13 @@ def capital_forecasting_fears(request):
         fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
         quarterly = capitalforecasting.FEARStatusReport(fund, fy, capital_project)
         quarterly.dataframe()
-        quarterly.df.Quarters="Q"+quarterly.df.Quarters
-        data = quarterly.df.to_json(orient="records")
-        table = quarterly.to_html()
+        if quarterly.df.size:
+            quarterly.df.Quarters="Q"+quarterly.df.Quarters
+            data = quarterly.df.to_json(orient="records")
+            table = quarterly.to_html()
+        else:
+            messages.warning(request,"Capital forecasting FEARS is empty")
+
     else:
         fy = BftStatus.current.fy()
 
@@ -315,8 +322,12 @@ def capital_historical_outlook(request):
         fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
         outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
         outlook.dataframe()
-        data = outlook.df.to_json(orient="records")
-        table = outlook.to_html()
+        if outlook.df.size:
+            data = outlook.df.to_json(orient="records")
+            table = outlook.to_html()
+        else:
+            messages.warning(request,"Capital forecasting historical outlook is empty")
+
     else:
         fy = BftStatus.current.fy()
 
