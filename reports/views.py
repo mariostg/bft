@@ -240,6 +240,7 @@ def capital_forecasting_estimates(request):
         fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
         estimates = capitalforecasting.EstimateReport(fund, fy, capital_project)
         estimates.dataframe()
+        estimates.df.quarter="Q"+estimates.df.quarter
         data = estimates.df.to_json(orient="records")
         table = estimates.to_html()
     else:
@@ -277,6 +278,7 @@ def capital_forecasting_fears(request):
         fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
         quarterly = capitalforecasting.FEARStatusReport(fund, fy, capital_project)
         quarterly.dataframe()
+        quarterly.df.Quarters="Q"+quarterly.df.Quarters
         data = quarterly.df.to_json(orient="records")
         table = quarterly.to_html()
     else:
@@ -377,6 +379,7 @@ def capital_forecasting_ye_ratios(request):
 def capital_forecasting_dashboard(request):
     fund = capital_project = source_estimates = source_quarterly = source_outlook = ""
     form_filter = True
+    print("HI")
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
@@ -388,10 +391,13 @@ def capital_forecasting_dashboard(request):
 
         estimates = capitalforecasting.EstimateReport(fund, fy, capital_project)
         estimates.dataframe()
+        estimates.df.quarter="Q"+estimates.df.quarter
         source_estimates = estimates.df.to_json(orient="records")
 
         quarterly = capitalforecasting.FEARStatusReport(fund, fy, capital_project)
         quarterly.dataframe()
+        quarterly.df.Quarters="Q"+quarterly.df.Quarters
+        print(quarterly.df)
         source_quarterly = quarterly.df.to_json(orient="records")
 
         outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
