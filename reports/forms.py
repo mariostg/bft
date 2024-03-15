@@ -34,31 +34,31 @@ class SearchCostCenterScreeningReportForm(forms.ModelForm):
 
 
 class SearchCapitalForecastingDashboardForm(forms.Form):
-    capital_project = forms.CharField(required=False)
-    fund = forms.CharField(required=False)
-    fy = forms.CharField(required=False)
+    capital_project = forms.CharField(required=True)
+    fund = forms.CharField(required=True)
+    fy = forms.CharField(required=True)
     quarter = forms.CharField(required=False)
 
 
 class SearchCapitalEstimatesForm(forms.Form):
-    capital_project = forms.CharField(required=False)
-    fund = forms.CharField(required=False)
-    fy = forms.CharField(required=False)
+    capital_project = forms.CharField(required=True)
+    fund = forms.CharField(required=True)
+    fy = forms.CharField(required=True)
 
 
 class SearchCapitalFearsForm(forms.Form):
-    capital_project = forms.CharField(required=False)
-    fund = forms.CharField(required=False)
-    fy = forms.CharField(required=False)
+    capital_project = forms.CharField(required=True)
+    fund = forms.CharField(required=True)
+    fy = forms.CharField(required=True)
 
 
 class SearchCapitalHistoricalForm(forms.Form):
-    capital_project = forms.CharField(required=False)
-    fund = forms.CharField(required=False)
-    fy = forms.CharField(required=False)
+    capital_project = forms.CharField(required=True)
+    fund = forms.CharField(required=True)
+    fy = forms.CharField(required=True)
 
 
 class SearchCapitalYeRatiosForm(forms.Form):
-    capital_project = forms.CharField(required=False)
-    fund = forms.CharField(required=False)
-    fy = forms.CharField(required=False)
+    capital_project = forms.CharField(required=True)
+    fund = forms.CharField(required=True)
+    fy = forms.CharField(required=True)
