@@ -37,7 +37,7 @@ class FundManager(models.Manager):
         if fund:
             fund = fund.upper()
             if not FundManager().exists(fund):
-                messages.info(request, "Fund specified does not exist.")
+                messages.info(request, f"Fund {fund} does not exist.")
             return fund
         else:
             return None
