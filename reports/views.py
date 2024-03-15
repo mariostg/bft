@@ -388,7 +388,8 @@ def capital_forecasting_ye_ratios(request):
 
 
 def capital_forecasting_dashboard(request):
-    fund = capital_project = source_estimates = source_quarterly = source_outlook = ""
+    fund = capital_project = ""
+    source_estimates=source_quarterly=source_outlook=0
     form_filter = True
     print("HI")
     if len(request.GET):
@@ -400,23 +401,29 @@ def capital_forecasting_dashboard(request):
         if str(quarter) not in QUARTERKEYS:
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
 
+
         estimates = capitalforecasting.EstimateReport(fund, fy, capital_project)
         estimates.dataframe()
-        estimates.df.quarter="Q"+estimates.df.quarter
-        source_estimates = estimates.df.to_json(orient="records")
+        if estimates.df.size:
+            estimates.df.quarter="Q"+estimates.df.quarter
+            source_estimates = estimates.df.to_json(orient="records")
+        else:
+            messages.warning(request,"Capital forecasting estimate is empty")
 
         quarterly = capitalforecasting.FEARStatusReport(fund, fy, capital_project)
         quarterly.dataframe()
-        quarterly.df.Quarters="Q"+quarterly.df.Quarters
-        print(quarterly.df)
-        source_quarterly = quarterly.df.to_json(orient="records")
+        if quarterly.df.size:
+            quarterly.df.Quarters="Q"+quarterly.df.Quarters
+            source_quarterly = quarterly.df.to_json(orient="records")
+        else:
+            messages.warning(request,"Capital forecasting FEARS is empty")
 
         outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
         outlook.dataframe()
-        source_outlook = outlook.df.to_json(orient="records")
-
-        pie = capitalforecasting.EncumbranceStatusReport(fund, fy, quarter, capital_project)
-        pie.dataframe()
+        if outlook.df.size:
+            source_outlook = outlook.df.to_json(orient="records")
+        else:
+            messages.warning(request,"Capital forecasting historical outlook is empty")
 
     else:
         fy = BftStatus.current.fy()

@@ -53,20 +53,23 @@
     const source_quarterly={{source_quarterly}};
     const source_outlook={{source_outlook}};
     const colors={MLE:'goldenrod',HE:'chocolate',LE:'coral',Spent:'#882255',CO:'#ddcc77',PC:'#afeeee',FR:'#fa8072'};
+    if(source_estimates!==0){
     const data_estimates = source_estimates.map(function (e) {
         return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
     });
     if (data_estimates.length){
-    data_estimates.columns = Object.keys(data_estimates[0]);
-    var config = {
-        color:colors,
-        style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
-        legend: { visibility: "show", orient: "v" },
-        threshold: [{name:"Q4 Working Plan",value:d3.max(source_estimates.map((d) => parseFloat(d["Working Plan"])))}],
-    };
-    Chart("chart_estimates", data_estimates, config);
+        data_estimates.columns = Object.keys(data_estimates[0]);
+        var config = {
+            color:colors,
+            style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
+            legend: { visibility: "show", orient: "v" },
+            threshold: [{name:"Q4 Working Plan",value:d3.max(source_estimates.map((d) => parseFloat(d["Working Plan"])))}],
+        };
+        Chart("chart_estimates", data_estimates, config);
+        }
     }
 
+    if(source_quarterly !==0){
     const data_quarterly=source_quarterly.map(function(e) {
         return {Quarters:e.Quarters,Spent:e.Spent, CO:e.CO, PC:e.PC, FR:e.FR,MLE:e.MLE,Allocation:e.allocation}
     });
@@ -82,6 +85,7 @@
     };
     Chart("chart_fearstatus", data_quarterly, config);
     }
+}
 
     const data_outlook = source_outlook.map(function (e) {
         return { FY: e.fy, "Initial Allocation": e['Initial Allocation'],  'Q1 MLE': e['Q1 MLE'],'Q2 MLE': e['Q2 MLE'],'Q3 MLE': e['Q3 MLE'],'Q4 MLE': e['Q4 MLE'],'YE Spent':e['YE Spent'] };
