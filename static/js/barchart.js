@@ -271,7 +271,15 @@ const Chart = function (parent, data, chart_config) {
             for (let k of chart_config.figure.yGroupName) {
                 chart_config.figure.yMax = Math.max(
                     chart_config.figure.yMax,
-                    d3.max(data.map((d) => parseFloat(d[k] || 0)))
+                    d3.max(
+                        data.map((d) => {
+                            const f = parseFloat(d[k] || 0);
+                            if (f === Infinity) {
+                                return 0;
+                            }
+                            return f;
+                        })
+                    )
                 );
                 chart_config.figure.yMin = Math.min(
                     chart_config.figure.yMin,
