@@ -47,11 +47,15 @@
         </div></div>
     </div>
 </div>
+{{source_estimates|json_script:"json_source_estimates"}}
+{{source_quarterly|json_script:"json_source_quarterly"}}
+{{source_outlook|json_script:"json_source_outlook"}}
+
 <script type="module">
     import { Chart,ChartHandler } from "/static/js/barchart.js";
-    const source_estimates={{source_estimates}};
-    const source_quarterly={{source_quarterly}};
-    const source_outlook={{source_outlook}};
+    const source_estimates=JSON.parse(JSON.parse(document.getElementById('json_source_estimates').textContent));
+    const source_quarterly=JSON.parse(JSON.parse(document.getElementById('json_source_quarterly').textContent));
+    const source_outlook=JSON.parse(JSON.parse(document.getElementById('json_source_outlook').textContent));
     const colors={MLE:'goldenrod',HE:'chocolate',LE:'coral',Spent:'#882255',CO:'#ddcc77',PC:'#afeeee',FR:'#fa8072'};
     if(source_estimates!==0){
     const data_estimates = source_estimates.map(function (e) {
