@@ -7,15 +7,14 @@
     {% if form_filter %}
     {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
-{% autoescape off %}
-{{table}}
-{% if data|length > 2 %}
-<div class="chart">
+
+    {% if data|length > 2 %}
+    {{data|json_script:"json_data"}}
     <div id="chart_outlook"><div class="chart__title">Historical Outlook {{capital_project}} {{fund}} FY {{fy}}</div></div>
-</div>
+    {{table|safe}}
 <script type="module">
     import { Chart, ChartHandler } from "/static/js/barchart.js";
-    const data={{data}}
+    const data=JSON.parse(JSON.parse(document.getElementById('json_data').textContent))
     const data_estimates = data.map(function (e) {
         return { FY: e.fy, "Initial Allocation": e['Initial Allocation'],  'Q1 MLE': e['Q1 MLE'],'Q2 MLE': e['Q2 MLE'],'Q3 MLE': e['Q3 MLE'],'Q4 MLE': e['Q4 MLE'],'YE Spent':e['YE Spent'] };
     });
@@ -28,7 +27,6 @@
     ChartHandler.ajust_chart_width()
 </script>
 {% endif %}
-{% endautoescape %}
 </main>
 
 

@@ -7,16 +7,14 @@
     {% if form_filter %}
     {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
-
-{% autoescape off %}
-{{table}}
-{% if data|length > 2 %}
-<div class="chart">
+    
+    {% if data|length > 2 %}
+    {{data|json_script:"json_data"}}
     <div id="chart_fearstatus"><div class="chart__title">FEAR Status {{capital_project}} - {{fund}} FY {{fy}}</div></div>
-</div>
-<script type="module">
+    {{table|safe}}
+    <script type="module">
     import { Chart, ChartHandler} from "/static/js/barchart.js";
-    const data={{data}}
+    const data=JSON.parse(JSON.parse(document.getElementById('json_data').textContent))
     const data_quarterly=data.map(function(e) {
         return {Quarters:e.Quarters,Spent:e.Spent, CO:e.CO, PC:e.PC, FR:e.FR,MLE:e.MLE,Allocation:e.allocation}
     });
@@ -33,6 +31,5 @@
     ChartHandler.ajust_chart_width()
 </script>
 {% endif %}
-{% endautoescape %}
 </main>
 {% endblock content %}

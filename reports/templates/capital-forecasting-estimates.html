@@ -7,13 +7,14 @@
     {% if form_filter %}
     {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
-{% autoescape off %}
-{{table}}
-{% if data|length > 2 %}
-<div id="chart_estimates"><div class="chart__title">Capital Forecasting Estimates {{capital_project}} {{fund}} FY {{fy}}</div></div>
+
+    {% if data|length > 2 %}
+    {{data|json_script:"json_data"}}
+    <div id="chart_estimates"><div class="chart__title">Capital Forecasting Estimates {{capital_project}} {{fund}} FY {{fy}}</div></div>
+    {{table|safe}}
     <script type="module">
         import { Chart,ChartHandler } from "/static/js/barchart.js";
-        const data={{data}}
+        const data=JSON.parse(JSON.parse(document.getElementById('json_data').textContent))
         const data_estimates = data.map(function (e) {
             return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
         });
@@ -27,6 +28,5 @@
         ChartHandler.ajust_chart_width()
     </script>
     {% endif %}
-    {% endautoescape %}
 </main>
 {% endblock content %}
