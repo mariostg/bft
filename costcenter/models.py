@@ -592,6 +592,11 @@ class CostCenterManager(models.Manager):
             return None
         return cc
 
+    def has_line_items(self, costcenter: "CostCenter"):
+        from lineitems.models import LineItem
+
+        return LineItem.objects.filter(costcenter=costcenter).exists()
+
     def get_sub_alloc(
         self, fc: FundCenter | str, fund: Fund | str, fy: int, quarter: int
     ) -> "CostCenterAllocation":
@@ -926,6 +931,14 @@ class ForecastAdjustment(models.Model):
     class Meta:
         ordering = ["costcenter", "fund"]
         verbose_name_plural = "Forecast Adjustments"
+
+    def save(self, *args, **kwargs):
+        if not CostCenterManager().has_line_items(self.costcenter):
+            raise exceptions.LineItemsDoNotExistError(
+                f"{self.costcenter} has no line items.  Forecast adjustment rejected."
+            )
+
+        super().save(*args, **kwargs)
 
 
 class AllocationQuerySet(models.QuerySet):

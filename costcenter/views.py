@@ -47,6 +47,7 @@ from bft.uploadprocessor import (
     FundProcessor,
     SourceProcessor,
 )
+from bft import exceptions
 from main.settings import UPLOADS
 from .filters import (
     CostCenterFilter,
@@ -58,7 +59,6 @@ from .filters import (
     FundCenterFilter,
     FundCenterAllocationFilter,
 )
-
 
 def fund_page(request):
     data = Fund.objects.all()
@@ -923,7 +923,12 @@ def forecast_adjustment_add(request):
         if form.is_valid():
             form = form.save(commit=False)
             form.user = request.user
-            form.save()
+            try:
+                form.save()
+            except exceptions.LineItemsDoNotExistError:
+                messages.warning(
+                    request, f"Cost center {form.costcenter} has no line items"
+                )
             return redirect("forecast-adjustment-table")
     else:
         form = ForecastadjustmentForm

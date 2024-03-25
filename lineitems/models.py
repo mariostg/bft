@@ -21,6 +21,9 @@ class LineItemManager(models.Manager):
             return None
         return self.filter(costcenter=cc)
 
+    def has_line_items(self, costcenter: "CostCenter") -> bool:
+        return LineItem.objects.filter(costcenter=costcenter).exists()
+
     def line_item_dataframe(self, fund: str = None, doctype: str = None) -> pd.DataFrame:
         """Prepare a pandas dataframe of the DRMIS line items.  Columns are renamed
         with a more friendly name.
