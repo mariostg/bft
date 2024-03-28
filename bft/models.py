@@ -1903,6 +1903,7 @@ class CostCenterChargeProcessor:
             skipfooter=1,
             skipinitialspace=True,
             index_col=False,
+            engine="python",
         )
 
         # flush empty lines

@@ -5,8 +5,8 @@ from bft.models import CostCenterChargeProcessor, CostCenterChargeImport, BftSta
 class TestChargeProcessor:
     @pytest.fixture
     def setup(self):
-        self.test_file = "drmis_data/charges_cc_test.txt"
-        self.test_file_invalid_period = "drmis_data/charges_cc_invalid_period_test.txt"
+        self.test_file = "test-data/cc-charges.txt"
+        self.test_file_many_periods = "test-data/cc-charges-many-periods.txt"
         bs = BftStatus()
         bs.status = "FY"
         bs.value = 2023
@@ -20,7 +20,7 @@ class TestChargeProcessor:
 
         with open(cp.csv_file, "r") as f:
             line_count = f.readlines()
-        assert 99 == len(line_count)
+        assert 2 == len(line_count)
 
         with open(cp.csv_file, "r") as f:
             line = f.readline()
@@ -35,7 +35,14 @@ class TestChargeProcessor:
 
         cp = CostCenterChargeProcessor()
         with pytest.raises(ValueError):
-            cp.to_csv(self.test_file_invalid_period, "7")
+            cp.to_csv(self.test_file, "7")
+
+    @pytest.mark.django_db  # needed to get BFT status
+    def test_to_csv_many_period(self, setup):
+
+        cp = CostCenterChargeProcessor()
+        with pytest.raises(ValueError):
+            cp.to_csv(self.test_file_many_periods, "1")
 
     @pytest.mark.django_db
     def test_csv2cost_center_charge_import_table(self, setup):
@@ -43,4 +50,4 @@ class TestChargeProcessor:
         cp.to_csv(self.test_file, "1")
         cp.csv2cost_center_charge_import_table(2023, 1)
 
-        assert 98 == CostCenterChargeImport.objects.count()
+        assert 1 == CostCenterChargeImport.objects.count()
