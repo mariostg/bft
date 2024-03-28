@@ -5,7 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from bft.uploadprocessor import LineItemProcessor, CostCenterLineItemProcessor
 from bft.management.commands import populate
 from main import settings
-from costcenter.models import FundManager, SourceManager, FundCenter, CostCenter
+from bft.models import FundManager, SourceManager, FundCenter, CostCenter
 
 
 @pytest.mark.django_db

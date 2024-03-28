@@ -1,8 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 import os
-from lineitems.models import LineItemImport
+from bft.models import LineItemImport, LineItem, LineForecastManager
 from bft.uploadprocessor import LineItemProcessor
-from lineitems.models import LineItem, LineForecastManager
 from main.settings import BASE_DIR
 
 import logging

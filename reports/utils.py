@@ -3,8 +3,8 @@ from django.db.models.functions import Cast
 from django.db.models import IntegerField
 from bft.conf import P2Q
 from bft import conf
-from lineitems.models import LineItem
-from costcenter.models import (
+from bft.models import (
+    LineItem,
     CostCenter,
     CostCenterManager,
     CostCenterAllocation,

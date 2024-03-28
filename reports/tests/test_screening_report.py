@@ -1,5 +1,5 @@
 import pytest
-from costcenter.models import FundCenterManager, CostCenterManager
+from bft.models import FundCenterManager, CostCenterManager
 from reports.utils import CostCenterScreeningReport
 from bft.management.commands import populate, uploadcsv
 import pandas as pd

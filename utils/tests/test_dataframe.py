@@ -4,8 +4,7 @@ from bft.exceptions import BFTDataFrameExceptionError
 from bft.management.commands import populate, uploadcsv, monthlydata
 from reports.models import CostCenterMonthly
 from reports.utils import CostCenterMonthlyReport
-from costcenter.models import CostCenter, FundCenter, Fund
-from lineitems.models import LineItem
+from bft.models import CostCenter, FundCenter, Fund, LineItem
 from django.db import models
 import pandas as pd
 

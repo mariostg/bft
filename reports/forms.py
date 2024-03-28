@@ -1,5 +1,5 @@
 from django import forms
-from costcenter.models import FundCenterAllocation
+from bft.models import FundCenterAllocation
 
 
 class SearchAllocationAnalysisForm(forms.ModelForm):

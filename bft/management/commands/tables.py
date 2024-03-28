@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 import os
-from costcenter.models import Fund, CostCenter, Source
+from bft.models import Fund, CostCenter, Source
 
 
 class Command(BaseCommand):

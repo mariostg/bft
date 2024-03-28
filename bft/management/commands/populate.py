@@ -12,7 +12,7 @@ Populate command uses the data available from the test-data folder.  This folder
 """
 from django.core.management.base import BaseCommand
 from main.settings import DEBUG
-from costcenter.models import (
+from bft.models import (
     Fund,
     Source,
     CostCenter,
@@ -23,12 +23,14 @@ from costcenter.models import (
     CapitalInYear,
     CapitalNewYear,
     CapitalYearEnd,
+    CostCenterChargeImport,
+    CostCenterChargeMonthly,
+    LineForecast,
+    LineItem,
+    BftStatus,
+    BftStatusManager,
+    BftUser,
 )
-from charges.models import CostCenterChargeImport, CostCenterChargeMonthly
-from lineitems.models import LineForecast, LineItem
-from bft.models import BftStatus, BftStatusManager
-from users.models import BftUser
-
 from bft import uploadprocessor
 
 

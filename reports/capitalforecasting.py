@@ -1,5 +1,6 @@
 from django.db.models import Sum,QuerySet
-from costcenter.models import (
+from bft.models import (
+    BftStatusManager,
     CapitalInYear,
     CapitalProject,
     CapitalProjectManager,
@@ -8,7 +9,6 @@ from costcenter.models import (
     FundManager,
     Fund,
 )
-from bft.models import BftStatusManager
 import pandas as pd
 
 

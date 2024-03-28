@@ -42,11 +42,7 @@ INSTALLED_APPS = [
     "django_filters",
     # apps
     "bft.apps.BftConfig",
-    "costcenter.apps.CostcenterConfig",
-    "lineitems.apps.LineitemsConfig",
     "reports.apps.ReportsConfig",
-    "charges.apps.ChargesConfig",
-    "users.apps.UsersConfig",
     # dev
     "django_extensions",
 ]
@@ -189,7 +185,7 @@ LOGGING = {
     },
 }
 
-LOGIN_URL = "/users/login/"
-AUTH_USER_MODEL = "users.BftUser"
+LOGIN_URL = "/bft/login/"
+AUTH_USER_MODEL = "bft.BftUser"
 UPLOADS = BASE_DIR / "uploads/"
 UPLOAD_LOG = LOG_DIR / "upload.log"

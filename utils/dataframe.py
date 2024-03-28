@@ -10,7 +10,7 @@ class BFTDataFrame(pd.DataFrame):
     """This class creates a Pandas DataFrame using either a Django QuerySet, a Django Model instance, or a dictionary.  Column names are renamed according to the django_model passed in the __init__ method.  If field method does not have a verbose name, the column name will be capitalized.
 
     Typical usage:
-    from costcenter.models import FundCenter
+    from bft.models import FundCenter
     from utils import dataframe
 
     fc = FundCenter.objects.all()

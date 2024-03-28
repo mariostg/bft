@@ -6,14 +6,14 @@ import re
 import sys
 from datetime import datetime
 from django.contrib import messages
-from users.models import BftUser
 from django.db import models, IntegrityError
 import logging
 import pandas as pd
 import numpy as np
 from bft.conf import QUARTERKEYS
 from main.settings import BASE_DIR
-from costcenter.models import (
+from bft.models import (
+    BftUser,
     CapitalProject,
     CapitalInYear,
     CapitalNewYear,
@@ -28,8 +28,10 @@ from costcenter.models import (
     FundManager,
     Source,
     SourceManager,
+    LineItemImport,
+    LineItem,
+    LineForecastManager,
 )
-from lineitems.models import LineItemImport, LineItem, LineForecastManager
 
 logger = logging.getLogger("uploadcsv")
 

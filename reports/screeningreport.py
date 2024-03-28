@@ -3,7 +3,8 @@ from django.db.models.functions import Cast
 from django.db.models import Q
 from django.db.models import IntegerField
 from django.db.models import Sum
-from costcenter.models import (
+from bft.models import (
+    LineItem,
     FundCenterManager,
     FundManager,
     Fund,
@@ -13,7 +14,6 @@ from costcenter.models import (
     FundCenterAllocation,
     ForecastAdjustment,
 )
-from lineitems.models import LineItem
 from bft.exceptions import LineItemsDoNotExistError
 
 

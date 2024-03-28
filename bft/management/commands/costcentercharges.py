@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from charges.models import CostCenterChargeProcessor
+from bft.models import CostCenterChargeProcessor
 
 
 class Command(BaseCommand):
