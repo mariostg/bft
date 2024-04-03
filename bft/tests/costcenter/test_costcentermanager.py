@@ -8,7 +8,7 @@ from bft.models import (
     FundCenter,
     Source,
 )
-from bft.management.commands import populate
+from bft.management.commands import populate, uploadcsv
 import pandas as pd
 
 
@@ -35,6 +35,11 @@ class TestCostCenterManager:
     def populate(self):
         hnd = populate.Command()
         hnd.handle()
+
+    @pytest.fixture
+    def upload(self):
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
     # Cost Center Tests
     def test_a_given_cost_center_exists(self, setup):
@@ -96,7 +101,7 @@ class TestCostCenterManager:
     def test_forecast_adjustment_dataframe_empty(self):
         assert True == CostCenterManager().forecast_adjustment_dataframe().empty
 
-    def test_forecast_adjustment_dataframe(self, populate):
+    def test_forecast_adjustment_dataframe(self, populate, upload):
         fund = Fund.objects.all().first()
         costcenter = CostCenterManager().cost_center("8484WA")
         ForecastAdjustment(fund=fund, costcenter=costcenter, amount=1000).save()
