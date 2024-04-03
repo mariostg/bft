@@ -360,7 +360,7 @@ class TestFundCenterModel:
 
     def test_can_save_POST_request(self):
         data = {"fundcenter": "zzzz33", "shortname": "Basement FC", "fundcenter_parent": ""}
-        response = Client().post("/fundcenter/fundcenter-add/", data=data)
+        response = Client().post("/bft/fundcenter-add/", data=data)
         assert response.status_code == 302
         assert FundCenter.objects.count() == 1
         obj = FundCenter.objects.first()
@@ -524,6 +524,17 @@ class TestCostCenterModel:
 
 @pytest.mark.django_db
 class TestForecastAdjustmentModel:
+
+    @pytest.fixture
+    def populate(self):
+        hnd = populate.Command()
+        hnd.handle()
+
+    @pytest.fixture
+    def upload(self):
+        up = uploadcsv.Command()
+        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
+
     def test_string_representation(self):
         fund = Fund(fund="C113", name="NP", vote=1)
         cc = CostCenter(costcenter="8484WA", shortname="Basement", fund=fund)
@@ -533,10 +544,8 @@ class TestForecastAdjustmentModel:
     def test_verbose_name_plural(self):
         assert str(ForecastAdjustment._meta.verbose_name_plural) == "Forecast Adjustments"
 
-    def test_can_save_and_retreive_forecast_adjustment(self):
-        hnd = populate.Command()
-        hnd.handle()
-        cc = CostCenterManager().cost_center("8486c2")
+    def test_can_save_and_retreive_forecast_adjustment(self, populate, upload):
+        cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C113")
         fa = ForecastAdjustment()
         fa.costcenter = cc

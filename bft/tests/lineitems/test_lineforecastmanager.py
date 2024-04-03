@@ -19,7 +19,7 @@ class TestLineForecastManager:
     @pytest.fixture
     def upload(self):
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
+        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
     def test_line_forecast_dataframe(self, populate, upload):
         li = LineItem.objects.all().first()

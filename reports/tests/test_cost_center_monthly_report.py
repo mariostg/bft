@@ -10,7 +10,7 @@ class TestCostCenterMonthlyReport:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
+        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
     def test_period_out_of_range(self):
         with pytest.raises(

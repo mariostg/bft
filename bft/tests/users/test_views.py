@@ -12,7 +12,7 @@ class TestBftUserViews:
             "email": "cardinal@forces.gc.ca",
             "password": "HelloYou!!",
         }
-        response = Client().post("/users/user-add/", data=data)
+        response = Client().post("/bft/user-add/", data=data)
         assert response.status_code == 302
         assert BftUser.objects.count() == 1
         new_user = BftUser.objects.first()
@@ -24,7 +24,7 @@ class TestBftUserViews:
             "last_name": "Rouge",
             "email": "cardinal@force.gc.ca",
         }
-        response = Client().post("/users/user-add/", data=data)
+        response = Client().post("/bft/user-add/", data=data)
         assert "Domain Part of email not valid.  Expected forces.gc.ca" in str(
             response.content
         )

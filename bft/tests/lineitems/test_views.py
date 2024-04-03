@@ -17,5 +17,5 @@ class CostCenterLineItemTest(TestCase):
 
     def test_url_is_good(self):
         c = Client()
-        response = c.get(f"/lineitem/lineitem/?costcenter={{cc_id}}")
+        response = c.get(f"/bft/lineitem/?costcenter={{cc_id}}")
         self.assertEqual(200, response.status_code)

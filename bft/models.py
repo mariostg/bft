@@ -7,7 +7,7 @@ from django.db import models, IntegrityError
 from django.db.models import Q, QuerySet, Sum, Value, F
 
 from django.forms.models import model_to_dict
-from bft.conf import YEAR_CHOICES, QUARTERS, PERIODS, STATUS, YEAR_VALUES
+from bft.conf import YEAR_CHOICES, QUARTERS, QUARTERKEYS, PERIODS, STATUS, YEAR_VALUES
 from bft import conf
 from bft import exceptions
 from main.settings import UPLOADS

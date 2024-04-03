@@ -16,7 +16,7 @@ class TestLineItemManager:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
+        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
     def test_get_line_items_when_cost_center_exists(self, setup):
         li = LineItem.objects.cost_center("8484WA")
@@ -47,7 +47,7 @@ class LineItemImportTest(TestCase):
         filldata = populate.Command()
         filldata.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
+        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
     def test_insert_line_item_from_encumbrance_line(self):
         obj = LineItem()
@@ -132,7 +132,7 @@ class LineItemManagementTest(TestCase):
         filldata = populate.Command()
         filldata.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
+        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
     def test_line_item_fund_center_wrong(self):
         # bring lines in and assign a bogus fund center
