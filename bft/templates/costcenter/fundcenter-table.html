@@ -16,7 +16,7 @@
         </div>
         {% endif %}
     </div>
-    
+
     <table class='container' id='fundcenter-table' class='zebra'>
         <thead>
             <tr>
@@ -33,15 +33,15 @@
             <tr class="level{{elem.level}}">
             <td>{{ forloop.counter }}</td>
             <td>{{elem.sequence}}</td><td>{{elem.fundcenter}}</td><td>{{elem.shortname}}</td><td>{{elem.fundcenter_parent}}</td>
-            <td class='spread'> 
-                    <a class='btn btn-view' href="{% url "costcenter-table"%}?costcenter_parent__fundcenter__icontains={{elem.fundcenter}}">Cost centers</a> 
+            <td class='spread'>
+                    <a class='btn btn-view' href="{% url "costcenter-table"%}?costcenter_parent__fundcenter__icontains={{elem.fundcenter}}">Cost centers</a>
                     {% if user.is_authenticated %}
-                    <a class='btn btn-edit' href="{% url "fundcenter-update" elem.id %}"></a> 
+                    <a class='btn btn-edit' href="{% url "fundcenter-update" elem.id %}"></a>
                     <a class='btn btn-delete' href="{% url "fundcenter-delete" elem.id %}"></a>
             </td>
             {% endif %}
         </tr>
-            {% endfor %} 
+            {% endfor %}
 
         </tbody>
     </table>

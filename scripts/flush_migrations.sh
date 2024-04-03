@@ -24,4 +24,3 @@ if [ -f "db.sqlite3" ]; then
 else
     echo "No database file"
 fi
-

@@ -6,7 +6,7 @@
     {% if not table %}
     <div class="alert alert--info">There are no data to display</div>
     {% endif %}
-    
+
     <h1>Cost Center Screening Report</h1>
     {% if form_filter %}
     {% include 'bmt-screening-report-form-filter.html' %}
@@ -30,7 +30,7 @@
 
         return siblings;
     };
-    
+
     function set_total_row_background(targetclass){
         fc = document.querySelectorAll("."+targetclass);
         fc.forEach((c) => {

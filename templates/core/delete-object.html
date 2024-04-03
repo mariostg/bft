@@ -7,10 +7,10 @@
         <form method="POST">
             {% csrf_token %}
             <p class='label hint hint-warning'>Êtes-vous certain de voulor effacer "{{ object }}"</p>
-            
+
             <div class="block block--spaced">
             <a class='btn btn-back' href="{% url back %}" style='text-decoration:none;'>Retour</a>
-            
+
             <input class='btn btn-delete' type="submit" value="Confirm" />
         </div>
         </form>

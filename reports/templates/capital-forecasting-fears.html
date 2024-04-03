@@ -7,7 +7,7 @@
     {% if form_filter %}
     {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
-    
+
     {% if data|length > 2 %}
     {{data|json_script:"json_data"}}
     <div id="chart_fearstatus"><div class="chart__title">FEAR Status {{capital_project}} - {{fund}} FY {{fy}}</div></div>
