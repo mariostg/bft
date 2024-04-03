@@ -1,14 +1,9 @@
 import pytest
-from bft.models import (
-    CostCenterAllocation,
-    FundCenterManager,
-    FundCenterAllocation,
-    Fund,
-    CostCenterManager,
-    FundManager,
-)
-from bft.management.commands import populate, uploadcsv
 from django.db.models import Sum
+
+from bft.management.commands import populate, uploadcsv
+from bft.models import (CostCenterAllocation, CostCenterManager, Fund,
+                        FundCenterAllocation, FundCenterManager, FundManager)
 
 
 @pytest.mark.django_db

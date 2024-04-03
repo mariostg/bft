@@ -1,15 +1,9 @@
-from django.db.models import Sum,QuerySet
-from bft.models import (
-    BftStatusManager,
-    CapitalInYear,
-    CapitalProject,
-    CapitalProjectManager,
-    CapitalYearEnd,
-    CapitalNewYear,
-    FundManager,
-    Fund,
-)
 import pandas as pd
+from django.db.models import QuerySet, Sum
+
+from bft.models import (BftStatusManager, CapitalInYear, CapitalNewYear,
+                        CapitalProject, CapitalProjectManager, CapitalYearEnd,
+                        Fund, FundManager)
 
 
 class CapitalReport:

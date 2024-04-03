@@ -1,8 +1,10 @@
-import pytest
-from bft.models import FundCenter, FundCenterManager, FundCenterAllocation, Fund
-from bft.management.commands import populate
 import numpy as np
+import pytest
 from django.db.models import QuerySet
+
+from bft.management.commands import populate
+from bft.models import (Fund, FundCenter, FundCenterAllocation,
+                        FundCenterManager)
 
 
 @pytest.mark.django_db

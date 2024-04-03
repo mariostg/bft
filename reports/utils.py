@@ -1,26 +1,17 @@
-from django.db.models import Sum, Value, Q, QuerySet, F
+import numpy as np
+import pandas as pd
+from django.db.models import F, IntegerField, Q, QuerySet, Sum, Value
 from django.db.models.functions import Cast
-from django.db.models import IntegerField
-from bft.conf import P2Q
+from pandas.io.formats.style import Styler
+
 from bft import conf
-from bft.models import (
-    LineItem,
-    CostCenter,
-    CostCenterManager,
-    CostCenterAllocation,
-    Fund,
-    FundCenter,
-    FundCenterAllocation,
-    FundCenterManager,
-    FundManager,
-    ForecastAdjustment,
-    FinancialStructureManager,
-)
+from bft.conf import P2Q
+from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
+                        FinancialStructureManager, ForecastAdjustment, Fund,
+                        FundCenter, FundCenterAllocation, FundCenterManager,
+                        FundManager, LineItem)
 from reports.models import CostCenterMonthly
 from utils.dataframe import BFTDataFrame
-import pandas as pd
-from pandas.io.formats.style import Styler
-import numpy as np
 
 
 class CostCenterMonthlyReport:

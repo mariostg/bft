@@ -1,8 +1,8 @@
 import pandas as pd
-from django.db.models import QuerySet
 from django.db import models
-from django.db.models import Model
+from django.db.models import Model, QuerySet
 from django.forms.models import model_to_dict
+
 from bft.exceptions import BFTDataFrameExceptionError
 
 

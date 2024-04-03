@@ -1,9 +1,10 @@
-from django.views.generic.base import TemplateView
-from django.shortcuts import render, redirect
 from django.contrib import messages
-from bft.models import BftStatus
-from bft.conf import QUARTERS, PERIODS
+from django.shortcuts import redirect, render
+from django.views.generic.base import TemplateView
+
+from bft.conf import PERIODS, QUARTERS
 from bft.forms import BftStatusForm
+from bft.models import BftStatus
 
 
 class HomeView(TemplateView):

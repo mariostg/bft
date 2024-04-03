@@ -1,65 +1,37 @@
-from django.shortcuts import render, redirect
-from django.db import IntegrityError
-from django.db.models import RestrictedError
 from django.contrib import messages
 from django.core.paginator import Paginator
-from main.settings import UPLOADS
-from bft import exceptions
+from django.db import IntegrityError
+from django.db.models import RestrictedError
+from django.shortcuts import redirect, render
 
-from bft.models import (
-    BftStatusManager,
-    Fund,
-    Source,
-    FundCenter,
-    FundCenterManager,
-    CapitalProject,
-    CapitalInYear,
-    CapitalNewYear,
-    CapitalYearEnd,
-    CostCenter,
-    CostCenterManager,
-    CostCenterAllocation,
-    FundCenterAllocation,
-    ForecastAdjustment,
-    FinancialStructureManager,
-)
-from bft.forms import (
-    CostCenterAllocationUploadForm,
-    CapitalForecastingNewYearForm,
-    CapitalForecastingInYearForm,
-    CapitalForecastingYearEndForm,
-    FundForm,
-    SourceForm,
-    FundCenterForm,
-    FundCenterAllocationForm,
-    FundCenterAllocationUploadForm,
-    CostCenterForm,
-    CapitalProjectForm,
-    CostCenterAllocationForm,
-    ForecastadjustmentForm,
-    UploadForm,
-)
-from bft.uploadprocessor import (
-    CapitalProjectNewYearProcessor,
-    CapitalProjectInYearProcessor,
-    CapitalProjectYearEndProcessor,
-    CostCenterProcessor,
-    FundCenterProcessor,
-    CostCenterAllocationProcessor,
-    FundCenterAllocationProcessor,
-    FundProcessor,
-    SourceProcessor,
-)
-from bft.filters import (
-    CostCenterFilter,
-    CapitalProjectFilter,
-    CapitalNewYearFilter,
-    CapitalInYearFilter,
-    CapitalYearEndFilter,
-    CostCenterAllocationFilter,
-    FundCenterFilter,
-    FundCenterAllocationFilter,
-)
+from bft import exceptions
+from bft.filters import (CapitalInYearFilter, CapitalNewYearFilter,
+                         CapitalProjectFilter, CapitalYearEndFilter,
+                         CostCenterAllocationFilter, CostCenterFilter,
+                         FundCenterAllocationFilter, FundCenterFilter)
+from bft.forms import (CapitalForecastingInYearForm,
+                       CapitalForecastingNewYearForm,
+                       CapitalForecastingYearEndForm, CapitalProjectForm,
+                       CostCenterAllocationForm,
+                       CostCenterAllocationUploadForm, CostCenterForm,
+                       ForecastadjustmentForm, FundCenterAllocationForm,
+                       FundCenterAllocationUploadForm, FundCenterForm,
+                       FundForm, SourceForm, UploadForm)
+from bft.models import (BftStatusManager, CapitalInYear, CapitalNewYear,
+                        CapitalProject, CapitalYearEnd, CostCenter,
+                        CostCenterAllocation, CostCenterManager,
+                        FinancialStructureManager, ForecastAdjustment, Fund,
+                        FundCenter, FundCenterAllocation, FundCenterManager,
+                        Source)
+from bft.uploadprocessor import (CapitalProjectInYearProcessor,
+                                 CapitalProjectNewYearProcessor,
+                                 CapitalProjectYearEndProcessor,
+                                 CostCenterAllocationProcessor,
+                                 CostCenterProcessor,
+                                 FundCenterAllocationProcessor,
+                                 FundCenterProcessor, FundProcessor,
+                                 SourceProcessor)
+from main.settings import UPLOADS
 
 
 def fund_page(request):

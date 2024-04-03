@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
-from django.db import IntegrityError
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from bft.forms import UserSelfRegisterForm, BftUserForm, PasswordResetForm
+from django.db import IntegrityError
+from django.shortcuts import redirect, render
 
+from bft.forms import BftUserForm, PasswordResetForm, UserSelfRegisterForm
 from bft.models import BftUser, BftUserManager
 
 

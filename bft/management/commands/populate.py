@@ -11,27 +11,15 @@ Populate command uses the data available from the test-data folder.  This folder
 
 """
 from django.core.management.base import BaseCommand
-from main.settings import DEBUG
-from bft.models import (
-    Fund,
-    Source,
-    CostCenter,
-    FundCenter,
-    FundCenterAllocation,
-    CostCenterAllocation,
-    CapitalProject,
-    CapitalInYear,
-    CapitalNewYear,
-    CapitalYearEnd,
-    CostCenterChargeImport,
-    CostCenterChargeMonthly,
-    LineForecast,
-    LineItem,
-    BftStatus,
-    BftStatusManager,
-    BftUser,
-)
+
 from bft import uploadprocessor
+from bft.models import (BftStatus, BftStatusManager, BftUser, CapitalInYear,
+                        CapitalNewYear, CapitalProject, CapitalYearEnd,
+                        CostCenter, CostCenterAllocation,
+                        CostCenterChargeImport, CostCenterChargeMonthly, Fund,
+                        FundCenter, FundCenterAllocation, LineForecast,
+                        LineItem, Source)
+from main.settings import DEBUG
 
 
 class Command(BaseCommand):

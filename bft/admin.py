@@ -1,19 +1,11 @@
 from django.contrib import admin
 
+from bft.models import (BftUser, CapitalInYear, CapitalNewYear, CapitalYearEnd,
+                        CostCenter, CostCenterAllocation,
+                        CostCenterChargeImport, CostCenterChargeMonthly, Fund,
+                        FundCenter, Source)
+
 from . import models
-from bft.models import (
-    BftUser,
-    Fund,
-    CostCenter,
-    Source,
-    FundCenter,
-    CostCenterAllocation,
-    CapitalInYear,
-    CapitalNewYear,
-    CapitalYearEnd,
-    CostCenterChargeMonthly,
-    CostCenterChargeImport,
-)
 
 
 class BftUserAdmin(admin.ModelAdmin):

@@ -1,7 +1,7 @@
 from django.test import Client, TestCase
 
-from bft.management.commands.uploadcsv import Command
 import bft.management.commands.populate as populate
+from bft.management.commands.uploadcsv import Command
 from bft.models import CostCenter
 
 

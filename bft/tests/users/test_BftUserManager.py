@@ -1,6 +1,7 @@
 import pytest
 from django.contrib.auth import get_user_model
-from bft.models import BftUserManager, BftUser
+
+from bft.models import BftUser, BftUserManager
 
 
 class TestBftUserManager:

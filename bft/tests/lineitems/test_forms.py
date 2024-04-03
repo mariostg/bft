@@ -1,9 +1,11 @@
 import pytest
-from bft.forms import CostCenterLineItemUploadForm, FundCenterLineItemUploadForm
-from django.core.files.uploadedfile import SimpleUploadedFile
-from main import settings
-from bft.management.commands import populate
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
+
+from bft.forms import (CostCenterLineItemUploadForm,
+                       FundCenterLineItemUploadForm)
+from bft.management.commands import populate
+from main import settings
 
 
 @pytest.mark.django_db

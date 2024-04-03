@@ -1,5 +1,6 @@
 from django.urls import path
-from bft.views import charges, bft, costcenter, lineitems, users
+
+from bft.views import bft, charges, costcenter, lineitems, users
 
 urlpatterns = [path("", bft.HomeView.as_view(), name="bft")]
 

@@ -1,30 +1,17 @@
 from typing import Any
+
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
-from bft.models import (
-    BftUser,
-    BftStatus,
-    Fund,
-    Source,
-    FundCenter,
-    CostCenter,
-    CapitalProject,
-    CapitalInYear,
-    CapitalNewYear,
-    CapitalYearEnd,
-    CostCenterAllocation,
-    FundCenterAllocation,
-    ForecastAdjustment,
-    LineForecast,
-    LineItem,
-    FundCenterManager,
-    CostCenterManager,
-    FinancialStructureManager,
-)
+from bft.models import (BftStatus, BftUser, CapitalInYear, CapitalNewYear,
+                        CapitalProject, CapitalYearEnd, CostCenter,
+                        CostCenterAllocation, CostCenterManager,
+                        FinancialStructureManager, ForecastAdjustment, Fund,
+                        FundCenter, FundCenterAllocation, FundCenterManager,
+                        LineForecast, LineItem, Source)
+
 
 class BftStatusForm(forms.ModelForm):
     class Meta:

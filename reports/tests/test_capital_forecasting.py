@@ -1,6 +1,7 @@
 import pytest
-from bft.models import BftStatusManager
+
 from bft.management.commands import populate
+from bft.models import BftStatusManager
 from reports import capitalforecasting
 
 

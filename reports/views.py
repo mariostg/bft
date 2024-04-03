@@ -1,41 +1,29 @@
-from django.core.paginator import Paginator
-from django.db.models.functions import Concat
-from django.db.models import Value as V
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.contrib import messages
 import csv
 
-from reports import utils, screeningreport, capitalforecasting
+import pandas as pd
+from django.contrib import messages
+from django.core.paginator import Paginator
+from django.db.models import Value as V
+from django.db.models.functions import Concat
+from django.http import HttpResponse
+from django.shortcuts import render
 
-from bft.models import (
-    LineItem,
-    CostCenterAllocation,
-    FundManager,
-    FundCenterAllocation,
-    FundCenterManager,
-    FinancialStructureManager,
-    ForecastAdjustmentManager,
-    CapitalForecasting,
-    CapitalProjectManager,
-)
-from bft.models import CostCenterChargeMonthly
-from reports.forms import (
-    SearchAllocationAnalysisForm,
-    SearchCostCenterScreeningReportForm,
-    SearchCapitalForecastingDashboardForm,
-    SearchCapitalEstimatesForm,
-    SearchCapitalFearsForm,
-    SearchCapitalHistoricalForm,
-    SearchCapitalYeRatiosForm,
-)
-from bft.models import BftStatus
 from bft.conf import QUARTERKEYS
 from bft.exceptions import LineItemsDoNotExistError
-from utils.getrequestfilter import set_query_string
+from bft.models import (BftStatus, CapitalForecasting, CapitalProjectManager,
+                        CostCenterAllocation, CostCenterChargeMonthly,
+                        FinancialStructureManager, ForecastAdjustmentManager,
+                        FundCenterAllocation, FundCenterManager, FundManager,
+                        LineItem)
 from main import settings
-
-import pandas as pd
+from reports import capitalforecasting, screeningreport, utils
+from reports.forms import (SearchAllocationAnalysisForm,
+                           SearchCapitalEstimatesForm, SearchCapitalFearsForm,
+                           SearchCapitalForecastingDashboardForm,
+                           SearchCapitalHistoricalForm,
+                           SearchCapitalYeRatiosForm,
+                           SearchCostCenterScreeningReportForm)
+from utils.getrequestfilter import set_query_string
 
 
 def _orphan_forecast_adjustments(request, allocations, forecast_adjustment):

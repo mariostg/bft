@@ -1,16 +1,9 @@
-import django_filters
 import django.forms
-from bft.models import (
-    CostCenter,
-    CostCenterAllocation,
-    FundCenter,
-    FundCenterAllocation,
-    CapitalProject,
-    CapitalInYear,
-    CapitalNewYear,
-    CapitalYearEnd,
-    LineItem,
-)
+import django_filters
+
+from bft.models import (CapitalInYear, CapitalNewYear, CapitalProject,
+                        CapitalYearEnd, CostCenter, CostCenterAllocation,
+                        FundCenter, FundCenterAllocation, LineItem)
 
 
 class FundCenterFilter(django_filters.FilterSet):

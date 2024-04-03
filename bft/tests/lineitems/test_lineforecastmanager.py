@@ -1,12 +1,8 @@
 import pytest
 from django.contrib.auth import get_user_model
+
 from bft.management.commands import populate, uploadcsv
-from bft.models import (
-    CostCenter,
-    LineForecastManager,
-    LineForecast,
-    LineItem,
-)
+from bft.models import CostCenter, LineForecast, LineForecastManager, LineItem
 
 
 @pytest.mark.django_db

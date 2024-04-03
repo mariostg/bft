@@ -1,8 +1,9 @@
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from selenium.webdriver.firefox.webdriver import WebDriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
 import time
+
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.webdriver import WebDriver
 
 
 class CostElementFundFormTest(StaticLiveServerTestCase):

@@ -1,10 +1,11 @@
-from django.core.management.base import BaseCommand, CommandError
+import logging
 import os
-from bft.models import LineItemImport, LineItem, LineForecastManager
+
+from django.core.management.base import BaseCommand, CommandError
+
+from bft.models import LineForecastManager, LineItem, LineItemImport
 from bft.uploadprocessor import LineItemProcessor
 from main.settings import BASE_DIR
-
-import logging
 
 logger = logging.getLogger("uploadcsv")
 

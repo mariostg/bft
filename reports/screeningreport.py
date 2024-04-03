@@ -1,20 +1,11 @@
 import pandas as pd
+from django.db.models import IntegerField, Q, Sum
 from django.db.models.functions import Cast
-from django.db.models import Q
-from django.db.models import IntegerField
-from django.db.models import Sum
-from bft.models import (
-    LineItem,
-    FundCenterManager,
-    FundManager,
-    Fund,
-    FundCenter,
-    CostCenter,
-    CostCenterAllocation,
-    FundCenterAllocation,
-    ForecastAdjustment,
-)
+
 from bft.exceptions import LineItemsDoNotExistError
+from bft.models import (CostCenter, CostCenterAllocation, ForecastAdjustment,
+                        Fund, FundCenter, FundCenterAllocation,
+                        FundCenterManager, FundManager, LineItem)
 
 
 def caster(value):

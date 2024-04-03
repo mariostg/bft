@@ -1,12 +1,13 @@
+import pandas as pd
 import pytest
-from utils.dataframe import BFTDataFrame
+from django.db import models
+
 from bft.exceptions import BFTDataFrameExceptionError
-from bft.management.commands import populate, uploadcsv, monthlydata
+from bft.management.commands import monthlydata, populate, uploadcsv
+from bft.models import CostCenter, Fund, FundCenter, LineItem
 from reports.models import CostCenterMonthly
 from reports.utils import CostCenterMonthlyReport
-from bft.models import CostCenter, FundCenter, Fund, LineItem
-from django.db import models
-import pandas as pd
+from utils.dataframe import BFTDataFrame
 
 
 @pytest.mark.django_db

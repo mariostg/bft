@@ -1,6 +1,7 @@
 import pytest
-from bft.conf import YEAR_CHOICES, QUARTERS, PERIODS, STATUS
+
 from bft import conf
+from bft.conf import PERIODS, QUARTERS, STATUS, YEAR_CHOICES
 
 
 class TestConf:

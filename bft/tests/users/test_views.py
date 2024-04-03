@@ -1,5 +1,6 @@
 import pytest
 from django.test import Client
+
 from bft.models import BftUser
 
 

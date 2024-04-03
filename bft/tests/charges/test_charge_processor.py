@@ -1,5 +1,7 @@
 import pytest
-from bft.models import CostCenterChargeProcessor, CostCenterChargeImport, BftStatus
+
+from bft.models import (BftStatus, CostCenterChargeImport,
+                        CostCenterChargeProcessor)
 
 
 class TestChargeProcessor:

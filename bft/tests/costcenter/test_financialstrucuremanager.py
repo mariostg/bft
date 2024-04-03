@@ -1,15 +1,10 @@
 import pytest
-from bft.models import (
-    CostCenterManager,
-    FinancialStructureManager,
-    FundCenter,
-    FundCenterManager,
-    FundManager,
-    SourceManager,
-    CostCenter,
-)
-from bft.exceptions import ParentDoesNotExistError, IncompatibleArgumentsError
+
+from bft.exceptions import IncompatibleArgumentsError, ParentDoesNotExistError
 from bft.management.commands import populate, uploadcsv
+from bft.models import (CostCenter, CostCenterManager,
+                        FinancialStructureManager, FundCenter,
+                        FundCenterManager, FundManager, SourceManager)
 
 
 @pytest.mark.django_db

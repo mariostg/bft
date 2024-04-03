@@ -1,15 +1,9 @@
-import pytest
-from bft.models import (
-    CostCenter,
-    CostCenterManager,
-    CostCenterAllocation,
-    Fund,
-    ForecastAdjustment,
-    FundCenter,
-    Source,
-)
-from bft.management.commands import populate, uploadcsv
 import pandas as pd
+import pytest
+
+from bft.management.commands import populate, uploadcsv
+from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
+                        ForecastAdjustment, Fund, FundCenter, Source)
 
 
 @pytest.mark.django_db

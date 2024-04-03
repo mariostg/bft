@@ -1,37 +1,25 @@
-from abc import ABC, abstractmethod
 import csv
 import locale
+import logging
 import os
 import re
 import sys
+from abc import ABC, abstractmethod
 from datetime import datetime
-from django.contrib import messages
-from django.db import models, IntegrityError
-import logging
-import pandas as pd
+
 import numpy as np
+import pandas as pd
+from django.contrib import messages
+from django.db import IntegrityError, models
+
 from bft.conf import QUARTERKEYS
+from bft.models import (BftUser, CapitalInYear, CapitalNewYear, CapitalProject,
+                        CapitalYearEnd, CostCenter, CostCenterAllocation,
+                        CostCenterManager, Fund, FundCenter,
+                        FundCenterAllocation, FundCenterManager, FundManager,
+                        LineForecastManager, LineItem, LineItemImport, Source,
+                        SourceManager)
 from main.settings import BASE_DIR
-from bft.models import (
-    BftUser,
-    CapitalProject,
-    CapitalInYear,
-    CapitalNewYear,
-    CapitalYearEnd,
-    CostCenter,
-    CostCenterAllocation,
-    CostCenterManager,
-    Fund,
-    FundCenter,
-    FundCenterAllocation,
-    FundCenterManager,
-    FundManager,
-    Source,
-    SourceManager,
-    LineItemImport,
-    LineItem,
-    LineForecastManager,
-)
 
 logger = logging.getLogger("uploadcsv")
 

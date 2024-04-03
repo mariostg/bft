@@ -1,11 +1,12 @@
 import pytest
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client
 from django.urls import reverse
-from django.core.files.uploadedfile import SimpleUploadedFile
-from bft.uploadprocessor import LineItemProcessor, CostCenterLineItemProcessor
+
 from bft.management.commands import populate
+from bft.models import CostCenter, FundCenter, FundManager, SourceManager
+from bft.uploadprocessor import CostCenterLineItemProcessor, LineItemProcessor
 from main import settings
-from bft.models import FundManager, SourceManager, FundCenter, CostCenter
 
 
 @pytest.mark.django_db

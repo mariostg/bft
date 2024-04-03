@@ -1,24 +1,24 @@
+import csv
+import logging
+import os
 from datetime import datetime
+
+import numpy as np
+import pandas as pd
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
-from django.db import models, IntegrityError
-from django.db.models import Q, QuerySet, Sum, Value, F
-
+from django.contrib.auth.models import AbstractUser
+from django.db import IntegrityError, models
+from django.db.models import F, Q, QuerySet, Sum, Value
 from django.forms.models import model_to_dict
-from bft.conf import YEAR_CHOICES, QUARTERS, QUARTERKEYS, PERIODS, STATUS, YEAR_VALUES
-from bft import conf
-from bft import exceptions
-from main.settings import UPLOADS
-
-import os
-import csv
-import pandas as pd
-import numpy as np
 from pandas.io.formats.style import Styler
+
+from bft import conf, exceptions
+from bft.conf import (PERIODS, QUARTERKEYS, QUARTERS, STATUS, YEAR_CHOICES,
+                      YEAR_VALUES)
+from main.settings import UPLOADS
 from utils.dataframe import BFTDataFrame
-import logging
 
 np.set_printoptions(suppress=True)
 logger = logging.getLogger("uploadcsv")

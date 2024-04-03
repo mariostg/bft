@@ -1,6 +1,7 @@
 import pytest
-from bft.models import LineItem, LineItemManager, LineForecast
+
 from bft.management.commands import populate, uploadcsv
+from bft.models import LineForecast, LineItem, LineItemManager
 
 
 @pytest.mark.django_db

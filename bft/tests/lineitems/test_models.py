@@ -1,11 +1,13 @@
-from django.test import TestCase
 import os
-from main.settings import BASE_DIR
+
 import pytest
 from django.db.models import Sum
-from bft.models import LineItem, LineForecast, LineForecastManager, LineItemImport
-from bft.uploadprocessor import LineItemProcessor
+from django.test import TestCase
+
 from bft.management.commands import populate, uploadcsv
+from bft.models import (LineForecast, LineForecastManager, LineItem,
+                        LineItemImport)
+from bft.uploadprocessor import LineItemProcessor
 from main.settings import BASE_DIR
 
 
