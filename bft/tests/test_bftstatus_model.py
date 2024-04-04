@@ -10,13 +10,13 @@ class TestModelBftStatus:
         assert "FY:2023" == str(b)
 
     def test_no_fy(self):
-        assert None == BftStatus.current.fy()
+        assert BftStatus.current.fy() is None
 
     def test_no_quarter(self):
-        assert None == BftStatus.current.quarter()
+        assert BftStatus.current.quarter() is None
 
     def test_no_period(self):
-        assert None == BftStatus.current.period()
+        assert BftStatus.current.period() is None
 
     def test_save_entry(self):
         bs = BftStatus()

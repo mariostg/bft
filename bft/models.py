@@ -1,6 +1,5 @@
 import csv
 import logging
-import os
 from datetime import datetime
 
 import numpy as np
@@ -10,18 +9,18 @@ from django.contrib import messages
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import IntegrityError, models
-from django.db.models import F, Q, QuerySet, Sum, Value
+from django.db.models import F, QuerySet, Sum, Value
 from django.forms.models import model_to_dict
 from pandas.io.formats.style import Styler
 
 from bft import conf, exceptions
-from bft.conf import (PERIODS, QUARTERKEYS, QUARTERS, STATUS, YEAR_CHOICES,
-                      YEAR_VALUES)
+from bft.conf import PERIODS, QUARTERKEYS, QUARTERS, STATUS, YEAR_CHOICES
 from main.settings import UPLOADS
 from utils.dataframe import BFTDataFrame
 
 np.set_printoptions(suppress=True)
 logger = logging.getLogger("uploadcsv")
+
 
 # Create your models here.
 class BftStatusManager(models.Manager):
@@ -122,9 +121,9 @@ class BftUserManager(BaseUserManager):
         Create and save a user with the given email and password.
         """
         if not email:
-            raise ValueError(_("The Email must be set"))
+            raise ValueError(_("The Email must be set"))  # noqa
         email = self.normalize_email(email)
-        username, _ = email.strip().rsplit("@", 1)
+        username, _ = email.strip().rsplit("@", 1)  # noqa
 
         user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
@@ -139,12 +138,12 @@ class BftUserManager(BaseUserManager):
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
         if extra_fields.get("is_staff") is not True:
-            raise ValueError(_("Superuser must have is_staff=True."))
+            raise ValueError(_("Superuser must have is_staff=True."))  # noqa
         if extra_fields.get("is_superuser") is not True:
-            raise ValueError(_("Superuser must have is_superuser=True."))
+            raise ValueError(_("Superuser must have is_superuser=True."))  # noqa
         try:
             extra_fields.pop("username")
-        except:
+        except Exception:
             pass
         return self.create_user(email, password, **extra_fields)
 
@@ -400,7 +399,7 @@ class FinancialStructureManager(models.Manager):
         return obj
 
     def has_children(self, fundcenter: "FundCenter|str") -> int:
-        if type(fundcenter) == str:
+        if isinstance(fundcenter, str):
             try:
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
             except FundCenter.DoesNotExist:
@@ -408,7 +407,7 @@ class FinancialStructureManager(models.Manager):
         return self.has_cost_centers(fundcenter) + self.has_fund_centers(fundcenter)
 
     def has_fund_centers(self, fundcenter: "FundCenter|str") -> int:
-        if type(fundcenter) == str:
+        if isinstance(fundcenter, str):
             try:
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
             except FundCenter.DoesNotExist:
@@ -416,7 +415,7 @@ class FinancialStructureManager(models.Manager):
         return FundCenter.objects.filter(fundcenter_parent=fundcenter).count()
 
     def has_cost_centers(self, fundcenter: "FundCenter|str") -> int:
-        if type(fundcenter) == str:
+        if isinstance(fundcenter, str):
             try:
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter)
             except FundCenter.DoesNotExist:
@@ -498,7 +497,7 @@ class FinancialStructureManager(models.Manager):
         Returns:
             str: A string the represents the child sequence number.
         """
-        if fundcenter_parent == None:
+        if fundcenter_parent is None:
             last_root = FinancialStructureManager().last_root()
             if not last_root:
                 parent = "1"
@@ -751,7 +750,7 @@ class FundCenter(models.Model):
         verbose_name_plural = "Fund Centers"
 
     def save(self, *args, **kwargs):
-        if self.fundcenter_parent == None:
+        if self.fundcenter_parent is None:
             self.sequence = FinancialStructureManager().new_root()
         elif (
             self.fundcenter_parent
@@ -887,7 +886,7 @@ class CostCenterManager(models.Manager):
         return pd.DataFrame(data).rename(columns=columns)
 
     def get_sibblings(self, parent: FundCenter | str):
-        if type(parent) == str:
+        if isinstance(parent, str):
             parent = FundCenterManager().fundcenter(fundcenter=parent)
         return CostCenter.objects.filter(costcenter_parent=parent)
 

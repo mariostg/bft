@@ -10,7 +10,7 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 from django.contrib import messages
-from django.db import IntegrityError, models
+from django.db import IntegrityError
 
 from bft.conf import QUARTERKEYS
 from bft.models import (BftUser, CapitalInYear, CapitalNewYear, CapitalProject,
@@ -543,7 +543,7 @@ class CapitalProjectNewYearProcessor(CapitalProjectForecastProcessor):
 
     def main(self):
         if not self.header_good():
-            msg = f"New year capital project forecast upload. Invalid columns header"
+            msg = "New year capital project forecast upload. Invalid columns header"
             logger.error(msg)
             if self.request:
                 messages.error(self.request, msg)
@@ -587,7 +587,7 @@ class CapitalProjectInYearProcessor(CapitalProjectForecastProcessor):
 
     def main(self):
         if not self.header_good():
-            msg = f"Capital project forecast upload. Invalid columns header"
+            msg = "Capital project forecast upload. Invalid columns header"
             logger.error(msg)
             if self.request:
                 messages.error(self.request, msg)
@@ -631,7 +631,7 @@ class CapitalProjectYearEndProcessor(CapitalProjectForecastProcessor):
 
     def main(self):
         if not self.header_good():
-            msg = f"Year end capital project forecast upload. Invalid columns header"
+            msg = "Year end capital project forecast upload. Invalid columns header"
             logger.error(msg)
             if self.request:
                 messages.error(self.request, msg)
@@ -780,7 +780,7 @@ class LineItemProcessor(UploadProcessor):
 
     def __init__(self, filepath=None, request=None):
         locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
-        if filepath == None:
+        if filepath is None:
             raise ValueError("No file name provided")
         filepath = os.path.join(self.DRMIS_DIR, filepath)
         if not os.path.exists(filepath):
@@ -1001,7 +1001,7 @@ class LineItemProcessor(UploadProcessor):
             try:
                 d = datetime.strptime(s, "%Y.%m.%d")
                 return d
-            except ValueError as e:
+            except ValueError:
                 print(f"Failed to convert {s} as date")
                 sys.exit()
 
@@ -1062,9 +1062,9 @@ class LineItemProcessor(UploadProcessor):
         with open(self.filepath, encoding="windows-1252") as lines:
             is_set = [False, False]
             for line in lines:
-                if self.data["fy"] == None:
+                if self.data["fy"] is None:
                     is_set[0] = self.find_base_fy(line)
-                if self.data["fc"] == None:
+                if self.data["fc"] is None:
                     is_set[1] = self.find_fund_center(line)
                 if all(is_set):
                     break

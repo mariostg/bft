@@ -30,7 +30,7 @@ class HistoricalOutlookReport(CapitalReport):
         super().__init__(fund, capital_project, fy)
         self.years = list(range(self.fy - 4, self.fy + 1))
 
-    def dataset(self)->dict[QuerySet]:
+    def dataset(self) -> dict[QuerySet]:
         in_year = CapitalInYear.objects.filter(
             fund=self.fund, capital_project=self.capital_project, fy__in=self.years
         ).values("fy", "quarter", "mle")
@@ -43,7 +43,7 @@ class HistoricalOutlookReport(CapitalReport):
 
         return dict(in_year=in_year, new_year=new_year, year_end=year_end)
 
-    def dataframe(self)->int:
+    def dataframe(self) -> int:
         """Create a dataframe of annual data, one row per year for given project and fund"""
 
         data = self.dataset()
@@ -111,7 +111,7 @@ class FEARStatusReport(CapitalReport):
         self.quarters = [1, 2, 3, 4]
         super().__init__(fund, capital_project, fy)
 
-    def dataset(self)->QuerySet:
+    def dataset(self) -> QuerySet:
         return (
             CapitalInYear.objects.filter(fy=self.fy, fund=self.fund, capital_project=self.capital_project)
             .values("capital_project", "fund", "quarter")
@@ -128,9 +128,9 @@ class FEARStatusReport(CapitalReport):
             )
         )
 
-    def dataframe(self)->int:
+    def dataframe(self) -> int:
         """Create a dataframe of quarterly data, one row per quarter for given fundcenter, fund, and FY"""
-        ds=self.dataset()
+        ds = self.dataset()
         if not ds.count():
             return 0
         self.df = pd.DataFrame.from_dict(ds)
@@ -211,7 +211,7 @@ class EstimateReport(CapitalReport):
 
         super().__init__(fund, capital_project, fy)
 
-    def dataset(self)->QuerySet:
+    def dataset(self) -> QuerySet:
         return (
             CapitalInYear.objects.filter(fy=self.fy, fund=self.fund, capital_project=self.capital_project)
             .values(
@@ -236,8 +236,8 @@ class EstimateReport(CapitalReport):
             )
         )
 
-    def dataframe(self)->int:
-        ds=self.dataset()
+    def dataframe(self) -> int:
+        ds = self.dataset()
         if not ds.count():
             return 0
         self.df = pd.DataFrame.from_dict(ds).rename(

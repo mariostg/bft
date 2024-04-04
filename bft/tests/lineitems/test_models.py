@@ -26,7 +26,7 @@ class TestLineItemManager:
 
     def test_get_line_items_when_cost_center_not_exists(self, setup):
         li = LineItem.objects.cost_center("0000C1")
-        assert li == None
+        assert li is None
 
 
 class LineItemModelTest(TestCase):
@@ -171,7 +171,7 @@ class TestLineForecastModel:
         li = LineItem.objects.filter(spent__gt=0).first()
         new_fcst = float(li.spent) * 0.1
 
-        line_fcst = LineForecast.objects.filter(lineitem__pk=li.pk).update(
+        LineForecast.objects.filter(lineitem__pk=li.pk).update(
             forecastamount=new_fcst
         )
 

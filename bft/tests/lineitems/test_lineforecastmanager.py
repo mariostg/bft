@@ -36,7 +36,7 @@ class TestLineForecastManager:
 
         user = get_user_model()
         new_owner = user.objects.create_user(email="luigi@forces.gc.ca", password="foo")
-        affected = mgr.update_owner(costcenter, new_owner)
+        mgr.update_owner(costcenter, new_owner)
         li = LineForecast.objects.filter(owner=new_owner).first()
 
         assert li.owner.username == "luigi"

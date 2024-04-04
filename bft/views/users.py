@@ -17,7 +17,7 @@ def user_login(request):
 
         try:
             user = BftUser.objects.get(username=username)
-        except:
+        except BftUser.DoesNotExist:
             messages.error(request, "Username does not exist")
 
         user = authenticate(request, username=username, password=password)

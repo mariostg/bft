@@ -1,9 +1,8 @@
-from django.db import IntegrityError
 from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import resolve
 
-from bft.models import Fund, Source
+from bft.models import Fund
 from bft.views.costcenter import fund_add, fund_page, fund_update
 from utils.string import strip_white_space
 

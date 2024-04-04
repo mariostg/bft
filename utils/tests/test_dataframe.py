@@ -1,12 +1,9 @@
 import pandas as pd
 import pytest
-from django.db import models
 
 from bft.exceptions import BFTDataFrameExceptionError
-from bft.management.commands import monthlydata, populate, uploadcsv
+from bft.management.commands import populate, uploadcsv
 from bft.models import CostCenter, Fund, FundCenter, LineItem
-from reports.models import CostCenterMonthly
-from reports.utils import CostCenterMonthlyReport
 from utils.dataframe import BFTDataFrame
 
 
@@ -27,7 +24,7 @@ class TestDataFrame:
 
     def test_dataframe_without_params(self):
         with pytest.raises(TypeError):
-            df = BFTDataFrame()
+            BFTDataFrame()
 
     def test_cost_center_model_fields(self):
         d = BFTDataFrame(CostCenter)

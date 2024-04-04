@@ -10,7 +10,7 @@ from bft.models import (BftStatus, BftUser, CapitalInYear, CapitalNewYear,
                         CostCenterAllocation, CostCenterManager,
                         FinancialStructureManager, ForecastAdjustment, Fund,
                         FundCenter, FundCenterAllocation, FundCenterManager,
-                        LineForecast, LineItem, Source)
+                        LineForecast, Source)
 
 
 class BftStatusForm(forms.ModelForm):

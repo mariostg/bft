@@ -3,8 +3,6 @@ from io import StringIO
 import pytest
 from django.core.management import call_command
 
-from bft.management.commands.monthlydata import Command
-
 
 @pytest.mark.django_db
 class TestCommandMonthlyData:

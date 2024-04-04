@@ -8,7 +8,7 @@ from bft.exceptions import (InvalidAllocationException,
 from bft.management.commands import populate, uploadcsv
 from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         FinancialStructureManager, ForecastAdjustment, Fund,
-                        FundCenter, FundCenterManager, FundManager, Source)
+                        FundCenter, FundManager, Source)
 
 FUND_C113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
 SOURCE_1 = {"source": "Basement"}

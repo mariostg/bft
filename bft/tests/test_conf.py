@@ -1,5 +1,3 @@
-import pytest
-
 from bft import conf
 from bft.conf import PERIODS, QUARTERS, STATUS, YEAR_CHOICES
 

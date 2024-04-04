@@ -1,10 +1,8 @@
 import numpy as np
 import pytest
-from django.db.models import QuerySet
 
 from bft.management.commands import populate
-from bft.models import (Fund, FundCenter, FundCenterAllocation,
-                        FundCenterManager)
+from bft.models import Fund, FundCenter, FundCenterManager
 
 
 @pytest.mark.django_db
@@ -60,8 +58,8 @@ class TestFundCenterManager:
     def test_no_fund_center_exists(self):
         assert False == FundCenterManager().exists()
 
-    def test_fund_center_exists(self, setup):
-        a = FundCenterManager().exists()
+    def test_fund_center_has_data(self, setup):
+        FundCenterManager().exists()
         assert True == FundCenterManager().exists()
 
     # Fund Center Tests
@@ -102,4 +100,4 @@ class TestFundCenterManager:
     def test_get_direct_descendants_wrong_string(self, setup):
         hnd = populate.Command()
         hnd.handle()
-        assert None == FundCenterManager().get_direct_descendants("2222zz")
+        assert FundCenterManager().get_direct_descendants("2222zz") is None

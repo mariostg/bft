@@ -1,6 +1,6 @@
 import pytest
 
-from bft.exceptions import IncompatibleArgumentsError, ParentDoesNotExistError
+from bft.exceptions import ParentDoesNotExistError
 from bft.management.commands import populate, uploadcsv
 from bft.models import (CostCenter, CostCenterManager,
                         FinancialStructureManager, FundCenter,
@@ -168,7 +168,7 @@ class TestFinancialStructureManager:
     def test_last_root_with_no_root_element(self):
         fsm = FinancialStructureManager()
 
-        assert None == fsm.last_root()
+        assert fsm.last_root() is None
 
     def test_last_root_with_one_root_element(self):
         fc = {"fundcenter": "1111AA", "shortname": "root 1", "fundcenter_parent": None}

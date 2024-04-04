@@ -25,6 +25,7 @@ from bft.models import (BftStatusManager, CapitalInYear, CapitalNewYear,
                         Source)
 from bft.uploadprocessor import (CapitalProjectInYearProcessor,
                                  CapitalProjectNewYearProcessor,
+                                 CapitalProjectProcessor,
                                  CapitalProjectYearEndProcessor,
                                  CostCenterAllocationProcessor,
                                  CostCenterProcessor,
@@ -881,7 +882,7 @@ def costcenter_allocation_add(request):
             try:
                 warning = err.get_json_data()["__all__"][0]["message"]
                 messages.warning(request, warning)
-            except:
+            except Exception:
                 pass
     else:
         form = CostCenterAllocationForm

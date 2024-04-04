@@ -2,7 +2,6 @@ import pandas as pd
 import pytest
 
 from bft.management.commands import populate, uploadcsv
-from bft.models import CostCenterManager, FundCenterManager
 from reports.utils import CostCenterScreeningReport
 
 

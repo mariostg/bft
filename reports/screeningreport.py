@@ -4,8 +4,7 @@ from django.db.models.functions import Cast
 
 from bft.exceptions import LineItemsDoNotExistError
 from bft.models import (CostCenter, CostCenterAllocation, ForecastAdjustment,
-                        Fund, FundCenter, FundCenterAllocation,
-                        FundCenterManager, FundManager, LineItem)
+                        Fund, FundCenter, FundCenterAllocation, LineItem)
 
 
 def caster(value):
@@ -172,7 +171,7 @@ class ScreeningReport:
             for c in rows.columns:
                 try:
                     val = f"{round(data_dict[c][i]):,}"
-                except:
+                except Exception:
                     val = data_dict[c][i]
                 td += f"<td>{val}</td>"
             level = len(v.split("."))

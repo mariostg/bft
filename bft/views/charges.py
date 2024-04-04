@@ -60,7 +60,6 @@ def cost_center_charge_upload(request: "HttpRequest"):
             error = result.get("error")
             if error:
                 messages.error(request, error)
-                initial = {"fy": fy, period: "ww"}
                 form = ChargeUploadForm
             else:
                 return redirect("/")

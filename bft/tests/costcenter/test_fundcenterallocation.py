@@ -78,7 +78,7 @@ class TestFundCenterAllocationManager:
 
     def test_fund_allocation_when_fund_invalid(self, populate):
         allocation = self.FCA.objects.fund("C999")
-        assert None == allocation
+        assert allocation is None
 
     # Fund Center allocation
     def test_fundcenter_allocation_when_fundcenter_valid_and_allocation_exists(
@@ -95,7 +95,7 @@ class TestFundCenterAllocationManager:
 
     def test_fundcenter_allocation_when_fundcenter_invalid(self, populate):
         allocation = self.FCA.objects.fundcenter("21ZZZ")
-        assert None == allocation
+        assert allocation is None
 
     # FY
     def test_fy_allocation_when_allocation_exists(self, populate):
@@ -117,7 +117,7 @@ class TestFundCenterAllocationManager:
 
     def test_quarter_allocation_when_quarter_invalid(self, populate):
         allocation = self.FCA.objects.quarter(6)
-        assert None == allocation
+        assert allocation is None
 
     def test_descendants_fundcenter_allocation(self, populate):
         allocation = self.FCA.objects.descendants_fundcenter("2184DA")
@@ -149,11 +149,11 @@ class TestCostCenterAllocationManager:
         up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
     # Fund Allocations
-    def test_fund_allocation_when_fund_valid_and_allocation_exists(self, populate):
+    def test_fundcenter_allocation_when_fund_valid_and_allocation_exists(self, populate):
         fund_allocation = self.FCA.objects.fund("c113")
         assert 2 == fund_allocation.count()
 
     # Cost Center Allocations
-    def test_fund_allocation_when_fund_valid_and_allocation_exists(self, populate):
+    def test_costcenter_allocation_when_fund_valid_and_allocation_exists(self, populate):
         allocation = self.FCA.objects.costcenter("8484wa")
         assert 1 == allocation.count()

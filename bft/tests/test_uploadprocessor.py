@@ -40,7 +40,7 @@ Base Fiscal Year : 2024
 
     def test_not_finding_fundcenter(self, setup):
         p = LineItemProcessor(self.source_file)
-        assert None == p.find_fund_center("blablabla")
+        assert None is p.find_fund_center("blablabla")
 
     def test_find_fundcenter(self, setup):
         p = LineItemProcessor(self.source_file)
@@ -48,7 +48,7 @@ Base Fiscal Year : 2024
 
     def test_not_finding_base_fy(self, setup):
         p = LineItemProcessor(self.source_file)
-        assert None == p.find_base_fy("Fiscal Year:")
+        assert p.find_base_fy("Fiscal Year:") is None
 
     def test_find_base_fy(self, setup):
         p = LineItemProcessor(self.source_file)
