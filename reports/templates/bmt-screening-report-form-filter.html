@@ -1,32 +1,32 @@
 <div class="form" id="filter-form">
-    <form action="{% url 'bmt-screening-report' %}" method="GET">
-        <div class="form__header">Filter Screening Report</div>
-        <section class="form__fields-row">
-                <div class="form__field">
-                    <label for="fundcenter" class="label">Fund Center</label>
-                    {{form.fundcenter}}
-                </div>
+  <form action="{% url 'bmt-screening-report' %}" method="GET">
+    <div class="form__header">Filter Screening Report</div>
+    <section class="form__fields-row">
+      <div class="form__field">
+        <label for="fundcenter" class="label">Fund Center</label>
+        {{form.fundcenter}}
+      </div>
 
-                <div class="form__field">
-                    <label class="label" for="fund">Fund</label>
-                    {{form.fund}}
-                </div>
+      <div class="form__field">
+        <label class="label" for="fund">Fund</label>
+        {{form.fund}}
+      </div>
 
 
-                <div class="form__field">
-                    <label class="label" for="fy">Fiscal Year</label>
-                    {{form.fy}}
-                </div>
+      <div class="form__field">
+        <label class="label" for="fy">Fiscal Year</label>
+        {{form.fy}}
+      </div>
 
-                <div class="form__field">
-                    <label class="label" for="quarter">Quarter</label>
-                    {{form.quarter}}
-                </div>
+      <div class="form__field">
+        <label class="label" for="quarter">Quarter</label>
+        {{form.quarter}}
+      </div>
 
-        </section>
+    </section>
 
-        <div class="block block--spaced">
-            <button class="btn">submit</button>
-        </div>
-    </form>
+    <div class="block block--spaced">
+      <button class="btn">submit</button>
+    </div>
+  </form>
 </div>

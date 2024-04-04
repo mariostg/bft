@@ -1,7 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,21 +11,21 @@
     <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js'%}" ></script>
     <script type="text/javascript" src="{% static '/js/d3.v7.min.js'%}" ></script>
     <title>
-    {% block title %}Business Forecasting Tool{% endblock title %}
+      {% block title %}Business Forecasting Tool{% endblock title %}
     </title>
-</head>
-{% include 'core/navbar.html' %}
+  </head>
+  {% include 'core/navbar.html' %}
 
-{% if messages %}
-{% for message in messages %}
-<div class="container alert  alert--{{message.tags}}">
-    <p class="alert__message">{{message|safe}}</p>
-</div>
-{% endfor %}
-{% endif %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="container alert  alert--{{message.tags}}">
+        <p class="alert__message">{{message|safe}}</p>
+      </div>
+    {% endfor %}
+  {% endif %}
 
 
-{% block content %}{% endblock content %}
+  {% block content %}{% endblock content %}
 </body>
 
 </html>
@@ -38,10 +38,10 @@
         }, 5000);
     }); {% endcomment %}
 
-    var alerts = document.querySelector('.alert')
-    if (alerts){
-        alerts.addEventListener('click',(event)=>{alerts.remove()})
-    }
+  var alerts = document.querySelector('.alert')
+  if (alerts){
+    alerts.addEventListener('click',(event)=>{alerts.remove()})
+  }
 
 
 

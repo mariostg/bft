@@ -1,21 +1,21 @@
 {% extends 'core/base.html' %}
 {% block title %}Fund Center Allocation Form{% endblock title %}
 {% block content %}
-<main class="block block--centered">
+  <main class="block block--centered">
     <section class="form">
-    <form method="POST">
+      <form method="POST">
         <header class='form__header'>Fund Center Allocation</header>
         {% csrf_token %}
         {% include 'core/form-fields.html'%}
-            <div class="block block--spaced">
-                <button class="btn">Save</button>
-                <a href="{% url 'fundcenter-allocation-table' %}" class="btn btn-back" href="#" >Back</a >
-            </div>
-        </form>
-        <footer class='form__footer'>Created on {{form.instance.created}}. Last edited by {{form.instance.owner}} on  {{form.instance.updated}}</footer>
+        <div class="block block--spaced">
+          <button class="btn">Save</button>
+          <a href="{% url 'fundcenter-allocation-table' %}" class="btn btn-back" href="#" >Back</a >
+        </div>
+      </form>
+      <footer class='form__footer'>Created on {{form.instance.created}}. Last edited by {{form.instance.owner}} on  {{form.instance.updated}}</footer>
     </section>
-</main>
-</body>
-</html>
+  </main>
+  </body>
+  </html>
 
 {% endblock content %}

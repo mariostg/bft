@@ -2,12 +2,12 @@
 {% load static %}
 {% block content %}
 
-<div class="">
+  <div class="">
 
-  <main class="block block--centered">
-    <section class="form">
-      <form action="#" method="POST">
-        <header class='form__header'>Business Forecasting Tool </header>
+    <main class="block block--centered">
+      <section class="form">
+        <form action="#" method="POST">
+          <header class='form__header'>Business Forecasting Tool </header>
           {% csrf_token %}
           <div class="form__fields">
             <label class='label' for="username">Nom d'utilisateur </label>
@@ -29,22 +29,22 @@
               <a class="" href="forgetpassword.html">Mot de passe oublié?</a>
               <a class="" href="{% url 'register' %}">Submit request for access</a>
               <a class="link" href="mailto:mario@mail.ca">Contactez le resonsable</a>
-          </div>
             </div>
           </div>
-        </form>
-      </section>
+        </div>
+      </form>
+    </section>
 
-    </main>
+  </main>
 
-<script>
-  function togglePassword() {
-    var x = document.getElementById("formInput#password");
-    if (x.type === "password") {
-      x.type = "text";
-    } else {
-      x.type = "password";
+  <script>
+    function togglePassword() {
+      var x = document.getElementById("formInput#password");
+      if (x.type === "password") {
+        x.type = "text";
+      } else {
+        x.type = "password";
+      }
     }
-  }
-</script>
-  {% endblock content %}
+  </script>
+{% endblock content %}

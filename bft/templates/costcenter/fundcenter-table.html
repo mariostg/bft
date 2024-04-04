@@ -2,49 +2,49 @@
 {% load static %}
 {% block title %}Fund Center Table{% endblock title %}
 {% block content %}
-{% include "core/form-filter.html" %}
-<main class="block block--centered">
+  {% include "core/form-filter.html" %}
+  <main class="block block--centered">
     <div class="container">
-        <header class=''>
-            <h2>Fund Centers</h2>
-        </header>
-        {% if user.is_authenticated %}
+      <header class=''>
+        <h2>Fund Centers</h2>
+      </header>
+      {% if user.is_authenticated %}
         <div class=''>
-            <div class="action-bar block">
-                <a class='btn btn-add' href="{% url 'fundcenter-add' %}"></a>
-            </div>
+          <div class="action-bar block">
+            <a class='btn btn-add' href="{% url 'fundcenter-add' %}"></a>
+          </div>
         </div>
-        {% endif %}
+      {% endif %}
     </div>
 
     <table class='container' id='fundcenter-table' class='zebra'>
-        <thead>
-            <tr>
-                <th>line No</th>
-                <th>Seq. No</th>
-                <th>FundCenter</th>
-                <th>Name</th>
-                <th>Parent</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for elem in filter.qs %}
-            <tr class="level{{elem.level}}">
+      <thead>
+        <tr>
+          <th>line No</th>
+          <th>Seq. No</th>
+          <th>FundCenter</th>
+          <th>Name</th>
+          <th>Parent</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for elem in filter.qs %}
+          <tr class="level{{elem.level}}">
             <td>{{ forloop.counter }}</td>
             <td>{{elem.sequence}}</td><td>{{elem.fundcenter}}</td><td>{{elem.shortname}}</td><td>{{elem.fundcenter_parent}}</td>
             <td class='spread'>
-                    <a class='btn btn-view' href="{% url "costcenter-table"%}?costcenter_parent__fundcenter__icontains={{elem.fundcenter}}">Cost centers</a>
-                    {% if user.is_authenticated %}
-                    <a class='btn btn-edit' href="{% url "fundcenter-update" elem.id %}"></a>
-                    <a class='btn btn-delete' href="{% url "fundcenter-delete" elem.id %}"></a>
-            </td>
-            {% endif %}
-        </tr>
-            {% endfor %}
+              <a class='btn btn-view' href="{% url "costcenter-table"%}?costcenter_parent__fundcenter__icontains={{elem.fundcenter}}">Cost centers</a>
+              {% if user.is_authenticated %}
+                <a class='btn btn-edit' href="{% url "fundcenter-update" elem.id %}"></a>
+                <a class='btn btn-delete' href="{% url "fundcenter-delete" elem.id %}"></a>
+                </td>
+              {% endif %}
+            </tr>
+        {% endfor %}
 
-        </tbody>
+      </tbody>
     </table>
-</main>
-<script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
+  </main>
+  <script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
 {% endblock content %}

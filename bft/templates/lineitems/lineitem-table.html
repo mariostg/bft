@@ -5,115 +5,115 @@
 
 {% block title %}Line Items Table{% endblock title %}
 {% block content %}
-{% include "core/form-filter.html" %}
-<main class="block block--centered">
+  {% include "core/form-filter.html" %}
+  <main class="block block--centered">
 
-<section class='container lineitems'>
-    <h1>Line Items</h1>
-    {% if not data %}
-    <div>No lines associated to cost center</div>
-    {% endif %}
+    <section class='container lineitems'>
+      <h1>Line Items</h1>
+      {% if not data %}
+        <div>No lines associated to cost center</div>
+      {% endif %}
 
-{% include 'paginator.html' %}
-<button id='comment-toggler'>Toggle long text view</button>
-{% for line in filter.qs  %}
-<article class="container lineitem">
-    <div class='lineitem__header'>
-        <div class='padded'> <a href="{% url 'lineitem-page'%}?docno__iexact={{line.docno}}">{{line.docno }}</a> - {{line.lineno }} {{line.linetext|default:''}}</div>
-        {% if line.fcintegrity == False%} <div class="hint-warning">Fund center incoherent</div> {% endif %}
-        <div class=''>{{line.fundcenter}} - {{line.costcenter}} - {{line.fund}} : {{line.id}}:{{line.status}}</div>
-    </div>
-    <div class='lineitem__part'>
-        <div class='padded'>{{line.doctype|default:"" }} {{line.enctype }}</div>
-        <div>Ref.: {{line.reference|default:"" }}</div>
-        <div>{% if line.duedate %} Due date: {{line.duedate}} {%endif%}</div>
-        <div>{% if line.createdby %}Creator: {{line.createdby}} {%endif%}</div>
-    </div>
-    <div class='lineitem__part'>
-        <div class='padded'>GL:{{line.gl}}</div>
-        <div>Vendor: {{line.vendor|default:"" }}</div>
-        <div>{% if line.predecessordocno%} Predecessor: {{line.predecessordocno|default:'' }} {{line.predecessorlineno|default:''}}{% endif %}</div>
-    </div>
-    <div class='lineitem__footer'>
-        <div class="padded">
-            {% if line.workingplan == 0 %}
+      {% include 'paginator.html' %}
+      <button id='comment-toggler'>Toggle long text view</button>
+      {% for line in filter.qs  %}
+        <article class="container lineitem">
+          <div class='lineitem__header'>
+            <div class='padded'> <a href="{% url 'lineitem-page'%}?docno__iexact={{line.docno}}">{{line.docno }}</a> - {{line.lineno }} {{line.linetext|default:''}}</div>
+            {% if line.fcintegrity == False%} <div class="hint-warning">Fund center incoherent</div> {% endif %}
+            <div class=''>{{line.fundcenter}} - {{line.costcenter}} - {{line.fund}} : {{line.id}}:{{line.status}}</div>
+          </div>
+          <div class='lineitem__part'>
+            <div class='padded'>{{line.doctype|default:"" }} {{line.enctype }}</div>
+            <div>Ref.: {{line.reference|default:"" }}</div>
+            <div>{% if line.duedate %} Due date: {{line.duedate}} {%endif%}</div>
+            <div>{% if line.createdby %}Creator: {{line.createdby}} {%endif%}</div>
+          </div>
+          <div class='lineitem__part'>
+            <div class='padded'>GL:{{line.gl}}</div>
+            <div>Vendor: {{line.vendor|default:"" }}</div>
+            <div>{% if line.predecessordocno%} Predecessor: {{line.predecessordocno|default:'' }} {{line.predecessorlineno|default:''}}{% endif %}</div>
+          </div>
+          <div class='lineitem__footer'>
+            <div class="padded">
+              {% if line.workingplan == 0 %}
                 <a class="btn btn-delete" title="Delete this line item" href="{% url 'line-item-delete' line.id %}"></a>
-            {% endif %}
+              {% endif %}
 
-            Spent:{{line.spent|intcomma }}
-            {% if line.spent > line.fcst.spent_initial %}
+              Spent:{{line.spent|intcomma }}
+              {% if line.spent > line.fcst.spent_initial %}
                 <span class="rising-green"  title="{{line.fcst.spent_initial|intcomma}}"></span>
-            {% elif line.spent < line.fcst.spent_initial %}
+              {% elif line.spent < line.fcst.spent_initial %}
                 <span class="decreasing-red"  title="{{line.fcst.spent_initial|intcomma}}"></span>
+              {% endif %}
+            </div>
+
+            <div>Balance:{{line.balance|intcomma }}</div>
+
+            <div>Working Plan:{{line.workingplan|intcomma}}
+              {% if line.workingplan < line.fcst.workingplan_initial%}
+                <span class="decreasing-green" title="{{line.fcst.workingplan_initial|intcomma}}"></span>
+              {% elif line.workingplan > line.fcst.workingplan_initial%}
+                <span class="rising-red" title="{{line.fcst.workingplan_initial|intcomma}}"></span>
+              {%endif%}
+            </div>
+
+            {% if line.fcst.id %}
+              <div class="{% if line.fcst.forecastamount < 0%} hint-too-low {% elif line.fcst.forecastamount > line.workingplan %} hint-warning{% endif %}"> Forecast:{{line.fcst.forecastamount|intcomma}}</div>
             {% endif %}
-        </div>
 
-        <div>Balance:{{line.balance|intcomma }}</div>
+          </div>
 
-        <div>Working Plan:{{line.workingplan|intcomma}}
-        {% if line.workingplan < line.fcst.workingplan_initial%}
-            <span class="decreasing-green" title="{{line.fcst.workingplan_initial|intcomma}}"></span>
-        {% elif line.workingplan > line.fcst.workingplan_initial%}
-            <span class="rising-red" title="{{line.fcst.workingplan_initial|intcomma}}"></span>
-        {%endif%}
-        </div>
-
-        {% if line.fcst.id %}
-        <div class="{% if line.fcst.forecastamount < 0%} hint-too-low {% elif line.fcst.forecastamount > line.workingplan %} hint-warning{% endif %}"> Forecast:{{line.fcst.forecastamount|intcomma}}</div>
-        {% endif %}
-
-    </div>
-
-        {% if not line.fcst.id %}
-        <div class="spread frame">
-            <div class="lineitem__nav">
+          {% if not line.fcst.id %}
+            <div class="spread frame">
+              <div class="lineitem__nav">
                 <span>Forecast Document</span>
                 <a class="btn btn--link-small" href="{% url 'document-forecast' line.docno %}">No {{line.docno}}</a>
-            </div>
-            <div class="lineitem__nav">
+              </div>
+              <div class="lineitem__nav">
                 <a class='btn btn--link-small' href="{% url 'line-forecast-add' line.id%}">Create Forecast</a>
+              </div>
             </div>
-        </div>
-        {% endif %}
+          {% endif %}
 
-        {% if line.fcst.id %}
-        <div class="spread frame">
-            <div class='lineitem__nav'>
+          {% if line.fcst.id %}
+            <div class="spread frame">
+              <div class='lineitem__nav'>
                 <div>Forecast: Document</div>
                 <a class="btn btn--link-small" href="{% url 'document-forecast' line.docno %}">No {{line.docno}}</a>
                 <div>Cost Center</div>
                 <a class="btn btn--link-small" href="{% url 'costcenter-forecast' line.costcenter.pk%}">{{line.costcenter.costcenter}}</a>
-            </div>
-            <div class='lineitem__nav'>
+              </div>
+              <div class='lineitem__nav'>
                 <div>Line Item</div>
                 <div class='btn__row'>
-                    {% if line.workingplan != line.fcst.forecastamount %}
+                  {% if line.workingplan != line.fcst.forecastamount %}
                     <a class="btn btn--link-small" href="{% url 'line-forecast-to-wp-update' line.fcst.id %}">Set to WP</a>
-                    {% endif %}
+                  {% endif %}
 
-                    {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
+                  {% if line.spent == 0 and line.fcst.forecastamount != 0 %}
                     <a class="btn btn--link-small" href="{% url 'line-forecast-zero-update' line.fcst.id %}">Set to 0</a>
-                    {% endif %}
+                  {% endif %}
 
-                    <a class="btn btn--link-small" href="{% url 'line-forecast-update' line.fcst.id %}">Form input</a>
+                  <a class="btn btn--link-small" href="{% url 'line-forecast-update' line.fcst.id %}">Form input</a>
                 </div>
 
+              </div>
             </div>
-        </div>
-        {% endif %}
-        <div class="cantoggle line-item-text">
-                {% if line.fcst.description %}
-                <div>{{line.fcst.description}}</div>
-                <hr class="hr--thin">
-                {% endif %}
-                {% if line.fcst.comment %}
-                <div>{{line.fcst.comment}}</div>
-                {% endif %}
-        </div>
-</article>
-{% endfor %}
-</section>
-</main>
-<script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
-<script type="text/javascript" src="{% static 'js/toggler.js'%}" ></script>
+          {% endif %}
+          <div class="cantoggle line-item-text">
+            {% if line.fcst.description %}
+              <div>{{line.fcst.description}}</div>
+              <hr class="hr--thin">
+            {% endif %}
+            {% if line.fcst.comment %}
+              <div>{{line.fcst.comment}}</div>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </section>
+  </main>
+  <script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
+  <script type="text/javascript" src="{% static 'js/toggler.js'%}" ></script>
 {% endblock content %}

@@ -2,32 +2,32 @@
 {% load humanize %}
 {% block title %}Capital Historical Outlook{% endblock title %}
 {% block content %}
-<main class='block block--centered'>
+  <main class='block block--centered'>
     <h1>Capital Historical Outlook</h1>
     {% if form_filter %}
-    {% include "core/capital-forecasting-filter.html" %}
+      {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
 
     {% if data|length > 2 %}
-    {{data|json_script:"json_data"}}
-    <div id="chart_outlook"><div class="chart__title">Historical Outlook {{capital_project}} {{fund}} FY {{fy}}</div></div>
-    {{table|safe}}
-<script type="module">
-    import { Chart, ChartHandler } from "/static/js/barchart.js";
-    const data=JSON.parse(JSON.parse(document.getElementById('json_data').textContent))
-    const data_estimates = data.map(function (e) {
-        return { FY: e.fy, "Initial Allocation": e['Initial Allocation'],  'Q1 MLE': e['Q1 MLE'],'Q2 MLE': e['Q2 MLE'],'Q3 MLE': e['Q3 MLE'],'Q4 MLE': e['Q4 MLE'],'YE Spent':e['YE Spent'] };
-    });
-    data_estimates.columns = Object.keys(data_estimates[0]);
-    var config = {
-        style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
-        legend: { visibility: "show", orient: "v" }
-    };
-    Chart("chart_outlook", data_estimates, config);
-    ChartHandler.ajust_chart_width()
-</script>
-{% endif %}
-</main>
+      {{data|json_script:"json_data"}}
+      <div id="chart_outlook"><div class="chart__title">Historical Outlook {{capital_project}} {{fund}} FY {{fy}}</div></div>
+      {{table|safe}}
+      <script type="module">
+        import { Chart, ChartHandler } from "/static/js/barchart.js";
+        const data=JSON.parse(JSON.parse(document.getElementById('json_data').textContent))
+        const data_estimates = data.map(function (e) {
+          return { FY: e.fy, "Initial Allocation": e['Initial Allocation'],  'Q1 MLE': e['Q1 MLE'],'Q2 MLE': e['Q2 MLE'],'Q3 MLE': e['Q3 MLE'],'Q4 MLE': e['Q4 MLE'],'YE Spent':e['YE Spent'] };
+        });
+        data_estimates.columns = Object.keys(data_estimates[0]);
+        var config = {
+          style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
+          legend: { visibility: "show", orient: "v" }
+        };
+        Chart("chart_outlook", data_estimates, config);
+        ChartHandler.ajust_chart_width()
+      </script>
+    {% endif %}
+  </main>
 
 
 {% endblock content %}

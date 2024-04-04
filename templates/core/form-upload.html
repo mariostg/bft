@@ -1,25 +1,25 @@
 {% extends 'core/base.html' %}
 {% block title %}{{form_title}}{% endblock title %}
 {% block content %}
-<main class="block block--centered">
+  <main class="block block--centered">
     <section class="form">
-        <header class='form__header'>{{form_title}}</header>
-        <form enctype="multipart/form-data" method="POST">
-            {% csrf_token %}
-            <div>
-                {{ form.errors }}
-                {{ form.non_field_errors }}
-            </div>
-            <div>
-                {{ form }}
-            </div>
-            <div class="block block--spaced">
-                <button class="btn">Proceed</button>
-                <button class='btn btn-back'><a href="{% url back %}" style='text-decoration:none;'>Go Back</a></button>
-            </div>
+      <header class='form__header'>{{form_title}}</header>
+      <form enctype="multipart/form-data" method="POST">
+        {% csrf_token %}
+        <div>
+          {{ form.errors }}
+          {{ form.non_field_errors }}
+        </div>
+        <div>
+          {{ form }}
+        </div>
+        <div class="block block--spaced">
+          <button class="btn">Proceed</button>
+          <button class='btn btn-back'><a href="{% url back %}" style='text-decoration:none;'>Go Back</a></button>
+        </div>
 
-        </form>
-        <footer class='form__footer'>Last edited by Mario St-Gelais, 8 Feb 2022</footer>
-</section>
-</main>
+      </form>
+      <footer class='form__footer'>Last edited by Mario St-Gelais, 8 Feb 2022</footer>
+    </section>
+  </main>
 {% endblock content %}

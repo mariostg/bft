@@ -2,44 +2,44 @@
 {% block title %}Forecast Adjustments{% endblock title %}
 {% comment %} {% load static %} {% endcomment %}
 {% block content %}
-<main class="block block--centered">
+  <main class="block block--centered">
     <header class='block'>
-        <h2>Forecast Ajustments</h2>
+      <h2>Forecast Ajustments</h2>
     </header>
     {% if user.is_authenticated %}
-        <div class=''>
-            <div class="action-bar block">
-                <a class='btn btn-add' href="{% url 'forecast-adjustment-add' %}"></a>
-            </div>
+      <div class=''>
+        <div class="action-bar block">
+          <a class='btn btn-add' href="{% url 'forecast-adjustment-add' %}"></a>
         </div>
-        {% endif %}
-    </div>
+      </div>
+    {% endif %}
+  </div>
 
-    {% for item in data %}
+  {% for item in data %}
     <section class='summary'>
-        <div class='summary__header'>
-            <span>{{item.costcenter.costcenter_parent}} | {{item.costcenter}}</span>
-            <span>{{item.fund}}</span>
-            <span>{{item.costcenter.source}}</span>
-        </div>
-        <div class="summary__body">
-            <span>{{item.amount}}</span>
-            <span>{{item.note|linebreaksbr}}</span>
-        </div>
-        <div class="footnote">
-            Created on {{item.created}}, Last updated by {{item.owner}} on {{item.updated}}
-        </div>
+      <div class='summary__header'>
+        <span>{{item.costcenter.costcenter_parent}} | {{item.costcenter}}</span>
+        <span>{{item.fund}}</span>
+        <span>{{item.costcenter.source}}</span>
+      </div>
+      <div class="summary__body">
+        <span>{{item.amount}}</span>
+        <span>{{item.note|linebreaksbr}}</span>
+      </div>
+      <div class="footnote">
+        Created on {{item.created}}, Last updated by {{item.owner}} on {{item.updated}}
+      </div>
 
-        {% if user.is_authenticated %}
+      {% if user.is_authenticated %}
         <div class="summary__footer">
-            <a class="btn btn-edit" href="{% url "forecast-adjustment-update" item.pk %}"></a>
-            <a class="btn btn-delete" href="{% url 'forecast-adjustment-delete' item.pk %}" ></a >
+          <a class="btn btn-edit" href="{% url "forecast-adjustment-update" item.pk %}"></a>
+          <a class="btn btn-delete" href="{% url 'forecast-adjustment-delete' item.pk %}" ></a >
         </div>
-        {% endif %}
+      {% endif %}
     </section>
-    {%empty%}
-        <p>no forecast</p>
-    {% endfor %}
-</main>
+  {%empty%}
+    <p>no forecast</p>
+  {% endfor %}
+  </main>
 
 {% endblock content %}

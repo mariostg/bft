@@ -2,47 +2,47 @@
 {% load static %}
 {% block title %}Fund Center Allocation Table{% endblock title %}
 {% block content %}
-{% include "core/form-filter.html" %}
-<main class="block block--centered">
+  {% include "core/form-filter.html" %}
+  <main class="block block--centered">
     <div>
 
-        <header class='frame'>
-            <h2>Fund Centers Allocations</h2>
-        </header>
-        {% if user.is_authenticated %}
+      <header class='frame'>
+        <h2>Fund Centers Allocations</h2>
+      </header>
+      {% if user.is_authenticated %}
         <div class="block">
-            <div class="block action-bar">
-                <a class='btn btn-add'  href="{% url 'fundcenter-allocation-add' %}"></a>
-            </div>
+          <div class="block action-bar">
+            <a class='btn btn-add'  href="{% url 'fundcenter-allocation-add' %}"></a>
+          </div>
         </div>
-        {% endif %}
+      {% endif %}
 
-            {% for item in filter.qs %}
-            <section class='summary'>
-                <div class='summary__header'>
-                    <span>{{item.fundcenter}}</span>
-                    <span>{{item.fund}}</span>
-                    <span>{{item.fy|stringformat:'s'}}</span>
-                    <span>{{item.quarter}}</span>
-                </div>
-                <div class="summary__body">
-                    <span>{{item.amount}}</span>
-                    <span>{{item.note|linebreaksbr}}</span>
-                </div>
-                <div class="footnote">
-                    <span></span>
-                    <span>Created on {{item.created}}, Last updated by {{item.owner}} on {{item.updated}}</span>
-                </div>
-                {% if user.is_authenticated %}
-                <div class="summary__footer">
-                    <a class="btn btn-edit" href="{% url 'fundcenter-allocation-update' item.pk%}"></a>
-                    <a class="btn btn-delete" href="{% url 'fundcenter-allocation-delete' item.pk %}" ></a >
-                </div>
-                {% endif %}
-            </section>
-            {% endfor %}
+      {% for item in filter.qs %}
+        <section class='summary'>
+          <div class='summary__header'>
+            <span>{{item.fundcenter}}</span>
+            <span>{{item.fund}}</span>
+            <span>{{item.fy|stringformat:'s'}}</span>
+            <span>{{item.quarter}}</span>
+          </div>
+          <div class="summary__body">
+            <span>{{item.amount}}</span>
+            <span>{{item.note|linebreaksbr}}</span>
+          </div>
+          <div class="footnote">
+            <span></span>
+            <span>Created on {{item.created}}, Last updated by {{item.owner}} on {{item.updated}}</span>
+          </div>
+          {% if user.is_authenticated %}
+            <div class="summary__footer">
+              <a class="btn btn-edit" href="{% url 'fundcenter-allocation-update' item.pk%}"></a>
+              <a class="btn btn-delete" href="{% url 'fundcenter-allocation-delete' item.pk %}" ></a >
+            </div>
+          {% endif %}
+        </section>
+      {% endfor %}
     </div>
-</main>
-<script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
+  </main>
+  <script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
 
 {% endblock content %}

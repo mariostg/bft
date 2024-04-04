@@ -6,7 +6,7 @@
   <div class='form__fields'>
     {% if field.use_fieldset %}
       <fieldset>
-      {% if field.label %}{{ field.legend_tag }}{% endif %}
+        {% if field.label %}{{ field.legend_tag }}{% endif %}
     {% else %}
       {% if field.label %}{{ field.label_tag }}{% endif %}
     {% endif %}
@@ -17,7 +17,7 @@
     {% if forloop.last %}
       {% for field in hidden_fields %}{{ field }}{% endfor %}
     {% endif %}
-</div>
+  </div>
 {% endfor %}
 {% if not fields and not errors %}
   {% for field in hidden_fields %}{{ field }}{% endfor %}

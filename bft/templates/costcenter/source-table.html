@@ -2,46 +2,46 @@
 {% load static %}
 {% block title %}Source Table{% endblock title %}
 {% block content %}
-<main class="block block--centered">
+  <main class="block block--centered">
 
     <div class="container">
-        <header class=''>
-            <h2>Sources</h2>
-        </header>
-        {% if user.is_authenticated %}
+      <header class=''>
+        <h2>Sources</h2>
+      </header>
+      {% if user.is_authenticated %}
         <div class=''>
-            <div class="action-bar block">
-                <a class='btn btn-add' href="{% url 'source-add' %}"></a>
-            </div>
+          <div class="action-bar block">
+            <a class='btn btn-add' href="{% url 'source-add' %}"></a>
+          </div>
         </div>
-        {% endif %}
+      {% endif %}
     </div>
 
     <table class='container' id='source-table'>
-        <thead>
-            <tr>
-                <th>Source</th>
-                {% if user.is_authenticated %}
-                <th colspan=2></th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for source in sources %}
-            <tr>
+      <thead>
+        <tr>
+          <th>Source</th>
+          {% if user.is_authenticated %}
+            <th colspan=2></th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for source in sources %}
+          <tr>
             <td>{{source.source}}</td>
             {% if user.is_authenticated %}
-            <td>
+              <td>
                 <a class='btn btn-edit' href="{% url "source-update" source.id %}"></a>
                 <a class='btn btn-delete' href="{% url "source-delete" source.id %}"></a>
-            </td>
+              </td>
             {% endif %}
-        </tr>
-            {% endfor %}
+          </tr>
+        {% endfor %}
 
-        </tbody>
+      </tbody>
     </table>
-</main>
-</body>
-</html>
+  </main>
+  </body>
+  </html>
 {% endblock content %}

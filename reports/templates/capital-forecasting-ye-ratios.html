@@ -2,34 +2,34 @@
 {% load humanize %}
 {% block title %}Annual Year end Ratios Table{% endblock title %}
 {% block content %}
-<main class='block block--centered'>
+  <main class='block block--centered'>
     <h1>Capital Forecasting Annual Year end Ratios</h1>
     {% if form_filter %}
-    {% include "core/capital-forecasting-filter.html" %}
+      {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
 
     {% if data|length > 2 %}
-    {{data|json_script:"json_data"}}
-    <div id="chart_ye_ratios"><div class="chart__title">Annual Year end Ratios {{capital_project}} - {{fund}}</div></div>
-    {{table|safe}}
-<script type="module">
-    import { Chart,ChartHandler } from "/static/js/barchart.js";
-    const data=JSON.parse(JSON.parse(document.getElementById('json_data').textContent))
-    const data_ye_ratios=data.map(function(e){ return {"FY":e.fy,
-        "YE vs Initial Allocation":e['YE Spent']/e['Initial Allocation'],"YE vs Q1":e['YE Spent']/e['Q1 MLE'],"YE vs Q2":e['YE Spent']/e['Q2 MLE'],"YE vs Q3":e['YE Spent']/e['Q3 MLE'],"YE vs Q4":e['YE Spent']/e['Q4 MLE']
-    }});
-    data_ye_ratios.columns = Object.keys(data_ye_ratios[0]);
-    var config = {
-        style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
-        legend: { visibility: "show", orient: "v" },
-        threshold:[{name:'100%',value:1}]
-    };
-    Chart("chart_ye_ratios", data_ye_ratios, config);
+      {{data|json_script:"json_data"}}
+      <div id="chart_ye_ratios"><div class="chart__title">Annual Year end Ratios {{capital_project}} - {{fund}}</div></div>
+      {{table|safe}}
+      <script type="module">
+        import { Chart,ChartHandler } from "/static/js/barchart.js";
+        const data=JSON.parse(JSON.parse(document.getElementById('json_data').textContent))
+        const data_ye_ratios=data.map(function(e){ return {"FY":e.fy,
+          "YE vs Initial Allocation":e['YE Spent']/e['Initial Allocation'],"YE vs Q1":e['YE Spent']/e['Q1 MLE'],"YE vs Q2":e['YE Spent']/e['Q2 MLE'],"YE vs Q3":e['YE Spent']/e['Q3 MLE'],"YE vs Q4":e['YE Spent']/e['Q4 MLE']
+        }});
+        data_ye_ratios.columns = Object.keys(data_ye_ratios[0]);
+        var config = {
+          style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
+          legend: { visibility: "show", orient: "v" },
+          threshold:[{name:'100%',value:1}]
+        };
+        Chart("chart_ye_ratios", data_ye_ratios, config);
 
-    ChartHandler.ajust_chart_width()
-</script>
-{% endif %}
-</main>
+        ChartHandler.ajust_chart_width()
+      </script>
+    {% endif %}
+  </main>
 
 
 {% endblock content %}

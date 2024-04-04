@@ -28,3 +28,12 @@ repos:
         -   flake8-no-pep420==2.7.0
         -   flake8-comprehensions==3.14.0
         -   flake8-print==5.0.0
+
+-   repo: https://github.com/rtts/djhtml
+    rev: 3.0.6
+    hooks:
+    -   id: djcss
+    -   id: djcss
+    -   id: djhtml
+        args:
+        -   --tabwidth=2

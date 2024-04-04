@@ -1,21 +1,21 @@
 {% extends 'core/base.html' %}
 {% block title %}Forecast Adjustment Form{% endblock title %}
 {% block content %}
-<main class="block block--centered">
+  <main class="block block--centered">
     <section class="form">
-        <form method="POST">
-            {% csrf_token %}
-            <header class='form__header'>Forecast Adjustment</header>
-            {% include 'core/form-fields.html'%}
-            <div class="block block--spaced">
-                <button class="btn">Save</button>
-                <a class="btn btn-back" href={% url 'forecast-adjustment-table' %}>Back</a>
-            </div>
-        </form>
-        <footer class='form__footer'>Created on {{form.instance.created}}. Last edited by {{form.instance.owner}} on  {{form.instance.updated}}</footer>
+      <form method="POST">
+        {% csrf_token %}
+        <header class='form__header'>Forecast Adjustment</header>
+        {% include 'core/form-fields.html'%}
+        <div class="block block--spaced">
+          <button class="btn">Save</button>
+          <a class="btn btn-back" href={% url 'forecast-adjustment-table' %}>Back</a>
+        </div>
+      </form>
+      <footer class='form__footer'>Created on {{form.instance.created}}. Last edited by {{form.instance.owner}} on  {{form.instance.updated}}</footer>
     </section>
-</main>
-</body>
-</html>
+  </main>
+  </body>
+  </html>
 
 {% endblock content %}

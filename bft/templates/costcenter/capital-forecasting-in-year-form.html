@@ -1,20 +1,20 @@
 {% extends 'core/base.html' %}
 {% block title %}Capital Forecasting In Year Form{% endblock title %}
 {% block content %}
-<main class="block block--centered">
+  <main class="block block--centered">
     <section class="form">
-        <form method="POST">
-            <header class='form__header'>Capital Forecasting In Year</header>
-            {% csrf_token %}
-            {% include 'core/form-fields.html'%}
-            <div class="block block--spaced">
-                <button class="btn">Save</button>
-                <button class="btn btn-back">Back</button>
-            </div>
-        </form>
+      <form method="POST">
+        <header class='form__header'>Capital Forecasting In Year</header>
+        {% csrf_token %}
+        {% include 'core/form-fields.html'%}
+        <div class="block block--spaced">
+          <button class="btn">Save</button>
+          <button class="btn btn-back">Back</button>
+        </div>
+      </form>
     </section>
-</main>
-</body>
-</html>
+  </main>
+  </body>
+  </html>
 
 {% endblock content %}

@@ -1,19 +1,19 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="block block--centered">
+  <div class="block block--centered">
     <section class="form">
-        <header class="form__header">Delete Action</header>
-        <form method="POST">
-            {% csrf_token %}
-            <p class='label hint hint-warning'>Êtes-vous certain de voulor effacer "{{ object }}"</p>
+      <header class="form__header">Delete Action</header>
+      <form method="POST">
+        {% csrf_token %}
+        <p class='label hint hint-warning'>Êtes-vous certain de voulor effacer "{{ object }}"</p>
 
-            <div class="block block--spaced">
-            <a class='btn btn-back' href="{% url back %}" style='text-decoration:none;'>Retour</a>
+        <div class="block block--spaced">
+          <a class='btn btn-back' href="{% url back %}" style='text-decoration:none;'>Retour</a>
 
-            <input class='btn btn-delete' type="submit" value="Confirm" />
+          <input class='btn btn-delete' type="submit" value="Confirm" />
         </div>
-        </form>
+      </form>
     </div>
-</section>
+  </section>
 {% endblock content %}

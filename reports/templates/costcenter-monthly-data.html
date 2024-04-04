@@ -2,42 +2,42 @@
 {% load humanize %}
 {% block title %}Cost Centers Monthly Data{% endblock title %}
 {% block content %}
-<main class='block block--spaced'>
+  <main class='block block--spaced'>
     <div>
-        <header class="frame">
-            <h2>Cost Centers Monthly Data</h2>
-        </header>
-        <section class="summary block--spaced">
-            {{table|safe}}
-        </section>
+      <header class="frame">
+        <h2>Cost Centers Monthly Data</h2>
+      </header>
+      <section class="summary block--spaced">
+        {{table|safe}}
+      </section>
     </div>
-</main>
+  </main>
 
-<script>
+  <script>
     var getSiblings = function (elem) {
         // Setup siblings array and get the first sibling
-        var siblings = [];
-        var sibling = elem.parentNode.firstChild;
+      var siblings = [];
+      var sibling = elem.parentNode.firstChild;
 
         // Loop through each sibling and push to the array
-        while (sibling) {
-            if (sibling.nodeType === 1 && sibling !== elem) {
-                siblings.push(sibling);
-            }
-            sibling = sibling.nextSibling;
+      while (sibling) {
+        if (sibling.nodeType === 1 && sibling !== elem) {
+          siblings.push(sibling);
         }
+        sibling = sibling.nextSibling;
+      }
 
-        return siblings;
+      return siblings;
     };
 
     function set_total_row_background(targetclass){
-        fc = document.querySelectorAll("."+targetclass);
-        fc.forEach((c) => {
-            sibblings = getSiblings(c);
-            sibblings.forEach((s) => {
-                s.classList.add(targetclass);
-            });
+      fc = document.querySelectorAll("."+targetclass);
+      fc.forEach((c) => {
+        sibblings = getSiblings(c);
+        sibblings.forEach((s) => {
+          s.classList.add(targetclass);
         });
+      });
     }
 
     //set the FUND centers class odd even
@@ -45,8 +45,8 @@
     tags = document.querySelectorAll(".row_heading.level0");
     odd = true;
     tags.forEach((t) => {
-        t.classList.add(odd == false ? "fc-even" : "fc-odd");
-        odd = !odd;
+      t.classList.add(odd == false ? "fc-even" : "fc-odd");
+      odd = !odd;
     });
 
     //Set the top row (totals) for each FUND centers
@@ -57,16 +57,16 @@
     tags = document.querySelectorAll(".row_heading.level1");
     odd = true;
     tags.forEach((t) => {
-        if (t.innerHTML) {
-            t.classList.add(odd == false ? "cc-even" : "cc-odd");
-            odd = !odd;
-        }
+      if (t.innerHTML) {
+        t.classList.add(odd == false ? "cc-even" : "cc-odd");
+        odd = !odd;
+      }
     });
 
     //Set the top row for each COST centers
     set_total_row_background('cc-odd')
     set_total_row_background('cc-even')
 
-</script>
+  </script>
 
 {% endblock content%}

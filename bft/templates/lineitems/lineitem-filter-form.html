@@ -1,64 +1,64 @@
 <aside class="form form--collapsible" id="filter-form">
-    <form action="{% url 'lineitem-page' %}" method="GET">
-        <div class="form__header">Filter</div>
-        <section class="form__fields_flex">
-            <div class="form__row">
-                <div class="form__field">
-                    <label for="costcenter" class="label">Cost Center</label>
-                    {{form.costcenter}}
-                </div>
+  <form action="{% url 'lineitem-page' %}" method="GET">
+    <div class="form__header">Filter</div>
+    <section class="form__fields_flex">
+      <div class="form__row">
+        <div class="form__field">
+          <label for="costcenter" class="label">Cost Center</label>
+          {{form.costcenter}}
+        </div>
 
-                <div class="form__field">
-                    <label class="label" for="fund">Fund</label>
-                    {{form.fund}}
-                </div>
-            </div>
+        <div class="form__field">
+          <label class="label" for="fund">Fund</label>
+          {{form.fund}}
+        </div>
+      </div>
 
-            <div class="form__row">
-                <div class="form__field">
-                    <label class="label" for="linetext">Line Text</label>
-                    {{form.linetext}}
-                </div>
+      <div class="form__row">
+        <div class="form__field">
+          <label class="label" for="linetext">Line Text</label>
+          {{form.linetext}}
+        </div>
 
-                <div class="form__field">
-                    <label class="label" for="doctype">Document Type</label>
-                    {{form.doctype}}
-                </div>
-            </div>
+        <div class="form__field">
+          <label class="label" for="doctype">Document Type</label>
+          {{form.doctype}}
+        </div>
+      </div>
 
-            <div class="form__row">
-                <div class="form__field">
-                    <label class="label" for="docno">Document No</label>
-                    {{form.docno}}
-                </div>
+      <div class="form__row">
+        <div class="form__field">
+          <label class="label" for="docno">Document No</label>
+          {{form.docno}}
+        </div>
 
-                <div class="form__field">
-                    <label class="label" for="createdby">Created By</label>
-                    {{form.createdby}}
-                </div>
-            </div>
+        <div class="form__field">
+          <label class="label" for="createdby">Created By</label>
+          {{form.createdby}}
+        </div>
+      </div>
 
             {% comment %} <div class="form__row"> {% endcomment %}
-                    <label class="label" for="status">Status</label>
-                    {{form.status}}
+      <label class="label" for="status">Status</label>
+      {{form.status}}
             {% comment %} </div> {% endcomment %}
 
-            <div class="form__row">
-                <div class="form__field">
-                    <label class="label checkbox-label">
-                        {{form.has_forecast}}Forecast exists</label>
-                </div>
-                    <div class="form__field">
-                        <label class="label checkbox-label">
-                            {{form.has_workingplan}}Has working Plan</label>
-                    </div>
-            </div>
-        </section>
-
-        <div class="block block--spaced">
-            <button class="btn">submit</button>
+      <div class="form__row">
+        <div class="form__field">
+          <label class="label checkbox-label">
+            {{form.has_forecast}}Forecast exists</label>
         </div>
-        <div class="form__footer">Form Footer</div>
-    </form>
-    <div id="expender" class="form__expender"><p>&nbsp;</p></div>
+        <div class="form__field">
+          <label class="label checkbox-label">
+            {{form.has_workingplan}}Has working Plan</label>
+        </div>
+      </div>
+    </section>
+
+    <div class="block block--spaced">
+      <button class="btn">submit</button>
+    </div>
+    <div class="form__footer">Form Footer</div>
+  </form>
+  <div id="expender" class="form__expender"><p>&nbsp;</p></div>
 </aside>

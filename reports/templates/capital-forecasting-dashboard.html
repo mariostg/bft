@@ -2,126 +2,126 @@
 {% load humanize %}
 {% block title %}Capital Forecasting Dashboard{% endblock title %}
 {% block content %}
-<main class='block block--centered'>
+  <main class='block block--centered'>
     {% if not table %}
-    <div class="alert alert--info">There are no data to display</div>
+      <div class="alert alert--info">There are no data to display</div>
     {% endif %}
 
     {% if form_filter %}
-    {% include 'capital-forecasting-dashboard-filter-form.html' %}
+      {% include 'capital-forecasting-dashboard-filter-form.html' %}
     {% else %}
-    <h1>Capital Forecasting Dashboard</h1>
+      <h1>Capital Forecasting Dashboard</h1>
     {% endif %}
-{% autoescape off %}
-<div class="charts">
-    <div class="chart">
-        <div id="chart_estimates"><div class="chart__title">
+    {% autoescape off %}
+      <div class="charts">
+        <div class="chart">
+          <div id="chart_estimates"><div class="chart__title">
             {% if source_estimates|length > 2 %}
-            Quarterly Estimates
+              Quarterly Estimates
             {% else %}No Estimates data
             {% endif %}
-        </div></div>
-    </div>
-    <div class="chart">
-        <div id="chart_fearstatus"><div class="chart__title">
+          </div></div>
+        </div>
+        <div class="chart">
+          <div id="chart_fearstatus"><div class="chart__title">
             {% if source_quarterly|length > 2 %}
-            FEAR Status (Forecast, Encumbrance, Allocation Relationship)
+              FEAR Status (Forecast, Encumbrance, Allocation Relationship)
             {% else %}No FEAR Status data
             {% endif %}
-        </div></div>
-    </div>
-    <div class="chart">
-        <div id="chart_outlook"><div class="chart__title">
+          </div></div>
+        </div>
+        <div class="chart">
+          <div id="chart_outlook"><div class="chart__title">
             {% if source_outlook|length > 2 %}
-            Historical Outlook
+              Historical Outlook
             {% else %}No Historical Outlook data
             {% endif %}
-        </div></div>
-    </div>
-    <div class="chart">
-        <div id="chart_ye_ratios"><div class="chart__title">
+          </div></div>
+        </div>
+        <div class="chart">
+          <div id="chart_ye_ratios"><div class="chart__title">
             {% if source_outlook|length > 2 %}
-            Annual YE Spent ratios
+              Annual YE Spent ratios
             {% else %}No Annual YE Spent data
             {% endif %}
-        </div></div>
-    </div>
-</div>
-{{source_estimates|json_script:"json_source_estimates"}}
-{{source_quarterly|json_script:"json_source_quarterly"}}
-{{source_outlook|json_script:"json_source_outlook"}}
+          </div></div>
+        </div>
+      </div>
+      {{source_estimates|json_script:"json_source_estimates"}}
+      {{source_quarterly|json_script:"json_source_quarterly"}}
+      {{source_outlook|json_script:"json_source_outlook"}}
 
-<script type="module">
-    import { Chart,ChartHandler } from "/static/js/barchart.js";
-    const source_estimates=JSON.parse(JSON.parse(document.getElementById('json_source_estimates').textContent));
-    const source_quarterly=JSON.parse(JSON.parse(document.getElementById('json_source_quarterly').textContent));
-    const source_outlook=JSON.parse(JSON.parse(document.getElementById('json_source_outlook').textContent));
-    const colors={MLE:'goldenrod',HE:'chocolate',LE:'coral',Spent:'#882255',CO:'#ddcc77',PC:'#afeeee',FR:'#fa8072'};
-    if(source_estimates!==0){
-    const data_estimates = source_estimates.map(function (e) {
-        return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
-    });
-    if (data_estimates.length){
-        data_estimates.columns = Object.keys(data_estimates[0]);
-        var config = {
+      <script type="module">
+        import { Chart,ChartHandler } from "/static/js/barchart.js";
+        const source_estimates=JSON.parse(JSON.parse(document.getElementById('json_source_estimates').textContent));
+        const source_quarterly=JSON.parse(JSON.parse(document.getElementById('json_source_quarterly').textContent));
+        const source_outlook=JSON.parse(JSON.parse(document.getElementById('json_source_outlook').textContent));
+        const colors={MLE:'goldenrod',HE:'chocolate',LE:'coral',Spent:'#882255',CO:'#ddcc77',PC:'#afeeee',FR:'#fa8072'};
+        if(source_estimates!==0){
+          const data_estimates = source_estimates.map(function (e) {
+            return { Quarter: e.quarter, LE: e.LE,  MLE: e.MLE,HE: e.HE };
+          });
+          if (data_estimates.length){
+            data_estimates.columns = Object.keys(data_estimates[0]);
+            var config = {
+              color:colors,
+              style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
+              legend: { visibility: "show", orient: "v" },
+              threshold: [{name:"Q4 Working Plan",value:d3.max(source_estimates.map((d) => parseFloat(d["Working Plan"])))}],
+            };
+            Chart("chart_estimates", data_estimates, config);
+          }
+        }
+
+        if(source_quarterly !==0){
+          const data_quarterly=source_quarterly.map(function(e) {
+            return {Quarters:e.Quarters,Spent:e.Spent, CO:e.CO, PC:e.PC, FR:e.FR,MLE:e.MLE,Allocation:e.allocation}
+          });
+
+          if(data_quarterly.length){
+            data_quarterly.columns = Object.keys(data_quarterly[0]);
+            var config = {
+              color:colors,
+              style: { type: "bar", barmode: "stacked", orientation: "v", width: 500, height: 200 },
+              piston: { name: "MLE", fill: "lightgrey" },
+              marker: { name: "Allocation", fill: "yellow" },
+              legend: { visibility: "show", orient: "v" }
+            };
+            Chart("chart_fearstatus", data_quarterly, config);
+          }
+        }
+
+        const data_outlook = source_outlook.map(function (e) {
+          return { FY: e.fy, "Initial Allocation": e['Initial Allocation'],  'Q1 MLE': e['Q1 MLE'],'Q2 MLE': e['Q2 MLE'],'Q3 MLE': e['Q3 MLE'],'Q4 MLE': e['Q4 MLE'],'YE Spent':e['YE Spent'] };
+        });
+        if(data_outlook.length){
+          data_outlook.columns = Object.keys(data_outlook[0]);
+          var config = {
+            color:colors,
+            style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
+            legend: { visibility: "show", orient: "v" }
+          };
+          Chart("chart_outlook", data_outlook, config);
+        }
+
+        const data_ye_ratios=source_outlook.map(function(e){ return {"FY":e.fy,
+          "YE vs Initial Allocation":e['YE Spent']/e['Initial Allocation'],"YE vs Q1":e['YE Spent']/e['Q1 MLE'],"YE vs Q2":e['YE Spent']/e['Q2 MLE'],"YE vs Q3":e['YE Spent']/e['Q3 MLE'],"YE vs Q4":e['YE Spent']/e['Q4 MLE']
+        }});
+        if (data_ye_ratios.length){
+          data_ye_ratios.columns = Object.keys(data_ye_ratios[0]);
+          var config = {
             color:colors,
             style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
             legend: { visibility: "show", orient: "v" },
-            threshold: [{name:"Q4 Working Plan",value:d3.max(source_estimates.map((d) => parseFloat(d["Working Plan"])))}],
-        };
-        Chart("chart_estimates", data_estimates, config);
+            threshold:[{name:'100%',value:1}]
+          };
+          Chart("chart_ye_ratios", data_ye_ratios, config);
         }
-    }
 
-    if(source_quarterly !==0){
-    const data_quarterly=source_quarterly.map(function(e) {
-        return {Quarters:e.Quarters,Spent:e.Spent, CO:e.CO, PC:e.PC, FR:e.FR,MLE:e.MLE,Allocation:e.allocation}
-    });
-
-    if(data_quarterly.length){
-    data_quarterly.columns = Object.keys(data_quarterly[0]);
-    var config = {
-        color:colors,
-        style: { type: "bar", barmode: "stacked", orientation: "v", width: 500, height: 200 },
-        piston: { name: "MLE", fill: "lightgrey" },
-        marker: { name: "Allocation", fill: "yellow" },
-        legend: { visibility: "show", orient: "v" }
-    };
-    Chart("chart_fearstatus", data_quarterly, config);
-    }
-}
-
-    const data_outlook = source_outlook.map(function (e) {
-        return { FY: e.fy, "Initial Allocation": e['Initial Allocation'],  'Q1 MLE': e['Q1 MLE'],'Q2 MLE': e['Q2 MLE'],'Q3 MLE': e['Q3 MLE'],'Q4 MLE': e['Q4 MLE'],'YE Spent':e['YE Spent'] };
-    });
-    if(data_outlook.length){
-    data_outlook.columns = Object.keys(data_outlook[0]);
-    var config = {
-        color:colors,
-        style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
-        legend: { visibility: "show", orient: "v" }
-    };
-    Chart("chart_outlook", data_outlook, config);
-    }
-
-    const data_ye_ratios=source_outlook.map(function(e){ return {"FY":e.fy,
-        "YE vs Initial Allocation":e['YE Spent']/e['Initial Allocation'],"YE vs Q1":e['YE Spent']/e['Q1 MLE'],"YE vs Q2":e['YE Spent']/e['Q2 MLE'],"YE vs Q3":e['YE Spent']/e['Q3 MLE'],"YE vs Q4":e['YE Spent']/e['Q4 MLE']
-    }});
-    if (data_ye_ratios.length){
-    data_ye_ratios.columns = Object.keys(data_ye_ratios[0]);
-    var config = {
-        color:colors,
-        style: { type: "bar", barmode: "grouped", orientation: "v", width: 500, height: 200 },
-        legend: { visibility: "show", orient: "v" },
-        threshold:[{name:'100%',value:1}]
-    };
-    Chart("chart_ye_ratios", data_ye_ratios, config);
-    }
-
-    ChartHandler.ajust_chart_width()
-</script>
-{% endautoescape %}
-</main>
+        ChartHandler.ajust_chart_width()
+      </script>
+    {% endautoescape %}
+  </main>
 
 
 {% endblock content %}

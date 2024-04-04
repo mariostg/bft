@@ -2,26 +2,26 @@
 {% load static %}
 {% block content %}
 
-<main class="block block--centered">
+  <main class="block block--centered">
 
     <div class="container block alert--info">
-        <div>
-                Upon submission, your request will be evaluated and activated if it meets the requirements.  An administrator will inform you by email when the account is activated.
-        </div>
+      <div>
+        Upon submission, your request will be evaluated and activated if it meets the requirements.  An administrator will inform you by email when the account is activated.
+      </div>
     </div>
-        <section class="form">
-            <form action="" method='POST'>
-                <header class="form__header">BFT New User Registration Request</header>
-                {% csrf_token %}
-                <div class="form__fields">
+    <section class="form">
+      <form action="" method='POST'>
+        <header class="form__header">BFT New User Registration Request</header>
+        {% csrf_token %}
+        <div class="form__fields">
 
-                    {{form}}
-                </div>
-                <div class="block block--spaced">
-                    <input class="btn" type="submit" value="Submit" />
-                </div>
-            </form>
-        </section>
-</main>
+          {{form}}
+        </div>
+        <div class="block block--spaced">
+          <input class="btn" type="submit" value="Submit" />
+        </div>
+      </form>
+    </section>
+  </main>
 
 {% endblock content %}
