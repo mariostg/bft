@@ -376,7 +376,6 @@ def capital_forecasting_dashboard(request):
     fund = capital_project = ""
     source_estimates = source_quarterly = source_outlook = 0
     form_filter = True
-    print("HI")
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)

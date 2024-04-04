@@ -600,23 +600,3 @@ class TestCostCenterAllocation:
         allocation = CostCenterAllocation(costcenter=cc, fund=fund, fy=3025, quarter=1, amount=100)
         with pytest.raises(InvalidFiscalYearException):
             allocation.save()
-
-    @pytest.mark.skip("Apparently cost center choice is bad")
-    def test_can_save_POST_request(self):
-        hnd = populate.Command()
-        hnd.handle()
-        data = {}
-        data["costcenter"] = 6  # That is 8486C2
-        data["fund"] = 7  # That is C523
-        data["fy"] = 2023
-        data["quarter"] = 1
-        data["amount"] = 400
-
-        response = Client().post("/costcenter/costcenter-allocation-add/", data=data)
-        assert response.status_code == 302
-        # obj = CostCenterAllocation.objects.get(fund=data["fund"])
-        obj = CostCenterAllocation.objects.all()
-        print("&&&&&&&&&&&&&&")
-        for a in obj:
-            print(a.fund)
-        # assert data["amount"] == obj.amount

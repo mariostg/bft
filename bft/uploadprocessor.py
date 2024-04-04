@@ -992,7 +992,7 @@ class LineItemProcessor(UploadProcessor):
             try:
                 return locale.atof(n)
             except ValueError:
-                print(f"Failed to convert '{n}' to float")
+                logger.fatal(f"Failed to convert '{n}' to float")
                 sys.exit()
 
         def str2date(s):
@@ -1002,7 +1002,7 @@ class LineItemProcessor(UploadProcessor):
                 d = datetime.strptime(s, "%Y.%m.%d")
                 return d
             except ValueError:
-                print(f"Failed to convert {s} as date")
+                logger.fatal(f"Failed to convert {s} as date")
                 sys.exit()
 
         LineItemImport.objects.all().delete()

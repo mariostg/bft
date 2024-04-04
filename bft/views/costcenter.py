@@ -229,8 +229,6 @@ def fundcenter_update(request, pk):
             except IntegrityError:
                 messages.error(request, "Duplicate entry cannot be saved")
             return redirect("fundcenter-table")
-        else:
-            print("NOT VALID")
     return render(request, "costcenter/fundcenter-form.html", {"form": form})
 
 
@@ -404,7 +402,6 @@ def capital_project_add(request):
 
 def capital_project_update(request, pk):
     capital_project = CapitalProject.objects.get(pk=pk)
-    print(capital_project)
     form = CapitalProjectForm(instance=capital_project)
 
     if request.method == "POST":
@@ -506,7 +503,6 @@ def capital_forecasting_new_year_add(request):
 
 def capital_forecasting_new_year_update(request, pk):
     obj = CapitalNewYear.objects.get(pk=pk)
-    print(obj)
     form = CapitalForecastingNewYearForm(instance=obj)
 
     if request.method == "POST":
@@ -584,7 +580,6 @@ def capital_forecasting_in_year_add(request):
 
 def capital_forecasting_in_year_update(request, pk):
     obj = CapitalInYear.objects.get(pk=pk)
-    print(obj)
     form = CapitalForecastingInYearForm(instance=obj)
 
     if request.method == "POST":
@@ -662,7 +657,6 @@ def capital_forecasting_year_end_add(request):
 
 def capital_forecasting_year_end_update(request, pk):
     obj = CapitalYearEnd.objects.get(pk=pk)
-    print(obj)
     form = CapitalForecastingYearEndForm(instance=obj)
 
     if request.method == "POST":

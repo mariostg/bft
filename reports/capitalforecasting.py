@@ -83,7 +83,6 @@ class HistoricalOutlookReport(CapitalReport):
 
         if any(data["new_year"]):
             df_new_year = pd.DataFrame.from_dict(data["new_year"])
-            print(df_new_year)
             df = df.merge(df_new_year, how="outer", on="fy")
 
         if not df.empty:

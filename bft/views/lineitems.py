@@ -183,23 +183,6 @@ def line_item_delete(request, pk):
     }
     return render(request, "core/delete-object.html", context)
 
-    print(
-        f"Created by {target.createdby}, \n current user is {request.user},\n forecast owner is {target.fcst.owner}, \n procurement cost center owner {target.costcenter.procurement_officer}"
-    )
-    if target.costcenter.procurement_officer == request.user:
-        print(
-            f"This is the current user {request.user}.  Owner is {target.costcenter.procurement_officer}"
-        )
-        context = {
-            "object": "Line item target to delete " + target.linetext,
-            "back": "lineitem-page",
-        }
-        return render(request, "core/delete-object.html", context)
-
-    else:
-        messages.warning(request, "Only owner can delete a line item.")
-    return redirect("lineitem-page")
-
 
 def fundcenter_lineitem_upload(request):
     if request.method == "POST":
@@ -229,7 +212,6 @@ def costcenter_lineitem_upload(request):
             user = request.user
             fundcenter = request.POST.get("fundcenter")
             costcenter = request.POST.get("costcenter")
-            print("DATA:", fundcenter, costcenter)
             filepath = f"{UPLOADS}/lineitem-upload-{user}.csv"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():

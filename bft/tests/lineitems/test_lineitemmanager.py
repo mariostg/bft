@@ -46,7 +46,6 @@ class TestLineItemManager:
 
     def test_line_item_detailed_dataframe(self, populate, upload):
         li_df = LineItemManager().line_item_detailed_dataframe()
-        print(li_df.columns)
         assert "int" == li_df.dtypes.Spent
         assert "int" == li_df.dtypes.Forecast
         expected_columns = [

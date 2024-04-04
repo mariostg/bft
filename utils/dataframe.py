@@ -1,9 +1,13 @@
+import logging
+
 import pandas as pd
 from django.db import models
 from django.db.models import Model, QuerySet
 from django.forms.models import model_to_dict
 
 from bft.exceptions import BFTDataFrameExceptionError
+
+logger = logging.getLogger("django")
 
 
 class BFTDataFrame(pd.DataFrame):
@@ -58,7 +62,7 @@ class BFTDataFrame(pd.DataFrame):
                         self.dataframe[self.dataframe_fields[c]].fillna(0).astype(int)
                     )
                 except TypeError:
-                    print((f"Failed to change type for {c}"))
+                    logger.error(f"Failed to change type for {c}")
 
     def build(
         self,

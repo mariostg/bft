@@ -665,7 +665,6 @@ class FinancialStructureManager(models.Manager):
                 "Fund Center Name",
             ],
         )
-        print(merged)
         merged = merged.fillna("")
         merged.set_index(
             [
@@ -1699,10 +1698,8 @@ class LineForecast(models.Model):
     def save(self, *args, **kwargs):
         if self.forecastamount > self.lineitem.workingplan:
             self.forecastamount = self.lineitem.workingplan
-            print("TOO HIGH")
         if self.forecastamount < self.lineitem.spent:
             self.forecastamount = self.lineitem.spent
-            print("TOO LOW")
         super(LineForecast, self).save(*args, **kwargs)
 
     def below_spent(self, request, lineitem: LineItem) -> bool:

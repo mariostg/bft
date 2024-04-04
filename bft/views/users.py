@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
@@ -5,6 +7,8 @@ from django.shortcuts import redirect, render
 
 from bft.forms import BftUserForm, PasswordResetForm, UserSelfRegisterForm
 from bft.models import BftUser, BftUserManager
+
+logger = logging.getLogger("django")
 
 
 def user_login(request):
@@ -46,7 +50,7 @@ def register_new_user(request):
         if form.is_valid:
             user_obj = form.save(commit=False)
             user_obj.username = BftUserManager.make_username(user_obj.email)
-            print("USERNAME : ", user_obj)
+            logger.info(f"Creating username {user_obj.username}")
             user_obj.is_active = False
             user_obj.save()
             return redirect("login")

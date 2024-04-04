@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 from django.db.models import F, IntegerField, Q, QuerySet, Sum, Value
 from django.db.models.functions import Cast
@@ -9,6 +11,8 @@ from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         FundManager, LineItem)
 from reports.models import CostCenterMonthly
 from utils.dataframe import BFTDataFrame
+
+logger = logging.getLogger("django")
 
 
 class CostCenterMonthlyReport:
@@ -52,7 +56,7 @@ class CostCenterMonthlyReport:
 
     def insert_line_items(self, lines: QuerySet) -> int:
         if len(lines) == 0:
-            print("THERE ARE NO LINES")
+            logger.info("There are no lines to insert")
             return 0
         CostCenterMonthly.objects.filter(fy=self.fy, period=self.period).delete()
         md = CostCenterMonthly.objects.bulk_create([CostCenterMonthly(**q) for q in lines])

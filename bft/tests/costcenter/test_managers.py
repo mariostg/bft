@@ -32,7 +32,6 @@ class FundManagerTest(TestCase):
 
     def test_get_by_name(self):
         obj = Fund.objects.fund("C111")
-        print(obj)
         self.assertEqual("C111", obj.fund)
 
     def test_get_by_pk(self):

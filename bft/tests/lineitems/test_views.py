@@ -8,7 +8,6 @@ from bft.models import CostCenter
 class CostCenterLineItemTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        print("Setting up")
         filldata = populate.Command()
         filldata.handle()
         a = Command()

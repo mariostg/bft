@@ -39,7 +39,6 @@ class TestDataFrame:
         fund_dict = {"id": 9, "fund": "C113", "name": "National Procurement", "vote": "1", "download": True}
         df = BFTDataFrame(Fund)
         df_fund = df.build(fund_dict)
-        print(df_fund.Fund)
         assert True == isinstance(df_fund, pd.DataFrame)
         # Confirm columns have been renamed
         assert "C113" == df_fund.at[0, "Fund"]

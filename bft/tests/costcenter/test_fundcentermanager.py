@@ -70,7 +70,6 @@ class TestFundCenterManager:
         r = FundCenterManager().fund_center_dataframe(fc.objects.all())
 
         columns = np.array(r.columns)
-        print(columns)
         expected_columns = np.array(
             [
                 "Fundcenter_ID",

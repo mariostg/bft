@@ -61,7 +61,6 @@ class TestCostCenterManager:
         CCM = CostCenterManager()
         cc = CCM.get_sibblings("2184A3")
         cc_df = CCM.cost_center_dataframe(cc)
-        print(cc_df)
         assert "Costcenter_ID" in cc_df.columns
         assert "Cost Center" in cc_df.columns
         assert "Fund Center" in cc_df.columns
@@ -85,11 +84,6 @@ class TestCostCenterManager:
         columns = CostCenterManager().allocation_dataframe().columns
         for c in ["Fund Center", "Cost Center", "Fund", "Allocation", "FY"]:
             assert c in columns
-
-    def test_get_sibblings_with_fundcenter_string(self, populate):
-        CCM = CostCenterManager()
-        siblings = CCM.get_sibblings("2184A3")
-        print(siblings)
 
     # Forecast Adjustment Tests
     def test_forecast_adjustment_dataframe_empty(self):

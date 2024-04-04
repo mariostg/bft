@@ -25,10 +25,6 @@ class TestCapitalForecastingHistoricalOutlookReport:
         hnd = populate.Command()
         hnd.handle()
 
-    def test_dataset(self, populate):
-        cf = capitalforecasting.HistoricalOutlookReport("c113", 2021, "c.999999")
-        print(cf._dataset)
-
 
 @pytest.mark.django_db
 class TestCapitalForecastingFEARStatus:
@@ -44,4 +40,4 @@ class TestCapitalForecastingFEARStatus:
             "c.999999",
         )
         cf.dataframe()
-        print(cf.df)
+        assert cf.df.size == 44
