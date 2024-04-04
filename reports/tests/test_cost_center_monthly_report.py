@@ -40,7 +40,7 @@ class TestCostCenterMonthlyReport:
             "fy",
             "period",
             "source",
-        } == {lines[0].keys()}
+        } == lines[0].keys()
 
     def test_insert_line_items(self, setup):
         cm = CostCenterMonthlyReport(2023, 1)
