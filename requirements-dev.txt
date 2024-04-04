@@ -11,4 +11,5 @@ pre-commit==3.7.0
 isort==5.13.2
 flake==7.0.0
 flake8-bugbear==24.2.6
+flake8-comprehensions==3.14.0
 pyflakes==3.2.0

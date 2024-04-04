@@ -31,7 +31,7 @@ class TestCostCenterScreeningReport:
 
     def test_cost_element_allocation(self, populate, upload):
         r = CostCenterScreeningReport()
-        expected_ce = set(["2184A3", "8484WA", "8484YA"])
+        expected_ce = {"2184A3", "8484WA", "8484YA"}
         data = r.cost_element_allocations("2184a3", "c113", 2023, 1)
         ce = set(pd.DataFrame(data).T["Cost Element"])
         assert 3 == len(data)

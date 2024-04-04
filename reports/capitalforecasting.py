@@ -19,7 +19,7 @@ class CapitalReport:
 
         self.fund = FundManager().fund(fund)
         self.chart_width = 400
-        self.layout_margin = dict(l=20, r=20, t=70, b=20)
+        self.layout_margin = {"l": 20, "r": 20, "t": 70, "b": 20}
         self.paper_bgcolor = "LightSteelBlue"
 
 
@@ -41,7 +41,7 @@ class HistoricalOutlookReport(CapitalReport):
             fund=self.fund, capital_project=self.capital_project, fy__in=self.years
         ).values("fy", "initial_allocation")
 
-        return dict(in_year=in_year, new_year=new_year, year_end=year_end)
+        return {"in_year": in_year, "new_year": new_year, "year_end": year_end}
 
     def dataframe(self) -> int:
         """Create a dataframe of annual data, one row per year for given project and fund"""

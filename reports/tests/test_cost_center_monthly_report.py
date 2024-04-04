@@ -28,21 +28,19 @@ class TestCostCenterMonthlyReport:
     def test_line_item_columns(self, setup):
         cm = CostCenterMonthlyReport(2023, 1)
         lines = cm.sum_line_items()
-        assert set(
-            [
-                "costcenter",
-                "fund",
-                "spent",
-                "commitment",
-                "pre_commitment",
-                "fund_reservation",
-                "balance",
-                "working_plan",
-                "fy",
-                "period",
-                "source",
-            ]
-        ) == set(list(lines[0].keys()))
+        assert {
+            "costcenter",
+            "fund",
+            "spent",
+            "commitment",
+            "pre_commitment",
+            "fund_reservation",
+            "balance",
+            "working_plan",
+            "fy",
+            "period",
+            "source",
+        } == {lines[0].keys()}
 
     def test_insert_line_items(self, setup):
         cm = CostCenterMonthlyReport(2023, 1)
