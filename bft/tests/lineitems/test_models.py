@@ -185,7 +185,7 @@ class TestLineForecastModel:
         lf = LineForecast
         lines = LineItem.objects.filter(docno=docno)
         if not lines:
-            assert False, f"No lines found in {docno}"
+            raise AssertionError(f"No lines found in {docno}")
         target_forecast = lines.aggregate(Sum("workingplan"))["workingplan__sum"]
         lf().forecast_line_by_line(docno, target_forecast)
 

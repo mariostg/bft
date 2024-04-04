@@ -272,7 +272,7 @@ class CostCenterScreeningReport:
             dict: A dictionary which financial data is rolled up.
         """
 
-        for path, item in alloc.items():
+        for _, item in alloc.items():
             parent_path = alloc.get(item["Parent Path"], {"Path": None})["Path"]
             if parent_path:
                 for p in alloc:

@@ -9,3 +9,6 @@ pytest==7.4.0
 pytest-django==4.5.2
 pre-commit==3.7.0
 isort==5.13.2
+flake==7.0.0
+flake8-bugbear==24.2.6
+pyflakes==3.2.0

@@ -854,7 +854,7 @@ class LineItemProcessor(UploadProcessor):
             header.pop()
         if header[0] == "" or header[-1] == "\n":
             header.pop(0)
-        for i, e in enumerate(header):
+        for _, e in enumerate(header):
             e = e.strip()
             self.data["header"] += [e]
 
