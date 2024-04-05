@@ -11,6 +11,7 @@ Populate command uses the data available from the test-data folder.  This folder
 
 """
 from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 
 from bft import uploadprocessor
 from bft.models import (BftStatus, BftStatusManager, BftUser, CapitalInYear,
@@ -53,7 +54,7 @@ class Command(BaseCommand):
             self.set_cost_center_allocation()
             self.set_fund_center_allocation()
         else:
-            print("This capability is only available when DEBUG is True")
+            raise CommandError("This capability is only available when DEBUG is True")
 
     def set_fund(self):
         """
