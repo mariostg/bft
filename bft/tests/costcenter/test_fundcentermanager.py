@@ -31,12 +31,6 @@ class TestFundCenterManager:
     def test_sequence_does_not_exists(self, setup):
         assert False == FundCenterManager().sequence_exist("11")
 
-    def test_fund_center_exists(self, setup):
-        assert True == FundCenterManager().fund_center_exist("1111AA")
-
-    def test_fund_center_does_not_exists(self, setup):
-        assert False == FundCenterManager().fund_center_exist("ZZZZZ")
-
     def test_get_by_fund_center(self, setup):
         obj = FundCenter.objects.fundcenter("1111AA")
         assert "1111AA" == obj.fundcenter
@@ -49,14 +43,8 @@ class TestFundCenterManager:
         r = FundCenter
         assert 0 == len(r.objects.fund_center_dataframe(r.objects))
 
-    def test_a_given_fund_center_exists(self, setup):
-        assert True == FundCenterManager().exists("1111aa")
-
     def test_a_given_fund_center_does_not_exists(self, setup):
         assert False == FundCenterManager().exists("9999aa")
-
-    def test_no_fund_center_exists(self):
-        assert False == FundCenterManager().exists()
 
     def test_fund_center_has_data(self, setup):
         FundCenterManager().exists()

@@ -288,9 +288,6 @@ class FundCenterManager(models.Manager):
     def sequence_exist(self, sequence):
         return FundCenter.objects.filter(sequence=sequence).exists()
 
-    def fund_center_exist(self, fc):
-        return FundCenter.objects.filter(fundcenter=fc).exists()
-
     def fund_center_dataframe(self, data: QuerySet) -> pd.DataFrame:
         """Prepare a pandas dataframe of the fund centers as per financial structure.
         Columns are renamed with a more friendly name.
