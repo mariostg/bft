@@ -4,6 +4,7 @@ import os
 import sys
 from pathlib import Path
 
+
 def main():
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "main.settings")
@@ -17,7 +18,7 @@ def main():
         ) from exc
 
     try:
-        import pip_lock
+        import pip_lock  # isort: skip
     except ModuleNotFoundError:
         raise ModuleNotFoundError("Couldn't import pip-lock. Are you on the right virtualenv and up " + "to date?")
     requirements_path = str(Path(__file__).parent / "requirements.txt")
