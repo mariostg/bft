@@ -10,8 +10,7 @@ Populate command uses the data available from the test-data folder.  This folder
     populate command is only available in DEBUG mode.  It will overwrite all existing data in the system.
 
 """
-from django.core.management.base import BaseCommand
-from django.core.management.base import CommandError
+from django.core.management.base import BaseCommand, CommandError
 
 from bft import uploadprocessor
 from bft.models import (BftStatus, BftStatusManager, BftUser, CapitalInYear,
