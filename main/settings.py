@@ -139,6 +139,14 @@ LOG_DIR = BASE_DIR / "log"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        },
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
     "formatters": {
         "verbose": {
             "format": "{asctime} {levelname} {module}.{funcName} {message}",
@@ -148,6 +156,7 @@ LOGGING = {
             "format": "{asctime} {levelname} {message}",
             "style": "{",
         },
+        "rich": {"datefmt": "[%X]"},
     },
     "handlers": {
         "file": {
@@ -162,6 +171,14 @@ LOGGING = {
             "filename": LOG_DIR / "upload.log",
             "formatter": "simple",
         },
+        "console": {
+            "class": "rich.logging.RichHandler",
+            "filters": ["require_debug_true"],
+            "formatter": "rich",
+            "level": "DEBUG",
+            "rich_tracebacks": True,
+            "tracebacks_show_locals": True,
+        },
         # "console": {
         # "level": "DEBUG",
         # "class": "logging.StreamHandler",
@@ -169,7 +186,7 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["file"],
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": True,
         },
