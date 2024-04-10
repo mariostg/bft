@@ -5,7 +5,9 @@
 #    pip-compile
 #
 asgiref==3.6.0
-    # via django
+    # via
+    #   django
+    #   django-browser-reload
 asttokens==2.4.1
     # via stack-data
 attrs==23.2.0
@@ -45,8 +47,11 @@ distlib==0.3.8
 django==4.2.1
     # via
     #   -r requirements.in
+    #   django-browser-reload
     #   django-extensions
     #   django-filter
+django-browser-reload==1.12.1
+    # via -r requirements.in
 django-extensions==3.2.0
     # via -r requirements.in
 django-filter==23.3
