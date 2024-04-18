@@ -94,11 +94,14 @@ def user_update(request, pk):
 
     if request.method == "POST":
         form = BftUserForm(request.POST, instance=_user)
-        if form.is_valid():
-            _user = form.save(commit=False)
-            _user = BftUserManager.normalize_user(_user)
-            _user.save()
-            return redirect("user-table")
+        try:
+            if form.is_valid():
+                _user = form.save(commit=False)
+                _user = BftUserManager.normalize_user(_user)
+                _user.save()
+                return redirect("user-table")
+        except ValueError as e:
+            messages.error(request, e)
 
     return render(request, "users/user-form.html", {"form": form})
 
