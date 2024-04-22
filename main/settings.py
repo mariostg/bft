@@ -29,7 +29,7 @@ if "pytest" not in sys.modules:
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", False)
+DEBUG = os.environ.get("DEBUG")
 ALLOWED_HOSTS = ["testserver", "127.0.0.1"]
 
 
@@ -51,9 +51,11 @@ INSTALLED_APPS = [
     # dev
     "django_extensions",
     "django_browser_reload",
+    "debug_toolbar",
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
