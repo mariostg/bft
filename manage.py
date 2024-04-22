@@ -26,6 +26,10 @@ def main():
         requirements_path,
         post_text="\nRun the following:\n\npython -m pip install -r requirements.\n",
     )
+
+    if not Path(".env").is_file():
+        raise FileExistsError(".env file not found.  Use .env-exemple as a starting point.")
+
     execute_from_command_line(sys.argv)
 
 

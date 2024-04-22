@@ -1,4 +1,4 @@
-django>=4.2,<5.0
+django>=5.0,<5.1
 pandas==2.0
 django-filter==23.3
 mkdocs==1.5.3
@@ -29,3 +29,4 @@ djhtml==3.0.6
 pip-lock
 rich
 django-browser-reload
+python-dotenv

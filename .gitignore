@@ -3,7 +3,7 @@ db.sqlire3.bak
 geckodriver.log
 .env/
 .env-bft/
-.env/
+.env
 __pycache__
 *.pyc
 .vscode
