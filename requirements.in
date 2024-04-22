@@ -30,3 +30,4 @@ pip-lock
 rich
 django-browser-reload
 python-dotenv
+django-debug-toolbar
