@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand
 
-from bft.models import BftStatus
+from bft.conf import PERIODKEYS
+from bft.models import (BftStatus, CostCenter, CostCenterManager, Fund,
+                        FundManager)
 from reports.utils import CostCenterMonthlyReport
 
 
@@ -23,21 +25,49 @@ class Command(BaseCommand):
         parser.add_argument(
             "--fy",
             action="store",
-            help="Set fy to use for setting monthly data",
+            help="Set fy to use for setting monthly data and report query",
         )
         parser.add_argument(
             "--period",
             action="store",
-            help="Set period to use for setting monthly data",
+            help="Set period to use for setting monthly data and report query",
+        )
+        parser.add_argument(
+            "--costcenter",
+            action="store",
+            help="Use this cost center in report query.",
+        )
+        parser.add_argument(
+            "--fund",
+            action="store",
+            help="Use this fund in report query.",
         )
 
         parser.add_argument(
             "--view",
             action="store_true",
-            help="Print dataframe of current FY and current Period",
+            help="Print dataframe of monthly data for given cost center, fund, fy and period",
         )
 
-    def handle(self, *args, update, bftstatus, fy, period, view, **options):
+    def handle(self, *args, update, bftstatus, fy, period, view, costcenter, fund, **options):
+        if CostCenterManager().exists(costcenter):
+            self.costcenter = costcenter
+        else:
+            raise CostCenter.DoesNotExist(f"Cost center [{costcenter}] not found")
+
+        if FundManager().exists(fund):
+            self.fund = fund
+        else:
+            raise Fund.DoesNotExist(f"Fund [{fund}] not found")
+
+        if period in PERIODKEYS:
+            self.period = period
+        else:
+            raise ValueError(f"Period [{period}] not valid.  Must be one of {PERIODKEYS}")
+
+        self.fund = fund
+        self.fy = fy
+        self.period = period
         s = BftStatus.current
         if bftstatus:
             self.stdout.write(f"Current fiscal year  {s.fy()}")
@@ -45,7 +75,7 @@ class Command(BaseCommand):
             self.stdout.write(f"Current period       {s.period()}")
             return
         if view:
-            self.show_current_monthly()
+            self.show_monthly()
         if not update:
             self.stdout.write("No action to perform.")
         else:
@@ -101,8 +131,7 @@ class Command(BaseCommand):
         c = CostCenterMonthlyReport(fy, period)
         c.insert_line_items(c.sum_line_items())
 
-    def show_current_monthly(self):
-        s = BftStatus.current
-        r = CostCenterMonthlyReport(fy=s.fy(), period=s.period())
+    def show_monthly(self):
+        r = CostCenterMonthlyReport(fy=self.fy, period=self.period, costcenter=self.costcenter, fund=self.fund)
         df = r.dataframe()
         print(df)
