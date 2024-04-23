@@ -3,6 +3,13 @@ from django import forms
 from bft.models import FundCenterAllocation
 
 
+class SearchCostCenterMonthlyDataForm(forms.Form):
+    costcenter = forms.CharField(required=False)
+    fund = forms.CharField(required=False)
+    fy = forms.CharField(required=False)
+    period = forms.CharField(required=False)
+
+
 class SearchAllocationAnalysisForm(forms.ModelForm):
     fundcenter = forms.CharField(required=False)
     fund = forms.CharField(required=False)

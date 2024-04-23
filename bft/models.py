@@ -892,6 +892,16 @@ class CostCenterManager(models.Manager):
         else:
             return CostCenter.objects.count() > 0
 
+    def get_request(self, request) -> str | None:
+        costcenter = request.GET.get("costcenter")
+        if costcenter:
+            costcenter = costcenter.upper()
+            if not CostCenterManager().exists(costcenter):
+                messages.info(request, f"Cost Center {costcenter} does not exist.")
+            return costcenter
+        else:
+            return None
+
 
 class CostCenter(models.Model):
     costcenter = models.CharField("Cost Center", max_length=6, unique=True)

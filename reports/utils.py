@@ -16,9 +16,12 @@ logger = logging.getLogger("django")
 
 
 class CostCenterMonthlyReport:
-    def __init__(self, fy, period):
+
+    def __init__(self, fy, period, costcenter: str, fund: str):
         fy = str(fy)
         period = str(period)
+        self.costcenter = costcenter
+        self.fund = fund
         self.fy = fy
         if conf.is_period(period):
             self.period = period
@@ -83,7 +86,9 @@ class CostCenterMonthlyReport:
             "Allocation"
         """
         monthly_df = BFTDataFrame(CostCenterMonthly)
-        qst = CostCenterMonthly.objects.filter(fy=self.fy, period=self.period)
+        qst = CostCenterMonthly.objects.filter(
+            fy=self.fy, period=self.period, fund=self.fund, costcenter=self.costcenter
+        )
         if qst.count() == 0:
             return pd.DataFrame()
         monthly_df = monthly_df.build(qst)

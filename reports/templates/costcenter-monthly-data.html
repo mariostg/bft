@@ -2,15 +2,20 @@
 {% load humanize %}
 {% block title %}Cost Centers Monthly Data{% endblock title %}
 {% block content %}
-  <main class='block block--spaced'>
+  <main class='block block--centered'>
     <div>
-      <header class="frame">
-        <h2>Cost Centers Monthly Data</h2>
-      </header>
-      <section class="summary block--spaced">
-        {{table|safe}}
-      </section>
-    </div>
+      {% if form_filter %}
+        <header class="block block--centered">
+          {% include 'costcenter-monthly-data-filter-form.html' %}
+      {% else %}
+        <header class="frame">
+          <h2>Cost Centers Monthly Data</h2>
+      {% endif %}
+    </header>
+    <section class="summary block--spaced">
+      {{table|safe}}
+    </section>
+  </div>
   </main>
 
   <script>

@@ -7,18 +7,19 @@ from django.db.models.functions import Concat
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from bft.conf import QUARTERKEYS
+from bft.conf import PERIODKEYS, QUARTERKEYS
 from bft.exceptions import LineItemsDoNotExistError
 from bft.models import (BftStatus, CapitalProjectManager, CostCenterAllocation,
-                        CostCenterChargeMonthly, FinancialStructureManager,
-                        FundCenterAllocation, FundCenterManager, FundManager,
-                        LineItem)
+                        CostCenterChargeMonthly, CostCenterManager,
+                        FinancialStructureManager, FundCenterAllocation,
+                        FundCenterManager, FundManager, LineItem)
 from reports import capitalforecasting, screeningreport, utils
 from reports.forms import (SearchAllocationAnalysisForm,
                            SearchCapitalEstimatesForm, SearchCapitalFearsForm,
                            SearchCapitalForecastingDashboardForm,
                            SearchCapitalHistoricalForm,
                            SearchCapitalYeRatiosForm,
+                           SearchCostCenterMonthlyDataForm,
                            SearchCostCenterScreeningReportForm)
 from utils.getrequestfilter import set_query_string
 
@@ -145,12 +146,32 @@ def allocation_status_report(request):
 
 
 def costcenter_monthly_data(request):
-    s = BftStatus.current
-    r = utils.CostCenterMonthlyReport(fy=s.fy(), period=s.period())
-    df = r.dataframe()
+    costcenter = fund = fy = ""
+    period = 1
+    context = {}
+    form_filter = True
+    if len(request.GET):
+        costcenter = CostCenterManager().get_request(request)
+        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        fund = FundManager().get_request(request)
+        period = int(request.GET.get("period")) if request.GET.get("period") else 1
 
+        if str(period) not in PERIODKEYS:
+            messages.warning(request, "Period is invalid.  Either value is missing or outside range")
+
+    initial = {
+        "costcenter": costcenter,
+        "fund": fund,
+        "fy": fy,
+        "period": period,
+    }
+    form = SearchCostCenterMonthlyDataForm(initial=initial)
+    r = utils.CostCenterMonthlyReport(fy=fy, fund=fund, costcenter=costcenter, period=period)
+    df = r.dataframe()
     df = df.style.format(thousands=",")
-    return render(request, "costcenter-monthly-data.html", {"table": df.to_html()})
+
+    context = {"table": df.to_html(), "form_filter": form_filter, "form": form}
+    return render(request, "costcenter-monthly-data.html", context)
 
 
 def line_items(request):

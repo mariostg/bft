@@ -1,0 +1,30 @@
+<div class="form" id="filter-form">
+  <form action="{% url 'costcenter-monthly-data' %}" method="GET">
+    <div class="form__header">Cost Center Monthly Data</div>
+    <section class="form__fields-row">
+      <div class="form__field">
+        <label for="fundcenter" class="label">Cost Center</label>
+        {{form.costcenter}}
+      </div>
+
+      <div class="form__field">
+        <label class="label" for="fund">Fund</label>
+        {{form.fund}}
+      </div>
+
+      <div class="form__field">
+        <label class="label" for="fy">FY</label>
+        {{form.fy}}
+      </div>
+      <div class="form__field">
+        <label class="label" for="quarter">Period</label>
+        {{form.period}}
+      </div>
+
+    </section>
+
+    <div class="block block--spaced">
+      <button class="btn">submit</button>
+    </div>
+  </form>
+</div>

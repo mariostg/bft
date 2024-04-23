@@ -18,15 +18,15 @@ class TestCostCenterMonthlyReport:
             ValueError,
             match="19 is not a valid period.  Expected value is one of 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14",
         ):
-            CostCenterMonthlyReport(2023, 19)
+            CostCenterMonthlyReport(2023, 19, "8484WA", "C113")
 
     def test_sum_line_items(self, setup):
-        cm = CostCenterMonthlyReport(2023, 1)
+        cm = CostCenterMonthlyReport(2023, 1, "8484WA", "C113")
         lines = cm.sum_line_items()
         assert 2 == len(lines)
 
     def test_line_item_columns(self, setup):
-        cm = CostCenterMonthlyReport(2023, 1)
+        cm = CostCenterMonthlyReport(2023, 1, "8484WA", "C113")
         lines = cm.sum_line_items()
         assert {
             "costcenter",
@@ -43,19 +43,19 @@ class TestCostCenterMonthlyReport:
         } == lines[0].keys()
 
     def test_insert_line_items(self, setup):
-        cm = CostCenterMonthlyReport(2023, 1)
+        cm = CostCenterMonthlyReport(2023, 1, "8484WA", "C113")
         lines = cm.sum_line_items()
         inserted = cm.insert_line_items(lines)
         assert 2 == inserted
 
     def test_insert_line_items_when_none(self, setup):
-        cm = CostCenterMonthlyReport(2023, 1)
+        cm = CostCenterMonthlyReport(2023, 1, "8484WA", "C113")
         lines = []
         inserted = cm.insert_line_items(lines)
         assert 0 == inserted
 
     def test_dataframe_model_empty(self):
-        r = CostCenterMonthlyReport(fy=2023, period=1)
+        r = CostCenterMonthlyReport(fy=2023, period=1, costcenter="8484WA", fund="C113")
         df = r.dataframe()
 
         assert True == df.empty
