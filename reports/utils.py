@@ -17,7 +17,7 @@ logger = logging.getLogger("django")
 
 class CostCenterMonthlyReport:
 
-    def __init__(self, fy, period, costcenter: str, fund: str):
+    def __init__(self, fy, period, costcenter: str = None, fund: str = None):
         fy = str(fy)
         period = str(period)
         self.costcenter = costcenter

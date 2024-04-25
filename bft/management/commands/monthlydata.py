@@ -50,16 +50,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, update, bftstatus, fy, period, view, costcenter, fund, **options):
-        if CostCenterManager().exists(costcenter):
-            self.costcenter = costcenter
-        else:
-            raise CostCenter.DoesNotExist(f"Cost center [{costcenter}] not found")
-
-        if FundManager().exists(fund):
-            self.fund = fund
-        else:
-            raise Fund.DoesNotExist(f"Fund [{fund}] not found")
-
         if period in PERIODKEYS:
             self.period = period
         else:
@@ -68,13 +58,23 @@ class Command(BaseCommand):
         self.fund = fund
         self.fy = fy
         self.period = period
-        s = BftStatus.current
         if bftstatus:
+            s = BftStatus.current
             self.stdout.write(f"Current fiscal year  {s.fy()}")
             self.stdout.write(f"Current quarter      {s.quarter()}")
             self.stdout.write(f"Current period       {s.period()}")
             return
         if view:
+            if CostCenterManager().exists(costcenter):
+                self.costcenter = costcenter
+            else:
+                raise CostCenter.DoesNotExist(f"Cost center [{costcenter}] not found")
+
+            if FundManager().exists(fund):
+                self.fund = fund
+            else:
+                raise Fund.DoesNotExist(f"Fund [{fund}] not found")
+
             self.show_monthly()
         if not update:
             self.stdout.write("No action to perform.")
