@@ -1109,16 +1109,15 @@ class ForecastAdjustmentManager(models.Manager):
             dict: A dictionary of forecast adjustments for all descendants of the specified fund center.
         """
         root = FundCenterManager().fundcenter(fundcenter)
-
         cc = CostCenter.objects.filter(sequence__startswith=root.sequence)
-        fund = FundManager().fund(fund)
         if cc:
-            fcst_adj = ForecastAdjustment.objects.filter(costcenter__in=cc, fund=fund)
-
-            lst = {}
+            fcst_adj = ForecastAdjustment.objects.filter(costcenter__in=cc)
+            if fund:
+                fund = FundManager().fund(fund)
+                fcst_adj = fcst_adj.filter(fund=fund)
+            lst = []
             d = {}
             for item in fcst_adj:
-                _id = item.costcenter.id
                 cc = item.costcenter
                 pid = cc.costcenter_parent.id
                 d = {
@@ -1133,7 +1132,7 @@ class ForecastAdjustmentManager(models.Manager):
                     "Forecast Adjustment": float(item.amount),
                     "Type": "CC",
                 }
-                lst[_id] = d
+                lst.append(d)
 
         return lst
 
