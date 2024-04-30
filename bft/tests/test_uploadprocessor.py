@@ -13,7 +13,7 @@ from bft.uploadprocessor import CostCenterLineItemProcessor, LineItemProcessor
 class TestLineItemProcessor:
     @pytest.fixture
     def setup(self):
-        self.source_file = f"{settings.BASE_DIR}/drmis_data/8486jm.txt"
+        self.source_file = f"{settings.BASE_DIR}/test-data/8486jm.txt"
         self.file_content = b"""
 DND Cost Center Encumbrance Report
 
@@ -81,7 +81,7 @@ Base Fiscal Year : 2024
 class TestCostCenterLineItemProcessor:
     @pytest.fixture
     def setup(self):
-        self.source_file = f"{settings.BASE_DIR}/drmis_data/8486jm.txt"
+        self.source_file = f"{settings.BASE_DIR}/test-data/8486jm.txt"
 
     @pytest.fixture
     def populate(self):
@@ -98,7 +98,7 @@ class TestCostCenterLineItemProcessor:
         ).save()
 
     def test_source_file_has_more_than_one_costcenter(self, setup, populate, create_costcenter):
-        self.source_file = f"{settings.BASE_DIR}/drmis_data/8486jm-with-extra-cc.txt"
+        self.source_file = f"{settings.BASE_DIR}/test-data/8486jm-with-extra-cc.txt"
         c = CostCenterLineItemProcessor(self.source_file, "8486JM", "2184JA")
         c.main()
         with open(settings.UPLOAD_LOG, "r") as f:

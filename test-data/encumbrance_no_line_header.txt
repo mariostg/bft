@@ -1,0 +1,28 @@
+------------------------------
+|Selection field     |Value  |
+|----------------------------|
+|Funds Center        |2184AA |
+|and all subordinates|X      |
+|Base Fiscal Year    |2023   |
+|Layout              |/BFT_NP|
+------------------------------
+-------------------------------------------
+|Sort criteria  |Ascdg|Descending|Subtotal|
+|-----------------------------------------|
+|Document Number|  X  |          |   X    |
+-------------------------------------------
+-----------------------------
+|Filter criteria|from|Option|
+|---------------------------|
+|Total Cur. Yr. |0.00|      |
+-----------------------------
+---------------------------
+|Data statistics|Number of|
+|-------------------------|
+|Records passed |   14,485|
+|Filtered out   |    1,734|
+---------------------------
+DND Cost Center Encumbrance Report
+
+Funds Center :     2184AA and all subordinates
+Base Fiscal Year : 2023

@@ -155,7 +155,7 @@ class TestLineForecastModel:
         hnd = populate.Command()
         hnd.handle()
         up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184A3.txt")
+        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
     def test_create_forecast_higher_than_wp(self, setup):
         li = LineItem.objects.all().first()
@@ -221,17 +221,17 @@ class TestLineForecastModel:
 
 
 class TestLineItemImport(TestCase):
-    GOODFILE = "encumbrance_small.txt"
-    WRONGFC = "encumbrance_wrong_fc.txt"
-    WRONGFY = "encumbrance_wrong_fy.txt"
-    WRONGLAYOUT = "encumbrance_wrong_layout.txt"
+    GOODFILE = os.path.join(BASE_DIR, "test-data/encumbrance_small.txt")
+    WRONGFC = os.path.join(BASE_DIR, "test-data/encumbrance_wrong_fc.txt")
+    WRONGFY = os.path.join(BASE_DIR, "test-data/encumbrance_wrong_fy.txt")
+    WRONGLAYOUT = os.path.join(BASE_DIR, "test-data/encumbrance_wrong_layout.txt")
 
     @classmethod
     def setUpTestData(cls):
-        cls.path = os.path.join(BASE_DIR, "drmis_data")
+        cls.path = os.path.join(BASE_DIR, "test-data")
 
     def test_drmis_data_folder_exists(self):
-        self.assertTrue(os.path.exists(self.path), "Drmis data directory not found")
+        self.assertTrue(os.path.exists(self.path), "Test data directory not found")
 
     def test_exception_raised_if_no_file_provided(self):
         with self.assertRaises(ValueError):
@@ -262,7 +262,7 @@ class TestLineItemImport(TestCase):
         self.assertNotEqual(fy, "2023")
 
     def test_is_dnd_cost_center_report(self):
-        er = LineItemProcessor("encumbrance_P1a.txt", None)
+        er = LineItemProcessor(self.GOODFILE, None)
         ok = er.is_dnd_cost_center_report()
         self.assertTrue(ok)
 
@@ -280,7 +280,7 @@ class TestLineItemImport(TestCase):
         self.assertEqual(len(er.data["header"]), er.COLUMNS - 2)
 
     def test_find_header_line_returns_zero_on_failure(self):
-        er = LineItemProcessor("encumbrance_no_line_header.txt", None)
+        er = LineItemProcessor(os.path.join(self.path, "encumbrance_no_line_header.txt"), None)
         lineno = er.find_header_line()
         self.assertEqual(lineno, 0)
 

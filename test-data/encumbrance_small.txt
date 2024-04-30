@@ -1,0 +1,70 @@
+------------------------------
+|Selection field     |Value  |
+|----------------------------|
+|Funds Center        |2184AA |
+|and all subordinates|X      |
+|Base Fiscal Year    |2023   |
+|Layout              |/BFT_NP|
+------------------------------
+-------------------------------------------
+|Sort criteria  |Ascdg|Descending|Subtotal|
+|-----------------------------------------|
+|Document Number|  X  |          |   X    |
+-------------------------------------------
+-----------------------------
+|Filter criteria|from|Option|
+|---------------------------|
+|Total Cur. Yr. |0.00|      |
+-----------------------------
+---------------------------
+|Data statistics|Number of|
+|-------------------------|
+|Records passed |   14,485|
+|Filtered out   |    1,734|
+---------------------------
+DND Cost Center Encumbrance Report
+
+Funds Center :     2184AA and all subordinates
+Base Fiscal Year : 2023
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|Document N|Line Numbe|AcctAssNo.| Cur Year s|    Cur YR Bal|    Total Cur.|Funds Cent|Fund|Cost Cente|Order       |Document T|Encumbrance Type     |Line Text                                         |Prd.doc.no|Pred doc.i|Reference       |G/L Accoun|Due date  |Vendor nam                         |Created by  |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|11361688  |       330|         1| 50,000.00 |   50,000.00  |   100,000.00 |1111AC    |C113|8486B1    |            |          |Purchase Requisitions|In-Service support                                |          |          |                |6217      ||                                              |J4POTVIN    |
+|11583345  |       190|         1|100,000.00 |   400,000.00 |   500,000.00 |1111AC    |C113|8486B1    |            |          |Purchase Requisitions|LCMR Program Mgmt FY 22/23                        |          |          |                |4201      |2022.09.30|                                    |GEVANS      |
+|12382523  |       170|         1|      0.00 |   100,000.00 |   100,000.00 |1111AC    |C113|8486B1    |            |          |Purchase Requisitions|R&O LEO2 RIB 2000, FY 22-23                       |          |          |                |6225      |2023.03.31|                                    |C2LEWIS     |
+|12580586  |        60|         1|      0.00 | 1,181,514.09 | 1,181,514.09 |1111AC    |C113|8486B1    |            |          |Purchase Requisitions|R&O - Chassis Elect (FY 20/21) Opt Yr3            |          |          |                |6233      |2023.03.31|                                    |LCNADEAU    |
+|12663089  |        70|         1|      0.00 |   429,329.96 |   429,329.96 |1111AC    |C113|8486B1    |            |          |Purchase Requisitions|Future Option Balance                             |          |          |                |6217      |2023.03.31|                                    |CURLACHER   |
+|12699110  |        40|         1|      0.00 |   795,906.00 |   795,906.00 |1111AB    |C113|8486C1    |            |          |Purchase Requisitions|Cleaning Gear SOA FY 20/21 Option Yr 1            |          |          |                |9334      |2023.03.31|                                    |LAURORA     |
+|12699110  |        50|         1|      0.00 |   811,824.00 |   811,824.00 |1111AB    |C523|8486C2    |            |          |Purchase Requisitions|Cleaning Gear SOA FY 21/22 Option Yr 2            |          |          |                |9334      |2023.03.31|                                    |LAURORA     |
+|13813777  |       100|         1|      0.00 |10,000,000.00 |10,000,000.00 |1111AB    |C113|8486C2    |            |          |Purchase Requisitions|CSESC FY 22/23                                    |          |          |                |4201      |2023.03.31|                                   |BMMACDONALD |
+|13824174  |        40|         1|      0.00 |   491,000.00 |   491,000.00 |1111AB    |C113|8486C2    |            |          |Purchase Requisitions|DVASA Phase 1 & 2                                 |          |          |                |4201      |2022.04.01|                                   |JSTLOUIS1   |
+|13841516  |        50|         1|      0.00 |65,000,000.00 |65,000,000.00 |1111AB    |C113|8486C2    |            |          |Purchase Requisitions|LEISC FY22/23                                     |          |          |                |4201      |2023.03.31|                                   |JSTLOUIS1   |
+|13843459  |       100|         1|      0.00 |35,000,000.00 |35,000,000.00 |1111AB    |C113|8486C2    |            |          |Purchase Requisitions|LTSSC FY 22/23                                    |          |          |                |4201      |2023.03.31|                                   |BMMACDONALD |
+|13950705  |        60|         1|      0.00 |   150,000.00 |   150,000.00 |1111AB    |C113|8486C1    |            |          |Purchase Requisitions|Chem and Explo Detectors R&O 22/23                |184868JE01|         6|                |6233      |2022.04.01|                                   |JSLAMY      |
+|13994439  |        40|         1|      0.00 |   815,313.50 |   815,313.50 |1111AB    |C113|8486C2    |            |          |Purchase Requisitions|ISS CDTS FY 22/23                                 |          |          |                |4201      |2023.03.31|                                   |HFEGAN      |
+|14085892  |       100|         1|      0.00 |    82,200.00 |    82,200.00 |1111AB    |L101|8486C1    |            |          |Purchase Requisitions|Option #2 Sr Project Manager                      |          |          |                |4911      |2022.09.17|                                   |SDBEAULIEU  |
+|14085892  |       100|         2|      0.00 |     1,250.00 |     1,250.00 |1111AB    |L101|8486C1    |            |          |Purchase Requisitions|Option #2 Sr Project Manager                      |          |          |                |2224      |2022.09.17|                                   |SDBEAULIEU  |
+|14094411  |       180|         1|      0.00 |   314,648.95 |   314,648.95 |1111AB    |C113|8486C1    |            |          |Purchase Requisitions|Radiation Detection Equipment ISS 22/23           |184869JJ03|         8|                |6233      |2022.04.01|                                   |AAMAYVILLE  |
+|14094411  |       190|         1|      0.00 |   322,515.17 |   322,515.17 |1111AB    |C113|8486C1    |            |          |Purchase Requisitions|Radiation Detection Equipment ISS 22/23           |184869JJ03|         9|                |6233      |2022.10.01|                                   |AAMAYVILLE  |
+|14147981  |        50|         1|      0.00 |   270,000.00 |   270,000.00 |1111AB    |C113|8486C2    |            |          |Purchase Requisitions|Test Force 22/23                                  |          |          |                |6217      |2023.03.31|                                   |J4POTVIN    |
+|14164690  |        90|         1|      0.00 | 5,480,576.14 | 5,480,576.14 |1111AB    |C113|8486C1    |            |          |Purchase Requisitions|SAT/IFT Core 1 FY 22/23                           |18486C1SAT|         9|                |4201      |2022.04.01|                                   |ADUGAS      |
+|14164690  |       100|         1|      0.00 | 2,968,392.07 | 2,968,392.07 |1111AB    |C113|8486C1    |            |          |Purchase Requisitions|SAT/IFT Non Core FY 22/23                         |18486C1SAT|        10|                |4201      |2022.04.01|                                   |ADUGAS      |
+|14177417  |       140|         1|      0.00 |        67.21 |        67.21 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|8540K214 - Black Nylon Sheet                      |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       150|         1|      0.00 |        42.19 |        42.19 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|8842T311 - Heavy Duty Cinching Strap              |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       160|         1|      0.00 |        41.39 |        41.39 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|29685T86 - Strap for Storage                      |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       170|         1|      0.00 |        20.40 |        20.40 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|8030T26 - Webbing Guide                           |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       180|         1|      0.00 |        18.85 |        18.85 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|97526A491 - Domed Head Blind Rivets               |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       190|         1|      0.00 |        24.15 |        24.15 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|97526A441 - Domed Head Blind Rivets 1/4           |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       200|         1|      0.00 |        14.91 |        14.91 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|97526A411 - Domed Head Blind Rivets               |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       210|         1|      0.00 |         8.24 |         8.24 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|2095N11 - Loop Fittings for Elastic Cord          |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       220|         1|      0.00 |         7.65 |         7.65 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|2095N13 - Mounting Plate for Elastic              |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       230|         1|      0.00 |         9.67 |         9.67 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|3961T21 - Long-Lasting�Polyurethane Cord          |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       240|         1|      0.00 |       127.27 |       127.27 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|2584A646 - Left-Hand�General Purpose Tap          |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       250|         1|      0.00 |        31.66 |        31.66 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|92415A122 - Steel Unthreaded Spacer               |10011852CT|         6|                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       260|         1|      0.00 |        13.72 |        13.72 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|4749T191 - Clevis Rod End R/H                     |          |          |                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       270|         1|      0.00 |        13.72 |        13.72 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|4749T192 - Clevis Rod End L/H                     |          |          |                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       280|         1|      0.00 |        17.95 |        17.95 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|97310A115 - M8 Oversized Washers                  |          |          |                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       290|         1|      0.00 |         8.98 |         8.98 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|90128A276 - M8 Socket Head Screw                  |          |          |                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|14177417  |       300|         1|      0.00 |        12.45 |        12.45 |1111AC    |C113|8486B1    |1007172     |          |Purchase Requisitions|91290A428 - M8 Socket Head Screw                  |          |          |                |7210      |2023.03.27|                                   |M4GARIEPY   |
+|8486C301  |       310|         1|    100.00 |       200.00 |       300.00 |2222BA    |C113|8486C3    |1007172     |          |Purchase Order       |98040A106 - M10 Oversized Washers                 |          |          |                |7210      |2023.03.27|                                   |M4GARIEPY   |

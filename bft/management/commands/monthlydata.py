@@ -50,14 +50,8 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, update, bftstatus, fy, period, view, costcenter, fund, **options):
-        if period in PERIODKEYS:
-            self.period = period
-        else:
-            raise ValueError(f"Period [{period}] not valid.  Must be one of {PERIODKEYS}")
-
         self.fund = fund
         self.fy = fy
-        self.period = period
         if bftstatus:
             s = BftStatus.current
             self.stdout.write(f"Current fiscal year  {s.fy()}")
@@ -79,7 +73,10 @@ class Command(BaseCommand):
         if not update:
             self.stdout.write("No action to perform.")
         else:
-            self.run_update(fy, period)
+            if period in PERIODKEYS:
+                self.run_update(fy, period)
+            else:
+                raise ValueError(f"Period [{period}] not valid.  Must be one of {PERIODKEYS}")
 
     def _get_user_input(self, hint: str) -> bool:
         choice = input(f"Continue using {hint} ? [y/n] ")
