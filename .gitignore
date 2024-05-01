@@ -26,4 +26,4 @@ site*/
 requirements.txt
 
 #ignore static files since collecstatic is run at upload
-staticfiles/
+static-root/*
