@@ -3,7 +3,7 @@ main {
 }
 
 aside {
-    margin-top: -240px;
+    margin-top: -180px;
     position: fixed;
     height: auto;
     z-index: 1000;
