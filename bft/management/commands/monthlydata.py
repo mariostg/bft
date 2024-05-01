@@ -59,17 +59,7 @@ class Command(BaseCommand):
             self.stdout.write(f"Current period       {s.period()}")
             return
         if view:
-            if CostCenterManager().exists(costcenter):
-                self.costcenter = costcenter
-            else:
-                raise CostCenter.DoesNotExist(f"Cost center [{costcenter}] not found")
-
-            if FundManager().exists(fund):
-                self.fund = fund
-            else:
-                raise Fund.DoesNotExist(f"Fund [{fund}] not found")
-
-            self.show_monthly()
+            self.show_monthly(fy, period, costcenter, fund)
         if not update:
             self.stdout.write("No action to perform.")
         else:
@@ -128,7 +118,16 @@ class Command(BaseCommand):
         c = CostCenterMonthlyReport(fy, period)
         c.insert_line_items(c.sum_line_items())
 
-    def show_monthly(self):
-        r = CostCenterMonthlyReport(fy=self.fy, period=self.period, costcenter=self.costcenter, fund=self.fund)
+    def show_monthly(self, fy, period, costcenter, fund):
+        if not CostCenterManager().exists(costcenter):
+            raise CostCenter.DoesNotExist(f"Cost center [{costcenter}] not found")
+
+        if not FundManager().exists(fund):
+            raise Fund.DoesNotExist(f"Fund [{fund}] not found")
+
+        if period not in PERIODKEYS:
+            raise ValueError(f"Period [{period}] not valid.  Must be one of {PERIODKEYS}")
+
+        r = CostCenterMonthlyReport(fy=fy, period=period, costcenter=costcenter, fund=fund)
         df = r.dataframe()
         print(df)
