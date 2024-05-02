@@ -1,13 +1,38 @@
 from django.db import models
 
 
-class CostCenterMonthly(models.Model):
+class MonthlyData(models.Model):
     fund = models.CharField("Fund", max_length=4)
     source = models.CharField("Source", max_length=24)
     costcenter = models.CharField("Cost Center", max_length=6)
 
     period = models.CharField("Period", max_length=2)
     fy = models.CharField("FY", max_length=4)
+
+    def __str__(self):
+        s = ""
+        field_names = [field.name for field in self._meta.fields]
+        for fn in field_names:
+            s += f"{fn} : {getattr(self,fn)}\n"
+        return s
+
+    class Meta:
+        abstract = True
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "fund",
+                    "source",
+                    "costcenter",
+                    "period",
+                    "fy",
+                ),
+                name="%(app_label)s_%(class)s_is_unique",
+            )
+        ]
+
+
+class CostCenterMonthly(MonthlyData):
 
     spent = models.DecimalField("Spent", max_digits=10, decimal_places=2, default=0, null=True)
     commitment = models.DecimalField("Commitment", max_digits=10, decimal_places=2, default=0, null=True)
@@ -19,24 +44,5 @@ class CostCenterMonthly(models.Model):
         "Forecast Adjustment", max_digits=10, decimal_places=2, default=0, null=True
     )
 
-    def __str__(self):
-        s = ""
-        field_names = [field.name for field in self._meta.fields]
-        for fn in field_names:
-            s += f"{fn} : {getattr(self,fn)}\n"
-        return s
-
-    class Meta:
+    class Meta(MonthlyData.Meta):
         verbose_name_plural = "Cost Center Monthly"
-        constraints = [
-            models.UniqueConstraint(
-                fields=(
-                    "fund",
-                    "source",
-                    "costcenter",
-                    "period",
-                    "fy",
-                ),
-                name="unique_cost_center_monthly_row",
-            )
-        ]
