@@ -122,9 +122,6 @@ class Command(BaseCommand):
         if not CostCenterManager().exists(costcenter):
             raise CostCenter.DoesNotExist(f"Cost center [{costcenter}] not found")
 
-        if not FundManager().exists(fund):
-            raise Fund.DoesNotExist(f"Fund [{fund}] not found")
-
         if period not in PERIODKEYS:
             raise ValueError(f"Period [{period}] not valid.  Must be one of {PERIODKEYS}")
 

@@ -1,8 +1,7 @@
-from io import StringIO
-
 import pytest
 from django.core.management import call_command
-from bft.models import LineItemManager, LineItem, CostCenterManager
+
+from bft.models import CostCenterManager, LineItem, LineItemManager
 
 
 @pytest.mark.django_db
