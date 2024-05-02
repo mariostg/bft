@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from reports.models import CostCenterMonthly
+from reports.models import CostCenterMonthlyEncumbrance
 
 
 class CostCenterMonthlyAdmin(admin.ModelAdmin):
@@ -19,4 +19,4 @@ class CostCenterMonthlyAdmin(admin.ModelAdmin):
     )
 
 
-admin.site.register(CostCenterMonthly, CostCenterMonthlyAdmin)
+admin.site.register(CostCenterMonthlyEncumbrance, CostCenterMonthlyAdmin)

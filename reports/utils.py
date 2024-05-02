@@ -9,7 +9,7 @@ from bft.conf import P2Q
 from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         FundCenter, FundCenterAllocation, FundCenterManager,
                         FundManager, LineItem)
-from reports.models import CostCenterMonthly
+from reports.models import CostCenterMonthlyEncumbrance
 from utils.dataframe import BFTDataFrame
 
 logger = logging.getLogger("django")
@@ -61,8 +61,8 @@ class CostCenterMonthlyReport:
         if len(lines) == 0:
             logger.info("There are no lines to insert")
             return 0
-        CostCenterMonthly.objects.filter(fy=self.fy, period=self.period).delete()
-        md = CostCenterMonthly.objects.bulk_create([CostCenterMonthly(**q) for q in lines])
+        CostCenterMonthlyEncumbrance.objects.filter(fy=self.fy, period=self.period).delete()
+        md = CostCenterMonthlyEncumbrance.objects.bulk_create([CostCenterMonthlyEncumbrance(**q) for q in lines])
         return len(md)
 
     def dataframe(self) -> pd.DataFrame:
@@ -85,8 +85,8 @@ class CostCenterMonthlyReport:
             "Working Plan",
             "Allocation"
         """
-        monthly_df = BFTDataFrame(CostCenterMonthly)
-        qst = CostCenterMonthly.objects.filter(fy=self.fy, period=self.period, costcenter=self.costcenter)
+        monthly_df = BFTDataFrame(CostCenterMonthlyEncumbrance)
+        qst = CostCenterMonthlyEncumbrance.objects.filter(fy=self.fy, period=self.period, costcenter=self.costcenter)
         if self.fund:
             qst = qst.filter(fund=self.fund)
         if qst.count() == 0:

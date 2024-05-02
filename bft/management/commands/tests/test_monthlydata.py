@@ -5,7 +5,7 @@ import pytest
 from django.core.management import call_command
 
 from bft.models import CostCenterManager, LineItem
-from reports.models import CostCenterMonthly
+from reports.models import CostCenterMonthlyEncumbrance
 
 
 @pytest.mark.django_db
@@ -38,7 +38,7 @@ class TestCommandMonthlyData:
         assert 7 == LineItem.objects.count()
 
         self.call_command("monthlydata", "--update", "--fy", "2023", "--period", "1")
-        assert 2 == CostCenterMonthly.objects.count()
+        assert 2 == CostCenterMonthlyEncumbrance.objects.count()
 
     def test_monthlydata_view_invalid_period(self):
         self.call_command("populate")

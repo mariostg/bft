@@ -32,7 +32,7 @@ class MonthlyData(models.Model):
         ]
 
 
-class CostCenterMonthly(MonthlyData):
+class CostCenterMonthlyEncumbrance(MonthlyData):
 
     spent = models.DecimalField("Spent", max_digits=10, decimal_places=2, default=0, null=True)
     commitment = models.DecimalField("Commitment", max_digits=10, decimal_places=2, default=0, null=True)
@@ -45,4 +45,4 @@ class CostCenterMonthly(MonthlyData):
     )
 
     class Meta(MonthlyData.Meta):
-        verbose_name_plural = "Cost Center Monthly"
+        verbose_name_plural = "Cost Center Monthly Encumbrance"

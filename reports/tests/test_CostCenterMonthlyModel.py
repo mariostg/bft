@@ -1,7 +1,7 @@
 import pytest
 from django.db.utils import IntegrityError
 
-from reports.models import CostCenterMonthly
+from reports.models import CostCenterMonthlyEncumbrance
 
 
 @pytest.mark.django_db
@@ -40,13 +40,13 @@ class TestCostCenterMonthlyModel:
         pass
 
     def test_insert_single_row(self):
-        md = CostCenterMonthly(**self.m1)
+        md = CostCenterMonthlyEncumbrance(**self.m1)
         md.save()
-        assert 1 == CostCenterMonthly.objects.count()
+        assert 1 == CostCenterMonthlyEncumbrance.objects.count()
 
     def test_insert_duplicate_row(self):
-        md = CostCenterMonthly(**self.m1)
+        md = CostCenterMonthlyEncumbrance(**self.m1)
         md.save()
-        md = CostCenterMonthly(**self.duplicate)
+        md = CostCenterMonthlyEncumbrance(**self.duplicate)
         with pytest.raises(IntegrityError):
             md.save()
