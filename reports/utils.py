@@ -15,7 +15,7 @@ from utils.dataframe import BFTDataFrame
 logger = logging.getLogger("django")
 
 
-class CostCenterMonthlyReport:
+class CostCenterMonthlyEncumbranceReport:
 
     def __init__(self, fy, period, costcenter: str = None, fund: str = None):
         fy = str(fy)

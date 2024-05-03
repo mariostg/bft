@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand
 from bft.conf import PERIODKEYS
 from bft.models import (BftStatus, CostCenter, CostCenterManager, Fund,
                         FundManager)
-from reports.utils import CostCenterMonthlyReport
+from reports.utils import CostCenterMonthlyEncumbranceReport
 
 
 class Command(BaseCommand):
@@ -116,7 +116,7 @@ class Command(BaseCommand):
             return
 
         print(f"UPDATING... for FY {fy} and period {period}")
-        c = CostCenterMonthlyReport(fy, period)
+        c = CostCenterMonthlyEncumbranceReport(fy, period)
         c.insert_line_items(c.sum_line_items())
 
     def show_monthly(self, fy, period, costcenter: str, fund: str):
@@ -128,6 +128,6 @@ class Command(BaseCommand):
         if period not in PERIODKEYS:
             raise ValueError(f"Period [{period}] not valid.  Must be one of {PERIODKEYS}")
 
-        r = CostCenterMonthlyReport(fy=fy, period=period, costcenter=costcenter, fund=fund)
+        r = CostCenterMonthlyEncumbranceReport(fy=fy, period=period, costcenter=costcenter, fund=fund)
         df = r.dataframe()
         print(df)

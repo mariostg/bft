@@ -166,7 +166,7 @@ def costcenter_monthly_data(request):
         "period": period,
     }
     form = SearchCostCenterMonthlyDataForm(initial=initial)
-    r = utils.CostCenterMonthlyReport(fy=fy, fund=fund, costcenter=costcenter, period=period)
+    r = utils.CostCenterMonthlyEncumbranceReport(fy=fy, fund=fund, costcenter=costcenter, period=period)
     df = r.dataframe()
     df = df.style.format(thousands=",")
 
