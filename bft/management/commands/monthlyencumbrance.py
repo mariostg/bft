@@ -60,6 +60,7 @@ class Command(BaseCommand):
             return
         if view:
             self.show_monthly(fy, period, costcenter, fund)
+            return
         if not update:
             self.stdout.write("No action to perform.")
         else:
@@ -118,7 +119,9 @@ class Command(BaseCommand):
         c = CostCenterMonthlyReport(fy, period)
         c.insert_line_items(c.sum_line_items())
 
-    def show_monthly(self, fy, period, costcenter, fund):
+    def show_monthly(self, fy, period, costcenter: str, fund: str):
+        if costcenter:
+            costcenter = costcenter.upper()
         if not CostCenterManager().exists(costcenter):
             raise CostCenter.DoesNotExist(f"Cost center [{costcenter}] not found")
 

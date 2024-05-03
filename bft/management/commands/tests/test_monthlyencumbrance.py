@@ -55,7 +55,7 @@ class TestCommandMonthlyEncumbrance:
         ):
             self.call_command("monthlyencumbrance", "--view", "--period", "19")
 
-    def test_monthlyencumbrance_view_missing_costcenter(self):
+    def test_monthlyencumbrance_view_with_period_only(self):
         self.call_command("populate")
         self.call_command("uploadcsv", "test-data/encumbrance_2184A3.txt")
 
@@ -63,4 +63,7 @@ class TestCommandMonthlyEncumbrance:
         assert ccmgr.exists("8484WA") == True
         assert 7 == LineItem.objects.count()
 
-        self.call_command("monthlyencumbrance", "--view", "--period", "1")
+        try:
+            self.call_command("monthlyencumbrance", "--view", "--period", "1")
+        except Exception as exc:
+            pytest.fail(f"Using --view with period only as param fails with exception {exc}")

@@ -86,9 +86,12 @@ class CostCenterMonthlyReport:
             "Allocation"
         """
         monthly_df = BFTDataFrame(CostCenterMonthlyEncumbrance)
-        qst = CostCenterMonthlyEncumbrance.objects.filter(fy=self.fy, period=self.period, costcenter=self.costcenter)
+        qst = CostCenterMonthlyEncumbrance.objects.filter(fy=self.fy, period=self.period)
         if self.fund:
             qst = qst.filter(fund=self.fund)
+        if self.costcenter:
+            qst = qst.filter(costcenter=self.costcenter)
+
         if qst.count() == 0:
             return pd.DataFrame()
         monthly_df = monthly_df.build(qst)
