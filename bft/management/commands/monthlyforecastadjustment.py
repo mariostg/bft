@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 
 from bft.conf import PERIODKEYS
 from bft.models import BftStatus, CostCenter, CostCenterManager, Fund, FundManager
-from reports.utils import CostCenterMonthlyEncumbranceReport
+from reports.utils import CostCenterMonthlyEncumbranceReport, CostCenterMonthlyForecastAdjustmentReport
 
 
 class Command(BaseCommand):
@@ -104,8 +104,8 @@ class Command(BaseCommand):
             return
 
         print(f"UPDATING... for FY {fy} and period {period}")
-        c = CostCenterMonthlyEncumbranceReport(fy, period)
-        c.insert_line_items(c.sum_line_items())
+        c = CostCenterMonthlyForecastAdjustmentReport(fy, period)
+        c.insert_grouped_forecast_adjustment(c.sum_forecast_adjustments())
 
     def show_monthly(self, fy, period, costcenter, fund):
         if not CostCenterManager().exists(costcenter):

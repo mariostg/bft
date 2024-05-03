@@ -32,6 +32,17 @@ class MonthlyData(models.Model):
         ]
 
 
+class CostCenterMonthlyForecastAdjustment(MonthlyData):
+    """A class to handle the monthly values of forecast adjustment"""
+
+    forecast_adjustment = models.DecimalField(
+        "Forecast Adjustment", max_digits=10, decimal_places=2, default=0, null=True
+    )
+
+    class Meta(MonthlyData.Meta):
+        verbose_name_plural = "Cost Center Monthly Forecast Adjustment"
+
+
 class CostCenterMonthlyEncumbrance(MonthlyData):
 
     spent = models.DecimalField("Spent", max_digits=10, decimal_places=2, default=0, null=True)
