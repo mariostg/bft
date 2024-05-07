@@ -22,12 +22,6 @@ class TestCommandMonthlyEncumbrance:
         )
         return out.getvalue()
 
-    def test_bftstatus(self):
-        out = self.call_command("monthlyencumbrance", "--bftstatus")
-        assert True == ("Current fiscal year" in out)
-        assert True == ("Current quarter" in out)
-        assert True == ("Current period" in out)
-
     def test_running_monthlyencumbrance_has_lines(self):
         """Check that executing monthly data for given fy, period, contains the cost center and number of lines expected."""
         self.call_command("populate")

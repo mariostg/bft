@@ -18,11 +18,6 @@ class Command(BaseCommand):
             help="Update monthly data for current period and fy",
         )
         parser.add_argument(
-            "--bftstatus",
-            action="store_true",
-            help="Print current Fy, period and quarter",
-        )
-        parser.add_argument(
             "--fy",
             action="store",
             help="Set fy to use for setting monthly data and report query",
@@ -49,15 +44,9 @@ class Command(BaseCommand):
             help="Print dataframe of monthly data for given cost center, fund, fy and period",
         )
 
-    def handle(self, *args, update, bftstatus, fy, period, view, costcenter, fund, **options):
+    def handle(self, *args, update, fy, period, view, costcenter, fund, **options):
         self.fund = fund
         self.fy = fy
-        if bftstatus:
-            s = BftStatus.current
-            self.stdout.write(f"Current fiscal year  {s.fy()}")
-            self.stdout.write(f"Current quarter      {s.quarter()}")
-            self.stdout.write(f"Current period       {s.period()}")
-            return
         if view:
             self.show_monthly(fy, period, costcenter, fund)
             return
