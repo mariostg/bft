@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
-from bft.models import BftStatus, CostCenter, CostCenterManager
-from bft.conf import PERIODKEYS
+
+from bft.models import BftStatus
 
 
 class UserInput(BaseCommand):
