@@ -43,6 +43,17 @@ class CostCenterMonthlyForecastAdjustment(MonthlyData):
         verbose_name_plural = "Cost Center Monthly Forecast Adjustment"
 
 
+class CostCenterMonthlyLineItemForecast(MonthlyData):
+    """A class to handle the monthly values of of Line Items forecast"""
+
+    line_item_forecast = models.DecimalField(
+        "Line Item Forecast", max_digits=10, decimal_places=2, default=0, null=True
+    )
+
+    class Meta(MonthlyData.Meta):
+        verbose_name_plural = "Line Item Monthly Forecast"
+
+
 class CostCenterMonthlyEncumbrance(MonthlyData):
 
     spent = models.DecimalField("Spent", max_digits=10, decimal_places=2, default=0, null=True)

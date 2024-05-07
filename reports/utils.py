@@ -10,14 +10,19 @@ from bft.models import (
     CostCenter,
     CostCenterAllocation,
     CostCenterManager,
+    ForecastAdjustment,
     FundCenter,
     FundCenterAllocation,
     FundCenterManager,
     FundManager,
+    LineForecast,
     LineItem,
-    ForecastAdjustment,
 )
-from reports.models import CostCenterMonthlyEncumbrance, CostCenterMonthlyForecastAdjustment
+from reports.models import (
+    CostCenterMonthlyEncumbrance,
+    CostCenterMonthlyForecastAdjustment,
+    CostCenterMonthlyLineItemForecast,
+)
 from utils.dataframe import BFTDataFrame
 
 logger = logging.getLogger("django")
@@ -36,6 +41,62 @@ class MonthlyReport:
             raise ValueError(
                 f"{period} is not a valid period.  Expected value is one of {(', ').join(map(str,conf.PERIODKEYS))}"
             )
+
+
+class CostCenterMonthlyForecastLineItemReport(MonthlyReport):
+    def sum_forecast_line_item(self) -> QuerySet:
+        grouped_sum = LineForecast.objects.values("lineitem__costcenter", "lineitem__fund").annotate(
+            line_item_forecast=Sum("forecastamount"),
+            fy=Value(self.fy),
+            period=Value(self.period),
+            source=Value(""),
+            costcenter=F("lineitem__costcenter__costcenter"),
+            fund=F("lineitem__fund"),
+        )
+
+        return grouped_sum.values(
+            "line_item_forecast",
+            "fund",
+            "fy",
+            "period",
+            "source",
+            "costcenter",
+        )
+
+    def insert_grouped_forecast_line_item(self, lines: QuerySet) -> int:
+        if len(lines) == 0:
+            logger.info("There are no line items.")
+            return 0
+        CostCenterMonthlyLineItemForecast.objects.filter(fy=self.fy, period=self.period).delete()
+        md = CostCenterMonthlyLineItemForecast.objects.bulk_create(
+            [CostCenterMonthlyLineItemForecast(**q) for q in lines]
+        )
+        return len(md)
+
+    def dataframe(self) -> pd.DataFrame:
+        """Create a pandas dataframe using CostCenterMonthlyLineItemForecast data as source
+        for the given FY and period.
+        Returns:
+            pandas.DataFrame: dataframe containing cost center monthly data with the following colums:
+            "ID",
+            "Fund",
+            "Source",
+            "Cost Center",
+            "Fund Center",
+            "FY",
+            "Period",
+            line_item_forecast
+        """
+        monthly_df = BFTDataFrame(CostCenterMonthlyForecastAdjustment)
+        qst = CostCenterMonthlyForecastAdjustment.objects.filter(fy=self.fy, period=self.period)
+        if self.fund:
+            qst = qst.filter(fund=self.fund)
+        if self.costcenter:
+            qst = qst.filter(costcenter=self.costcenter)
+
+        if qst.count() == 0:
+            return pd.DataFrame()
+        return monthly_df.build(qst)
 
 
 class CostCenterMonthlyForecastAdjustmentReport(MonthlyReport):
