@@ -109,6 +109,8 @@ class Command(BaseCommand):
         c.insert_grouped_forecast_adjustment(c.sum_forecast_adjustments())
 
     def show_monthly(self, fy, period, costcenter, fund):
+        if costcenter:
+            costcenter = costcenter.upper()
         if not CostCenterManager().exists(costcenter):
             raise CostCenter.DoesNotExist(f"Cost center [{costcenter}] not found")
 
