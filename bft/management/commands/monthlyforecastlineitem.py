@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 
 from bft.conf import PERIODKEYS
 from bft.models import BftStatus, CostCenter, CostCenterManager
-from reports.utils import CostCenterMonthlyEncumbranceReport, CostCenterMonthlyForecastLineItemReport
+from reports.utils import CostCenterMonthlyForecastLineItemReport
 
 
 class Command(BaseCommand):
