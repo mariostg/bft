@@ -1,6 +1,6 @@
 <div class="form" id="filter-form">
-  <form action="{% url 'costcenter-monthly-data' %}" method="GET">
-    <div class="form__header">Cost Center Monthly Data</div>
+  <form action="{% url action %}" method="GET">
+    <div class="form__header">{{title}}</div>
     <section class="form__fields-row">
       <div class="form__field">
         <label for="fundcenter" class="label">Cost Center</label>
