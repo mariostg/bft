@@ -23,8 +23,14 @@ class MonthlyReport:
     def __init__(self, fy, period, costcenter: str = None, fund: str = None, quarter=None):
         fy = str(fy)
         period = str(period)
-        self.costcenter = costcenter
-        self.fund = fund
+        try:
+            self.costcenter = costcenter.upper()
+        except:
+            self.costcenter = None
+        try:
+            self.fund = fund.upper()
+        except:
+            self.fund = None
         self.fy = fy
         self.quarter = quarter
         if conf.is_period(period):
