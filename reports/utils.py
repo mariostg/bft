@@ -9,12 +9,10 @@ from bft.conf import P2Q
 from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         ForecastAdjustment, FundCenter, FundCenterAllocation,
                         FundCenterManager, FundManager, LineForecast, LineItem)
-from reports.models import (
-    CostCenterMonthlyEncumbrance,
-    CostCenterMonthlyForecastAdjustment,
-    CostCenterMonthlyLineItemForecast,
-    CostCenterMonthlyAllocation,
-)
+from reports.models import (CostCenterMonthlyAllocation,
+                            CostCenterMonthlyEncumbrance,
+                            CostCenterMonthlyForecastAdjustment,
+                            CostCenterMonthlyLineItemForecast)
 from utils.dataframe import BFTDataFrame
 
 logger = logging.getLogger("django")
@@ -53,7 +51,6 @@ class CostCenterMonthlyAllocationReport(MonthlyReport):
                 fund=F("fund__fund"),
             )
         )
-        print("GROUPER", grouped_sum)
         return grouped_sum.values(
             "allocation",
             "fund",

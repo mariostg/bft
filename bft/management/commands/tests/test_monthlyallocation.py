@@ -1,10 +1,9 @@
-import re
 from io import StringIO
 
 import pytest
 from django.core.management import call_command
 
-from bft.models import CostCenterManager, CostCenterAllocation, FundManager
+from bft.models import CostCenterAllocation
 from reports.models import CostCenterMonthlyAllocation
 
 
