@@ -9,27 +9,92 @@ from bft.conf import P2Q
 from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         ForecastAdjustment, FundCenter, FundCenterAllocation,
                         FundCenterManager, FundManager, LineForecast, LineItem)
-from reports.models import (CostCenterMonthlyEncumbrance,
-                            CostCenterMonthlyForecastAdjustment,
-                            CostCenterMonthlyLineItemForecast)
+from reports.models import (
+    CostCenterMonthlyEncumbrance,
+    CostCenterMonthlyForecastAdjustment,
+    CostCenterMonthlyLineItemForecast,
+    CostCenterMonthlyAllocation,
+)
 from utils.dataframe import BFTDataFrame
 
 logger = logging.getLogger("django")
 
 
 class MonthlyReport:
-    def __init__(self, fy, period, costcenter: str = None, fund: str = None):
+
+    def __init__(self, fy, period, costcenter: str = None, fund: str = None, quarter=None):
         fy = str(fy)
         period = str(period)
         self.costcenter = costcenter
         self.fund = fund
         self.fy = fy
+        self.quarter = quarter
         if conf.is_period(period):
             self.period = period
         else:
             raise ValueError(
                 f"{period} is not a valid period.  Expected value is one of {(', ').join(map(str,conf.PERIODKEYS))}"
             )
+
+
+class CostCenterMonthlyAllocationReport(MonthlyReport):
+    def sum_allocation_cost_center(self) -> QuerySet:
+        if not all([self.fy, self.quarter, self.period]):
+            raise ValueError(f"Argument cannot be none in FY={self.fy}, quarter={self.quarter}, period={self.period}")
+        grouped_sum = (
+            CostCenterAllocation.objects.filter(quarter=self.quarter)
+            .values("costcenter__costcenter", "fund__fund")
+            .annotate(
+                allocation=Sum("amount"),
+                fy=Value(self.fy),
+                period=Value(self.period),
+                source=Value(""),
+                costcenter=F("costcenter__costcenter"),
+                fund=F("fund__fund"),
+            )
+        )
+        print("GROUPER", grouped_sum)
+        return grouped_sum.values(
+            "allocation",
+            "fund",
+            "fy",
+            "period",
+            "source",
+            "costcenter",
+        )
+
+    def insert_grouped_allocation(self, lines: QuerySet) -> int:
+        if len(lines) == 0:
+            logger.info("There are no line items.")
+            return 0
+        CostCenterMonthlyAllocation.objects.filter(fy=self.fy, period=self.period).delete()
+        md = CostCenterMonthlyAllocation.objects.bulk_create([CostCenterMonthlyAllocation(**q) for q in lines])
+        return len(md)
+
+    def dataframe(self) -> pd.DataFrame:
+        """Create a pandas dataframe using CostCenterMonthlyAllocation data as source
+        for the given FY and period.
+        Returns:
+            pandas.DataFrame: dataframe containing cost center monthly data with the following colums:
+            "ID",
+            "Fund",
+            "Source",
+            "Cost Center",
+            "Fund Center",
+            "FY",
+            "Period",
+            allocation
+        """
+        monthly_df = BFTDataFrame(CostCenterMonthlyAllocation)
+        qst = CostCenterMonthlyAllocation.objects.filter(fy=self.fy, period=self.period)
+        if self.fund:
+            qst = qst.filter(fund=self.fund)
+        if self.costcenter:
+            qst = qst.filter(costcenter=self.costcenter)
+
+        if qst.count() == 0:
+            return pd.DataFrame()
+        return monthly_df.build(qst)
 
 
 class CostCenterMonthlyForecastLineItemReport(MonthlyReport):
