@@ -138,8 +138,8 @@ class CostCenterMonthlyForecastLineItemReport(MonthlyReport):
             "Period",
             line_item_forecast
         """
-        monthly_df = BFTDataFrame(CostCenterMonthlyForecastAdjustment)
-        qst = CostCenterMonthlyForecastAdjustment.objects.filter(fy=self.fy, period=self.period)
+        monthly_df = BFTDataFrame(CostCenterMonthlyLineItemForecast)
+        qst = CostCenterMonthlyLineItemForecast.objects.filter(fy=self.fy, period=self.period)
         if self.fund:
             qst = qst.filter(fund=self.fund)
         if self.costcenter:

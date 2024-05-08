@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 {% load humanize %}
-{% block title %}Cost Centers Monthly Data{% endblock title %}
+{% block title %}{{title}}{% endblock title %}
 {% block content %}
   <main class='block block--centered'>
     <div>
@@ -9,7 +9,7 @@
           {% include 'costcenter-monthly-data-filter-form.html' %}
       {% else %}
         <header class="frame">
-          <h2>Cost Centers Monthly Data</h2>
+          <h2>{{title}}</h2>
       {% endif %}
     </header>
     <section class="summary block--spaced">

@@ -16,6 +16,16 @@ urlpatterns = [
     path("lineitems-csv/", views.csv_line_items, name="lineitem-csv"),
     path("costcenter-monthly-data/", views.costcenter_monthly_data, name="costcenter-monthly-data"),
     path("costcenter-monthly-allocation", views.costcenter_monthly_allocation, name="costcenter-monthly-allocation"),
+    path(
+        "costcenter-monthly-forecast-line-item",
+        views.costcenter_monthly_forecast_line_item,
+        name="costcenter-monthly-forecast-line-item",
+    ),
+    path(
+        "costcenter-monthly-forecast-adjustment",
+        views.costcenter_monthly_forecast_adjustment,
+        name="costcenter-monthly-forecast-adjustment",
+    ),
     path("charges/<str:cc>/<int:fy>/<int:period>/", views.cost_center_charge_table, name="costcenter-charges"),
 ]
 urlpatterns += [
