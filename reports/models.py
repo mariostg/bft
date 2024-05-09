@@ -2,6 +2,7 @@ from django.db import models
 
 
 class MonthlyData(models.Model):
+    """A generic base class that contains generic fields to be used by other classes that needs monthly related fields."""
     fund = models.CharField("Fund", max_length=4)
     source = models.CharField("Source", max_length=24)
     costcenter = models.CharField("Cost Center", max_length=6)
