@@ -188,9 +188,9 @@
     padding: 0 2rem;
 }
 .form__header--small {
-  padding-left: 4px;
-  font-size: 1.5rem;
-  color: #bfbfbf;
+    padding-left: 4px;
+    font-size: 1.5rem;
+    color: #bfbfbf;
     background-color: #4b5544;
     margin: 6px -2rem
 }
