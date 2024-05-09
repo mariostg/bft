@@ -1,0 +1,44 @@
+site_name: Business Forecasting Tool Manual
+site_url: https://exemple.com
+extra_css:
+    - stylesheets/extra.css
+nav:
+    - Home: index.md
+    - About: about.md
+    - Line Items: line-items-table.md
+    - System administration: system-administration/index.md
+    - Uploading Line Items: system-administration/uploading-line-items.md
+
+theme:
+    name: material
+    logo: images/logo.png
+    custom_dir: overrides
+    features:
+        - navigation.instant
+        - navigation.tabs
+        - navigation.sections
+        - search.highlight
+        - search.suggest
+        - header.autohide
+    palette:
+        primary: blue grey
+        scheme: slate
+        accent: blue
+
+markdown_extensions:
+    - attr_list
+    - pymdownx.emoji:
+          emoji_index: !!python/name:material.extensions.emoji.twemoji
+          emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    - md_in_html
+    - admonition
+    - toc:
+          permalink: true
+          title: On this page
+    - pymdownx.details
+    - pymdownx.superfences
+    - pymdownx.critic
+    - pymdownx.caret
+    - pymdownx.keys
+    - pymdownx.mark
+    - pymdownx.tilde
