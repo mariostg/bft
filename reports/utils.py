@@ -280,34 +280,6 @@ class CostCenterMonthlyEncumbranceReport(MonthlyReport):
         if qst.count() == 0:
             return pd.DataFrame()
         monthly_df = monthly_df.build(qst)
-
-        alloc_df = CostCenterManager().allocation_dataframe(fy=self.fy, quarter=P2Q[self.period])
-        alloc_df.drop(["FY", "Quarter"], axis=1, inplace=True)
-        alloc_df["Allocation"].fillna(0, inplace=True)
-        if not alloc_df.empty:
-            monthly_df = pd.merge(monthly_df, alloc_df, how="left", on=["Cost Center", "Fund"])
-        else:
-            monthly_df["Allocation"] = 0
-        monthly_df["Allocation"].fillna(0, inplace=True)
-        monthly_df["Fund Center"].fillna("", inplace=True)
-        columns = [
-            "Fund",
-            "Source",
-            "Cost Center",
-            "Fund Center",
-            "FY",
-            "Period",
-            "Spent",
-            "Commitment",
-            "Pre Commitment",
-            "Fund Reservation",
-            "Balance",
-            "Working Plan",
-            "Allocation",
-        ]
-        monthly_df = monthly_df.reindex(columns=columns).set_index(
-            ["Fund Center", "Cost Center", "Fund", "Source", "FY", "Period"]
-        )
         return monthly_df
 
 
@@ -666,3 +638,38 @@ class AllocationStatusReport:
             thead = "<thead><th>Fund Center</th><th>Allocation</th><th>Sub-Allocations</th></thead>"
             table = f"<table class=''>{thead}{tbody}</table>"
             return table
+
+
+class CostCenterMonthlyPlanReport(MonthlyReport):
+    """CostCenterMonthlyPlanReport summarize all cost center monthly report : allocation, line item forecast, forecast adjustment, encumbrance"""
+
+    """
+    monthly_df=''
+    alloc_df = CostCenterManager().allocation_dataframe(fy=self.fy, quarter=P2Q[self.period])
+    alloc_df.drop(["FY", "Quarter"], axis=1, inplace=True)
+    alloc_df["Allocation"].fillna(0, inplace=True)
+    if not alloc_df.empty:
+        monthly_df = pd.merge(monthly_df, alloc_df, how="left", on=["Cost Center", "Fund"])
+    else:
+        monthly_df["Allocation"] = 0
+    monthly_df["Allocation"].fillna(0, inplace=True)
+    monthly_df["Fund Center"].fillna("", inplace=True)
+    columns = [
+        "Fund",
+        "Source",
+        "Cost Center",
+        "Fund Center",
+        "FY",
+        "Period",
+        "Spent",
+        "Commitment",
+        "Pre Commitment",
+        "Fund Reservation",
+        "Balance",
+        "Working Plan",
+        "Allocation",
+    ]
+    monthly_df = monthly_df.reindex(columns=columns).set_index(
+        ["Fund Center", "Cost Center", "Fund", "Source", "FY", "Period"]
+    )
+    """
