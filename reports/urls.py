@@ -19,6 +19,7 @@ urlpatterns = [
         "costcenter-monthly-encumbrance/", views.costcenter_monthly_encumbrance, name="costcenter-monthly-encumbrance"
     ),
     path("costcenter-monthly-allocation", views.costcenter_monthly_allocation, name="costcenter-monthly-allocation"),
+    path("costcenter-monthly-plan", views.costcenter_monthly_plan, name="costcenter-monthly-plan"),
     path(
         "costcenter-monthly-forecast-line-item",
         views.costcenter_monthly_forecast_line_item,

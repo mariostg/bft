@@ -266,8 +266,7 @@ class CostCenterMonthlyEncumbranceReport(MonthlyReport):
             "Pre Commitment",
             "Fund Reservation",
             "Balance",
-            "Working Plan",
-            "Allocation"
+            "Working Plan"
         """
         monthly_df = BFTDataFrame(CostCenterMonthlyEncumbrance)
         qst = CostCenterMonthlyEncumbrance.objects.filter(fy=self.fy, period=self.period)
@@ -640,35 +639,45 @@ class AllocationStatusReport:
 
 
 class CostCenterMonthlyPlanReport(MonthlyReport):
-    """CostCenterMonthlyPlanReport summarize all cost center monthly report : allocation, line item forecast, forecast adjustment, encumbrance"""
 
-    """
-    monthly_df=''
-    alloc_df = CostCenterManager().allocation_dataframe(fy=self.fy, quarter=P2Q[self.period])
-    alloc_df.drop(["FY", "Quarter"], axis=1, inplace=True)
-    alloc_df["Allocation"].fillna(0, inplace=True)
-    if not alloc_df.empty:
-        monthly_df = pd.merge(monthly_df, alloc_df, how="left", on=["Cost Center", "Fund"])
-    else:
-        monthly_df["Allocation"] = 0
-    monthly_df["Allocation"].fillna(0, inplace=True)
-    monthly_df["Fund Center"].fillna("", inplace=True)
-    columns = [
-        "Fund",
-        "Source",
-        "Cost Center",
-        "Fund Center",
-        "FY",
-        "Period",
-        "Spent",
-        "Commitment",
-        "Pre Commitment",
-        "Fund Reservation",
-        "Balance",
-        "Working Plan",
-        "Allocation",
-    ]
-    monthly_df = monthly_df.reindex(columns=columns).set_index(
-        ["Fund Center", "Cost Center", "Fund", "Source", "FY", "Period"]
-    )
-    """
+    def __init__(self, fy, period, costcenter=None, fund=None):
+        self.params = {"fy": fy, "period": period, "costcenter": costcenter, "fund": fund}
+
+    def dataframe(self) -> pd.DataFrame:
+        if all([self.params["fy"], self.params["period"]]) == False:
+            return pd.DataFrame()
+        encumbrance = CostCenterMonthlyEncumbranceReport(**self.params)
+        allocation = CostCenterMonthlyAllocationReport(**self.params)
+        forecast_adjustment = CostCenterMonthlyForecastAdjustmentReport(**self.params)
+        forecast_line_items = CostCenterMonthlyForecastLineItemReport(**self.params)
+
+        on = [
+            "Fund",
+            "Source",
+            "Cost Center",
+            "FY",
+            "Period",
+        ]
+        encumbrance_fields = [
+            "Spent",
+            "Commitment",
+            "Pre Commitment",
+            "Fund Reservation",
+            "Balance",
+            "Working Plan",
+        ]
+        allocation__fields = ["Allocation"]
+        forecast_adjustment_fields = ["Forecast Adjustment"]
+        forecast_line_item_fields = ["Line Item Forecast"]
+
+        encumbrance_df = encumbrance.dataframe()[[*on, *encumbrance_fields]]
+        allocation_df = allocation.dataframe()[[*on, *allocation__fields]]
+        forecast_adjustment_df = forecast_adjustment.dataframe()[[*on, *forecast_adjustment_fields]]
+        forecast_line_items_df = forecast_line_items.dataframe()[[*on, *forecast_line_item_fields]]
+
+        report = (
+            encumbrance_df.merge(allocation_df, how="outer", on=on)
+            .merge(forecast_adjustment_df, how="outer", on=on)
+            .merge(forecast_line_items_df, how="outer", on=on)
+        )
+        return report

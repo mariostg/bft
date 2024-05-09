@@ -215,6 +215,41 @@ def costcenter_monthly_allocation(request):
     return render(request, "costcenter-monthly-data.html", context)
 
 
+def costcenter_monthly_plan(request):
+    costcenter = fund = fy = ""
+    period = 1
+    context = {}
+    form_filter = True
+    if len(request.GET):
+        costcenter = CostCenterManager().get_request(request)
+        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        fund = FundManager().get_request(request)
+        period = int(request.GET.get("period")) if request.GET.get("period") else 1
+
+        if str(period) not in PERIODKEYS:
+            messages.warning(request, "Period is invalid.  Either value is missing or outside range")
+
+    initial = {
+        "costcenter": costcenter,
+        "fund": fund,
+        "fy": fy,
+        "period": period,
+    }
+    form = SearchCostCenterMonthlyDataForm(initial=initial)
+    r = utils.CostCenterMonthlyPlanReport(fy=fy, fund=fund, costcenter=costcenter, period=period)
+    df = r.dataframe()
+    df = df.style.format(thousands=",", precision=0)
+
+    context = {
+        "table": df.to_html(),
+        "form_filter": form_filter,
+        "form": form,
+        "title": "Cost Center Monthly Plan",
+        "action": "costcenter-monthly-plan",
+    }
+    return render(request, "costcenter-monthly-data.html", context)
+
+
 def costcenter_monthly_encumbrance(request):
     costcenter = fund = fy = ""
     period = 1
