@@ -940,6 +940,7 @@ class CostCenter(models.Model):
     class Meta:
         ordering = ["costcenter"]
         verbose_name_plural = "Cost Centers"
+        indexes = [models.Index(fields=["costcenter"])]
 
     def save(self, *args, **kwargs):
         if not FinancialStructureManager().is_child_of(self.costcenter_parent, self):
