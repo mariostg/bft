@@ -38,6 +38,7 @@ PERIODKEYS, PERIODVALUES = zip(*PERIODS)
 
 STATUS = [("FY", "FY"), ("QUARTER", "QUARTER"), ("PERIOD", "PERIOD")]
 
+"""P2Q is a mapping of periods to quarters."""
 P2Q = {
     "1": "1",
     "2": "1",
