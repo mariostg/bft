@@ -5,7 +5,6 @@ from django.db.models import F, IntegerField, Q, QuerySet, Sum, Value
 from django.db.models.functions import Cast
 
 from bft import conf
-from bft.conf import P2Q
 from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         ForecastAdjustment, FundCenter, FundCenterAllocation,
                         FundCenterManager, FundManager, LineForecast, LineItem)
