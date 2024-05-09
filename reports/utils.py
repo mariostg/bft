@@ -25,11 +25,11 @@ class MonthlyReport:
         period = str(period)
         try:
             self.costcenter = costcenter.upper()
-        except ValueError:
+        except AttributeError:
             self.costcenter = None
         try:
             self.fund = fund.upper()
-        except ValueError:
+        except AttributeError:
             self.fund = None
         self.fy = fy
         self.quarter = quarter
