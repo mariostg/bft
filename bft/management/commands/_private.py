@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from bft.models import BftStatus
-
+from bft import conf
 
 class UserInput(BaseCommand):
 
@@ -44,3 +44,22 @@ class UserInput(BaseCommand):
                 if not self._get_user_input(period):
                     period = None
         return period
+
+    def set_quarter(self, quarter=None) -> str | None:
+        currentquarter = BftStatus.current.quarter()
+        if not quarter:
+            msg = f"You did not specify a quarter. Current quarter [{currentquarter}] will be used."
+            self.stdout.write(style_func=self.style.WARNING, msg=msg)
+            if self._get_user_input(currentquarter):
+                quarter = currentquarter
+        else:
+            if not conf.is_quarter(quarter):
+                msg = f"Quarter {quarter} is not a valid option, expected values are one of {conf.QUARTERKEYS}"
+                self.stdout.write(style_func=self.style.ERROR, msg=msg)
+                exit(0)
+            if quarter != currentquarter:
+                msg = f"You specified a quarter different than current value.\nCurrent is {currentquarter}.\nYou provided {quarter}"
+                self.stdout.write(style_func=self.style.WARNING, msg=msg)
+                if not self._get_user_input(quarter):
+                    quarter = None
+        return quarter

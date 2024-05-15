@@ -67,11 +67,18 @@ class Command(BaseCommand):
     def run_update(self, fy=None, period=None, quarter=None):
         fy = UserInput().set_fy(fy=fy)
         period = UserInput().set_period(period=period)
-        if not fy or not period or not period:
-            self.stdout.write(style_func=self.style.SUCCESS, msg="Operation cancelled")
+        quarter = UserInput().set_quarter(quarter=quarter)
+        if not fy or not period or not quarter:
+            self.stdout.write(style_func=self.style.WARNING, msg="Operation aborted")
+            if not fy:
+                self.stdout.write(style_func=self.style.WARNING, msg="argument --fy missing")
+            if not period:
+                self.stdout.write(style_func=self.style.WARNING, msg="argument --period missing")
+            if not quarter:
+                self.stdout.write(style_func=self.style.WARNING, msg="argument --quarter missing")
             return
 
-        print(f"UPDATING... for FY {fy} and period {period} using {quarter} as reference")
+        print(f"UPDATING... for FY {fy} and period {period} using quarter {quarter} as reference")
         c = CostCenterMonthlyAllocationReport(fy, period, quarter=quarter)
         c.insert_grouped_allocation(c.sum_allocation_cost_center())
 
