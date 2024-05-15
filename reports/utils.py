@@ -670,14 +670,35 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
         forecast_adjustment_fields = ["Forecast Adjustment"]
         forecast_line_item_fields = ["Line Item Forecast"]
 
-        encumbrance_df = encumbrance.dataframe()[[*on, *encumbrance_fields]]
-        allocation_df = allocation.dataframe()[[*on, *allocation__fields]]
-        forecast_adjustment_df = forecast_adjustment.dataframe()[[*on, *forecast_adjustment_fields]]
-        forecast_line_items_df = forecast_line_items.dataframe()[[*on, *forecast_line_item_fields]]
+        encumbrance_df = encumbrance.dataframe()
+        allocation_df = allocation.dataframe()
+        forecast_adjustment_df = forecast_adjustment.dataframe()
+        forecast_line_items_df = forecast_line_items.dataframe()
 
-        report = (
-            encumbrance_df.merge(allocation_df, how="outer", on=on)
-            .merge(forecast_adjustment_df, how="outer", on=on)
-            .merge(forecast_line_items_df, how="outer", on=on)
-        )
+        report = pd.DataFrame()
+        if len(encumbrance_df):
+            encumbrance_df = encumbrance_df[[*on, *encumbrance_fields]]
+            report = encumbrance_df
+
+        if len(allocation_df):
+            allocation_df = allocation_df[[*on, *allocation__fields]]
+            if not report.empty:
+                report = report.merge(allocation_df, how="outer", on=on)
+            else:
+                report = allocation_df
+
+        if len(forecast_adjustment_df):
+            forecast_adjustment_df = forecast_adjustment_df[[*on, *forecast_adjustment_fields]]
+            if not report.empty:
+                report = report.merge(forecast_adjustment_df, how="outer", on=on)
+            else:
+                report = forecast_adjustment_df
+
+        if len(forecast_line_items_df):
+            forecast_line_items_df = forecast_line_items_df[[*on, *forecast_line_item_fields]]
+            if not report.empty:
+                report = report.merge(forecast_line_items_df, how="outer", on=on)
+            else:
+                report = forecast_line_items_df
+
         return report

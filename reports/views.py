@@ -238,10 +238,16 @@ def costcenter_monthly_plan(request):
     form = SearchCostCenterMonthlyDataForm(initial=initial)
     r = utils.CostCenterMonthlyPlanReport(fy=fy, fund=fund, costcenter=costcenter, period=period)
     df = r.dataframe()
-    df = df.style.format(thousands=",", precision=0)
+    if not df.empty:
+        df = df.style.format(thousands=",", precision=0)
+        df = df.to_html()
+    elif len(request.GET):
+        df = "There are no data to report using the given parameters."
+    else:
+        df = ""
 
     context = {
-        "table": df.to_html(),
+        "table": df,
         "form_filter": form_filter,
         "form": form,
         "title": "Cost Center Monthly Plan",
