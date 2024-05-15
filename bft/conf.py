@@ -65,3 +65,15 @@ def is_period(p: str) -> bool:
         bool: If p in an element of PERIODS, return True, false otherwise.
     """
     return str(p) in PERIODKEYS
+
+
+def is_quarter(q: str) -> bool:
+    """Utility function to determine if argument is an acceptable quarter value.
+
+    Args:
+        q (str): quarter to verify
+
+    Returns:
+        bool: If q in an element of QUARTERKEYS, return True, false otherwise.
+    """
+    return str(q) in QUARTERKEYS

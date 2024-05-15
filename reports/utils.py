@@ -31,7 +31,12 @@ class MonthlyReport:
         except AttributeError:
             self.fund = None
         self.fy = fy
-        self.quarter = quarter
+        if conf.is_quarter(quarter):
+            self.quarter = quarter
+        elif quarter:
+            raise ValueError(
+                f"{quarter} is not a valid quarter.  Expected value is one of {(', ').join(map(str,conf.QUARTERKEYS))}"
+            )
         if conf.is_period(period):
             self.period = period
         else:
