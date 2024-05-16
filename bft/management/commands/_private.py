@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand
 
-from bft.models import BftStatus
 from bft import conf
+from bft.models import BftStatus
+
 
 class UserInput(BaseCommand):
 

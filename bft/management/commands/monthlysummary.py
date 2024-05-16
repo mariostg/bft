@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from bft.conf import PERIODKEYS
-from bft.models import BftStatus, FundManager, CostCenterManager
+from bft.models import BftStatus, CostCenterManager, FundManager
 from reports.utils import CostCenterMonthlyPlanReport
 
 

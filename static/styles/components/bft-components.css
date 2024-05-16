@@ -148,9 +148,9 @@
         grid-template-columns: 1fr;
         gap: 4px;
     }
-        .form__fields-row {
-          flex-direction: column;
-        }
+    .form__fields-row {
+        flex-direction: column;
+    }
 }
 .form__fields > .right {
     grid-column: 1/-1;
