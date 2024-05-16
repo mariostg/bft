@@ -239,6 +239,7 @@ def document_forecast(request, docno):
             forecast = request.POST.get("forecastamount")
             LineForecast().forecast_line_by_line(docno, float(forecast))
             return redirect(reverse("lineitem-page") + f"?docno__iexact={docno}")
+
     doc = LineItem.objects.filter(docno=docno)
     agg = doc.aggregate(Sum("workingplan"), Sum("spent"))
     agg["workingplan__sum"] = round(agg["workingplan__sum"], 2)
