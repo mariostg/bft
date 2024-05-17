@@ -219,6 +219,23 @@ class TestLineForecastModel:
         lf = LineForecast()
         assert 0 == lf.forecast_line_by_line(docno, 1000)
 
+    @pytest.mark.parametrize(
+        "docno, target_forecast",
+        [
+            ("12663089", 10000),  # "12663089" contains three lines with one having a spent of 5000
+            ("11111110", 150000),  # "11111110" has one line only with a spent > 0
+            ("12382523", 150000),  # "12382523" has one line, spent == 0
+        ],
+    )
+    def test_forecast_line_by_line(self, setup, docno, target_forecast):
+        LineForecast().forecast_line_by_line(docno, target_forecast)
+
+        forecast = LineForecast.objects.filter(lineitem__docno=docno).aggregate(Sum("forecastamount"))[
+            "forecastamount__sum"
+        ]
+
+        assert target_forecast == forecast
+
 
 class TestLineItemImport(TestCase):
     GOODFILE = os.path.join(BASE_DIR, "test-data/encumbrance_small.txt")
