@@ -5,8 +5,13 @@ from django.db.models import Sum
 from django.test import TestCase
 
 from bft.management.commands import populate, uploadcsv
-from bft.models import (LineForecast, LineForecastManager, LineItem,
-                        LineItemImport)
+from bft.models import (
+    LineForecast,
+    LineForecastManager,
+    LineItem,
+    LineItemImport,
+    CostCenterManager,
+)
 from bft.uploadprocessor import LineItemProcessor
 from main.settings import BASE_DIR
 
@@ -235,6 +240,23 @@ class TestLineForecastModel:
         ]
 
         assert target_forecast == forecast
+
+    @pytest.mark.parametrize(
+        "costcenter, target_forecast",
+        [
+            ("8484wa", 400000),
+            ("8484wa", 300000),
+        ],
+    )
+    def test_forecast_line_by_costcenter(self, setup, costcenter, target_forecast):
+        LineForecast().forecast_costcenter_lines(costcenter, target_forecast)
+
+        costcenter = CostCenterManager().cost_center(costcenter)
+        forecast = LineForecast.objects.filter(lineitem__costcenter=costcenter).aggregate(Sum("forecastamount"))[
+            "forecastamount__sum"
+        ]
+
+        assert abs(target_forecast - forecast) <= 0.01
 
 
 class TestLineItemImport(TestCase):
