@@ -237,7 +237,7 @@ def document_forecast(request, docno):
         if form.is_valid():
             docno = request.POST.get("docno")
             forecast = request.POST.get("forecastamount")
-            LineForecast().forecast_line_by_line(docno, float(forecast))
+            LineForecast().forecast_line_by_docno(docno, float(forecast))
             return redirect(reverse("lineitem-page") + f"?docno__iexact={docno}")
 
     doc = LineItem.objects.filter(docno=docno)

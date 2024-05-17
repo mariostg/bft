@@ -187,7 +187,7 @@ class TestLineForecastModel:
         if not lines:
             raise AssertionError(f"No lines found in {docno}")
         target_forecast = lines.aggregate(Sum("workingplan"))["workingplan__sum"]
-        lf().forecast_line_by_line(docno, target_forecast)
+        lf().forecast_line_by_docno(docno, target_forecast)
 
         applied_forecast = LineItem.objects.filter(docno=docno).aggregate(
             Sum("fcst__forecastamount")
@@ -207,7 +207,7 @@ class TestLineForecastModel:
         total_spent = LineItem.objects.filter(docno=docno).aggregate(Sum("spent"))[
             "spent__sum"
         ]
-        lf().forecast_line_by_line(docno, target_forecast)
+        lf().forecast_line_by_docno(docno, target_forecast)
 
         applied_forecast = LineItem.objects.filter(docno=docno).aggregate(
             Sum("fcst__forecastamount")
@@ -217,7 +217,7 @@ class TestLineForecastModel:
     def test_create_forecast_no_lines(self, setup):
         docno = "XXXX"
         lf = LineForecast()
-        assert 0 == lf.forecast_line_by_line(docno, 1000)
+        assert 0 == lf.forecast_line_by_docno(docno, 1000)
 
     @pytest.mark.parametrize(
         "docno, target_forecast",
@@ -227,8 +227,8 @@ class TestLineForecastModel:
             ("12382523", 150000),  # "12382523" has one line, spent == 0
         ],
     )
-    def test_forecast_line_by_line(self, setup, docno, target_forecast):
-        LineForecast().forecast_line_by_line(docno, target_forecast)
+    def test_forecast_line_by_docno(self, setup, docno, target_forecast):
+        LineForecast().forecast_line_by_docno(docno, target_forecast)
 
         forecast = LineForecast.objects.filter(lineitem__docno=docno).aggregate(Sum("forecastamount"))[
             "forecastamount__sum"

@@ -1727,13 +1727,23 @@ class LineForecast(models.Model):
             return True
         return False
 
-    def forecast_line_by_line(self, docno: str, forecast: float) -> int:
+    def forecast_lines(self, lines: QuerySet[LineItem], ratio):
+        for li in lines:
+            if hasattr(li, "fcst"):
+                li_fcst = LineForecastManager().get_line_forecast(li)
+                li_fcst.forecastamount = float(li.workingplan) * ratio
+                li_fcst.save()
+            else:
+                li_fcst = LineForecast(lineitem=li, forecastamount=float(li.workingplan) * ratio)
+                li_fcst.save()
+
+    def forecast_line_by_docno(self, docno: str, forecast: float) -> int:
         lines = LineItem.objects.filter(docno=docno)
         if not lines:
             return 0
 
-        lines_with_spent = LineItem.objects.filter(docno=docno, spent__gt=0)
-        lines_no_spent = LineItem.objects.filter(docno=docno, spent=0)
+        lines_with_spent = lines.filter(spent__gt=0)
+        lines_no_spent = lines.filter(spent=0)
 
         full_working_plan = lines.aggregate(models.Sum("workingplan"))["workingplan__sum"]
         unspent_working_plan = lines_no_spent.aggregate(models.Sum("workingplan"))["workingplan__sum"]
@@ -1741,29 +1751,14 @@ class LineForecast(models.Model):
         spent_ratio = float(forecast) / float(full_working_plan)
         spent_forecast = 0
         if lines_with_spent:
-            for li in lines_with_spent:
-                if hasattr(li, "fcst"):
-                    li_fcst = LineForecastManager().get_line_forecast(li)
-                    li_fcst.forecastamount = float(li.workingplan) * spent_ratio
-                    li_fcst.save()
-                else:
-                    li_fcst = LineForecast(lineitem=li, forecastamount=float(li.workingplan) * spent_ratio)
-                    li_fcst.save()
-
+            self.forecast_lines(lines_with_spent, spent_ratio)
             spent_forecast = LineItem.objects.filter(docno=docno, spent__gt=0).aggregate(Sum("fcst__forecastamount"))[
                 "fcst__forecastamount__sum"
             ]
 
         if unspent_working_plan:
             unspent_ratio = (float(forecast) - float(spent_forecast)) / float(unspent_working_plan)
-            for li in lines_no_spent:
-                if hasattr(li, "fcst"):
-                    li_fcst = LineForecastManager().get_line_forecast(li)
-                    li_fcst.forecastamount = float(li.workingplan) * unspent_ratio
-                    li_fcst.save()
-                else:
-                    li_fcst = LineForecast(lineitem=li, forecastamount=float(li.workingplan) * unspent_ratio)
-                    li_fcst.save()
+            self.forecast_lines(lines_no_spent, unspent_ratio)
         return len(lines)
 
     def forecast_costcenter_lines(self, costcenter: str, forecast: float) -> int:
