@@ -606,7 +606,7 @@ def capital_forecasting_dashboard(request):
         quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
         fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
 
-        if str(quarter) not in QUARTERKEYS:
+        if not conf.is_quarter(quarter):
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
 
         estimates = capitalforecasting.EstimateReport(fund, fy, capital_project)
