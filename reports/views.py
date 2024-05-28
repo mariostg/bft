@@ -258,7 +258,6 @@ def costcenter_monthly_plan(request):
             return render(request, "costcenter-monthly-data.html", context)
 
         form.initial = initial
-        print("fund:", fund, "cc:", costcenter)
         if "" in [fund, costcenter]:
             return render(request, "costcenter-monthly-data.html", context)
 
