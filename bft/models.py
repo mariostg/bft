@@ -197,6 +197,7 @@ class FundManager(models.Manager):
             fund = fund.upper()
             if not FundManager().exists(fund):
                 messages.info(request, f"Fund {fund} does not exist.")
+                return ""
             return fund
         else:
             return None
@@ -898,6 +899,7 @@ class CostCenterManager(models.Manager):
             costcenter = costcenter.upper()
             if not CostCenterManager().exists(costcenter):
                 messages.info(request, f"Cost Center {costcenter} does not exist.")
+                return ""
             return costcenter
         else:
             return None

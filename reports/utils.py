@@ -698,6 +698,8 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
                 df_report = df_report.merge(forecast_adjustment_df, how="outer", on=on_grouping)
             else:
                 df_report = forecast_adjustment_df
+        else:
+            df_report["Forecast Adjustment"] = 0
 
         if len(forecast_line_items_df):
             forecast_line_items_df = forecast_line_items_df[[*on_grouping, *forecast_line_item_fields]]
@@ -706,6 +708,7 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
             else:
                 df_report = forecast_line_items_df
 
-        df_report.fillna(0, inplace=True)
-        df_report["Total Forecast"] = df_report["Forecast Adjustment"] + df_report["Line Item Forecast"]
+        if not df_report.empty:
+            df_report.fillna(0, inplace=True)
+            df_report["Total Forecast"] = df_report["Forecast Adjustment"] + df_report["Line Item Forecast"]
         return df_report
