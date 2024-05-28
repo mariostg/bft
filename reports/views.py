@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 from bft import conf
-from bft.conf import PERIODKEYS, QUARTERKEYS
+from bft.conf import QUARTERKEYS
 from bft.exceptions import LineItemsDoNotExistError
 from bft.models import (BftStatus, CapitalProjectManager, CostCenterAllocation,
                         CostCenterChargeMonthly, CostCenterManager,
@@ -157,7 +157,7 @@ def costcenter_monthly_forecast_line_item(request):
         fund = FundManager().get_request(request)
         period = int(request.GET.get("period")) if request.GET.get("period") else 1
 
-        if str(period) not in PERIODKEYS:
+        if not conf.is_period(period):
             messages.warning(request, "Period is invalid.  Either value is missing or outside range")
 
     initial = {
@@ -192,7 +192,7 @@ def costcenter_monthly_allocation(request):
         fund = FundManager().get_request(request)
         period = int(request.GET.get("period")) if request.GET.get("period") else 1
 
-        if str(period) not in PERIODKEYS:
+        if not conf.is_period(period):
             messages.warning(request, "Period is invalid.  Either value is missing or outside range")
 
     initial = {
@@ -289,7 +289,7 @@ def costcenter_monthly_encumbrance(request):
         fund = FundManager().get_request(request)
         period = int(request.GET.get("period")) if request.GET.get("period") else 1
 
-        if str(period) not in PERIODKEYS:
+        if not conf.is_period(period):
             messages.warning(request, "Period is invalid.  Either value is missing or outside range")
 
     initial = {
@@ -324,7 +324,7 @@ def costcenter_monthly_forecast_adjustment(request):
         fund = FundManager().get_request(request)
         period = int(request.GET.get("period")) if request.GET.get("period") else 1
 
-        if str(period) not in PERIODKEYS:
+        if not conf.is_period(period):
             messages.warning(request, "Period is invalid.  Either value is missing or outside range")
 
     initial = {
@@ -359,7 +359,7 @@ def costcenter_monthly_data(request):
         fund = FundManager().get_request(request)
         period = int(request.GET.get("period")) if request.GET.get("period") else 1
 
-        if str(period) not in PERIODKEYS:
+        if not conf.is_period(period):
             messages.warning(request, "Period is invalid.  Either value is missing or outside range")
 
     initial = {
