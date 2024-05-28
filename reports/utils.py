@@ -684,6 +684,8 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
         if len(encumbrance_df):
             encumbrance_df = encumbrance_df[[*on_grouping, *encumbrance_fields]]
             df_report = encumbrance_df
+        else:
+            return df_report
 
         if len(allocation_df):
             allocation_df = allocation_df[[*on_grouping, *allocation__fields]]
