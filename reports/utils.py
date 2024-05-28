@@ -706,4 +706,6 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
             else:
                 df_report = forecast_line_items_df
 
+        df_report.fillna(0, inplace=True)
+        df_report["Total Forecast"] = df_report["Forecast Adjustment"] + df_report["Line Item Forecast"]
         return df_report
