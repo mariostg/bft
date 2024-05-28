@@ -656,7 +656,7 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
         forecast_adjustment = CostCenterMonthlyForecastAdjustmentReport(**self.params)
         forecast_line_items = CostCenterMonthlyForecastLineItemReport(**self.params)
 
-        on = [
+        on_grouping = [
             "Fund",
             "Source",
             "Cost Center",
@@ -680,30 +680,30 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
         forecast_adjustment_df = forecast_adjustment.dataframe()
         forecast_line_items_df = forecast_line_items.dataframe()
 
-        report = pd.DataFrame()
+        df_report = pd.DataFrame()
         if len(encumbrance_df):
-            encumbrance_df = encumbrance_df[[*on, *encumbrance_fields]]
-            report = encumbrance_df
+            encumbrance_df = encumbrance_df[[*on_grouping, *encumbrance_fields]]
+            df_report = encumbrance_df
 
         if len(allocation_df):
-            allocation_df = allocation_df[[*on, *allocation__fields]]
-            if not report.empty:
-                report = report.merge(allocation_df, how="outer", on=on)
+            allocation_df = allocation_df[[*on_grouping, *allocation__fields]]
+            if not df_report.empty:
+                df_report = df_report.merge(allocation_df, how="outer", on=on_grouping)
             else:
-                report = allocation_df
+                df_report = allocation_df
 
         if len(forecast_adjustment_df):
-            forecast_adjustment_df = forecast_adjustment_df[[*on, *forecast_adjustment_fields]]
-            if not report.empty:
-                report = report.merge(forecast_adjustment_df, how="outer", on=on)
+            forecast_adjustment_df = forecast_adjustment_df[[*on_grouping, *forecast_adjustment_fields]]
+            if not df_report.empty:
+                df_report = df_report.merge(forecast_adjustment_df, how="outer", on=on_grouping)
             else:
-                report = forecast_adjustment_df
+                df_report = forecast_adjustment_df
 
         if len(forecast_line_items_df):
-            forecast_line_items_df = forecast_line_items_df[[*on, *forecast_line_item_fields]]
-            if not report.empty:
-                report = report.merge(forecast_line_items_df, how="outer", on=on)
+            forecast_line_items_df = forecast_line_items_df[[*on_grouping, *forecast_line_item_fields]]
+            if not df_report.empty:
+                df_report = df_report.merge(forecast_line_items_df, how="outer", on=on_grouping)
             else:
-                report = forecast_line_items_df
+                df_report = forecast_line_items_df
 
-        return report
+        return df_report
