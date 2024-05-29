@@ -56,7 +56,7 @@ def bmt_screening_report(request):
         fundcenter = FundCenterManager().get_request(request)
         fund = FundManager().get_request(request)
         quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        fy = set_fy(request)
 
         if str(quarter) not in QUARTERKEYS:
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
@@ -119,7 +119,7 @@ def allocation_status_report(request):
         fundcenter = FundCenterManager().get_request(request)
         fund = FundManager().get_request(request)
         quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        fy = fy = set_fy(request)
 
         if str(quarter) not in QUARTERKEYS:
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
@@ -385,7 +385,7 @@ def costcenter_monthly_data(request):
     form_filter = True
     if len(request.GET):
         costcenter = CostCenterManager().get_request(request)
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        fy = fy = set_fy(request)
         fund = FundManager().get_request(request)
         period = int(request.GET.get("period")) if request.GET.get("period") else 1
 
@@ -476,7 +476,7 @@ def capital_forecasting_estimates(request):
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        fy = set_fy(request)
         estimates = capitalforecasting.EstimateReport(fund, fy, capital_project)
         estimates.dataframe()
         if estimates.df.size:
@@ -517,7 +517,7 @@ def capital_forecasting_fears(request):
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        fy = set_fy(request)
         quarterly = capitalforecasting.FEARStatusReport(fund, fy, capital_project)
         quarterly.dataframe()
         if quarterly.df.size:
@@ -558,7 +558,7 @@ def capital_historical_outlook(request):
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        fy = set_fy(request)
         outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
         outlook.dataframe()
         if outlook.df.size:
@@ -597,7 +597,7 @@ def capital_forecasting_ye_ratios(request):
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        fy = set_fy(request)
         outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
         outlook.dataframe()
         data = outlook.df.to_json(orient="records")
@@ -634,7 +634,7 @@ def capital_forecasting_dashboard(request):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
         quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
+        fy = set_fy(request)
 
         if not conf.is_quarter(quarter):
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")

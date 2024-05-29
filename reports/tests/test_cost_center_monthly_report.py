@@ -14,11 +14,8 @@ class TestCostCenterMonthlyReport:
         up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
     def test_period_out_of_range(self):
-        with pytest.raises(
-            ValueError,
-            match="19 is not a valid period.  Expected value is one of 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14",
-        ):
-            CostCenterMonthlyEncumbranceReport(2023, 19, "8484WA", "C113")
+        cm = CostCenterMonthlyEncumbranceReport(2023, 19, "8484WA", "C113")
+        assert None == cm.period
 
     def test_sum_line_items(self, setup):
         cm = CostCenterMonthlyEncumbranceReport(2023, 1, "8484WA", "C113")
