@@ -711,6 +711,19 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
         if not df_report.empty:
             df_report.fillna(0, inplace=True)
             df_report["Total Forecast"] = df_report["Forecast Adjustment"] + df_report["Line Item Forecast"]
-            report_fields = on_grouping[0:3] + encumbrance_fields  # don't show fy and period
+            report_fields = (
+                on_grouping[0:3]
+                + encumbrance_fields
+                + allocation__fields
+                + forecast_line_item_fields
+                + forecast_adjustment_fields
+            )  # don't show fy and period
             df_report = df_report[report_fields]
+            df_report
+
+        df_report["% Spent"] = df_report["Spent"] / df_report["Working Plan"]
+        df_report["% Commit"] = (df_report["Spent"] + df_report["Commitment"]) / df_report["Working Plan"]
+        if len(allocation_df):
+            df_report["% Programmed"] = df_report["Working Plan"] / df_report["Allocation"]
+
         return df_report

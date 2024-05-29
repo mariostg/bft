@@ -287,7 +287,24 @@ def costcenter_monthly_plan(request):
         )
         df = r.dataframe()
         if not df.empty:
-            df = df.style.format(thousands=",", precision=0)
+            # df = df.style.format(thousands=",", precision=0)
+            df = df.style.format(
+                {
+                    "Spent": "{:,.0f}",
+                    "Commitment": "{:,.0f}",
+                    "Pre Commitment": "{:,.0f}",
+                    "Fund Reservation": "{:,.0f}",
+                    "Balance": "{:,.0f}",
+                    "Working Plan": "{:,.0f}",
+                    "Allocation": "{:,.0f}",
+                    "Line Item Forecast": "{:,.0f}",
+                    "Forecast Adjustment": "{:,.0f}",
+                    "% Spent": "{:.1%}",
+                    "% Commit": "{:.1%}",
+                    "% Programmed": "{:.1%}",
+                }
+            )  # .bar(subset=["% Spent", "Allocation"], color="red")
+
             df = df.to_html()
         elif len(request.GET):
             df = "There are no data to report using the given parameters."
