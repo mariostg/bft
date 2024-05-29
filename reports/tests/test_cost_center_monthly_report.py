@@ -15,7 +15,7 @@ class TestCostCenterMonthlyReport:
 
     def test_period_out_of_range(self):
         cm = CostCenterMonthlyEncumbranceReport(2023, 19, "8484WA", "C113")
-        assert None == cm.period
+        assert cm.period is None
 
     def test_sum_line_items(self, setup):
         cm = CostCenterMonthlyEncumbranceReport(2023, 1, "8484WA", "C113")

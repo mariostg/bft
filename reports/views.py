@@ -24,6 +24,7 @@ from reports.forms import (SearchAllocationAnalysisForm,
                            SearchCostCenterScreeningReportForm)
 from utils.getrequestfilter import set_query_string
 
+
 def bmt_screening_report(request):
     fundcenter = fund = ""
     fy = BftStatus.current.fy()
@@ -290,7 +291,6 @@ def costcenter_monthly_plan(request):
 
 def costcenter_monthly_encumbrance(request):
     initial = set_initial(request)
-    costcenter, fund = (initial["costcenter"], initial["fund"])
     form = SearchCostCenterMonthlyDataForm(initial=initial)
 
     context = {
@@ -329,7 +329,6 @@ def costcenter_monthly_encumbrance(request):
 
 def costcenter_monthly_forecast_adjustment(request):
     initial = set_initial(request)
-    costcenter, fund = (initial["costcenter"], initial["fund"])
     form = SearchCostCenterMonthlyDataForm(initial=initial)
 
     context = {
