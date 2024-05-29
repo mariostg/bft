@@ -140,7 +140,7 @@ def costcenter_monthly_forecast_line_item(request):
     form = SearchCostCenterMonthlyDataForm(initial=initial)
 
     context = {
-        "title": "Cost Center Monthly Forecast Line Item",
+        "title": f"{initial['costcenter_name']} Monthly Forecast Line Item",
         "action": "costcenter-monthly-forecast-line-item",
         "form_filter": True,
         "form": form,
@@ -305,7 +305,7 @@ def costcenter_monthly_encumbrance(request):
     form = SearchCostCenterMonthlyDataForm(initial=initial)
 
     context = {
-        "title": "Cost Center Monthly Encumbrance",
+        "title": f"{initial['costcenter_name']} Monthly Encumbrance",
         "action": "costcenter-monthly-encumbrance",
         "form_filter": True,
         "form": form,
@@ -356,7 +356,7 @@ def costcenter_monthly_forecast_adjustment(request):
     form = SearchCostCenterMonthlyDataForm(initial=initial)
 
     context = {
-        "title": "Cost Center Monthly Forecast Adjustment",
+        "title": f"{initial['costcenter_name']} Monthly Forecast Adjustment",
         "action": "costcenter-monthly-forecast-adjustment",
         "form_filter": True,
         "form": form,
