@@ -711,4 +711,6 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
         if not df_report.empty:
             df_report.fillna(0, inplace=True)
             df_report["Total Forecast"] = df_report["Forecast Adjustment"] + df_report["Line Item Forecast"]
+            report_fields = on_grouping[0:3] + encumbrance_fields  # don't show fy and period
+            df_report = df_report[report_fields]
         return df_report

@@ -162,6 +162,10 @@ def costcenter_monthly_forecast_line_item(request):
         )
         df = r.dataframe()
         if not df.empty:
+            df_columns = ["Fund", "Source", "Line Item Forecast"]
+            if initial["costcenter"] is None:
+                df_columns = ["Cost Center"] + df_columns
+            df = df[df_columns]
             df = df.style.format(thousands=",", precision=0)
             df = df.to_html()
         elif len(request.GET):
@@ -188,6 +192,7 @@ def set_fy(request) -> int:
 def set_initial(request):
     initial = {
         "costcenter": "",
+        "costcenter_name": "Cost Centers",
         "fund": "",
         "fy": "",
         "period": "",
@@ -196,6 +201,8 @@ def set_initial(request):
         return initial
 
     initial["costcenter"] = CostCenterManager().get_request(request)
+    if initial["costcenter"]:
+        initial["costcenter_name"] = CostCenterManager().cost_center(initial["costcenter"])
     initial["fund"] = FundManager().get_request(request)
     initial["fy"] = set_fy(request)
 
@@ -214,7 +221,7 @@ def costcenter_monthly_allocation(request):
     form = SearchCostCenterMonthlyDataForm(initial=initial)
 
     context = {
-        "title": "Cost Center Monthly Allocation",
+        "title": f"{initial['costcenter_name']} Monthly Allocation",
         "action": "costcenter-monthly-allocation",
         "form_filter": True,
         "form": form,
@@ -236,6 +243,10 @@ def costcenter_monthly_allocation(request):
         )
         df = r.dataframe()
         if not df.empty:
+            df_columns = ["Fund", "Source", "Allocation"]
+            if initial["costcenter"] is None:
+                df_columns = ["Cost Center"] + df_columns
+            df = df[df_columns]
             df = df.style.format(thousands=",", precision=0)
             df = df.to_html()
         elif len(request.GET):
@@ -254,7 +265,7 @@ def costcenter_monthly_plan(request):
     form = SearchCostCenterMonthlyDataForm(initial=initial)
 
     context = {
-        "title": "Cost Center Monthly Plan",
+        "title": f"{initial['costcenter_name']} Monthly Plan",
         "action": "costcenter-monthly-plan",
         "form_filter": True,
         "form": form,
@@ -315,6 +326,19 @@ def costcenter_monthly_encumbrance(request):
         )
         df = r.dataframe()
         if not df.empty:
+            df_columns = [
+                "Fund",
+                "Source",
+                "Spent",
+                "Commitment",
+                "Pre Commitment",
+                "Fund Reservation",
+                "Balance",
+                "Working Plan",
+            ]
+            if initial["costcenter"] is None:
+                df_columns = ["Cost Center"] + df_columns
+            df = df[df_columns]
             df = df.style.format(thousands=",", precision=0)
             df = df.to_html()
         elif len(request.GET):
@@ -353,6 +377,10 @@ def costcenter_monthly_forecast_adjustment(request):
         )
         df = r.dataframe()
         if not df.empty:
+            df_columns = ["Fund", "Source", "Forecast Adjustment"]
+            if initial["costcenter"] is None:
+                df_columns = ["Cost Center"] + df_columns
+            df = df[df_columns]
             df = df.style.format(thousands=",", precision=0)
             df = df.to_html()
         elif len(request.GET):
