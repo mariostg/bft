@@ -147,49 +147,81 @@ def allocation_status_report(request):
 
 
 def costcenter_monthly_forecast_line_item(request):
-    costcenter = fund = fy = ""
-    period = 1
-    context = {}
-    form_filter = True
-    if len(request.GET):
-        costcenter = CostCenterManager().get_request(request)
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
-        fund = FundManager().get_request(request)
-        period = int(request.GET.get("period")) if request.GET.get("period") else 1
-
-        if not conf.is_period(period):
-            messages.warning(request, "Period is invalid.  Either value is missing or outside range")
-
-    initial = {
-        "costcenter": costcenter,
-        "fund": fund,
-        "fy": fy,
-        "period": period,
-    }
+    initial = set_initial(request)
     form = SearchCostCenterMonthlyDataForm(initial=initial)
-    r = utils.CostCenterMonthlyForecastLineItemReport(fy=fy, fund=fund, costcenter=costcenter, period=period)
-    df = r.dataframe()
-    df = df.style.format(thousands=",")
 
     context = {
-        "table": df.to_html(),
-        "form_filter": form_filter,
-        "form": form,
         "title": "Cost Center Monthly Forecast Line Item",
         "action": "costcenter-monthly-forecast-line-item",
+        "form_filter": True,
+        "form": form,
+        "table": "FY and period are mandatory fields.",
     }
+
+    if len(request.GET):
+        if "" in [initial["costcenter"], initial["fund"]]:
+            form.initial = initial
+            context["form"] = form
+            return render(request, "costcenter-monthly-data.html", context)
+
+        form.initial = initial
+        if "" in [initial["fund"], initial["costcenter"]]:
+            return render(request, "costcenter-monthly-data.html", context)
+
+        r = utils.CostCenterMonthlyForecastLineItemReport(
+            fy=initial["fy"], fund=initial["fund"], costcenter=initial["costcenter"], period=initial["period"]
+        )
+        df = r.dataframe()
+        if not df.empty:
+            df = df.style.format(thousands=",", precision=0)
+            df = df.to_html()
+        elif len(request.GET):
+            df = "There are no data to report using the given parameters."
+        else:
+            df = ""
+
+        context["table"] = df
+        context["form"] = form
+
     return render(request, "costcenter-monthly-data.html", context)
 
 
-def costcenter_monthly_allocation(request):
-    fund = fy = ""
-    period = 1
+def set_fy(request) -> int:
+    try:
+        fy_ = request.GET.get("fy")
+        fy = int(fy_)
+    except ValueError as err:
+        messages.error(request, f"Invalid Fiscal Year, {fy_}<br>{err}")
+        return 0
+    return fy
+
+
+def set_initial(request):
     initial = {
         "costcenter": "",
-        "fund": fund,
-        "fy": fy,
-        "period": period,
+        "fund": "",
+        "fy": "",
+        "period": "",
     }
+    if not len(request.GET):
+        return initial
+
+    initial["costcenter"] = CostCenterManager().get_request(request)
+    initial["fund"] = FundManager().get_request(request)
+    initial["fy"] = set_fy(request)
+
+    period = int(request.GET.get("period")) if request.GET.get("period") else 1
+    if conf.is_period(period):
+        initial["period"] = period
+    else:
+        msg = f"{period} is not a valid period.  Expected value is one of {(', ').join(map(str,conf.PERIODKEYS))}"
+        messages.warning(request, msg)
+
+    return initial
+
+
+def costcenter_monthly_allocation(request):
+    initial = set_initial(request)
     form = SearchCostCenterMonthlyDataForm(initial=initial)
 
     context = {
@@ -197,36 +229,22 @@ def costcenter_monthly_allocation(request):
         "action": "costcenter-monthly-allocation",
         "form_filter": True,
         "form": form,
-        "table": "There are no data to report using the given parameters.",
+        "table": "FY and period are mandatory fields.",
     }
 
     if len(request.GET):
-        costcenter = CostCenterManager().get_request(request)
-        initial["costcenter"] = costcenter
-
-        fund = FundManager().get_request(request)
-        initial["fund"] = fund
-
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
-        initial["fy"] = fy
-
-        period = int(request.GET.get("period")) if request.GET.get("period") else 1
-
-        if not conf.is_period(period):
-            messages.warning(request, "Period is invalid.  Either value is missing or outside range")
-            return render(request, "costcenter-monthly-data.html", context)
-        initial["period"] = period
-
-        if "" in [costcenter, fund]:
+        if "" in [initial["costcenter"], initial["fund"]]:
             form.initial = initial
             context["form"] = form
             return render(request, "costcenter-monthly-data.html", context)
 
         form.initial = initial
-        if "" in [fund, costcenter]:
+        if "" in [initial["fund"], initial["costcenter"]]:
             return render(request, "costcenter-monthly-data.html", context)
 
-        r = utils.CostCenterMonthlyAllocationReport(fy=fy, fund=fund, costcenter=costcenter, period=period)
+        r = utils.CostCenterMonthlyAllocationReport(
+            fy=initial["fy"], fund=initial["fund"], costcenter=initial["costcenter"], period=initial["period"]
+        )
         df = r.dataframe()
         if not df.empty:
             df = df.style.format(thousands=",", precision=0)
@@ -243,14 +261,7 @@ def costcenter_monthly_allocation(request):
 
 
 def costcenter_monthly_plan(request):
-    fund = fy = ""
-    period = 1
-    initial = {
-        "costcenter": "",
-        "fund": fund,
-        "fy": fy,
-        "period": period,
-    }
+    initial = set_initial(request)
     form = SearchCostCenterMonthlyDataForm(initial=initial)
 
     context = {
@@ -258,36 +269,22 @@ def costcenter_monthly_plan(request):
         "action": "costcenter-monthly-plan",
         "form_filter": True,
         "form": form,
-        "table": "There are no data to report using the given parameters.",
+        "table": "FY and period are mandatory fields.",
     }
 
     if len(request.GET):
-        costcenter = CostCenterManager().get_request(request)
-        initial["costcenter"] = costcenter
-
-        fund = FundManager().get_request(request)
-        initial["fund"] = fund
-
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
-        initial["fy"] = fy
-
-        period = int(request.GET.get("period")) if request.GET.get("period") else 1
-
-        if not conf.is_period(period):
-            messages.warning(request, "Period is invalid.  Either value is missing or outside range")
-            return render(request, "costcenter-monthly-data.html", context)
-        initial["period"] = period
-
-        if "" in [costcenter, fund]:
+        if "" in [initial["costcenter"], initial["fund"]]:
             form.initial = initial
-            context["form"] = form
+            # context["form"] = form
             return render(request, "costcenter-monthly-data.html", context)
 
         form.initial = initial
-        if "" in [fund, costcenter]:
+        if "" in [initial["fund"], initial["costcenter"]]:
             return render(request, "costcenter-monthly-data.html", context)
 
-        r = utils.CostCenterMonthlyPlanReport(fy=fy, fund=fund, costcenter=costcenter, period=period)
+        r = utils.CostCenterMonthlyPlanReport(
+            fy=initial["fy"], fund=initial["fund"], costcenter=initial["costcenter"], period=initial["period"]
+        )
         df = r.dataframe()
         if not df.empty:
             df = df.style.format(thousands=",", precision=0)
@@ -304,72 +301,80 @@ def costcenter_monthly_plan(request):
 
 
 def costcenter_monthly_encumbrance(request):
-    costcenter = fund = fy = ""
-    period = 1
-    context = {}
-    form_filter = True
-    if len(request.GET):
-        costcenter = CostCenterManager().get_request(request)
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
-        fund = FundManager().get_request(request)
-        period = int(request.GET.get("period")) if request.GET.get("period") else 1
-
-        if not conf.is_period(period):
-            messages.warning(request, "Period is invalid.  Either value is missing or outside range")
-
-    initial = {
-        "costcenter": costcenter,
-        "fund": fund,
-        "fy": fy,
-        "period": period,
-    }
+    initial = set_initial(request)
+    costcenter, fund = (initial["costcenter"], initial["fund"])
     form = SearchCostCenterMonthlyDataForm(initial=initial)
-    r = utils.CostCenterMonthlyEncumbranceReport(fy=fy, fund=fund, costcenter=costcenter, period=period)
-    df = r.dataframe()
-    df = df.style.format(thousands=",")
 
     context = {
-        "table": df.to_html(),
-        "form_filter": form_filter,
-        "form": form,
         "title": "Cost Center Monthly Encumbrance",
         "action": "costcenter-monthly-encumbrance",
+        "form_filter": True,
+        "form": form,
+        "table": "FY and period are mandatory fields.",
     }
+    if len(request.GET):
+        if "" in [initial["costcenter"], initial["fund"]]:
+            form.initial = initial
+            context["form"] = form
+            return render(request, "costcenter-monthly-data.html", context)
+
+        form.initial = initial
+        if "" in [initial["fund"], initial["costcenter"]]:
+            return render(request, "costcenter-monthly-data.html", context)
+
+        r = utils.CostCenterMonthlyEncumbranceReport(
+            fy=initial["fy"], fund=initial["fund"], costcenter=initial["costcenter"], period=initial["period"]
+        )
+        df = r.dataframe()
+        if not df.empty:
+            df = df.style.format(thousands=",", precision=0)
+            df = df.to_html()
+        elif len(request.GET):
+            df = "There are no data to report using the given parameters."
+        else:
+            df = ""
+
+        context["table"] = df
+        context["form"] = form
     return render(request, "costcenter-monthly-data.html", context)
 
 
 def costcenter_monthly_forecast_adjustment(request):
-    costcenter = fund = fy = ""
-    period = 1
-    context = {}
-    form_filter = True
-    if len(request.GET):
-        costcenter = CostCenterManager().get_request(request)
-        fy = int(request.GET.get("fy")) if request.GET.get("fy") else 0
-        fund = FundManager().get_request(request)
-        period = int(request.GET.get("period")) if request.GET.get("period") else 1
-
-        if not conf.is_period(period):
-            messages.warning(request, "Period is invalid.  Either value is missing or outside range")
-
-    initial = {
-        "costcenter": costcenter,
-        "fund": fund,
-        "fy": fy,
-        "period": period,
-    }
+    initial = set_initial(request)
+    costcenter, fund = (initial["costcenter"], initial["fund"])
     form = SearchCostCenterMonthlyDataForm(initial=initial)
-    r = utils.CostCenterMonthlyForecastAdjustmentReport(fy=fy, fund=fund, costcenter=costcenter, period=period)
-    df = r.dataframe()
-    df = df.style.format(thousands=",")
 
     context = {
-        "table": df.to_html(),
-        "form_filter": form_filter,
-        "form": form,
         "title": "Cost Center Monthly Forecast Adjustment",
         "action": "costcenter-monthly-forecast-adjustment",
+        "form_filter": True,
+        "form": form,
+        "table": "FY and period are mandatory fields.",
     }
+    if len(request.GET):
+        if "" in [initial["costcenter"], initial["fund"]]:
+            form.initial = initial
+            context["form"] = form
+            return render(request, "costcenter-monthly-data.html", context)
+
+        form.initial = initial
+        if "" in [initial["fund"], initial["costcenter"]]:
+            return render(request, "costcenter-monthly-data.html", context)
+
+        r = utils.CostCenterMonthlyForecastAdjustmentReport(
+            fy=initial["fy"], fund=initial["fund"], costcenter=initial["costcenter"], period=initial["period"]
+        )
+        df = r.dataframe()
+        if not df.empty:
+            df = df.style.format(thousands=",", precision=0)
+            df = df.to_html()
+        elif len(request.GET):
+            df = "There are no data to report using the given parameters."
+        else:
+            df = ""
+
+        context["table"] = df
+        context["form"] = form
     return render(request, "costcenter-monthly-data.html", context)
 
 

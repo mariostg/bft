@@ -40,9 +40,7 @@ class MonthlyReport:
         if conf.is_period(period):
             self.period = period
         else:
-            raise ValueError(
-                f"{period} is not a valid period.  Expected value is one of {(', ').join(map(str,conf.PERIODKEYS))}"
-            )
+            self.period = None
 
 
 class CostCenterMonthlyAllocationReport(MonthlyReport):
