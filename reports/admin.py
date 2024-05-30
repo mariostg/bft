@@ -1,8 +1,21 @@
 from django.contrib import admin
 
-from reports.models import (CostCenterMonthlyEncumbrance,
-                            CostCenterMonthlyForecastAdjustment,
-                            CostCenterMonthlyLineItemForecast)
+from reports.models import (
+    CostCenterMonthlyEncumbrance,
+    CostCenterMonthlyForecastAdjustment,
+    CostCenterMonthlyLineItemForecast,
+    CostCenterMonthlyAllocation,
+)
+
+
+class CostCenterMonthlyAllocationAdmin(admin.ModelAdmin):
+    list_display = (
+        "costcenter",
+        "fund",
+        "fy",
+        "period",
+        "allocation",
+    )
 
 
 class CostCenterMonthlyForecastLineItemAdmin(admin.ModelAdmin):
@@ -40,6 +53,8 @@ class CostCenterMonthlyAdmin(admin.ModelAdmin):
         "spent",
     )
 
+
+admin.site.register(CostCenterMonthlyAllocation, CostCenterMonthlyAllocationAdmin)
 
 admin.site.register(CostCenterMonthlyEncumbrance, CostCenterMonthlyAdmin)
 
