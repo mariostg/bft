@@ -45,6 +45,7 @@ class MonthlyReport:
 
 class CostCenterMonthlyAllocationReport(MonthlyReport):
     def sum_allocation_cost_center(self) -> QuerySet:
+        """Given a FY, quarter and period, sum the allocation of cost centers grouped by fund and period."""
         if not all([self.fy, self.quarter, self.period]):
             raise ValueError(f"Argument cannot be none in FY={self.fy}, quarter={self.quarter}, period={self.period}")
         grouped_sum = (
@@ -69,6 +70,7 @@ class CostCenterMonthlyAllocationReport(MonthlyReport):
         )
 
     def insert_grouped_allocation(self, lines: QuerySet) -> int:
+        """Delete all allocations for a given FY and period and insert allocations from given queryset of lines."""
         if len(lines) == 0:
             logger.info("There are no line items.")
             return 0
