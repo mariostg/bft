@@ -32,6 +32,7 @@ from bft.uploadprocessor import (CapitalProjectInYearProcessor,
                                  FundCenterAllocationProcessor,
                                  FundCenterProcessor, FundProcessor,
                                  SourceProcessor)
+from reports.utils import CostCenterMonthlyAllocationReport
 from main.settings import UPLOADS
 
 
@@ -871,6 +872,9 @@ def costcenter_allocation_add(request):
             form = form.save(commit=False)
             form.user = request.user
             form.save()
+            c = CostCenterMonthlyAllocationReport(form.fy, BftStatusManager().period(), quarter=form.quarter)
+            c.insert_grouped_allocation(c.sum_allocation_cost_center())
+
             return redirect("costcenter-allocation-table")
         else:
             err = form.errors
@@ -894,6 +898,8 @@ def costcenter_allocation_update(request, pk):
             form = form.save(commit=False)
             form.owner = request.user
             form.save()
+            c = CostCenterMonthlyAllocationReport(form.fy, BftStatusManager().period(), quarter=form.quarter)
+            c.insert_grouped_allocation(c.sum_allocation_cost_center())
             return redirect("costcenter-allocation-table")
         else:
             err = form.errors.get_json_data()["__all__"][0]["message"]
