@@ -287,7 +287,6 @@ def costcenter_monthly_plan(request):
         )
         df = r.dataframe()
         if not df.empty:
-            # df = df.style.format(thousands=",", precision=0)
             df = df.style.format(
                 {
                     "Spent": "{:,.0f}",
@@ -303,7 +302,7 @@ def costcenter_monthly_plan(request):
                     "% Commit": "{:.1%}",
                     "% Programmed": "{:.1%}",
                 }
-            )  # .bar(subset=["% Spent", "Allocation"], color="red")
+            )
 
             df = df.to_html()
         elif len(request.GET):
