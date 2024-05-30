@@ -1,11 +1,11 @@
 import pytest
+from django.db.models import Sum
 
-from bft.management.commands import populate, uploadcsv
-from reports.utils import CostCenterMonthlyAllocationReport
+from bft.management.commands import populate
+from bft.models import (BftStatusManager, CostCenterAllocation,
+                        CostCenterManager, FundManager)
 from reports.models import CostCenterMonthlyAllocation
-from bft.models import CostCenterAllocation, CostCenterManager, FundManager
-from django.db.models import F, Sum, Value
-from bft.models import BftStatusManager
+from reports.utils import CostCenterMonthlyAllocationReport
 
 
 @pytest.mark.django_db
@@ -14,8 +14,6 @@ class TestCostCenterMonthlyAllocationReport:
     def populate(self):
         hnd = populate.Command()
         hnd.handle()
-        # up = uploadcsv.Command()
-        # up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
         bftm = BftStatusManager()
         self.fy = bftm.fy()
