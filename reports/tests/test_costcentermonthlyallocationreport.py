@@ -30,7 +30,7 @@ class TestCostCenterMonthlyAllocationReport:
         alloc_sum = CostCenterAllocation.objects.aggregate(Sum("amount"))
         assert 20010.99 == float(alloc_sum["amount__sum"])
 
-    def test_sum_allocation_cost_center(self, populate):
+    def test_costcenter_monthly_allocation_on_insert_allocation(self, populate):
         """After populate, 8484WA C113 has allocation of 10.  Insert 1000 allocation."""
         new_alloc = CostCenterAllocation()
         new_alloc.amount = 1000
