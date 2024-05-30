@@ -6,7 +6,11 @@ from reports.utils import CostCenterMonthlyPlanReport
 
 
 class Command(BaseCommand):
-    """A management command class to handle the update of monthly allocation."""
+    """A class to display a summary of monthly plan.
+
+    Ex : python manage.py monthlysummary --period 1
+
+    """
 
     help = "Update and show monthly allocation."
 
