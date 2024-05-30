@@ -72,8 +72,8 @@ class CostCenterMonthlyAllocationReport(MonthlyReport):
     def insert_grouped_allocation(self, lines: QuerySet) -> int:
         """Delete all allocations for a given FY and period and insert allocations from given queryset of lines."""
         if len(lines) == 0:
-            logger.info("There are no line items.")
-            return 0
+            logger.info("There are no allocations to insert given the queryset provided.")
+            # return 0  otherwise, on delete an allocation, it will exit here because queryset is empty.
         CostCenterMonthlyAllocation.objects.filter(fy=self.fy, period=self.period).delete()
         md = CostCenterMonthlyAllocation.objects.bulk_create([CostCenterMonthlyAllocation(**q) for q in lines])
         return len(md)

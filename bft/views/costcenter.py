@@ -911,6 +911,8 @@ def costcenter_allocation_delete(request, pk):
     item = CostCenterAllocation.objects.get(id=pk)
     if request.method == "POST":
         item.delete()
+        c = CostCenterMonthlyAllocationReport(item.fy, BftStatusManager().period(), quarter=item.quarter)
+        c.insert_grouped_allocation(c.sum_allocation_cost_center())
         return redirect("costcenter-allocation-table")
     context = {"object": item, "back": "costcenter-allocation-table"}
     return render(request, "core/delete-object.html", context)
