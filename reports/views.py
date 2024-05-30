@@ -10,10 +10,19 @@ from django.shortcuts import render
 from bft import conf
 from bft.conf import QUARTERKEYS
 from bft.exceptions import LineItemsDoNotExistError
-from bft.models import (BftStatus, CapitalProjectManager, CostCenterAllocation,
-                        CostCenterChargeMonthly, CostCenterManager,
-                        FinancialStructureManager, FundCenterAllocation,
-                        FundCenterManager, FundManager, LineItem)
+from bft.models import (
+    BftStatus,
+    BftStatusManager,
+    CapitalProjectManager,
+    CostCenterAllocation,
+    CostCenterChargeMonthly,
+    CostCenterManager,
+    FinancialStructureManager,
+    FundCenterAllocation,
+    FundCenterManager,
+    FundManager,
+    LineItem,
+)
 from reports import capitalforecasting, screeningreport, utils
 from reports.forms import (SearchAllocationAnalysisForm,
                            SearchCapitalEstimatesForm, SearchCapitalFearsForm,
@@ -194,8 +203,8 @@ def set_initial(request):
         "costcenter": "",
         "costcenter_name": "Cost Centers",
         "fund": "",
-        "fy": "",
-        "period": "",
+        "fy": BftStatusManager().fy(),
+        "period": BftStatusManager().period(),
     }
     if not len(request.GET):
         return initial
