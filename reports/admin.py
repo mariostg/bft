@@ -36,7 +36,7 @@ class CostCenterMonthlyForecastAdjustmentAdmin(admin.ModelAdmin):
     )
 
 
-class CostCenterMonthlyAdmin(admin.ModelAdmin):
+class CostCenterMonthlyEncumbranceAdmin(admin.ModelAdmin):
     list_display = (
         "costcenter",
         "fund",
@@ -48,13 +48,12 @@ class CostCenterMonthlyAdmin(admin.ModelAdmin):
         "fund_reservation",
         "balance",
         "working_plan",
-        "spent",
     )
 
 
 admin.site.register(CostCenterMonthlyAllocation, CostCenterMonthlyAllocationAdmin)
 
-admin.site.register(CostCenterMonthlyEncumbrance, CostCenterMonthlyAdmin)
+admin.site.register(CostCenterMonthlyEncumbrance, CostCenterMonthlyEncumbranceAdmin)
 
 admin.site.register(CostCenterMonthlyLineItemForecast, CostCenterMonthlyForecastLineItemAdmin)
 
