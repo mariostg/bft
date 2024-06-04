@@ -1,0 +1,25 @@
+<div class="form" id="filter-form">
+  <form action="{% url action %}" method="GET">
+    <div class="form__header">{{title}}</div>
+    <section class="form__fields-row">
+      <div class="form__field">
+        <label for="fundcenter" class="label">Cost Center</label>
+        {{form.costcenter}}
+      </div>
+
+      <div class="form__field">
+        <label class="label" for="fund">Fund</label>
+        {{form.fund}}
+      </div>
+
+      <div class="form__field">
+        <label class="label" for="fy">FY</label>
+        {{form.fy}}
+      </div>
+    </section>
+
+    <div class="block block--spaced">
+      <button class="btn">submit</button>
+    </div>
+  </form>
+</div>
