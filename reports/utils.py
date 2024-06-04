@@ -8,13 +8,31 @@ from bft import conf
 from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         ForecastAdjustment, FundCenter, FundCenterAllocation,
                         FundCenterManager, FundManager, LineForecast, LineItem)
-from reports.models import (CostCenterMonthlyAllocation,
-                            CostCenterMonthlyEncumbrance,
-                            CostCenterMonthlyForecastAdjustment,
-                            CostCenterMonthlyLineItemForecast)
+from reports.models import (
+    CostCenterMonthlyAllocation,
+    CostCenterMonthlyEncumbrance,
+    CostCenterMonthlyForecastAdjustment,
+    CostCenterMonthlyLineItemForecast,
+    CostCenterInYearEncumbrance,
+)
 from utils.dataframe import BFTDataFrame
 
 logger = logging.getLogger("django")
+
+
+class InYearReport:
+
+    def __init__(self, fy, costcenter: str = None, fund: str = None, quarter=None):
+        fy = str(fy)
+        try:
+            self.costcenter = costcenter.upper()
+        except AttributeError:
+            self.costcenter = None
+        try:
+            self.fund = fund.upper()
+        except AttributeError:
+            self.fund = None
+        self.fy = fy
 
 
 class MonthlyReport:
@@ -729,3 +747,69 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
             df_report["% Programmed"] = df_report["Working Plan"] / df_report["Allocation"]
 
         return df_report
+
+
+class CostCenterInYearEncumbranceReport(MonthlyReport):
+
+    def sum_line_items(self) -> QuerySet:
+        line_item_group = LineItem.objects.values("costcenter__costcenter", "fund").annotate(
+            spent=Sum("spent"),
+            commitment=Sum("balance", filter=Q(doctype="CO")),
+            pre_commitment=Sum("balance", filter=Q(doctype="PC")),
+            fund_reservation=Sum("balance", filter=Q(doctype="FR")),
+            balance=Sum("balance"),
+            working_plan=Sum("workingplan"),
+            fy=Value(self.fy),
+            source=Value(""),
+            costcenter=F("costcenter__costcenter"),
+        )
+        return line_item_group.values(
+            "spent",
+            "fund",
+            "commitment",
+            "pre_commitment",
+            "fund_reservation",
+            "balance",
+            "working_plan",
+            "fy",
+            "source",
+            "costcenter",
+        )
+
+    def insert_line_items(self, lines: QuerySet) -> int:
+        if len(lines) == 0:
+            logger.info("There are no lines to insert")
+            return 0
+        CostCenterInYearEncumbrance.objects.filter(fy=self.fy).delete()
+        md = CostCenterInYearEncumbrance.objects.bulk_create([CostCenterInYearEncumbrance(**q) for q in lines])
+        return len(md)
+
+    def dataframe(self) -> pd.DataFrame:
+        """Create a pandas dataframe using CostCenterInYear data as source for the given FY.
+
+        Returns:
+            pandas.DataFrame: dataframe containing cost center monthly data with the following columns :
+            "ID",
+            "Fund",
+            "Source",
+            "Cost Center",
+            "Fund Center",
+            "FY",
+            "Spent",
+            "Commitment",
+            "Pre Commitment",
+            "Fund Reservation",
+            "Balance",
+            "Working Plan"
+        """
+        inyear_df = BFTDataFrame(CostCenterMonthlyEncumbrance)
+        qst = CostCenterMonthlyEncumbrance.objects.filter(fy=self.fy)
+        if self.fund:
+            qst = qst.filter(fund=self.fund)
+        if self.costcenter:
+            qst = qst.filter(costcenter=self.costcenter)
+
+        if qst.count() == 0:
+            return pd.DataFrame()
+        inyear_df = inyear_df.build(qst)
+        return inyear_df
