@@ -193,9 +193,18 @@
 .form__header--small {
     padding-left: 4px;
     font-size: 1.5rem;
-    color: #bfbfbf;
+    margin: 6px -2rem;
+      border-top: 1px solid;
+      color: #4b5544;
+    }
+
+    .form__header--title {
+      padding-left: 4px;
+      font-size: 1.5rem;
+  color: #bfbfbf;
     background-color: #4b5544;
-    margin: 6px -2rem
+  margin: 6px -2rem;
+    text-align: center;
 }
 .form__footer {
     grid-column-start: 1/-1;
