@@ -689,6 +689,8 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
             "Balance",
             "Working Plan",
         ]
+
+        report_fields = on_grouping[0:3] + encumbrance_fields
         allocation__fields = ["Allocation"]
         forecast_adjustment_fields = ["Forecast Adjustment"]
         forecast_line_item_fields = ["Line Item Forecast"]
@@ -706,6 +708,7 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
             return df_report
 
         if len(allocation_df):
+            report_fields.extend(allocation__fields)
             allocation_df = allocation_df[[*on_grouping, *allocation__fields]]
             if not df_report.empty:
                 df_report = df_report.merge(allocation_df, how="outer", on=on_grouping)
@@ -713,6 +716,7 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
                 df_report = allocation_df
 
         if len(forecast_adjustment_df):
+            report_fields.extend(forecast_adjustment_fields)
             forecast_adjustment_df = forecast_adjustment_df[[*on_grouping, *forecast_adjustment_fields]]
             if not df_report.empty:
                 df_report = df_report.merge(forecast_adjustment_df, how="outer", on=on_grouping)
@@ -722,6 +726,7 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
             df_report["Forecast Adjustment"] = 0
 
         if len(forecast_line_items_df):
+            report_fields.extend(forecast_line_item_fields)
             forecast_line_items_df = forecast_line_items_df[[*on_grouping, *forecast_line_item_fields]]
             if not df_report.empty:
                 df_report = df_report.merge(forecast_line_items_df, how="outer", on=on_grouping)
@@ -731,13 +736,6 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
         if not df_report.empty:
             df_report.fillna(0, inplace=True)
             df_report["Total Forecast"] = df_report["Forecast Adjustment"] + df_report["Line Item Forecast"]
-            report_fields = (
-                on_grouping[0:3]
-                + encumbrance_fields
-                + allocation__fields
-                + forecast_line_item_fields
-                + forecast_adjustment_fields
-            )  # don't show fy and period
             df_report = df_report[report_fields]
             df_report
 
