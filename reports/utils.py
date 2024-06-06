@@ -749,7 +749,7 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
         return df_report
 
 
-class CostCenterInYearEncumbranceReport(MonthlyReport):
+class CostCenterInYearEncumbranceReport(InYearReport):
 
     def sum_line_items(self) -> QuerySet:
         line_item_group = LineItem.objects.values("costcenter__costcenter", "fund").annotate(

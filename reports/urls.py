@@ -30,6 +30,11 @@ urlpatterns = [
         views.costcenter_monthly_forecast_adjustment,
         name="costcenter-monthly-forecast-adjustment",
     ),
+    path(
+        "costcenter_in_year_encumbrance",
+        views.costcenter_in_year_encumbrance,
+        name="costcenter-in-year-encumbrance",
+    ),
     path("charges/<str:cc>/<int:fy>/<int:period>/", views.cost_center_charge_table, name="costcenter-charges"),
 ]
 urlpatterns += [

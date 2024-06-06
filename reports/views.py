@@ -16,13 +16,17 @@ from bft.models import (BftStatus, BftStatusManager, CapitalProjectManager,
                         FundCenterAllocation, FundCenterManager, FundManager,
                         LineItem)
 from reports import capitalforecasting, screeningreport, utils
-from reports.forms import (SearchAllocationAnalysisForm,
-                           SearchCapitalEstimatesForm, SearchCapitalFearsForm,
-                           SearchCapitalForecastingDashboardForm,
-                           SearchCapitalHistoricalForm,
-                           SearchCapitalYeRatiosForm,
-                           SearchCostCenterMonthlyDataForm,
-                           SearchCostCenterScreeningReportForm)
+from reports.forms import (
+    SearchAllocationAnalysisForm,
+    SearchCapitalEstimatesForm,
+    SearchCapitalFearsForm,
+    SearchCapitalForecastingDashboardForm,
+    SearchCapitalHistoricalForm,
+    SearchCapitalYeRatiosForm,
+    SearchCostCenterMonthlyDataForm,
+    SearchCostCenterScreeningReportForm,
+    SearchCostCenterInYearDataForm,
+)
 from utils.getrequestfilter import set_query_string
 
 
@@ -437,6 +441,58 @@ def costcenter_monthly_data(request):
 
     context = {"table": df.to_html(), "form_filter": form_filter, "form": form}
     return render(request, "costcenter-monthly-data.html", context)
+
+
+def costcenter_in_year_encumbrance(request):
+    initial = set_initial(request)
+    form = SearchCostCenterInYearDataForm(initial=initial)
+
+    context = {
+        "title": f"{initial['costcenter_name']} In Year Encumbrance",
+        "action": "costcenter-in-year-encumbrance",
+        "form_filter": True,
+        "form": form,
+        "table": "FY and period are mandatory fields.",
+    }
+    if len(request.GET):
+        if "" in [initial["costcenter"], initial["fund"]]:
+            form.initial = initial
+            context["form"] = form
+            return render(request, "costcenter-in-year-data.html", context)
+
+        form.initial = initial
+        if "" in [initial["fund"], initial["costcenter"]]:
+            return render(request, "costcenter-in-year-data.html", context)
+
+        r = utils.CostCenterInYearEncumbranceReport(
+            fy=initial["fy"], fund=initial["fund"], costcenter=initial["costcenter"]
+        )
+        df = r.dataframe()
+        if not df.empty:
+            df_columns = [
+                "Period",
+                "Fund",
+                "Source",
+                "Spent",
+                "Commitment",
+                "Pre Commitment",
+                "Fund Reservation",
+                "Balance",
+                "Working Plan",
+            ]
+            if initial["costcenter"] is None:
+                df_columns = ["Cost Center"] + df_columns
+            df = df[df_columns]
+            df = df.style.format(thousands=",", precision=0)
+            df = df.to_html()
+        elif len(request.GET):
+            df = "There are no data to report using the given parameters."
+        else:
+            df = ""
+
+        context["table"] = df
+        context["form"] = form
+    return render(request, "costcenter-in-year-data.html", context)
 
 
 def line_items(request):
