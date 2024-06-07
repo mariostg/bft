@@ -33,7 +33,7 @@ from bft.uploadprocessor import (CapitalProjectInYearProcessor,
                                  FundCenterProcessor, FundProcessor,
                                  SourceProcessor)
 from main.settings import UPLOADS
-from reports.utils import CostCenterMonthlyAllocationReport
+from reports.utils import CostCenterMonthlyAllocationReport, CostCenterMonthlyForecastAdjustmentReport
 
 
 def fund_page(request):
@@ -964,6 +964,8 @@ def forecast_adjustment_add(request):
             form.user = request.user
             try:
                 form.save()
+                c = CostCenterMonthlyForecastAdjustmentReport(BftStatusManager().fy(), BftStatusManager().period())
+                c.insert_grouped_forecast_adjustment(c.sum_forecast_adjustments())
             except exceptions.LineItemsDoNotExistError:
                 messages.warning(
                     request, f"Cost center {form.costcenter} has no line items"
@@ -986,6 +988,8 @@ def forecast_adjustment_update(request, pk):
             form = form.save(commit=False)
             form.owner = request.user
             form.save()
+            c = CostCenterMonthlyForecastAdjustmentReport(BftStatusManager().fy(), BftStatusManager().period())
+            c.insert_grouped_forecast_adjustment(c.sum_forecast_adjustments())
             return redirect("forecast-adjustment-table")
 
     return render(request, "costcenter/forecast-adjustment-form.html", {"form": form})
@@ -995,7 +999,12 @@ def forecast_adjustment_update(request, pk):
 def forecast_adjustment_delete(request, pk):
     item = ForecastAdjustment.objects.get(id=pk)
     if request.method == "POST":
+        print("Deleting")
         item.delete()
+        print("Deleted!!!")
+        c = CostCenterMonthlyForecastAdjustmentReport(BftStatusManager().fy(), BftStatusManager().period())
+        print("This is c", c)
+        c.insert_grouped_forecast_adjustment(c.sum_forecast_adjustments())
         return redirect("forecast-adjustment-table")
     context = {"object": item, "back": "forecast-adjustment-table"}
     return render(request, "core/delete-object.html", context)

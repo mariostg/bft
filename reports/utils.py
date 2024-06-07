@@ -202,7 +202,6 @@ class CostCenterMonthlyForecastAdjustmentReport(MonthlyReport):
     def insert_grouped_forecast_adjustment(self, lines: QuerySet) -> int:
         if len(lines) == 0:
             logger.info("There are no forecast adjustments to insert")
-            return 0
         CostCenterMonthlyForecastAdjustment.objects.filter(fy=self.fy, period=self.period).delete()
         md = CostCenterMonthlyForecastAdjustment.objects.bulk_create(
             [CostCenterMonthlyForecastAdjustment(**q) for q in lines]
