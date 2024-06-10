@@ -19,14 +19,12 @@ from bft.models import (BftStatus, BftStatusManager, BftUser, CapitalInYear,
                         CostCenterChargeImport, CostCenterChargeMonthly, Fund,
                         FundCenter, FundCenterAllocation, LineForecast,
                         LineItem, Source)
-from reports.models import (
-    CostCenterInYearEncumbrance,
-    CostCenterMonthlyAllocation,
-    CostCenterMonthlyEncumbrance,
-    CostCenterMonthlyForecastAdjustment,
-    CostCenterMonthlyLineItemForecast,
-)
 from main.settings import DEBUG
+from reports.models import (CostCenterInYearEncumbrance,
+                            CostCenterMonthlyAllocation,
+                            CostCenterMonthlyEncumbrance,
+                            CostCenterMonthlyForecastAdjustment,
+                            CostCenterMonthlyLineItemForecast)
 
 
 class Command(BaseCommand):
