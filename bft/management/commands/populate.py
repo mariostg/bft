@@ -19,6 +19,13 @@ from bft.models import (BftStatus, BftStatusManager, BftUser, CapitalInYear,
                         CostCenterChargeImport, CostCenterChargeMonthly, Fund,
                         FundCenter, FundCenterAllocation, LineForecast,
                         LineItem, Source)
+from reports.models import (
+    CostCenterInYearEncumbrance,
+    CostCenterMonthlyAllocation,
+    CostCenterMonthlyEncumbrance,
+    CostCenterMonthlyForecastAdjustment,
+    CostCenterMonthlyLineItemForecast,
+)
 from main.settings import DEBUG
 
 
@@ -33,14 +40,22 @@ class Command(BaseCommand):
             CapitalNewYear.objects.all().delete()
             CapitalInYear.objects.all().delete()
             CapitalYearEnd.objects.all().delete()
+
             Source.objects.all().delete()
             Fund.objects.all().delete()
             FundCenter.objects.all().delete()
             BftStatus.objects.all().delete()
             CostCenterAllocation.objects.all().delete()
             FundCenterAllocation.objects.all().delete()
+            # monthly data
             CostCenterChargeMonthly.objects.all().delete()
             CostCenterChargeImport.objects.all().delete()
+            CostCenterInYearEncumbrance.objects.all().delete()
+            CostCenterMonthlyAllocation.objects.all().delete()
+            CostCenterMonthlyEncumbrance.objects.all().delete()
+            CostCenterMonthlyForecastAdjustment.objects.all().delete()
+            CostCenterMonthlyLineItemForecast.objects.all().delete()
+
             self.set_bft_status()
             self.set_fund()
             self.set_source()
