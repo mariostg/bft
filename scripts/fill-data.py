@@ -61,5 +61,5 @@ fa.amount = 1000
 fa.note = "Increase in demand"
 fa.save()
 for p in range(1, 14):
-    do_monthly(2023, p, 1)
     call_command("uploadcsv", f"test-data/encumbrance_2184A3-p{p}.txt")
+    do_monthly(2023, p, 1)

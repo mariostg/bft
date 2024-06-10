@@ -479,6 +479,7 @@ def costcenter_in_year_encumbrance(request):
             ]
             if initial["costcenter"] is None:
                 df_columns = ["Cost Center"] + df_columns
+            context["data"] = df.to_json(orient="records")  # json data for chart.  To be worked on
             df = df[df_columns]
             df = df.style.format(thousands=",", precision=0)
             df = df.to_html()
