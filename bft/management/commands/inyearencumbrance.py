@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 
 from bft.management.commands._private import UserInput
 from bft.models import CostCenter, CostCenterManager
-from reports.utils import CostCenterMonthlyEncumbranceReport, CostCenterInYearEncumbranceReport
+from reports.utils import CostCenterInYearEncumbranceReport
 
 
 class Command(BaseCommand):

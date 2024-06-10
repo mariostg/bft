@@ -11,11 +11,10 @@ from bft.filters import LineItemFilter
 from bft.forms import (CostCenterForecastForm, CostCenterLineItemUploadForm,
                        DocumentNumberForm, FundCenterLineItemUploadForm,
                        LineForecastForm)
-from bft.models import CostCenter, LineForecast, LineItem
+from bft.models import BftStatusManager, CostCenter, LineForecast, LineItem
 from bft.uploadprocessor import CostCenterLineItemProcessor, LineItemProcessor
 from main.settings import UPLOADS
 from reports.utils import CostCenterMonthlyForecastLineItemReport
-from bft.models import BftStatusManager
 
 logger = logging.getLogger("django")
 
@@ -171,6 +170,7 @@ def line_forecast_zero_update(request, pk):
 
 def line_forecast_delete(request, pk):
     target = LineForecast.objects.get(pk=pk)
+
     if request.method == "POST":
         if target.lineitem.spent > 0:
             messages.warning(

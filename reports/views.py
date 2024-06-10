@@ -16,17 +16,14 @@ from bft.models import (BftStatus, BftStatusManager, CapitalProjectManager,
                         FundCenterAllocation, FundCenterManager, FundManager,
                         LineItem)
 from reports import capitalforecasting, screeningreport, utils
-from reports.forms import (
-    SearchAllocationAnalysisForm,
-    SearchCapitalEstimatesForm,
-    SearchCapitalFearsForm,
-    SearchCapitalForecastingDashboardForm,
-    SearchCapitalHistoricalForm,
-    SearchCapitalYeRatiosForm,
-    SearchCostCenterMonthlyDataForm,
-    SearchCostCenterScreeningReportForm,
-    SearchCostCenterInYearDataForm,
-)
+from reports.forms import (SearchAllocationAnalysisForm,
+                           SearchCapitalEstimatesForm, SearchCapitalFearsForm,
+                           SearchCapitalForecastingDashboardForm,
+                           SearchCapitalHistoricalForm,
+                           SearchCapitalYeRatiosForm,
+                           SearchCostCenterInYearDataForm,
+                           SearchCostCenterMonthlyDataForm,
+                           SearchCostCenterScreeningReportForm)
 from utils.getrequestfilter import set_query_string
 
 

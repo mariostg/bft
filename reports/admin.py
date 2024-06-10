@@ -1,12 +1,10 @@
 from django.contrib import admin
 
-from reports.models import (
-    CostCenterMonthlyAllocation,
-    CostCenterMonthlyEncumbrance,
-    CostCenterMonthlyForecastAdjustment,
-    CostCenterMonthlyLineItemForecast,
-    CostCenterInYearEncumbrance,
-)
+from reports.models import (CostCenterInYearEncumbrance,
+                            CostCenterMonthlyAllocation,
+                            CostCenterMonthlyEncumbrance,
+                            CostCenterMonthlyForecastAdjustment,
+                            CostCenterMonthlyLineItemForecast)
 
 
 class CostCenterMonthlyAllocationAdmin(admin.ModelAdmin):

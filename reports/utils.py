@@ -8,13 +8,11 @@ from bft import conf
 from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         ForecastAdjustment, FundCenter, FundCenterAllocation,
                         FundCenterManager, FundManager, LineForecast, LineItem)
-from reports.models import (
-    CostCenterMonthlyAllocation,
-    CostCenterMonthlyEncumbrance,
-    CostCenterMonthlyForecastAdjustment,
-    CostCenterMonthlyLineItemForecast,
-    CostCenterInYearEncumbrance,
-)
+from reports.models import (CostCenterInYearEncumbrance,
+                            CostCenterMonthlyAllocation,
+                            CostCenterMonthlyEncumbrance,
+                            CostCenterMonthlyForecastAdjustment,
+                            CostCenterMonthlyLineItemForecast)
 from utils.dataframe import BFTDataFrame
 
 logger = logging.getLogger("django")

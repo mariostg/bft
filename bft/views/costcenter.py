@@ -33,7 +33,8 @@ from bft.uploadprocessor import (CapitalProjectInYearProcessor,
                                  FundCenterProcessor, FundProcessor,
                                  SourceProcessor)
 from main.settings import UPLOADS
-from reports.utils import CostCenterMonthlyAllocationReport, CostCenterMonthlyForecastAdjustmentReport
+from reports.utils import (CostCenterMonthlyAllocationReport,
+                           CostCenterMonthlyForecastAdjustmentReport)
 
 
 def fund_page(request):
