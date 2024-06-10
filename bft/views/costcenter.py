@@ -999,11 +999,8 @@ def forecast_adjustment_update(request, pk):
 def forecast_adjustment_delete(request, pk):
     item = ForecastAdjustment.objects.get(id=pk)
     if request.method == "POST":
-        print("Deleting")
         item.delete()
-        print("Deleted!!!")
         c = CostCenterMonthlyForecastAdjustmentReport(BftStatusManager().fy(), BftStatusManager().period())
-        print("This is c", c)
         c.insert_grouped_forecast_adjustment(c.sum_forecast_adjustments())
         return redirect("forecast-adjustment-table")
     context = {"object": item, "back": "forecast-adjustment-table"}
