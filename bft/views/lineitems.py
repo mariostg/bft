@@ -14,6 +14,8 @@ from bft.forms import (CostCenterForecastForm, CostCenterLineItemUploadForm,
 from bft.models import CostCenter, LineForecast, LineItem
 from bft.uploadprocessor import CostCenterLineItemProcessor, LineItemProcessor
 from main.settings import UPLOADS
+from reports.utils import CostCenterMonthlyForecastLineItemReport
+from bft.models import BftStatusManager
 
 logger = logging.getLogger("django")
 
@@ -71,6 +73,13 @@ def line_forecast_add(request, pk):
             else:
                 messages.success(request, "Forecast created")
             line_forecast.save()
+            c = CostCenterMonthlyForecastLineItemReport(
+                BftStatusManager().fy(),
+                BftStatusManager().period(),
+                costcenter=form.lineitem.costcenter.costcenter,
+                fund=form.lineitem.fund,
+            )
+            c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
             return redirect("lineitem-page")
     else:
         form = LineForecastForm()
@@ -107,6 +116,13 @@ def line_forecast_update(request, pk):
                 messages.success(request, "Forecast has been updated")
                 # form.owner = request.user
             form.save()
+            c = CostCenterMonthlyForecastLineItemReport(
+                BftStatusManager().fy(),
+                BftStatusManager().period(),
+                costcenter=form.lineitem.costcenter.costcenter,
+                fund=form.lineitem.fund,
+            )
+            c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
             return redirect("lineitem-page")
 
     return render(
@@ -121,6 +137,13 @@ def line_forecast_to_wp_update(request, pk):
         target = LineForecast.objects.get(pk=pk)
         target.forecastamount = target.lineitem.workingplan
         target.save()
+        c = CostCenterMonthlyForecastLineItemReport(
+            BftStatusManager().fy(),
+            BftStatusManager().period(),
+            costcenter=target.lineitem.costcenter.costcenter,
+            fund=target.lineitem.fund,
+        )
+        c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
         messages.info(request, "Forecast set to working plan amount")
     return redirect("lineitem-page")
 
@@ -135,13 +158,19 @@ def line_forecast_zero_update(request, pk):
         else:
             target.forecastamount = 0
             target.save()
+            c = CostCenterMonthlyForecastLineItemReport(
+                BftStatusManager().fy(),
+                BftStatusManager().period(),
+                costcenter=target.lineitem.costcenter.costcenter,
+                fund=target.lineitem.fund,
+            )
+            c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
             messages.success(request, "Forecast has been set to 0")
     return redirect("lineitem-page")
 
 
 def line_forecast_delete(request, pk):
     target = LineForecast.objects.get(pk=pk)
-
     if request.method == "POST":
         if target.lineitem.spent > 0:
             messages.warning(
@@ -150,6 +179,13 @@ def line_forecast_delete(request, pk):
         else:
             messages.success(request, "Forecast has been deleted")
             target.delete()
+            c = CostCenterMonthlyForecastLineItemReport(
+                BftStatusManager().fy(),
+                BftStatusManager().period(),
+                costcenter=target.lineitem.costcenter.costcenter,
+                fund=target.lineitem.fund,
+            )
+            c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
         return redirect("lineitem-page")
     context = {
         "object": "Forecast for " + target.lineitem.linetext,
