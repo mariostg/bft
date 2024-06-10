@@ -22,6 +22,8 @@ class InYearReport:
 
     def __init__(self, fy, costcenter: str = None, fund: str = None, quarter=None):
         fy = str(fy)
+        if len(fy) != 4 or not fy.isdigit():
+            raise ValueError("Fiscal Year must be 4 digits long.")
         try:
             self.costcenter = costcenter.upper()
         except AttributeError:
