@@ -805,8 +805,10 @@ class CostCenterInYearEncumbranceReport(InYearReport):
             qst = qst.filter(fund=self.fund)
         if self.costcenter:
             qst = qst.filter(costcenter=self.costcenter)
-
         if qst.count() == 0:
             return pd.DataFrame()
         inyear_df = inyear_df.build(qst)
+        inyear_df.Period = inyear_df.Period.astype("int")
+        inyear_df = inyear_df.sort_values("Period")
+        print(inyear_df.dtypes)
         return inyear_df
