@@ -26,7 +26,7 @@ class TestCostCenterMonthlyAllocationReport:
     def test_populate_allocation(self, populate):
         """Check our test data has expected allocation"""
         alloc_sum = CostCenterAllocation.objects.aggregate(Sum("amount"))
-        assert 20010.99 == float(alloc_sum["amount__sum"])
+        assert 120000.99 == float(alloc_sum["amount__sum"])
 
     def test_costcenter_monthly_allocation_on_insert_allocation(self, populate):
         """After populate, 8484WA C113 has allocation of 10.  Insert 1000 allocation."""
@@ -40,16 +40,16 @@ class TestCostCenterMonthlyAllocationReport:
         CCMAR = CostCenterMonthlyAllocationReport(fy=self.fy, period=self.period, quarter=self.quarter)
 
         grouped_sum = CCMAR.sum_allocation_cost_center()
-        assert 1010 == float(grouped_sum[0]["allocation"])
+        assert 101000 == float(grouped_sum[0]["allocation"])
 
         affected_count = CCMAR.insert_grouped_allocation(grouped_sum)
         assert 2 == affected_count
 
         cc_alloc = CostCenterMonthlyAllocation.objects.filter(costcenter=self.cc_str).aggregate(Sum("allocation"))
-        assert 1010 == float(cc_alloc["allocation__sum"])
+        assert 101000 == float(cc_alloc["allocation__sum"])
 
     def test_costcenter_monthly_allocation_on_update_allocation(self, populate):
-        """After populate, 8484WA C113 has allocation of 10.  Let's update to 2000."""
+        """After populate, 8484WA C113 has allocation of 10000.  Let's update to 2000."""
         update_alloc = CostCenterAllocation.objects.get(
             costcenter=self.costcenter,
             fund=self.fund,
