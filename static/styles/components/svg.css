@@ -31,7 +31,8 @@ rect {
 #chart_estimates,
 #chart_fearstatus,
 #chart_outlook,
-#chart_ye_ratios {
+#chart_ye_ratios,
+#chart_in_year {
     background-color: antiquewhite;
     display: flex;
     flex-direction: column;

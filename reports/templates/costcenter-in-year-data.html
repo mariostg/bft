@@ -13,13 +13,9 @@
           <h2>{{title}}</h2>
       {% endif %}
     </header>
-    <section class="summary block--spaced">
-      {{table|safe}}
-    </section>
-  </div>
-  </main>
 
-  <script type="text/javascript" src="{% static 'js/reports/table-formatter.js'%}" ></script>
+  </div>
+
   {% if data|length > 2 %}
   <div id="chart_in_year"><div class="chart__title">NP In Year</div></div>
 
@@ -46,4 +42,10 @@
   </script>
   {% endif %}
 
+  <section class="summary block--spaced">
+    {{table|safe}}
+  </section>
+  <script type="text/javascript" src="{% static 'js/reports/table-formatter.js'%}" ></script>
+
+</main>
 {% endblock content%}

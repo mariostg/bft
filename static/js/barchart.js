@@ -9,20 +9,32 @@ const Chart = function (parent, data, chart_config) {
         };
         */
         const config_default = {
-            style: {
-                type: chart_config?.style?.type || "bar",
-                barmode: chart_config?.style?.barmode || "stacked",
-                orient: "v",
-                canvas: {
-                    width: chart_config?.style?.width || 200,
-                    height: chart_config?.style?.height || 300,
-                },
-                margin: { top: 10, right: 30, bottom: 20, left: 50 },
-                legend: { position: "right", orient: "v", translate_x: 0, translate_y: 0, width: 0 }, //left,right,top,bottom,none
+          style: {
+            type: chart_config?.style?.type || "bar",
+            barmode: chart_config?.style?.barmode || "stacked",
+            orient: "v",
+            canvas: {
+              width: chart_config?.style?.width || 200,
+              height: chart_config?.style?.height || 300,
             },
-            figure: { color: chart_config.color || {} }, //defined in setColors},
-            piston: { name: chart_config?.piston?.name || null, fill: chart_config?.piston?.fill || null },
-            marker: { name: chart_config?.marker?.name || null, fill: chart_config?.marker?.fill || null },
+            margin: { top: 10, right: 30, bottom: 20, left: 60 },
+            legend: {
+              position: "right",
+              orient: "v",
+              translate_x: 0,
+              translate_y: 0,
+              width: 0,
+            }, //left,right,top,bottom,none
+          },
+          figure: { color: chart_config.color || {} }, //defined in setColors},
+          piston: {
+            name: chart_config?.piston?.name || null,
+            fill: chart_config?.piston?.fill || null,
+          },
+          marker: {
+            name: chart_config?.marker?.name || null,
+            fill: chart_config?.marker?.fill || null,
+          },
         };
         chart_config.figure = config_default.figure;
         chart_config.figure.yGroupName = Object.keys(data[0]).slice(1);
