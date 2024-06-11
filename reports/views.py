@@ -483,6 +483,20 @@ def costcenter_in_year_encumbrance(request):
             df = df[df_columns]
             df = df.style.format(thousands=",", precision=0)
             df = df.to_html()
+
+            mgr = CostCenterManager()
+            cc_df = mgr.allocation_dataframe("8484wa", fund=initial["fund"], fy=initial["fy"], quarter=1)
+            context["allocation"] = cc_df.Allocation.to_json(orient="records")
+
+            fcst_adj = utils.CostCenterMonthlyForecastAdjustmentReport(
+                fy=initial["fy"],
+                period=BftStatusManager().period(),
+                costcenter=initial["costcenter"],
+                fund=initial["fund"],
+            )
+            fcst_adj.dataframe()
+            fcst_adj_df = fcst_adj.dataframe()
+            context["fcst"] = fcst_adj_df["Forecast Adjustment"].to_json(orient="records")
         elif len(request.GET):
             df = "There are no data to report using the given parameters."
         else:

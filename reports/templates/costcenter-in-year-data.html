@@ -20,22 +20,24 @@
   <div id="chart_in_year"><div class="chart__title">NP In Year</div></div>
 
   {{data|json_script:"json_data"}}
+  {{allocation|json_script:"json_allocation"}}
+  {{fcst|json_script:"json_fcst"}}
   <script type="module">
     import { Chart, ChartHandler} from "/static/js/barchart.js";
     const data=JSON.parse(JSON.parse(document.getElementById('json_data').textContent))
+    const allocation=JSON.parse(JSON.parse(document.getElementById('json_allocation').textContent))
+    const fcst=JSON.parse(JSON.parse(document.getElementById('json_fcst').textContent))
     const data_quarterly=data.map(function(e) {
       console.log(e)
-      return {Period:e.Period,Spent:e.Spent,Commitment:e.Commitment, PC:e['Pre Commitment'],FR:e['Fund Reservation']}
+      return {Period:e.Period,Spent:e.Spent,CO:e.Commitment, PC:e['Pre Commitment'],FR:e['Fund Reservation']}
     });
-    console.log("---------------")
-    console.log(data_quarterly)
-    console.log("---------------")
     const colors={Spent:'#882255',CO:'#ddcc77',PC:'#afeeee',FR:'#fa8072'};
     data_quarterly.columns = Object.keys(data_quarterly[0]);
     var config = {
       color:colors,
       style: { type: "bar", barmode: "stacked", orientation: "v", width: 700, height: 300 },
-      legend: { visibility: "show", orient: "v" }
+      legend: { visibility: "show", orient: "v" },
+      threshold: [{name:"Allocation",value:allocation[0]},{name:"Forecast", value:fcst[0]}]
     };
     Chart("chart_in_year", data_quarterly, config);
     ChartHandler.ajust_chart_width()
