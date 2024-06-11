@@ -562,7 +562,7 @@ class TestCostCenterAllocation:
         cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C113")
         allocation = CostCenterAllocation.objects.get(costcenter=cc, fund=fund, fy=2023, quarter=1)
-        assert str(allocation) == "8484WA - BASEMENT - C113 - Basement Procurement - 2023 Q1 10.00"
+        assert str(allocation) == "8484WA - BASEMENT - C113 - Basement Procurement - 2023 Q1 100000.00"
 
     def test_verbose_name_plural(self):
         assert str(ForecastAdjustment._meta.verbose_name_plural) == "Forecast Adjustments"
