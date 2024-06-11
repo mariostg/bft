@@ -57,7 +57,7 @@ call_command("uploadcsv", f"{settings.BASE_DIR}/test-data/encumbrance_2184A3-p1.
 fa = ForecastAdjustment()
 fa.costcenter = cc
 fa.fund = fund
-fa.amount = 1000
+fa.amount = 225000
 fa.note = "Increase in demand"
 fa.save()
 for p in range(1, 14):
