@@ -1,6 +1,28 @@
 from django.db import models
 
 
+class MonthlyDataQuerySet(models.QuerySet):
+    def fund(self, fund: str = None):
+        if not fund:
+            return self
+        return self.filter(fund=fund)
+
+    def fy(self, fy: int = None):
+        if not fy:
+            return self
+        return self.filter(fy=fy)
+
+    def period(self, period: int = None):
+        if not period:
+            return self
+        return self.filter(period=period)
+
+    def costcenter(self, costcenter: str = None):
+        if not costcenter:
+            return self
+        return self.filter(costcenter=costcenter)
+
+
 class MonthlyData(models.Model):
     """A generic base class that contains generic fields to be used by other classes that needs monthly related fields."""
     fund = models.CharField("Fund", max_length=4)
@@ -9,6 +31,9 @@ class MonthlyData(models.Model):
 
     period = models.CharField("Period", max_length=2)
     fy = models.CharField("FY", max_length=4)
+
+    objects = models.Manager()
+    search = MonthlyDataQuerySet.as_manager()
 
     def __str__(self):
         s = ""

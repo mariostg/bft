@@ -498,7 +498,8 @@ def costcenter_in_year_encumbrance(request):
                 costcenter=initial["costcenter"],
                 fund=initial["fund"],
             )
-            fcst_adj.dataframe()
+
+            # fcst_adj.dataframe()
             fcst_adj_df = fcst_adj.dataframe()
             context["fcst"] = fcst_adj_df["Forecast Adjustment"].to_json(orient="records")
 

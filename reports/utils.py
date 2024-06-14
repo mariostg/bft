@@ -110,15 +110,16 @@ class CostCenterMonthlyAllocationReport(MonthlyReport):
             "Period",
             allocation
         """
-        monthly_df = BFTDataFrame(CostCenterMonthlyAllocation)
-        qst = CostCenterMonthlyAllocation.objects.filter(fy=self.fy, period=self.period)
-        if self.fund:
-            qst = qst.filter(fund=self.fund)
-        if self.costcenter:
-            qst = qst.filter(costcenter=self.costcenter)
+        qst = (
+            CostCenterMonthlyAllocation.search.fy(self.fy)
+            .period(self.period)
+            .fund(self.fund)
+            .costcenter(self.costcenter)
+        )
 
         if qst.count() == 0:
             return pd.DataFrame()
+        monthly_df = BFTDataFrame(CostCenterMonthlyAllocation)
         return monthly_df.build(qst)
 
 
@@ -166,15 +167,16 @@ class CostCenterMonthlyForecastLineItemReport(MonthlyReport):
             "Period",
             line_item_forecast
         """
-        monthly_df = BFTDataFrame(CostCenterMonthlyLineItemForecast)
-        qst = CostCenterMonthlyLineItemForecast.objects.filter(fy=self.fy, period=self.period)
-        if self.fund:
-            qst = qst.filter(fund=self.fund)
-        if self.costcenter:
-            qst = qst.filter(costcenter=self.costcenter)
+        qst = (
+            CostCenterMonthlyLineItemForecast.search.fy(self.fy)
+            .period(self.period)
+            .fund(self.fund)
+            .costcenter(self.costcenter)
+        )
 
         if qst.count() == 0:
             return pd.DataFrame()
+        monthly_df = BFTDataFrame(CostCenterMonthlyLineItemForecast)
         return monthly_df.build(qst)
 
 
@@ -222,15 +224,15 @@ class CostCenterMonthlyForecastAdjustmentReport(MonthlyReport):
             "Period",
             Forecast Adjustment
         """
-        monthly_df = BFTDataFrame(CostCenterMonthlyForecastAdjustment)
-        qst = CostCenterMonthlyForecastAdjustment.objects.filter(fy=self.fy, period=self.period)
-        if self.fund:
-            qst = qst.filter(fund=self.fund)
-        if self.costcenter:
-            qst = qst.filter(costcenter=self.costcenter)
-
+        qst = (
+            CostCenterMonthlyForecastAdjustment.search.fy(self.fy)
+            .period(self.period)
+            .fund(self.fund)
+            .costcenter(self.costcenter)
+        )
         if qst.count() == 0:
             return pd.DataFrame()
+        monthly_df = BFTDataFrame(CostCenterMonthlyForecastAdjustment)
         return monthly_df.build(qst)
 
 
@@ -290,17 +292,16 @@ class CostCenterMonthlyEncumbranceReport(MonthlyReport):
             "Balance",
             "Working Plan"
         """
-        monthly_df = BFTDataFrame(CostCenterMonthlyEncumbrance)
-        qst = CostCenterMonthlyEncumbrance.objects.filter(fy=self.fy, period=self.period)
-        if self.fund:
-            qst = qst.filter(fund=self.fund)
-        if self.costcenter:
-            qst = qst.filter(costcenter=self.costcenter)
-
+        qst = (
+            CostCenterMonthlyEncumbrance.search.fy(self.fy)
+            .period(self.period)
+            .fund(self.fund)
+            .costcenter(self.costcenter)
+        )
         if qst.count() == 0:
             return pd.DataFrame()
-        monthly_df = monthly_df.build(qst)
-        return monthly_df
+        monthly_df = BFTDataFrame(CostCenterMonthlyEncumbrance)
+        return monthly_df.build(qst)
 
 
 class CostCenterScreeningReport:
