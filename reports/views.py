@@ -498,10 +498,19 @@ def costcenter_in_year_encumbrance(request):
                 costcenter=initial["costcenter"],
                 fund=initial["fund"],
             )
-
-            # fcst_adj.dataframe()
             fcst_adj_df = fcst_adj.dataframe()
-            context["fcst"] = fcst_adj_df["Forecast Adjustment"].to_json(orient="records")
+
+            fcst_line_items = utils.CostCenterMonthlyForecastLineItemReport(
+                fy=initial["fy"],
+                period=BftStatusManager().period(),
+                costcenter=initial["costcenter"],
+                fund=initial["fund"],
+            )
+            fcst_line_df = fcst_line_items.dataframe()
+
+            context["fcst"] = (fcst_line_df["Line Item Forecast"] + fcst_adj_df["Forecast Adjustment"]).to_json(
+                orient="records"
+            )
 
         elif len(request.GET):
             df = "There are no data to report using the given parameters."
