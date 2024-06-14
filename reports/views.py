@@ -194,7 +194,7 @@ def set_fy(request) -> int:
 def set_initial(request):
     initial = {
         "costcenter": "",
-        "costcenter_name": "Cost Centers",
+        "costcenter_name": "All Cost Centers",
         "fund": "",
         "fy": BftStatusManager().fy(),
         "period": BftStatusManager().period(),
@@ -440,12 +440,12 @@ def costcenter_monthly_data(request):
     return render(request, "costcenter-monthly-data.html", context)
 
 
-def costcenter_in_year_encumbrance(request):
+def costcenter_in_year_fear(request):
     initial = set_initial(request)
     form = SearchCostCenterInYearDataForm(initial=initial)
 
     context = {
-        "title": f"{initial['costcenter_name']} In Year Encumbrance",
+        "title": f"{initial['costcenter_name']} In Year FEARS",
         "action": "costcenter-in-year-encumbrance",
         "form_filter": True,
         "form": form,

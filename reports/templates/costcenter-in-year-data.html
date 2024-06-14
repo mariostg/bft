@@ -17,7 +17,7 @@
   </div>
 
   {% if data|length > 2 %}
-  <div id="chart_in_year"><div class="chart__title">NP In Year</div></div>
+  <div id="chart_in_year"><div class="chart__title">{{title}}</div></div>
 
   {{data|json_script:"json_data"}}
   {{allocation|json_script:"json_allocation"}}
