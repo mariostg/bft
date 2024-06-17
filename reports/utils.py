@@ -811,5 +811,4 @@ class CostCenterInYearEncumbranceReport(InYearReport):
         inyear_df = inyear_df.build(qst)
         inyear_df.Period = inyear_df.Period.astype("int")
         inyear_df = inyear_df.sort_values("Period")
-        print(inyear_df.dtypes)
         return inyear_df

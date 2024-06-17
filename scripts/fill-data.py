@@ -2,11 +2,23 @@
 # A useful script to throw some data into BFT for testing purposes. To be used in DEBUG mode.
 # """
 
-import os, sys
+import os
+import sys
 from pathlib import Path
 
 import django
 from django.core.management import call_command
+
+from reports.utils import (CostCenterMonthlyAllocationReport,
+                           CostCenterMonthlyEncumbranceReport,
+                           CostCenterMonthlyForecastAdjustmentReport,
+                           CostCenterMonthlyForecastLineItemReport,
+                           CostCenterMonthlyPlanReport)
+
+from reports.utils import CostCenterInYearEncumbranceReport  # isort:skip
+
+from main import settings  # isort:skip
+from bft.models import ForecastAdjustment, CostCenterManager, FundManager  # isort:skip
 
 
 PWD = os.getenv("PWD")
@@ -16,17 +28,6 @@ if BASE_DIR not in sys.path:
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "main.settings")
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 django.setup()
-
-from main import settings  # isort:skip
-from bft.models import ForecastAdjustment, CostCenterManager, FundManager  # isort:skip
-from reports.utils import (
-    CostCenterMonthlyAllocationReport,
-    CostCenterMonthlyForecastLineItemReport,
-    CostCenterMonthlyForecastAdjustmentReport,
-    CostCenterInYearEncumbranceReport,
-    CostCenterMonthlyPlanReport,
-    CostCenterMonthlyEncumbranceReport,
-)  # isort:skip
 
 
 def do_monthly(fy, period, quarter):
