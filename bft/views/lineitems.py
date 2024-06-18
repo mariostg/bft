@@ -15,6 +15,7 @@ from bft.models import BftStatusManager, CostCenter, LineForecast, LineItem
 from bft.uploadprocessor import CostCenterLineItemProcessor, LineItemProcessor
 from main.settings import UPLOADS
 from reports.utils import CostCenterMonthlyForecastLineItemReport
+from bft import exceptions
 
 logger = logging.getLogger("django")
 
@@ -95,9 +96,13 @@ def line_forecast_update(request, pk):
     spent = data.lineitem.spent
     form = LineForecastForm(instance=data)
     if request.method == "POST":
-        form = LineForecastForm(request.POST, instance=data)
+        form: LineForecast = LineForecastForm(request.POST, instance=data)
         if form.is_valid():
             form = form.save(commit=False)
+            if not data.lineitem.costcenter.isforecastable:
+                messages.warning(request, "This cost center is not forecastable.")
+                return redirect("lineitem-page")
+
             forecast_amount = form.forecastamount
             if form.forecastamount < spent:
                 messages.warning(
@@ -135,7 +140,12 @@ def line_forecast_to_wp_update(request, pk):
     if request.method == "GET":
         target = LineForecast.objects.get(pk=pk)
         target.forecastamount = target.lineitem.workingplan
-        target.save()
+        try:
+            target.save()
+        except exceptions.BFTCostCenterNotForecastable as e:
+            messages.warning(request, e)
+            return redirect("lineitem-page")
+
         c = CostCenterMonthlyForecastLineItemReport(
             BftStatusManager().fy(),
             BftStatusManager().period(),
@@ -150,6 +160,12 @@ def line_forecast_to_wp_update(request, pk):
 def line_forecast_zero_update(request, pk):
     if request.method == "GET":
         target = LineForecast.objects.get(pk=pk)
+        try:
+            target.save()
+        except exceptions.BFTCostCenterNotForecastable as e:
+            messages.warning(request, e)
+            return redirect("lineitem-page")
+
         if target.lineitem.spent > 0:
             messages.warning(
                 request, "Cannot set forecast to 0 when Spent is greater than 0"

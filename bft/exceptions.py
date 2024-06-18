@@ -55,3 +55,11 @@ class ParentDoesNotExistError(Exception):
 
 class BFTDataFrameExceptionError(Exception):
     pass
+
+
+class BFTCostCenterNotForecastable(Exception):
+    def __init__(self, costcenter=None):
+        self.message = f"Cost center {costcenter} is not forecastable."
+
+    def __str__(self) -> str:
+        return self.message

@@ -94,7 +94,13 @@ class TestCostCenterLineItemProcessor:
         source = SourceManager().source("Common")
         parent = FundCenter.objects.create(**{"fundcenter": "2184JA"})
         CostCenter(
-            **{"costcenter": "8486JM", "fund": fund, "source": source, "costcenter_parent": parent}
+            **{
+                "costcenter": "8486JM",
+                "fund": fund,
+                "source": source,
+                "costcenter_parent": parent,
+                "isforecastable": True,
+            }
         ).save()
 
     def test_source_file_has_more_than_one_costcenter(self, setup, populate, create_costcenter):
