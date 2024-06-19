@@ -97,3 +97,28 @@ class TestCostCenterManager:
         df = CostCenterManager().forecast_adjustment_dataframe()
         assert 1 == len(df)
         assert "Forecast Adjustment" in df.columns
+
+    def test_is_updatable_cc_object(self, populate):
+        mgr = CostCenterManager()
+        cc = mgr.cost_center(costcenter="8484wa")
+
+        cc.isupdatable = True
+        cc.save()
+        updatable = mgr.is_updatable(cc)
+        assert True == updatable
+        cc.isupdatable = False
+        cc.save()
+        updatable = mgr.is_updatable(cc)
+        assert False == updatable
+
+    def test_is_updatable_cc_string(self, populate):
+        mgr = CostCenterManager()
+        cc = mgr.cost_center(costcenter="8484wa")
+        cc.isupdatable = True
+        cc.save()
+        updatable = mgr.is_updatable("8484WA")
+        assert True == updatable
+        cc.isupdatable = False
+        cc.save()
+        updatable = mgr.is_updatable("8484WA")
+        assert False == updatable

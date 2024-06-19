@@ -782,6 +782,15 @@ class CostCenterManager(models.Manager):
             return None
         return cc
 
+    def is_updatable(self, cc: "str|CostCenter") -> bool:
+        if isinstance(cc, str):
+            cc_: CostCenter = self.cost_center(cc)
+            if cc_:
+                return cc_.isupdatable
+        elif isinstance(cc, CostCenter):
+            return cc.isupdatable
+        raise TypeError("Cost center of invalid type.")
+
     def has_line_items(self, costcenter: "CostCenter"):
 
         return LineItem.objects.filter(costcenter=costcenter).exists()
