@@ -1538,9 +1538,12 @@ class LineItem(models.Model):
         count = LineItem.objects.all().update(status="old")
         logger.info(f"Set {count} lines to old.")
 
+        cc_no_update = CostCenter.objects.filter(isupdatable=False).values_list("costcenter", flat=True)
         encumbrance = LineItemImport.objects.all()
         logger.info(f"Retreived {encumbrance.count()} encumbrance lines.")
         for e in encumbrance:
+            if e.costcenter in cc_no_update:
+                continue
             try:
                 target = LineItem.objects.get(docno=e.docno, lineno=e.lineno)
                 self.update_line_item(target, e)
