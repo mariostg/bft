@@ -63,6 +63,7 @@ class LineItemAdmin(admin.ModelAdmin):
         "balance",
         "workingplan",
         "linetext",
+        "status",
     ]
 
 
