@@ -30,10 +30,13 @@ def document_page(request, docno):
     return render(request, "lineitems/lineitem-table.html", context)
 
 
-def lineitem_page(request):
+def lineitem_page(request, ccpk=None):
     has_filter = False
     if not request.GET:
-        data = LineItem.objects.none()
+        if ccpk:
+            data = LineItem.objects.filter(costcenter_pk=ccpk).order_by("docno")
+        else:
+            data = LineItem.objects.none()
     else:
         data = (
             LineItem.objects.all()
@@ -91,17 +94,17 @@ def line_forecast_add(request, pk):
 
 
 def line_forecast_update(request, pk):
-    data = get_object_or_404(LineForecast, pk=pk)
-    working_plan = data.lineitem.workingplan
-    spent = data.lineitem.spent
-    form = LineForecastForm(instance=data)
+    target = get_object_or_404(LineForecast, pk=pk)
+    working_plan = target.lineitem.workingplan
+    spent = target.lineitem.spent
+    form = LineForecastForm(instance=target)
     if request.method == "POST":
-        form: LineForecast = LineForecastForm(request.POST, instance=data)
+        form: LineForecast = LineForecastForm(request.POST, instance=target)
         if form.is_valid():
             form = form.save(commit=False)
-            if not data.lineitem.costcenter.isforecastable:
+            if not target.lineitem.costcenter.isforecastable:
                 messages.warning(request, "This cost center is not forecastable.")
-                return redirect("lineitem-page")
+                return redirect(reverse("lineitem-page") + f"?costcenter={target.lineitem.costcenter.pk}")
 
             forecast_amount = form.forecastamount
             if form.forecastamount < spent:
@@ -127,12 +130,12 @@ def line_forecast_update(request, pk):
                 fund=form.lineitem.fund,
             )
             c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
-            return redirect("lineitem-page")
+            return redirect(reverse("lineitem-page") + f"?costcenter={target.lineitem.costcenter.pk}")
 
     return render(
         request,
         "lineitems/line-forecast-form.html",
-        {"form": form, "lineitem": data.lineitem},
+        {"form": form, "lineitem": target.lineitem},
     )
 
 
@@ -144,7 +147,7 @@ def line_forecast_to_wp_update(request, pk):
             target.save()
         except exceptions.BFTCostCenterNotForecastable as e:
             messages.warning(request, e)
-            return redirect("lineitem-page")
+            return redirect(reverse("lineitem-page") + f"?costcenter={target.lineitem.costcenter.pk}")
 
         c = CostCenterMonthlyForecastLineItemReport(
             BftStatusManager().fy(),
@@ -154,7 +157,7 @@ def line_forecast_to_wp_update(request, pk):
         )
         c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
         messages.info(request, "Forecast set to working plan amount")
-    return redirect("lineitem-page")
+    return redirect(reverse("lineitem-page") + f"?costcenter={target.lineitem.costcenter.pk}")
 
 
 def line_forecast_zero_update(request, pk):
@@ -164,7 +167,7 @@ def line_forecast_zero_update(request, pk):
             target.save()
         except exceptions.BFTCostCenterNotForecastable as e:
             messages.warning(request, e)
-            return redirect("lineitem-page")
+            return redirect(reverse("lineitem-page") + f"?costcenter={target.lineitem.costcenter.pk}")
 
         if target.lineitem.spent > 0:
             messages.warning(
@@ -181,7 +184,7 @@ def line_forecast_zero_update(request, pk):
             )
             c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
             messages.success(request, "Forecast has been set to 0")
-    return redirect("lineitem-page")
+    return redirect(reverse("lineitem-page") + f"?costcenter={target.lineitem.costcenter.pk}")
 
 
 def line_forecast_delete(request, pk):

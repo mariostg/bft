@@ -281,9 +281,8 @@ urlpatterns += [
 urlpatterns += [
     path("", lineitems.lineitem_page, name="lineitem-page"),
     path("lineitem/", lineitems.lineitem_page, name="lineitem-page"),
-    path(
-        "lineitem/delete/<int:pk>", lineitems.line_item_delete, name="line-item-delete"
-    ),
+    path("lineitem/costcenter/<int:pk>/", lineitems.lineitem_page, name="lineitem-page"),
+    path("lineitem/delete/<int:pk>", lineitems.line_item_delete, name="line-item-delete"),
     path(
         "fundcenter-lineitem-upload",
         lineitems.fundcenter_lineitem_upload,
