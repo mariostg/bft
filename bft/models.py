@@ -894,6 +894,7 @@ class CostCenterManager(models.Manager):
             return CostCenter.objects.count() > 0
 
     def get_request(self, request) -> str | None:
+        """Extract the cost center string from the request and verifies that it does exist."""
         costcenter = request.GET.get("costcenter")
         if costcenter:
             costcenter = costcenter.upper()
