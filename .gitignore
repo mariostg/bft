@@ -21,7 +21,7 @@ scripts/quick-test.py
 uploads/
 
 # MkDocs documentation
-site*/
+htmldocs/static/mkdocs_build/
 
 requirements.txt
 

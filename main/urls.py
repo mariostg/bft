@@ -7,6 +7,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("bft.urls")),
     path("bft/", include("bft.urls")),
+    path("htmldocs/", include("htmldocs.urls")),
     path("reports/", include("reports.urls")),
     path("__reload__/", include("django_browser_reload.urls")),
     path("__debug__/", include("debug_toolbar.urls")),

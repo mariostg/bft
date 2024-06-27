@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     # apps
     "bft.apps.BftConfig",
     "reports.apps.ReportsConfig",
+    "htmldocs",
     # dev
     "django_extensions",
     "django_browser_reload",
@@ -146,6 +147,9 @@ MEDIA_ROOT = BASE_DIR / "static/images"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+DOCS_DIR = BASE_DIR / "htmldocs/static/mkdocs_build"
+DOCS_STATIC_NAMESPACE = os.path.basename(DOCS_DIR)
+
 LOG_DIR = BASE_DIR / "log"
 LOGGING = {
     "version": 1,

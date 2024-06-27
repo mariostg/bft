@@ -1,26 +1,31 @@
-site_name: Business Forecasting Tool Source Code Documentation
+site_name: Business Forecasting Tool Manual
+docs_dir: 'mkdocs'
+site_dir: 'htmldocs/static/mkdocs_build'
+site_url: https://exemple.com
+extra_css:
+    - stylesheets/extra.css
+nav:
+    - Home: docs/index.md
+    - About: docs/about.md
+    - Line Items: docs/line-items-table.md
+    - System administration: docs/system-administration/index.md
+    - Uploading Line Items: docs/system-administration/uploading-line-items.md
 
 theme:
-    name: "material"
-    logo: images/logo.png
+    name: material
+    logo: docs/images/logo.png
+    custom_dir: mkdocs/overrides
     features:
         - navigation.instant
-        # - navigation.tabs
+        - navigation.tabs
         - navigation.sections
         - search.highlight
+        - search.suggest
         - header.autohide
     palette:
         primary: blue grey
         scheme: slate
         accent: blue
-
-plugins:
-    - mkdocstrings
-    - search
-
-nav:
-    - Business Forecasting Tool Documentation: index.md
-    - References: ./references/reference.md
 
 markdown_extensions:
     - attr_list

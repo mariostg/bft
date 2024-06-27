@@ -1,1 +1,0 @@
-::: bft.management.commands.uploadcsv
