@@ -89,7 +89,7 @@ def fund_upload(request):
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/fund-upload-{user}.csv"
+            filepath = f"{UPLOADS}/fund-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -156,7 +156,7 @@ def source_upload(request):
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/source-upload-{user}.csv"
+            filepath = f"{UPLOADS}/source-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -256,7 +256,7 @@ def fundcenter_upload(request):
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/fundcenter-upload-{user}.csv"
+            filepath = f"{UPLOADS}/fundcenter-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -340,7 +340,7 @@ def fundcenter_allocation_upload(request):
             fy = data["fy"]
             quarter = data["quarter"]
             user = request.user
-            filepath = f"{UPLOADS}/fund-center-upload-{user}.csv"
+            filepath = f"{UPLOADS}/fund-center-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -439,7 +439,7 @@ def capital_project_upload(request):
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/capital-project-upload-{user}.csv"
+            filepath = f"{UPLOADS}/capital-project-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -690,7 +690,7 @@ def capital_forecasting_new_year_upload(request):
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/capital-forecasting-new-year-upload-{user}.csv"
+            filepath = f"{UPLOADS}/capital-forecasting-new-year-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -710,7 +710,7 @@ def capital_forecasting_in_year_upload(request):
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/capital-forecasting-in-year-upload-{user}.csv"
+            filepath = f"{UPLOADS}/capital-forecasting-in-year-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -730,7 +730,7 @@ def capital_forecasting_year_end_upload(request):
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/capital-forecasting-year-end-upload-{user}.csv"
+            filepath = f"{UPLOADS}/capital-forecasting-year-end-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -838,7 +838,7 @@ def costcenter_upload(request):
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/costcenter-upload-{user}.csv"
+            filepath = f"{UPLOADS}/costcenter-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -933,7 +933,7 @@ def costcenter_allocation_upload(request):
             fy = data["fy"]
             quarter = data["quarter"]
             user = request.user
-            filepath = f"{UPLOADS}/cost-center-upload-{user}.csv"
+            filepath = f"{UPLOADS}/cost-center-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)

@@ -244,7 +244,7 @@ def fundcenter_lineitem_upload(request):
         form = FundCenterLineItemUploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/lineitem-upload-{user}.csv"
+            filepath = f"{UPLOADS}/lineitem-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -267,7 +267,7 @@ def costcenter_lineitem_upload(request):
             user = request.user
             fundcenter = request.POST.get("fundcenter")
             costcenter = request.POST.get("costcenter")
-            filepath = f"{UPLOADS}/lineitem-upload-{user}.csv"
+            filepath = f"{UPLOADS}/lineitem-upload-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
