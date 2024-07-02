@@ -1,4 +1,4 @@
-site_name: Business Forecasting Tool Manual
+site_name: Business Forecasting Tool Documentation
 docs_dir: 'mkdocs'
 site_dir: 'htmldocs/static/mkdocs_build'
 site_url: https://exemple.com
