@@ -28,6 +28,7 @@ class TestCommandMonthlyEncumbrance:
         self.call_command("uploadcsv", "test-data/encumbrance_2184A3.txt")
 
         ccmgr = CostCenterManager()
+        assert ccmgr.cost_center("8484WA").isupdatable
         assert ccmgr.exists("8484WA") == True
         assert 7 == LineItem.objects.count()
 
@@ -39,6 +40,7 @@ class TestCommandMonthlyEncumbrance:
         self.call_command("uploadcsv", "test-data/encumbrance_2184A3.txt")
 
         ccmgr = CostCenterManager()
+        assert ccmgr.cost_center("8484WA").isupdatable
         assert ccmgr.exists("8484WA") == True
         assert 7 == LineItem.objects.count()
         with pytest.raises(
