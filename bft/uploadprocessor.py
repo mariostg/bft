@@ -1172,6 +1172,12 @@ class CostCenterLineItemProcessor(LineItemProcessor):
 
     def main(self) -> bool:
         logger.info(f"Begin Cost Center Upload processing by {self.user}")
+        if not self.costcenter_obj.isupdatable:
+            messages.warning(
+                self.request,
+                f"{self.costcenter} is not updatable.  You must change the Updatable status first to proceed.",
+            )
+            return False
         if not self._set_data():
             logger.warning("Failed to set data")
             return False
