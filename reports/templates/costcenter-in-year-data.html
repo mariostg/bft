@@ -41,16 +41,7 @@
       }
 
       var data=parseJSONFromId('json_data')
-      if (data.length > 1){
-        var data = data.reduce(function(previousValue, currentValue) {
-          return [{
-            Spent: previousValue.Spent + currentValue.Spent,
-            Commitment: previousValue.Commitment + currentValue.Commitment,
-            "Pre Commitment": previousValue['Pre Commitment'] + currentValue['Pre Commitment'],
-            "Fund Reservation": previousValue['Fund Reservation'] + currentValue['Fund Reservation'],
-          }]
-        });
-      }
+
       const allocation=parseJSONFromId('json_allocation')
       const fcst=parseJSONFromId('json_fcst')
       const data_quarterly=data.map(function(e) {

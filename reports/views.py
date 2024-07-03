@@ -464,8 +464,8 @@ def costcenter_in_year_fear(request):
         r = utils.CostCenterInYearEncumbranceReport(
             fy=initial["fy"], fund=initial["fund"], costcenter=initial["costcenter"]
         )
-        df = r.dataframe()
-        if not df.empty:
+        table_df = r.dataframe()
+        if not table_df.empty:
             df_columns = [
                 "Period",
                 "Fund",
@@ -477,13 +477,16 @@ def costcenter_in_year_fear(request):
                 "Balance",
                 "Working Plan",
             ]
+            chart_df = table_df[df_columns]
+            chart_df = chart_df.groupby(["Fund", "Period"]).sum().reset_index()
+
             if initial["costcenter"] is None:
                 df_columns = ["Cost Center"] + df_columns
-            context["data"] = df.to_json(orient="records")  # json data for chart.  To be worked on
-            df = df[df_columns]
-            df = df.style.format(thousands=",", precision=0)
-            df = df.to_html()
+            table_df = table_df[df_columns].sort_values("Cost Center")
+            table_df = table_df.style.format(thousands=",", precision=0)
+            table_df = table_df.to_html()
 
+            context["data"] = chart_df.to_json(orient="records")  # json data for chart.  To be worked on
             # CC allocation for given cc, fund, quarter and period.  For chart threshold line
             mgr = CostCenterManager()
             cc_df = mgr.allocation_dataframe(
@@ -517,11 +520,11 @@ def costcenter_in_year_fear(request):
                 context["fcst"] = fcst_adj_df["Forecast Adjustment"].to_json(orient="records")
 
         elif len(request.GET):
-            df = "There are no data to report using the given parameters."
+            table_df = "There are no data to report using the given parameters."
         else:
-            df = ""
+            table_df = ""
 
-        context["table"] = df
+        context["table"] = table_df
         context["form"] = form
     return render(request, "costcenter-in-year-data.html", context)
 
