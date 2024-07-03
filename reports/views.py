@@ -506,6 +506,7 @@ def costcenter_in_year_fear(request):
                 fund=initial["fund"],
             )
             fcst_line_df = fcst_line_items.dataframe()
+
             if not fcst_adj_df.empty and not fcst_line_df.empty:
                 context["fcst"] = (fcst_line_df["Line Item Forecast"] + fcst_adj_df["Forecast Adjustment"]).to_json(
                     orient="records"
