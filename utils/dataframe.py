@@ -54,6 +54,12 @@ class BFTDataFrame(pd.DataFrame):
         self.dataframe.rename(columns=self.dataframe_fields, inplace=True)
 
     def _set_dtype(self):
+        # FutureWarning: Downcasting object dtype arrays on .fillna, .ffill,
+        # .bfill is deprecated and will change in a future version.
+        # Call result.infer_objects(copy=False) instead.
+        # To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+        # self.dataframe[self.dataframe_fields[c]].fillna(0).astype(int)
+        pd.set_option("future.no_silent_downcasting", True)
         # TODO Fine tune this, Commitment showing as none.  Maybe do this before colum renaming.
         for c in self.dataframe_fields:
             if self.django_model._meta.get_field(c).get_internal_type() == "DecimalField":
