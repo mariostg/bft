@@ -1058,6 +1058,13 @@ class LineItemProcessor(UploadProcessor):
                 messages.error(self.request, msg)
             return True
 
+    def spent_in_fr_pc(self) -> bool:
+        # Must return false for clean result
+        df = pd.read_csv(self.CSVFILE, usecols=["spent", "doctype", "enctype"])
+        fr_has_spent = not df.query("doctype == 'FR' & spent > 0 ").empty
+        pc_has_spent = not df.query("doctype == 'PC' & spent > 0 ").empty
+        return all([fr_has_spent, pc_has_spent])
+
     def _set_data(self) -> bool:
         if not self.filepath:
             raise ValueError("Encumbrance report not defined.")
@@ -1095,7 +1102,7 @@ class LineItemProcessor(UploadProcessor):
     def _do_preliminary_checks(self) -> bool:
         logger.info(f"Begin Upload processing by {self.user}")
         if not self._set_data():
-            logger.warn("Failed to set data")
+            logger.warn("Failed to set data.  Something is wrong with the encubrance report.")
             return False
 
         if not self._fundcenter_matches_report():
@@ -1123,7 +1130,8 @@ class LineItemProcessor(UploadProcessor):
     def main(self) -> bool:
         if not self._do_preliminary_checks():
             return False
-
+        if self.spent_in_fr_pc():
+            raise ValueError("Encumbrance Report contains spent amount in either FR or PC elements")
         self.csv2table()
         linecount = LineItemImport.objects.count()
         logger.info(f"{linecount} lines have been written to Encumbrance import table")
