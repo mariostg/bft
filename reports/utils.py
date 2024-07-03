@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 from django.db.models import F, IntegerField, Q, QuerySet, Sum, Value
 from django.db.models.functions import Cast
-
+from django.db import IntegrityError
 from bft import conf
 from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         ForecastAdjustment, FundCenter, FundCenterAllocation,
@@ -148,10 +148,13 @@ class CostCenterMonthlyForecastLineItemReport(MonthlyReport):
             logger.info("There are no line items.")
             return 0
         CostCenterMonthlyLineItemForecast.objects.filter(fy=self.fy, period=self.period).delete()
-        md = CostCenterMonthlyLineItemForecast.objects.bulk_create(
-            [CostCenterMonthlyLineItemForecast(**q) for q in lines]
-        )
-        return len(md)
+        try:
+            md = CostCenterMonthlyLineItemForecast.objects.bulk_create(
+                [CostCenterMonthlyLineItemForecast(**q) for q in lines]
+            )
+            return len(md)
+        except IntegrityError as e:
+            logger.error(f"insert_grouped_forecast_line_item: {e}")
 
     def dataframe(self) -> pd.DataFrame:
         """Create a pandas dataframe using CostCenterMonthlyLineItemForecast data as source
