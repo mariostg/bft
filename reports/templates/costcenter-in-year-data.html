@@ -24,9 +24,25 @@
     {{fcst|json_script:"json_fcst"}}
     <script type="module">
       import { Chart, ChartHandler} from "/static/js/barchart.js";
-      const data=JSON.parse(JSON.parse(document.getElementById('json_data').textContent))
-      const allocation=JSON.parse(JSON.parse(document.getElementById('json_allocation').textContent))
-      const fcst=JSON.parse(JSON.parse(document.getElementById('json_fcst').textContent))
+
+      function parseJSONFromId (id) {
+        var parsed
+        const elem=document.getElementById(id).textContent
+        if (elem==null){
+          return [0]
+        }
+        try {
+          parsed = JSON.parse(JSON.parse(elem))
+        } catch (e) {
+          parsed=[0]
+        }
+
+        return parsed
+      }
+
+      const data=parseJSONFromId('json_data')
+      const allocation=parseJSONFromId('json_allocation')
+      const fcst=parseJSONFromId('json_fcst')
       const data_quarterly=data.map(function(e) {
         console.log(e)
         return {Period:e.Period,Spent:e.Spent,CO:e.Commitment, PC:e['Pre Commitment'],FR:e['Fund Reservation']}
