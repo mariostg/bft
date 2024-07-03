@@ -929,10 +929,13 @@ class LineItemProcessor(UploadProcessor):
         csv.pop(0)
         for i, e in enumerate(csv):
             csv[i] = e.strip()
-        if len(csv) == 20:
+        line_len = len(csv)
+        if line_len == 20:
             return csv
         else:
-            return None
+            raise AttributeError(
+                f"Invalid line encountered in Encumbrance Report. Expected 20 elements, got {line_len}: {'|'.join(csv[:4])}"
+            )
 
     def is_data_line(self, line: str) -> bool:
         """Check if a line of the encumbrance report can be considered a line of data.
