@@ -137,30 +137,34 @@ const Chart = function (parent, data, chart_config) {
 
     function drawThreshold() {
         //Threshold horizontal line
+        const y_delta = { Allocation: -15, Forecast: 5 };
         if (chart_config.threshold) {
-            const threshold = svg.append("g");
+          const threshold = svg.append("g");
 
-            threshold
-                .attr("class", "threshold")
-                .selectAll("g")
-                .data(chart_config.threshold)
-                .join("line")
-                .style("stroke-dasharray", "15, 7")
-                .attr("x1", 0)
-                .attr("x2", chart_config.style.canvas.width)
-                .attr("y2", (d) => chart_config.figure.yScale(d.value))
-                .attr("y1", (d) => chart_config.figure.yScale(d.value))
-                .attr("stroke", "red")
-                .attr("stroke-width", 2);
-            threshold
-                .selectAll("g")
-                .data(chart_config.threshold)
-                .join("text")
-                .attr("x", 0)
-                .attr("y", (d) => chart_config.figure.yScale(d.value) - 5)
-                .text(function (d) {
-                    return d.name;
-                });
+          threshold
+            .attr("class", "threshold")
+            .selectAll("g")
+            .data(chart_config.threshold)
+            .join("line")
+            .style("stroke-dasharray", "15, 7")
+            .attr("x1", 0)
+            .attr("x2", chart_config.style.canvas.width)
+            .attr("y2", (d) => chart_config.figure.yScale(d.value))
+            .attr("y1", (d) => chart_config.figure.yScale(d.value))
+            .attr("stroke", "red")
+            .attr("stroke-width", 2);
+          threshold
+            .selectAll("g")
+            .data(chart_config.threshold)
+            .join("text")
+            .attr("x", 0)
+            .attr(
+              "y",
+              (d) => chart_config.figure.yScale(d.value) - y_delta[d.name]
+            )
+            .text(function (d) {
+              return d.name;
+            });
         }
     }
     function drawGroupedBarChart() {
