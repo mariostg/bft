@@ -64,3 +64,11 @@ urlpatterns += [
         name="capital-forecasting-dashboard",
     ),
 ]
+
+urlpatterns += [
+    path(
+        "costcenter-monthly-allocation-update",
+        views.costcenter_monthly_allocation_update,
+        name="costcenter-monthly-allocation-update",
+    )
+]

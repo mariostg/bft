@@ -23,7 +23,8 @@ from reports.forms import (SearchAllocationAnalysisForm,
                            SearchCapitalYeRatiosForm,
                            SearchCostCenterInYearDataForm,
                            SearchCostCenterMonthlyDataForm,
-                           SearchCostCenterScreeningReportForm)
+                           SearchCostCenterScreeningReportForm,
+                           UpdateCostCenterAllocationMonthlyForm)
 from utils.getrequestfilter import set_query_string
 
 
@@ -216,6 +217,21 @@ def set_initial(request):
         messages.warning(request, msg)
 
     return initial
+
+
+def costcenter_monthly_allocation_update(request):
+    form = UpdateCostCenterAllocationMonthlyForm()
+    if request.method == "POST":
+        print(request.POST)
+        form = UpdateCostCenterAllocationMonthlyForm(request.POST)
+        if form.is_valid():
+            fy = request.POST.get("fy")
+            quarter = request.POST.get("quarter")
+            period = request.POST.get("period")
+            c = utils.CostCenterMonthlyAllocationReport(fy, period, quarter=quarter)
+            c.insert_grouped_allocation(c.sum_allocation_cost_center())
+    context = {"form": form}
+    return render(request, "costcenter-monthly-allocation-update-form.html", context)
 
 
 def costcenter_monthly_allocation(request):
