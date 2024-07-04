@@ -79,8 +79,8 @@ def line_forecast_add(request, pk):
             c = CostCenterMonthlyForecastLineItemReport(
                 BftStatusManager().fy(),
                 BftStatusManager().period(),
-                costcenter=form.lineitem.costcenter.costcenter,
-                fund=form.lineitem.fund,
+                costcenter=lineitem.costcenter.costcenter,
+                fund=lineitem.fund,
             )
             c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
             return redirect("lineitem-page")
