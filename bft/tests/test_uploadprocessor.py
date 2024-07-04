@@ -100,6 +100,7 @@ class TestCostCenterLineItemProcessor:
                 "source": source,
                 "costcenter_parent": parent,
                 "isforecastable": True,
+                "isupdatable": True,
             }
         ).save()
 
