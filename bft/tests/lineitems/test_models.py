@@ -335,19 +335,18 @@ class TestLineItemImport(TestCase):
         for line in lines:
             self.assertEqual(er.is_data_line(line["line"]), line["result"])
 
-    def test_line_to_csv_returns_list_or_none(self):
+    def test_line_to_csv_returns_list_or_Exception(self):
         er = LineItemProcessor(self.GOODFILE, None)
         result_ok = er.line_to_csv(
             "|col1|col2|col3|col4|col5|col6|col7|col8|col9|col10|col11|col12|col13|col14|col15|col16|col17|col18|col19|col20|"
         )
-        result_bad = er.line_to_csv(
-            "|col1|col2|col3|col4|col5|col6|col7|col8|col9|col10|col11|col12|col13|col14|col15|col16|col17|col18|col19|"
-        )
+        result_bad = "|col1|col2|col3|col4|col5|col6|col7|col8|col9|col10|col11|col12|col13|col14|col15|col16|col17|col18|col19|"
 
         self.assertEqual(20, len(result_ok), "List does not contain 20 elements")
         self.assertTrue(type(result_ok) is list, "Argument does not return a list")
 
-        self.assertIsNone(result_bad, "Must returns none when list is not good")
+        with pytest.raises(AttributeError) as e:
+            er.line_to_csv(result_bad)
 
     def test_run_all_stops_on_bad_cost_center_report(self):
         er = LineItemProcessor(self.GOODFILE, None)

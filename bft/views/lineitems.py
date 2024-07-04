@@ -249,7 +249,11 @@ def fundcenter_lineitem_upload(request):
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
             processor = LineItemProcessor(filepath, request)
-            processor.main()
+            try:
+                processor.main()
+            except AttributeError as e:
+                messages.error(request, e)
+
     else:
         form = FundCenterLineItemUploadForm
     return render(

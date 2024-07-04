@@ -913,7 +913,7 @@ class LineItemProcessor(UploadProcessor):
         logger.error("DID not find DND Cost center report.")
         return False
 
-    def line_to_csv(self, line: str) -> list | None:
+    def line_to_csv(self, line: str) -> list:
         """
         Split a line from the encumbrance report in a list
 
@@ -934,7 +934,7 @@ class LineItemProcessor(UploadProcessor):
             return csv
         else:
             raise AttributeError(
-                f"Invalid line encountered in Encumbrance Report. Expected 20 elements, got {line_len}: {'|'.join(csv[:4])}"
+                f"Invalid line encountered in Encumbrance Report. Expected 20 elements, got {line_len} at line beginning with: {'|'.join(csv[:4])}"
             )
 
     def is_data_line(self, line: str) -> bool:
