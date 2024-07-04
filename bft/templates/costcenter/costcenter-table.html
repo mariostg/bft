@@ -17,6 +17,7 @@
       {% endif %}
     </div>
     {% include 'paginator.html' %}
+    <div class="container">
     {% for elem in data  %}
       <section class='summary'>
         <div class='summary__header'>
@@ -31,6 +32,8 @@
           <span class="tag {% if elem.isforecastable %}yes"> {%else%} no"> Not{%endif%} Forecastable</span>
         <span class="tag {% if elem.isupdatable %} yes"> {%else%} no"> Not {%endif%} Updatable</span>
       <a class='btn btn-view' href="{% url 'lineitem-page'%}?costcenter={{elem.pk}}">Lines</a>
+      <a class='btn btn-view' href="{% url 'costcenter-allocation-table'%}?costcenter={{elem.pk}}">Allocation</a>
+      <a class='btn btn-view' href="{% url 'forecast-adjustment-table'%}?costcenter={{elem.pk}}">Forecast Adjustment</a>
       {% if status.fy and status.period %}
         <a class='btn btn-view' href="{% url 'costcenter-charges' elem.costcenter status.fy status.period %}">Current charges</a>
       {% endif %}
@@ -41,7 +44,7 @@
       </div>
       </section>
     {% endfor %}
-
+  </div>
   </main>
 
   <script type="text/javascript" src="{% static 'js/filter-expender.js'%}" ></script>
