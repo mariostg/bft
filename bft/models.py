@@ -1668,7 +1668,10 @@ class LineForecastManager(models.Manager):
         maxlines = lines.count()
         logger.info(f"{maxlines} new lines need encumbrance record history to be set.")
         counter = 0
+        li: LineItem
         for li in lines:
+            if not li.costcenter.isforecastable:
+                continue
             counter += 1
             li_fcst = LineForecast(
                 lineitem=li,
