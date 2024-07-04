@@ -782,10 +782,6 @@ class LineItemProcessor(UploadProcessor):
         locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
         if filepath is None:
             raise ValueError("No file name provided")
-        print("FILEPATH: ", filepath)
-        # filepath = os.path.join(self.DRMIS_DIR, filepath)
-        print("DRMIS DIR: ", self.DRMIS_DIR)
-        print("FILEPATH: ", filepath)
         if not os.path.exists(filepath):
             raise FileNotFoundError(f"{filepath} was not found")
         self.filepath = filepath
