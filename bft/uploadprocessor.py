@@ -1063,9 +1063,13 @@ class LineItemProcessor(UploadProcessor):
 
     def spent_in_fr_pc(self) -> bool:
         # Must return false for clean result
+        fr_has_spent = pc_has_spent = False
         df = pd.read_csv(self.CSVFILE, usecols=["spent", "doctype", "enctype"])
-        fr_has_spent = not df.query("doctype == 'FR' & spent > 0 ").empty
-        pc_has_spent = not df.query("doctype == 'PC' & spent > 0 ").empty
+        try:  # assume that if exception occurs, there are no spent.
+            fr_has_spent = not df.query("doctype == 'FR' & spent > 0 ").empty
+            pc_has_spent = not df.query("doctype == 'PC' & spent > 0 ").empty
+        except:
+            pass
         return all([fr_has_spent, pc_has_spent])
 
     def _set_data(self) -> bool:
