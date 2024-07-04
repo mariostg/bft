@@ -735,6 +735,8 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
                 df_report = df_report.merge(forecast_line_items_df, how="outer", on=on_grouping)
             else:
                 df_report = forecast_line_items_df
+        else:
+            df_report["Line Item Forecast"] = 0
 
         if not df_report.empty:
             df_report.fillna(0, inplace=True)
