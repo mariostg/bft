@@ -345,7 +345,7 @@ class TestLineItemImport(TestCase):
         self.assertEqual(20, len(result_ok), "List does not contain 20 elements")
         self.assertTrue(type(result_ok) is list, "Argument does not return a list")
 
-        with pytest.raises(AttributeError) as e:
+        with pytest.raises(AttributeError):
             er.line_to_csv(result_bad)
 
     def test_run_all_stops_on_bad_cost_center_report(self):

@@ -6,13 +6,13 @@
 #     return HttpResponse("Docs are going to be served here")
 
 
-from django.conf import settings
 import os
+
+from django.conf import settings
 from django.contrib.staticfiles.views import serve
 
 
 def serve_docs(request, path):
-    print("PATH:", path)
 
     docs_path = settings.DOCS_DIR / path
 
