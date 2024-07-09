@@ -12,16 +12,16 @@ or not the user is permitted to create, update or delete allocations. Viewing al
 works the same way for both Cost Centers and Fund Centers.
 
 *Read only mode*
-![](../images/allocation-view-read-only.png)
+![](images/allocation-view-read-only.png)
 
 *Editable mode*
-![](../images/allocation-view.png)
+![](images/allocation-view.png)
 
 It is possible to display the monthly monthly.  This data is for historical purposes and is never
 deleted. FY and Period are mandatory fields.
 
 *Viewing monthly allocation*
-![](../images/allocation-monthly.png)
+![](images/allocation-monthly.png)
 
 ## Create Allocation
 
@@ -36,7 +36,7 @@ the amount of the allocation.  Amount of the allocation must be greather than ze
 Allocation form for creating and updating data
 </figcaption>
 
-![](../images/allocation-form.png)
+![](images/allocation-form.png)
 </figure>
 
 ## Delete Allocation
@@ -45,7 +45,7 @@ A confirmation dialog will appear before proceding with the delete action.
 
 
 *Confirm the allocation deletion*
-![](../images/allocation-delete.png)
+![](images/allocation-delete.png)
 
 ## Uploading Cost Center Allocations
 
@@ -59,7 +59,8 @@ The required csv file must contains 6 columns as shown in the sample below.
 The quarter column must be a number between 1 and 4. The amount numbers must not contain any separator other than the dot decimal separator. The note entries are not mandatory. The text must be surrounded by double quotes.
 
 <figure markdown>
-![](../images/csv-samples/costcenters-allocations.png)
+
+![](images/allocation-costcenter-csv-sample.png)
 </figure>
 
 The first row contains the header and the name of the elements in the header must be exactly as shown here. If this is not respected, a warning message will be displayed to notify the user and the operation will abort.
@@ -70,7 +71,7 @@ The user select the file containing the cost centers to upload by using the ==co
 
 <figure markdown>
 
-![](../images/forms/form-costcenter-allocation-upload.png)
+![](images/allocation-costcenter-upload-form.png)
 </figure>
 
 #### Upload messages

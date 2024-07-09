@@ -15,16 +15,16 @@ All current forecast adjustments recorded can be viewed by anyone.  The report w
 or not the user is permitted to create, update or delete forecast adjustment.
 
 *Read only mode*
-![](../images/forecast-adjustment-view-read-only.png)
+![](images/forecast-adjustment-view-read-only.png)
 
 *Editable mode*
-![](../images/forecast-adjustment-view.png)
+![](images/forecast-adjustment-view.png)
 
 It is possible to display the monthly forecast adjustment.  This data is for historical purposes and is never
 deleted. FY and Period are mandatory fields.
 
 *Viewing monthly forecast adjustments*
-![](../images/forecast-adjustment-monthly.png)
+![](images/forecast-adjustment-monthly.png)
 
 ## Create a forecast adjustment
 
@@ -36,7 +36,7 @@ It is possible to create more than one forecast adjustment for a given cost cent
 
 <figure markdown>
 <figcaption>Forecast adjustment form for creating and editing data</figcaption>
-![](../images/forecast-adjustment-form.png)
+![](images/forecast-adjustment-form.png)
 </figure>
 
 ## Delete a forecast adjustment
@@ -44,4 +44,4 @@ It is possible to create more than one forecast adjustment for a given cost cent
 A confirmation dialog will appear before proceding with the delete action.
 
 *Confirm the forecast adjustment deletion*
-![](../images/forecast-adjustment-delete.png)
+![](images/forecast-adjustment-delete.png)
