@@ -13,6 +13,7 @@ nav:
     - Allocation: docs/allocation/index.md
     - Forecast Adjustment : docs/forecast-adjustment/index.md
     - Funds: docs/fund/index.md
+    - Sources: docs/source/index.md
 theme:
     name: material
     logo: docs/images/logo.png
