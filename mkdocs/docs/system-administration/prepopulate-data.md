@@ -4,7 +4,6 @@ This section supposes that BFT is already deployed to some kind of environment, 
 
 Typical sequence of events would be as follow:
 
--   [upload Funds](./upload-funds.md)
 -   [upload Sources](./upload-sources.md)
 -   [upload Fund Centers](./upload-fundcenters.md)
 -   [upload Cost Centers](./upload-costcenters.md)

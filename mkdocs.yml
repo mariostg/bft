@@ -10,7 +10,9 @@ nav:
     - Line Items: docs/line-items-table.md
     - System administration: docs/system-administration/index.md
     - Uploading Line Items: docs/system-administration/uploading-line-items.md
-
+    - Allocation: docs/allocation/index.md
+    - Forecast Adjustment : docs/forecast-adjustment/index.md
+    - Funds: docs/fund/index.md
 theme:
     name: material
     logo: docs/images/logo.png
