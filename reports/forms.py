@@ -3,6 +3,11 @@ from django import forms
 from bft.models import FundCenterAllocation
 
 
+class UpdateCostCenterForecastAdjustmentMonthlyForm(forms.Form):
+    fy = forms.CharField()
+    period = forms.CharField()
+
+
 class UpdateCostCenterAllocationMonthlyForm(forms.Form):
     fy = forms.CharField()
     quarter = forms.CharField()

@@ -16,15 +16,19 @@ from bft.models import (BftStatus, BftStatusManager, CapitalProjectManager,
                         FundCenterAllocation, FundCenterManager, FundManager,
                         LineItem)
 from reports import capitalforecasting, screeningreport, utils
-from reports.forms import (SearchAllocationAnalysisForm,
-                           SearchCapitalEstimatesForm, SearchCapitalFearsForm,
-                           SearchCapitalForecastingDashboardForm,
-                           SearchCapitalHistoricalForm,
-                           SearchCapitalYeRatiosForm,
-                           SearchCostCenterInYearDataForm,
-                           SearchCostCenterMonthlyDataForm,
-                           SearchCostCenterScreeningReportForm,
-                           UpdateCostCenterAllocationMonthlyForm)
+from reports.forms import (
+    SearchAllocationAnalysisForm,
+    SearchCapitalEstimatesForm,
+    SearchCapitalFearsForm,
+    SearchCapitalForecastingDashboardForm,
+    SearchCapitalHistoricalForm,
+    SearchCapitalYeRatiosForm,
+    SearchCostCenterInYearDataForm,
+    SearchCostCenterMonthlyDataForm,
+    SearchCostCenterScreeningReportForm,
+    UpdateCostCenterAllocationMonthlyForm,
+    UpdateCostCenterForecastAdjustmentMonthlyForm,
+)
 from utils.getrequestfilter import set_query_string
 
 
@@ -232,6 +236,21 @@ def costcenter_monthly_allocation_update(request):
             c.insert_grouped_allocation(c.sum_allocation_cost_center())
     context = {"form": form}
     return render(request, "costcenter-monthly-allocation-update-form.html", context)
+
+
+def costcenter_monthly_forecast_adjustment_update(request):
+    form = UpdateCostCenterForecastAdjustmentMonthlyForm()
+    if request.method == "POST":
+        print(request.POST)
+        form = UpdateCostCenterForecastAdjustmentMonthlyForm(request.POST)
+        if form.is_valid():
+            fy = request.POST.get("fy")
+            quarter = request.POST.get("quarter")
+            period = request.POST.get("period")
+            c = utils.CostCenterMonthlyForecastAdjustmentReport(fy, period, quarter=quarter)
+            c.insert_grouped_forecast_adjustment(c.sum_forecast_adjustments())
+    context = {"form": form}
+    return render(request, "costcenter-monthly-forecast-adjustment-update-form.html", context)
 
 
 def costcenter_monthly_allocation(request):
