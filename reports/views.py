@@ -29,6 +29,7 @@ from reports.forms import (
     UpdateCostCenterAllocationMonthlyForm,
     UpdateCostCenterForecastAdjustmentMonthlyForm,
     UpdateCostCenterForecastLineItemMonthlyForm,
+    UpdateCostCenterEncumbranceMonthlyForm,
 )
 from utils.getrequestfilter import set_query_string
 
@@ -265,6 +266,20 @@ def costcenter_monthly_forecast_line_item_update(request):
             c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
     context = {"form": form}
     return render(request, "costcenter-monthly-forecast-line-item-update-form.html", context)
+
+
+def costcenter_monthly_encumbrance_update(request):
+    form = UpdateCostCenterEncumbranceMonthlyForm()
+    if request.method == "POST":
+        print(request.POST)
+        form = UpdateCostCenterEncumbranceMonthlyForm(request.POST)
+        if form.is_valid():
+            fy = request.POST.get("fy")
+            period = request.POST.get("period")
+            c = utils.CostCenterMonthlyEncumbranceReport(fy, period)
+            c.insert_line_items(c.sum_line_items())
+    context = {"form": form}
+    return render(request, "costcenter-monthly-encumbrance-update-form.html", context)
 
 
 def costcenter_monthly_allocation(request):

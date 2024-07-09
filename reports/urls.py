@@ -81,4 +81,9 @@ urlpatterns += [
         views.costcenter_monthly_forecast_line_item_update,
         name="costcenter-monthly-forecast-line-item-update",
     ),
+    path(
+        "costcenter-monthly-encumbrance-update",
+        views.costcenter_monthly_encumbrance_update,
+        name="costcenter-monthly-encumbrance-update",
+    ),
 ]
