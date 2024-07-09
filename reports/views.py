@@ -28,6 +28,7 @@ from reports.forms import (
     SearchCostCenterScreeningReportForm,
     UpdateCostCenterAllocationMonthlyForm,
     UpdateCostCenterForecastAdjustmentMonthlyForm,
+    UpdateCostCenterForecastLineItemMonthlyForm,
 )
 from utils.getrequestfilter import set_query_string
 
@@ -245,12 +246,25 @@ def costcenter_monthly_forecast_adjustment_update(request):
         form = UpdateCostCenterForecastAdjustmentMonthlyForm(request.POST)
         if form.is_valid():
             fy = request.POST.get("fy")
-            quarter = request.POST.get("quarter")
             period = request.POST.get("period")
-            c = utils.CostCenterMonthlyForecastAdjustmentReport(fy, period, quarter=quarter)
+            c = utils.CostCenterMonthlyForecastAdjustmentReport(fy, period)
             c.insert_grouped_forecast_adjustment(c.sum_forecast_adjustments())
     context = {"form": form}
     return render(request, "costcenter-monthly-forecast-adjustment-update-form.html", context)
+
+
+def costcenter_monthly_forecast_line_item_update(request):
+    form = UpdateCostCenterForecastLineItemMonthlyForm()
+    if request.method == "POST":
+        print(request.POST)
+        form = UpdateCostCenterForecastLineItemMonthlyForm(request.POST)
+        if form.is_valid():
+            fy = request.POST.get("fy")
+            period = request.POST.get("period")
+            c = utils.CostCenterMonthlyForecastLineItemReport(fy, period)
+            c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
+    context = {"form": form}
+    return render(request, "costcenter-monthly-forecast-line-item-update-form.html", context)
 
 
 def costcenter_monthly_allocation(request):

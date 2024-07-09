@@ -76,4 +76,9 @@ urlpatterns += [
         views.costcenter_monthly_forecast_adjustment_update,
         name="costcenter-monthly-forecast-adjustment-update",
     ),
+    path(
+        "costcenter-monthly-forecast-line-item-update",
+        views.costcenter_monthly_forecast_line_item_update,
+        name="costcenter-monthly-forecast-line-item-update",
+    ),
 ]
