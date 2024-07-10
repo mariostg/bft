@@ -5,7 +5,6 @@ site_url: https://exemple.com
 nav:
     - Home: docs/index.md
     - About: docs/about.md
-    - Line Items: docs/line-items-table.md
     - System administration: docs/system-administration/index.md
     - Uploading Line Items: docs/system-administration/uploading-line-items.md
     - Allocation: docs/allocation/index.md
@@ -14,6 +13,7 @@ nav:
     - Forecast Adjustment : docs/forecast-adjustment/index.md
     - Fund Center : docs/fundcenter/
     - Funds: docs/fund/index.md
+    - Line Items: docs/line-items
     - Sources: docs/source/index.md
 theme:
     name: material
