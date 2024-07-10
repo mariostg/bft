@@ -9,6 +9,7 @@ nav:
     - System administration: docs/system-administration/index.md
     - Uploading Line Items: docs/system-administration/uploading-line-items.md
     - Allocation: docs/allocation/index.md
+    - Capital Project: docs/capitalproject/
     - Cost Center: docs/costcenter/index.md
     - Forecast Adjustment : docs/forecast-adjustment/index.md
     - Fund Center : docs/fundcenter/
