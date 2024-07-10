@@ -3,6 +3,7 @@
 ## BFT Data
 
 - [Allocation](docs/allocation/)
+- [Capital Forecasting](docs/capital-forecasting)
 - [Capital Project](docs/capitalproject/)
 - [Cost Center](docs/costcenter/)
 - [Forecast Adjustment ](docs/forecast-adjustment/)
