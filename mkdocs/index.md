@@ -1,8 +1,9 @@
 # Business Forecasting Tool Documentation
 
-- [Allocation](docs/allocation/index.md)
+- [Allocation](docs/allocation/)
 - [Capital Project](docs/capitalproject/)
-- [Cost Center](docs/costcenter/index.md)
-- [Forecast Adjustment ](docs/forecast-adjustment/index.md)
-- [Fund](docs/fund/index.md)
-- [Source](docs/source/index.md)
+- [Cost Center](docs/costcenter/)
+- [Forecast Adjustment ](docs/forecast-adjustment/)
+- [Fund](docs/fund/)
+- [Line Items](docs/line-items/)
+- [Source](docs/source/)
