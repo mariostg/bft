@@ -1064,7 +1064,7 @@ class LineItemProcessor(UploadProcessor):
         try:  # assume that if exception occurs, there are no spent.
             fr_has_spent = not df.query("doctype == 'FR' & spent > 0 ").empty
             pc_has_spent = not df.query("doctype == 'PC' & spent > 0 ").empty
-        except:
+        except BaseException:
             pass
         return all([fr_has_spent, pc_has_spent])
 

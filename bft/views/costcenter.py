@@ -241,7 +241,6 @@ def fundcenter_delete(request, pk):
             fundcenter.delete()
         except RestrictedError as e:
             msg = e.args[0].split(":")[0] + " : "
-            print(msg)
             fkeys = []
             for fk in e.restricted_objects:
                 if isinstance(fk, CapitalProject):

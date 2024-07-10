@@ -16,21 +16,18 @@ from bft.models import (BftStatus, BftStatusManager, CapitalProjectManager,
                         FundCenterAllocation, FundCenterManager, FundManager,
                         LineItem)
 from reports import capitalforecasting, screeningreport, utils
-from reports.forms import (
-    SearchAllocationAnalysisForm,
-    SearchCapitalEstimatesForm,
-    SearchCapitalFearsForm,
-    SearchCapitalForecastingDashboardForm,
-    SearchCapitalHistoricalForm,
-    SearchCapitalYeRatiosForm,
-    SearchCostCenterInYearDataForm,
-    SearchCostCenterMonthlyDataForm,
-    SearchCostCenterScreeningReportForm,
-    UpdateCostCenterAllocationMonthlyForm,
-    UpdateCostCenterForecastAdjustmentMonthlyForm,
-    UpdateCostCenterForecastLineItemMonthlyForm,
-    UpdateCostCenterEncumbranceMonthlyForm,
-)
+from reports.forms import (SearchAllocationAnalysisForm,
+                           SearchCapitalEstimatesForm, SearchCapitalFearsForm,
+                           SearchCapitalForecastingDashboardForm,
+                           SearchCapitalHistoricalForm,
+                           SearchCapitalYeRatiosForm,
+                           SearchCostCenterInYearDataForm,
+                           SearchCostCenterMonthlyDataForm,
+                           SearchCostCenterScreeningReportForm,
+                           UpdateCostCenterAllocationMonthlyForm,
+                           UpdateCostCenterEncumbranceMonthlyForm,
+                           UpdateCostCenterForecastAdjustmentMonthlyForm,
+                           UpdateCostCenterForecastLineItemMonthlyForm)
 from utils.getrequestfilter import set_query_string
 
 
@@ -228,7 +225,6 @@ def set_initial(request):
 def costcenter_monthly_allocation_update(request):
     form = UpdateCostCenterAllocationMonthlyForm()
     if request.method == "POST":
-        print(request.POST)
         form = UpdateCostCenterAllocationMonthlyForm(request.POST)
         if form.is_valid():
             fy = request.POST.get("fy")
@@ -243,7 +239,6 @@ def costcenter_monthly_allocation_update(request):
 def costcenter_monthly_forecast_adjustment_update(request):
     form = UpdateCostCenterForecastAdjustmentMonthlyForm()
     if request.method == "POST":
-        print(request.POST)
         form = UpdateCostCenterForecastAdjustmentMonthlyForm(request.POST)
         if form.is_valid():
             fy = request.POST.get("fy")
@@ -257,7 +252,6 @@ def costcenter_monthly_forecast_adjustment_update(request):
 def costcenter_monthly_forecast_line_item_update(request):
     form = UpdateCostCenterForecastLineItemMonthlyForm()
     if request.method == "POST":
-        print(request.POST)
         form = UpdateCostCenterForecastLineItemMonthlyForm(request.POST)
         if form.is_valid():
             fy = request.POST.get("fy")
@@ -271,7 +265,6 @@ def costcenter_monthly_forecast_line_item_update(request):
 def costcenter_monthly_encumbrance_update(request):
     form = UpdateCostCenterEncumbranceMonthlyForm()
     if request.method == "POST":
-        print(request.POST)
         form = UpdateCostCenterEncumbranceMonthlyForm(request.POST)
         if form.is_valid():
             fy = request.POST.get("fy")
