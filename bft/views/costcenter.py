@@ -241,9 +241,15 @@ def fundcenter_delete(request, pk):
             fundcenter.delete()
         except RestrictedError as e:
             msg = e.args[0].split(":")[0] + " : "
+            print(msg)
             fkeys = []
             for fk in e.restricted_objects:
-                fkeys.append(fk.fundcenter_parent.fundcenter)
+                if isinstance(fk, CapitalProject):
+                    fkeys.append(fk.project_no)
+                elif isinstance(fk, FundCenter):
+                    fkeys.append(fk.fundcenter)
+                elif isinstance(fk, CostCenter):
+                    fkeys.append(fk.costcenter)
             msg = msg + ", ".join(fkeys)
             messages.warning(request, msg)
         return redirect("fundcenter-table")
