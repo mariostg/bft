@@ -3,10 +3,9 @@ docs_dir: 'mkdocs'
 site_dir: 'htmldocs/static/mkdocs_build'
 site_url: https://exemple.com
 nav:
-    - Home: docs/index.md
+    - Home: /
     - About: docs/about.md
     - System administration: docs/system-administration/index.md
-    - Uploading Line Items: docs/system-administration/uploading-line-items.md
     - Allocation: docs/allocation/index.md
     - Capital Project: docs/capitalproject/
     - Cost Center: docs/costcenter/index.md
