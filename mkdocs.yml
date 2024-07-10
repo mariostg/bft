@@ -11,6 +11,7 @@ nav:
     - Allocation: docs/allocation/index.md
     - Cost Center: docs/costcenter/index.md
     - Forecast Adjustment : docs/forecast-adjustment/index.md
+    - Fund Center : docs/fundcenter/
     - Funds: docs/fund/index.md
     - Sources: docs/source/index.md
 theme:
