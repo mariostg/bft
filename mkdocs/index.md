@@ -2,14 +2,14 @@
 
 ## BFT Data
 
-- [Allocation](docs/allocation/)
-- [Capital Forecasting](docs/capital-forecasting)
-- [Capital Project](docs/capitalproject/)
-- [Cost Center](docs/costcenter/)
-- [Forecast Adjustment ](docs/forecast-adjustment/)
-- [Fund](docs/fund/)
-- [Line Items](docs/line-items/)
-- [Source](docs/source/)
+- [Allocation](docs/allocation/index.md)
+- [Capital Forecasting](docs/capital-forecasting/index.md)
+- [Capital Project](docs/capitalproject/index.md)
+- [Cost Center](docs/costcenter/index.md)
+- [Forecast Adjustment ](docs/forecast-adjustment/index.md)
+- [Fund](docs/fund/index.md)
+- [Line Items](docs/line-items/index.md)
+- [Source](docs/source/index.md)
 
 
 ## Preparing BFT for Initial Launch

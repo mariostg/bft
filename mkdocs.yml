@@ -5,14 +5,13 @@ site_url: https://exemple.com
 nav:
     - Home: /
     - About: docs/about.md
-    - System administration: docs/system-administration/index.md
     - Allocation: docs/allocation/index.md
-    - Capital Project: docs/capitalproject/
+    - Capital Project: docs/capitalproject/index.md
     - Cost Center: docs/costcenter/index.md
     - Forecast Adjustment : docs/forecast-adjustment/index.md
-    - Fund Center : docs/fundcenter/
+    - Fund Center : docs/fundcenter/index.md
     - Funds: docs/fund/index.md
-    - Line Items: docs/line-items
+    - Line Items: docs/line-items/index.md
     - Sources: docs/source/index.md
 theme:
     name: material
