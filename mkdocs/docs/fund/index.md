@@ -36,6 +36,20 @@ Fund form for creating and updating data
 ![](images/fund-form.png)
 </figure>
 
+## Delete Fund
+
+A confirmation dialog will appear before proceding with a delete action.
+
+*Confirm the Fund deletion*
+![](images/fund-delete.png)
+
+## Warning message
+
+When an attempt to delete a fund which has relationship with other
+elements, it will not be possible to delete the fund and a warning
+will be displayed indicating the elements related to the fund.
+
+!!! Warning "Cannot delete some instances of model 'Fund' because they are referenced through restricted foreign keys : 8484WA, 8484XA, 8484YA"
 
 ## Uploading Funds
 
