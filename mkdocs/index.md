@@ -10,7 +10,7 @@
 - [Fund](docs/fund/index.md)
 - [Line Items](docs/line-items/index.md)
 - [Source](docs/source/index.md)
-
+- [Users](docs/user/index.md)
 
 ## Preparing BFT for Initial Launch
 
