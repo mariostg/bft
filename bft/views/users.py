@@ -115,7 +115,7 @@ def user_delete(request, pk):
     if request.method == "POST":
         _user.delete()
         return redirect("user-table")
-    context = {"object": BftUser, "back": "user-table"}
+    context = {"object": _user, "back": "user-table"}
     return render(request, "core/delete-object.html", context)
 
 
