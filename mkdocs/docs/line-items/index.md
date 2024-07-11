@@ -156,4 +156,18 @@ _Line item incoherent fund center_
 
 If it can be determined that the fund center specified is not the direct parent of the specified cost center, the download will not occur.  The user will be warned as show below.
 
+<figure markdown>
+
+*Invalid fund center and cost center relationship when both exist in the BFT*
 ![](images/form-upload-line-items-costcenter-error.png)
+</figure>
+
+### Wrong Cost Center
+
+If the specified cost center does not exist in the BFT, the download will not accur.  The user will be warned as shown below.
+
+<figure markdown>
+
+*The specified cost center does not exists*
+![](images/forn-upload-line-item-unknown-costcenter.png)
+</figure>
