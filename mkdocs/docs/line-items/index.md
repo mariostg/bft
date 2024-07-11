@@ -6,8 +6,8 @@ The line item table is the entry door to line item forecasting. It displays all 
 
 <figure markdown>
 
-![](images/line-items-table.png)
 _Line item table overview_
+![](images/line-items-table.png)
 
 </figure>
 
@@ -21,7 +21,8 @@ The line item table can be filtered by mean of several fields as shown in the im
 
 <figure markdown>
 
-![](images/line-item-table-filter.png)_Line item filtering options_
+_Line item filtering options_
+![](images/line-item-table-filter.png)
 
 </figure>
 
@@ -33,8 +34,8 @@ The green buttons visible for each line item allows for forecasting actions. It 
 
 <figure markdown>
 
+_Forecast by Document Number Form will forecast all lines under specified document number_
 ![](images/form-document-item-forecast.png)
-_Forecasting for a Document Number_
 
 </figure>
 
@@ -44,8 +45,8 @@ With this input form, one can forecast all lines that fall under the selected do
 
 <figure markdown>
 
+_Forecasting by Cost Center Form will forecast all lines under specified cost center_
 ![](images/line-item-forecast-by-costcenter-form.png)
-_Forecasting for a Document Number_
 
 </figure>
 
@@ -59,8 +60,8 @@ The Form Input button opens a form that allows for description and comment input
 
 <figure markdown>
 
+_Individual line item forecasting form for updating all forecasting apects related to a single line item_
 ![](images/line-item-forecast-form.png)
-_Individual line item forecasting form_
 
 </figure>
 
@@ -68,12 +69,12 @@ When doing individual line item forecast, messages will warn you if you attempt 
 
 <figure markdown>
 
-![](images/line-item-forecast-higher-than-workingplan-warning.png)
 _Attempt to forecast above working plan_
+![](images/line-item-forecast-higher-than-workingplan-warning.png)
 
 </figure>
 
-# Uploading Line Items
+## Uploading Line Items
 
 Line items can be uploaded in the BFT in two manners. During BFT normal operations, a designated person performs the upload for the entire division on a daily basis and normally in the morning. This is known as an upload at the fund center level. Executing such an operation has the effect of creating "orphan lines". An orphan line is a line that exists in the BFT, but does not exist in the Encumbrance Report. Such orphan lines are not erased from the BFT, but their encumbrance and forecast are set to zero.
 
@@ -89,19 +90,13 @@ Both fund center and cost center must exist in the BFT.
 
 <figure markdown>
 
-!['test'](images/line-item-upload-by-costcenter-form.png){align=right}
+Cost Center Lint Items Upload form will act on all line items related to the specified cost center
+![](images/line-item-upload-by-costcenter-form.png){align=right}
 
-<figcaption>Selecting Uploading line items for Cost Center</figcaption>
 </figure>
 
 Three pieces of information are mandatory and must be supplied to the input form : The file that contains the encumbrance report, the fund center and the cost center, child of the fund center.
 
-<figure markdown>
-
-!['test'](../images/form-upload-line-items-costcenter.png){align=right}
-
-<figcaption>Cost Center line items upload form</figcaption>
-</figure>
 There are several checks that are performed when the proceed button is pressed and messages will be displayed if anything is not acceptable to the BFT.  The DRMIS report must be supplied as is without any alterations.
 
 -   The fund center must exist in the BFT.
@@ -115,12 +110,7 @@ There are several checks that are performed when the proceed button is pressed a
 -   The provided file must be a DND cost center encumbrance report. This information is part of the DRMIS report header.
 -   The provided file must have a column header line that matches what the BFT expect.
 
-<figure markdown>
 
-!['test'](../images/form-upload-line-items-costcenter-error.png){align=right}
-
-<figcaption>Cost Center line items upload form with typical error</figcaption>
-</figure>
 If any of the above fails, the upload process will not take place.
 
 During the upload process, the BFT will manipulate the line items in the following ways:
@@ -131,7 +121,31 @@ During the upload process, the BFT will manipulate the line items in the followi
 -   When a line item is new, record its encumbrance for historical purposes.
 -   Adjust the forecast of line items. When forecast is below spent, set the forecast to spent. When the forecast is above working plan, set the forecast to working plan
 
-## Warnings
+!!! Note
+    If the encumbrance report has any line containing a fund center that does not exist in the BFT, download process will carry on normally. The Line Item Table will highlight discrepencies as shown below.
+
+<figure markdown>
+
+*BFT Screening report indicates potential problem in cost center/fund center relationship*
+![](images/line-item-fund-center-incoherent.png)
+</figure>
+
+## Upload Messages
+
+
+This is telling that the cost center parent in the financial structure of the BFT is different than one is being reported in the encumbrance report.  Either the BFT financial structure must be changed or there is a problem in DRMIS.
+
+!!! Warning "The encumbrance report contains a fund that is not recorded in the BFT"
+
+    ('There are missing funds', {'C444'})
+
+!!! Warning "Uploading for one cost center, BFT Expect to find only one cost center in the encumbrance report"
+
+    There are more that one cost center in the report. Found 8484WA, 8484ZZ
+
+!!! Warning "Encumbrance report has a cost center that does not exists in the BFT"
+
+    ('There are missing cost centers', {'8484ZZ'})
 
 ### Wrong fund center
 
@@ -139,3 +153,7 @@ If for a given line item there exist a discrepency between the fund center repor
 
 ![Line item incoherent fund center](images/line-item-fund-center-incoherent.png "Line item incoherent fund center")
 _Line item incoherent fund center_
+
+If it can be determined that the fund center specified is not the direct parent of the specified cost center, the download will not occur.  The user will be warned as show below.
+
+![](images/form-upload-line-items-costcenter-error.png)
