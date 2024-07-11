@@ -48,7 +48,11 @@ def register_new_user(request):
     if request.method == "POST":
         form = UserSelfRegisterForm(request.POST)
         if form.is_valid:
-            user_obj = form.save(commit=False)
+            try:
+                user_obj = form.save(commit=False)
+            except ValueError as e:
+                messages.error(request, e)
+                return redirect("register")
             user_obj.username = BftUserManager.make_username(user_obj.email)
             logger.info(f"Creating username {user_obj.username}")
             user_obj.is_active = False

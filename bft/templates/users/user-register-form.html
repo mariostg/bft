@@ -13,10 +13,10 @@
       <form action="" method='POST'>
         <header class="form__header">BFT New User Registration Request</header>
         {% csrf_token %}
-        <div class="form__fields">
+        {% comment %} <div class="form__fields"> {% endcomment %}
 
           {{form}}
-        </div>
+        {% comment %} </div> {% endcomment %}
         <div class="block block--spaced">
           <input class="btn" type="submit" value="Submit" />
         </div>
