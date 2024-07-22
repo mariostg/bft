@@ -3,7 +3,7 @@
 Allocations are managed at both cost center and fund center level using the
 appropriate entry form.  Creating or updating an allocation will update the monthly
 allocation for the current FY and period.  Deleting an allocation
-has no effect on the monthly forecast adjustment.
+has no effect on the monthly allocation.
 
 ## Viewing Allocations
 
@@ -17,8 +17,8 @@ works the same way for both Cost Centers and Fund Centers.
 *Editable mode*
 ![](images/allocation-view.png)
 
-It is possible to display the monthly monthly.  This data is for historical purposes and is never
-deleted. FY and Period are mandatory fields.
+It is possible to display the monthly allocation.  This data is for historical purposes for the last 5 years.
+FY and Period are mandatory fields.
 
 *Viewing monthly allocation*
 ![](images/allocation-monthly.png)
@@ -59,7 +59,9 @@ The required csv file must contains 6 columns as shown in the sample below.
 The quarter column must be a number between 1 and 4. The amount numbers must not contain any separator other than the dot decimal separator. The note entries are not mandatory. The text must be surrounded by double quotes.
 
 <figure markdown>
-
+<figcaption>
+Sample cost center allocation CSV file
+</figcaption>
 ![](images/allocation-costcenter-csv-sample.png)
 </figure>
 
