@@ -13,12 +13,27 @@ from django.contrib import messages
 from django.db import IntegrityError
 
 from bft.conf import QUARTERKEYS
-from bft.models import (BftUser, CapitalInYear, CapitalNewYear, CapitalProject,
-                        CapitalYearEnd, CostCenter, CostCenterAllocation,
-                        CostCenterManager, Fund, FundCenter,
-                        FundCenterAllocation, FundCenterManager, FundManager,
-                        LineForecastManager, LineItem, LineItemImport, Source,
-                        SourceManager)
+from bft.models import (
+    BftUser,
+    CapitalInYear,
+    CapitalNewYear,
+    CapitalProject,
+    CapitalYearEnd,
+    CostCenter,
+    CostCenterAllocation,
+    CostCenterManager,
+    Fund,
+    FundCenter,
+    FundCenterAllocation,
+    FundCenterManager,
+    FundManager,
+    LineForecastManager,
+    LineItem,
+    LineItemImport,
+    Source,
+    SourceManager,
+    CapitalProjectManager,
+)
 from main.settings import BASE_DIR
 
 logger = logging.getLogger("uploadcsv")
@@ -511,7 +526,7 @@ class CapitalProjectForecastProcessor(UploadProcessor):
 
     def _assign_capital_project(self, capital_forecasts: dict, request=None) -> dict | None:
         for item in capital_forecasts:  # assign fund center to everyone before saving
-            obj = CapitalProject.objects.get(project_no=item["capital_project"].upper())
+            obj = CapitalProjectManager().project(item["capital_project"].upper())
             if not obj:
                 msg = f"Project {item['capital_project']} does not exist, no capital forecasts have been recorded."
                 logger.warn(msg)
