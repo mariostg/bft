@@ -583,7 +583,7 @@ class CapitalProjectNewYearProcessor(CapitalProjectForecastProcessor):
                 counter += 1
                 logger.info(f"Uploaded Capital Forecasting New Year {obj.fund}.")
             except IntegrityError as err:
-                msg = f"Saving New Year Capital Forecasting {item} generates {err}."
+                msg = f"Saving New Year Capital Forecasting {obj} generates {err}."
                 logger.warn(msg)
                 if self.request:
                     messages.error(self.request, msg)
