@@ -67,6 +67,9 @@ Capital Forecasting New Year Source File Sample
 
     Your project database already contains a New Year allocation for the specified project, FY and fund.
 
+!!! Warning "Project C.999999 - BASEMENT RENO fund (c111) does not exist, no capital Forecasts have been recorded."
+    The fund specified in the CSV file does not exist in the database.
+
 ### In Year Upload
 
 The In Year upload allows for recording on a quarterly basis the encumbrance, allocation, estimates and encumbrance of each capital project.
@@ -94,6 +97,10 @@ Capital Forecasting In Year Source file Sample
 
     Your project database already contains a New Year allocation for the specified project, FY and fund.
 
+
+!!! Warning "Project C.999999 - BASEMENT RENO fund (c111) does not exist, no capital Forecasts have been recorded."
+    The fund specified in the CSV file does not exist in the database.
+
 ### Year End Upload
 The Year End Upload allows for recording the Year End Spent of each capital project by fund.
 
@@ -117,3 +124,6 @@ Capital Forecasting Year End Source File Sample
 !!! Warning "Saving Year End Capital Forecasting C.999999 - BASEMENT RENO - 2020 - C113 generates UNIQUE constraint failed: bft_capitalyearend.fund_id, bft_capitalyearend.capital_project_id, bft_capitalyearend.commit_item, bft_capitalyearend.fy."
 
     Your project database already contains a New Year allocation for the specified project, FY and fund.
+
+!!! Warning "Project C.999999 - BASEMENT RENO fund (c111) does not exist, no capital Forecasts have been recorded."
+    The fund specified in the CSV file does not exist in the database.
