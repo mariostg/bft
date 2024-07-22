@@ -36,4 +36,32 @@ A confirmation dialog will appear before proceding with a delete action.  Once t
 
 ## Upload Capital Project
 
-!!! Todo
+!!! Note
+
+    This operation requires administration privileges.
+
+### Source File
+
+Depending on the period of the year (new year, in year, end of year),
+the content of the source file must be adapted
+
+#### New Year Source File
+
+The New Year source file must contain 4 columns as shown in the sample below.  All fields are mandatory.  The columns initial_allocation and commit_item can be set to 0 if desired.
+
+<figure markdown>
+<figcaption>
+Capital Forecasting New Year Source File Sample
+</figcaption>
+![](images/capital-project-csv-new-year.png)
+</figure>
+
+!!! Warning "Project c.123456 does not exist, no capital forecasts have been recorded."
+    Your source file contains a project number that is not found in the database. Upload will fail if a project in the source file does not exist.
+
+!!! Warning " New year capital project forecast upload. Invalid columns header"
+    Upload will fail because it contains an invalid column header.  Verify the first row of the source file.
+
+!!! Warning "Saving New Year Capital Forecasting C.999999 - BASEMENT RENO - 2020 - C113 generates UNIQUE constraint failed: bft_capitalnewyear.fund_id, bft_capitalnewyear.capital_project_id, bft_capitalnewyear.commit_item, bft_capitalnewyear.fy."
+
+    Your project database already contains a New Year allocation for the specified project, FY and fund.
