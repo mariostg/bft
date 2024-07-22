@@ -612,7 +612,7 @@ class CapitalProjectInYearProcessor(CapitalProjectForecastProcessor):
                 counter += 1
                 logger.info(f"Uploaded Capital Forecasting In Year {obj.fund}.")
             except IntegrityError as err:
-                msg = f"Saving In Year Capital Forecasting {item} generates {err}."
+                msg = f"Saving In Year Capital Forecasting {obj} generates {err}."
                 logger.warn(msg)
                 if self.request:
                     messages.error(self.request, msg)
@@ -656,7 +656,7 @@ class CapitalProjectYearEndProcessor(CapitalProjectForecastProcessor):
                 counter += 1
                 logger.info(f"Uploaded Capital Forecasting Year End {obj.fund}.")
             except IntegrityError as err:
-                msg = f"Saving Year End Capital Forecasting {item} generates {err}."
+                msg = f"Saving Year End Capital Forecasting {obj} generates {err}."
                 logger.warn(msg)
                 if self.request:
                     messages.error(self.request, msg)
