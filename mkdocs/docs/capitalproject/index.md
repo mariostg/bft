@@ -39,3 +39,21 @@ A confirmation dialog will appear before proceding with a delete action.  Once t
 !!! Note
 
     These operations requires administration privileges.
+
+### Capital Project Source File
+The Capital Project required source file contains 4 columns as shown in the sample below. The first three columns are mandatory : project_no, shortname and fundcenter.  The fund center must exist in the database otherwise the upload will fail.
+
+<figure markdown>
+<figcaption>
+Capital Project Source File Sample
+</figcaption>
+![](images/capital-project-csv-sample.png)
+</figure>
+
+### Capital Project upload Form
+The user select the file containing the capital projects to upload by using the capital project upload form.
+
+![](images/capital-project-upload-form.png)
+
+### Capital Project Upload Messages
+!!! Todo
