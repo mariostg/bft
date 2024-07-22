@@ -42,6 +42,7 @@ A confirmation dialog will appear before proceding with a delete action.  Once t
 
 ### New Year Upload
 The new Year upload allows for fixing the allocations of each project for a given fund.
+The project number and the fund must exist in the database for the upload to succeed.
 
 #### Source File
 
