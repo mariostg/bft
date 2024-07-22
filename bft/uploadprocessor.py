@@ -525,7 +525,7 @@ class CapitalProjectForecastProcessor(UploadProcessor):
         for item in capital_forecasts:  # assign fund to everyone before saving
             fund = FundManager().fund(item["fund"])
             if not fund:
-                msg = f"Project {item['project_no']} fund ({item['fund']}) does not exist, no capital Forecasts have been recorded."
+                msg = f"Project {item['capital_project']} fund ({item['fund']}) does not exist, no capital Forecasts have been recorded."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
