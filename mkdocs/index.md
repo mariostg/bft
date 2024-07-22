@@ -16,8 +16,18 @@ Each of the following sections contains the specific instructions about how to h
 ## Uploading Data in the BFT
 
 Go to the specific section that explains how to upload in the BFT certain data from a CSV file.
+
 [Upload Cost Center Allocations](docs/allocation/index.md#uploading-cost-center-allocations)  
-[Upload Capital Forecasting New Year Allocation](docs/capital-forecasting/index.md#upload-capital-forecasting)
+[Upload Capital Forecasting New Year Allocation](docs/capital-forecasting/index.md#new-year-upload)  
+[Upload Capital Forecasting In Year](docs/capital-forecasting/index.md#in-year-upload)  
+[Upload Capital Forecasting Year End](docs/capital-forecasting/index.md#year-end-upload)  
+[Upload Capital Project](docs/capitalproject/index.md#upload-capital-project)  
+[Upload Cost Centers](docs/costcenter/index.md#upload-cost-center)  
+[Upload Funds](docs/fund/index.md#uploading-funds)  
+[Upload Line Items for Cost Center](docs/line-items/index.md#upload-line-items-for-cost-center)  
+[Upload Source](docs/source/index.md#uploading-sources)  
+
+
 ## Preparing BFT for Initial Launch
 
 This section supposes that BFT is already deployed to some kind of environment, the goal here being to feed initial data in the system.
