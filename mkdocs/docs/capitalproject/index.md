@@ -44,7 +44,7 @@ A confirmation dialog will appear before proceding with a delete action.  Once t
 The new Year upload allows for fixing the allocations of each project for a given fund.
 The project number and the fund must exist in the database for the upload to succeed.
 
-#### Source File
+#### New Year Source File
 
 The New Year source file must contain 4 columns as shown in the sample below.  All fields are mandatory.  The columns initial_allocation and commit_item can be set to 0 if desired.
 
@@ -55,7 +55,7 @@ Capital Forecasting New Year Source File Sample
 ![](images/capital-project-csv-new-year.png)
 </figure>
 
-#### Warning Messages
+#### New Year Messages
 
 !!! Warning "Project c.123456 does not exist, no capital forecasts have been recorded."
     Your source file contains a project number that is not found in the database. Upload will fail if a project in the source file does not exist.
@@ -74,7 +74,7 @@ Capital Forecasting New Year Source File Sample
 
 The In Year upload allows for recording on a quarterly basis the encumbrance, allocation, estimates and encumbrance of each capital project.
 
-#### Source File
+#### In Year Source File
 
 The In Year source file must contain 12 columns as shown in the sample below.
 
@@ -85,7 +85,7 @@ Capital Forecasting In Year Source file Sample
 ![](images/capital-project-csv-in-year.png)
 </figure>
 
-#### Warning Messages
+#### In Year Messages
 
 !!! Warning "Project c.123456 does not exist, no capital forecasts have been recorded."
     Your source file contains a project number that is not found in the database. Upload will fail if a project in the source file does not exist.
@@ -104,7 +104,7 @@ Capital Forecasting In Year Source file Sample
 ### Year End Upload
 The Year End Upload allows for recording the Year End Spent of each capital project by fund.
 
-#### Source File
+#### Year End Source File
 
 <figure markdown>
 <figcaption>
