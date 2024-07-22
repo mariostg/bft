@@ -57,7 +57,7 @@ The New Year source file must contain 4 columns as shown in the sample below.  A
 <figcaption>
 Capital Forecasting New Year Source File Sample
 </figcaption>
-![](images/capital-project-csv-new-year.png)
+![](images/capital-project-forecasting-csv-new-year.png)
 </figure>
 
 #### New Year Messages
@@ -87,7 +87,7 @@ The In Year source file must contain 12 columns as shown in the sample below.
 <figcaption>
 Capital Forecasting In Year Source file Sample
 </figcaption>
-![](images/capital-project-csv-in-year.png)
+![](images/capital-project-forecasting-csv-in-year.png)
 </figure>
 
 #### In Year Messages
@@ -115,7 +115,7 @@ The Year End Upload allows for recording the Year End Spent of each capital proj
 <figcaption>
 Capital Forecasting Year End Source File Sample
 </figcaption>
-![](images/capital-project-csv-year-end.png)
+![](images/capital-project-forecasting-csv-year-end.png)
 </figure>
 
 #### Year End Messages
