@@ -1,6 +1,7 @@
 # Business Forecasting Tool Documentation
 
 ## BFT Data
+Each of the following sections contains the specific instructions about how to handle the data in the BFT.  Where applicable, it describes how to view, create, update, delete and upload the data.
 
 - [Allocation](docs/allocation/index.md)
 - [Capital Forecasting](docs/capital-forecasting/index.md)
@@ -12,6 +13,11 @@
 - [Source](docs/source/index.md)
 - [Users](docs/user/index.md)
 
+## Uploading Data in the BFT
+
+Go to the specific section that explains how to upload in the BFT certain data from a CSV file.
+[Upload Cost Center Allocations](docs/allocation/index.md#uploading-cost-center-allocations)  
+[Upload Capital Forecasting New Year Allocation](docs/capital-forecasting/index.md#upload-capital-forecasting)
 ## Preparing BFT for Initial Launch
 
 This section supposes that BFT is already deployed to some kind of environment, the goal here being to feed initial data in the system.
