@@ -13,27 +13,12 @@ from django.contrib import messages
 from django.db import IntegrityError
 
 from bft.conf import QUARTERKEYS
-from bft.models import (
-    BftUser,
-    CapitalInYear,
-    CapitalNewYear,
-    CapitalProject,
-    CapitalYearEnd,
-    CostCenter,
-    CostCenterAllocation,
-    CostCenterManager,
-    Fund,
-    FundCenter,
-    FundCenterAllocation,
-    FundCenterManager,
-    FundManager,
-    LineForecastManager,
-    LineItem,
-    LineItemImport,
-    Source,
-    SourceManager,
-    CapitalProjectManager,
-)
+from bft.models import (BftUser, CapitalInYear, CapitalNewYear, CapitalProject,
+                        CapitalProjectManager, CapitalYearEnd, CostCenter,
+                        CostCenterAllocation, CostCenterManager, Fund,
+                        FundCenter, FundCenterAllocation, FundCenterManager,
+                        FundManager, LineForecastManager, LineItem,
+                        LineItemImport, Source, SourceManager)
 from main.settings import BASE_DIR
 
 logger = logging.getLogger("uploadcsv")
