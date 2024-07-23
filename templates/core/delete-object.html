@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-
+{% load static %}
 {% block content %}
   <div class="block block--centered">
     <section class="form">
@@ -11,7 +11,7 @@
         <div class="block block--spaced">
           <a class='btn btn-back' href="{% url back %}" style='text-decoration:none;'>Retour</a>
 
-          <input class='btn btn-delete' type="submit" value="Confirm" />
+          <input class='btn' type="submit" value="Confirm" />
         </div>
       </form>
     </div>
