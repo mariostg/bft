@@ -76,44 +76,36 @@ The user select the file containing the cost centers to upload by using the ==co
 ![](images/allocation-costcenter-upload-form.png)
 </figure>
 
-#### Upload messages
+### Cost Center Upload Messages
 
 Upon clicking the proceed button, the BFT will process the request and display any messages according to circumstances. Such as the one below which indicates that the column header in the file are invalid.
 
-!!! warning "Supplying a file that contains invalid column header yields this message"
-
-    Cost centers upload by admin, Invalid columns header"
+!!! warning "Cost centers upload by admin, Invalid columns header"
+    Upload will fail because it contains an invalid column header.  Verify the first row of the source file.  Maybe you selected the wrong file.
 
 And there are more potential messages.
 
-!!! warning "Indicating a quarter that does not match the quarter indicated in the file."
+!!! warning "Error allocation upload by admin, Quarter data does not match request (2 does not match 1)"
+    The quarter provided in the upload form does not match the quarter from the dataset
 
-    Error allocation upload by admin, Quarter data does not match request (2 does not match 1)
+!!! warning "FY request does not match dataset"
+    The FY provided in the upload form does not match the FY from the dataset
 
-!!! warning "Indicating a fiscal year that does not match the file content."
+!!! warning "Quarters not all matching. admin, 2023, 2"
+    The source file contains more that one quarter. Upload can be done only if the quarter column contains the save values.
 
-    FY request does not match dataset
+!!! warning "Fund(s) not found during check fund ['C11']"
+    The source file contains a fund that does not exist in the database.
 
-!!! warning "The source file contains more that one quarter."
+!!! warning "Cost centers not found during check cost centers ['8484WW']"
+    the source file contains a cost center that does not exist in the database.
 
-    Quarters not all matching. admin, 2023, 2
-
-!!! warning "The source file contains an unknown fund"
-
-    Fund(s) not found during check fund ['C11']
-
-!!! warning "The source file contains an unknown cost center."
-
-    Cost centers not found during check cost centers ['8484WW']
-
-!!! warning "The source file contains duplicate cost center - fund pair."
-
-    Saving cost center allocation {'costcenter': , 'fund': , 'fy': 2023, 'quarter': 2, 'amount': 20000.0, 'note': 'Note related to allocation 2184XA', 'owner': >} generates UNIQUE constraint failed: costcenter_costcenterallocation.fund_id, costcenter_costcenterallocation.costcenter_id, costcenter_costcenterallocation.quarter, costcenter_costcenterallocation.fy.
+!!! warning "Saving cost center allocation 8484YA - CELLAR - C113 - Basement Procurement - 2023 Q1 20000.99 generates UNIQUE constraint failed: bft_costcenterallocation.fund_id, bft_costcenterallocation.costcenter_id, bft_costcenterallocation.quarter, bft_costcenterallocation.fy."
+    You are trying to save an allocation that already exist in the database for the given cost center, FY, quarter and fund.
 
 ## Uploading Fund Center Allocations
 
 !!! note
-
     This operation requires administration privileges.
 
 ### Source file
@@ -143,10 +135,10 @@ The user select the file containing the fund centers to upload by using the ==fu
 ### Fund Center Upload Messages
 
 !!! Warning "Fund center allocation upload by admin, Invalid columns header"
-    Supplying a file that contains invalid column header yields this message
+    Upload will fail because it contains an invalid column header.  Verify the first row of the source file.  Maybe you selected the wrong file.
 
 !!! warning "Error allocation upload by admin, Quarter data does not match request (2 does not match 1)"
-    Indicating a quarter that does not match the quarter indicated in the file.
+    The quarter provided in the upload form does not match the quarter from the dataset
 
 !!! warning "FY request does not match dataset"
     The FY provided in the upload form does not match the FY from the dataset
