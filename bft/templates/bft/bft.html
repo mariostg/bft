@@ -12,18 +12,20 @@
       {% endif %}
       <div class="form__body">
         <div class="form__header--title">Fundamentals</div>
-        <a class='btn' href="{% url 'fund-table' %}">Funds</a>
-        <a class='btn'  href="{% url 'source-table' %}">Sources</a>
-        <a class='btn'  href="{% url 'costcenter-table' %}">Cost Centers</a>
-        <a class='btn'  href="{% url 'fundcenter-table' %}">Fund Centers</a>
-        <a class='btn'  href="{% url 'capital-project-table' %}">Capital Projects</a>
+        <a class='btn'  href="{% url 'capital-project-table' %}">Capital Project</a>
+        <a class='btn'  href="{% url 'costcenter-table' %}">Cost Center</a>
+        <a class='btn' href="{% url 'fund-table' %}">Fund</a>
+        <a class='btn'  href="{% url 'fundcenter-table' %}">Fund Center</a>
+        <a class='btn'  href="{% url 'source-table' %}">Source</a>
         <div class="form__header--title">Planning</div>
-        <a class='btn'  href="{% url 'forecast-adjustment-table' %}">Forecast Adjustments</a>
-        <a class='btn'  href="{% url 'costcenter-allocation-table' %}">Cost Centers Allocations</a>
-        <a class='btn'  href="{% url 'fundcenter-allocation-table' %}">Fund Centers Allocations</a>
         <a class='btn'  href="{% url 'capital-forecasting-new-year-table' %}">Capital Forecasting New Year</a>
         <a class='btn'  href="{% url 'capital-forecasting-in-year-table' %}">Capital Forecasting In-Year</a>
         <a class='btn'  href="{% url 'capital-forecasting-year-end-table' %}">Capital Forecasting Year End</a>
+        <a class='btn'  href="{% url 'costcenter-allocation-table' %}">Cost Center Allocation</a>
+        <a class='btn'  href="{% url 'forecast-adjustment-table' %}">Forecast Adjustment</a>
+        <a class='btn'  href="{% url 'fundcenter-allocation-table' %}">Fund Center Allocation</a>
+        <a class="btn"  href="{% url 'lineitem-page' %}">Line Item In Year Forecast</a>
+
 
         <div class="form__header--title">Monthly</div>
         <a class='btn'  href="{% url 'costcenter-monthly-allocation-update' %}">Cost Center Allocation</a>
@@ -41,22 +43,22 @@
         <div class="form__header">Upload Data</div>
         <div class="form__body">
           <div class="form__header--title">Fundamentals</div>
-          <a class='btn'  href="{% url 'fund-upload' %}">Funds</a>
-          <a class='btn'  href="{% url 'source-upload' %}">Sources</a>
-          <a class='btn'  href="{% url 'costcenter-upload' %}">Cost Centers</a>
-          <a class='btn'  href="{% url 'fundcenter-upload' %}">Fund Centers</a>
-          <a class='btn'  href="{% url 'capital-project-upload' %}">Capital Projects</a>
+          <a class='btn'  href="{% url 'capital-project-upload' %}">Capital Project</a>
+          <a class='btn'  href="{% url 'costcenter-upload' %}">Cost Center</a>
+          <a class='btn'  href="{% url 'fund-upload' %}">Fund</a>
+          <a class='btn'  href="{% url 'fundcenter-upload' %}">Fund Center</a>
+          <a class='btn'  href="{% url 'source-upload' %}">Source</a>
           <div class="form__header--title">New Year</div>
-          <a class='btn'  href="{% url 'capital-forecasting-new-year-upload' %}">Capital Forecasting New Year</a>
+          <a class='btn'  href="{% url 'capital-forecasting-new-year-upload' %}">Capital Forecasting</a>
           <div class="form__header--title">In Year</div>
-          <a class='btn'  href="{% url 'capital-forecasting-in-year-upload' %}">Capital Forecasting In Year</a>
-          <a class='btn'  href="{% url 'cost-center-charges-upload' %}">Cost Center Charges</a>
-          <a class='btn'  href="{% url 'costcenter-allocation-upload' %}">Cost Center Allocations</a>
-          <a class='btn'  href="{% url 'costcenter-lineitem-upload' %}">Cost Center Line Items</a>
-          <a class='btn'  href="{% url 'fundcenter-allocation-upload' %}">Fund Center Allocations</a>
-          <a class='btn'  href="{% url 'fundcenter-lineitem-upload' %}">Fund Center Line Items</a>
+          <a class='btn'  href="{% url 'capital-forecasting-in-year-upload' %}">Capital Forecasting</a>
+          <a class='btn'  href="{% url 'costcenter-allocation-upload' %}">Cost Center Allocation</a>
+          <a class='btn'  href="{% url 'cost-center-charges-upload' %}">Cost Center Charge</a>
+          <a class='btn'  href="{% url 'costcenter-lineitem-upload' %}">Cost Center Line Item</a>
+          <a class='btn'  href="{% url 'fundcenter-allocation-upload' %}">Fund Center Allocation</a>
+          <a class='btn'  href="{% url 'fundcenter-lineitem-upload' %}">Fund Center Line Item</a>
           <div class="form__header--title">Year end</div>
-          <a class='btn'  href="{% url 'capital-forecasting-year-end-upload' %}">Capital Forecasting Year End</a>
+          <a class='btn'  href="{% url 'capital-forecasting-year-end-upload' %}">Capital Forecasting</a>
         </div>
       </div>
     {% endif %}
@@ -65,28 +67,31 @@
         <div class="form__header"> Create Data </div>
         <div class="form__body">
           <div class="form__header--title">Fundamentals</div>
+
+          {%if perms.costcenter.add_costcenter%}
+            <a class='btn'  href="{% url 'capital-project-add' %}">Capital Project</a>
+            <a class='btn'  href="{% url 'costcenter-add' %}">Cost Center</a>
+          {% endif %}
+
           {%if perms.costcenter.add_fund%}
             <a class='btn'  href="{% url 'fund-add' %}">Fund</a>
+          {% endif %}
+
+          {%if perms.costcenter.add_fundcenter%}
+            <a class='btn'  href="{% url 'fundcenter-add' %}">Fund Center</a>
           {% endif %}
 
           {%if perms.costcenter.add_source%}
             <a class='btn'  href="{% url 'source-add' %}">Source</a>
           {% endif %}
 
-          {%if perms.costcenter.add_costcenter%}
-            <a class='btn'  href="{% url 'costcenter-add' %}">Cost Center</a>
-            <a class='btn'  href="{% url 'capital-project-add' %}">Capital Project</a>
-          {% endif %}
-          {%if perms.costcenter.add_fundcenter%}
-            <a class='btn'  href="{% url 'fundcenter-add' %}">Fund Center</a>
-          {% endif %}
           <div class="form__header--title">Planning</div>
 
+          {%if perms.costcenter.add_costcenter_allocation%}
+          <a class='btn'  href="{% url 'costcenter-allocation-add' %}">Cost Center Allocation</a>
+          {% endif %}
           {%if perms.costcenter.add_forecast_adjustment%}
             <a class='btn'  href="{% url 'forecast-adjustment-add' %}">Forecast Adjustment</a>
-          {% endif %}
-          {%if perms.costcenter.add_costcenter_allocation%}
-            <a class='btn'  href="{% url 'costcenter-allocation-add' %}">Cost Center Allocation</a>
           {% endif %}
           {%if perms.costcenter.add_fundcenter_allocation%}
             <a class='btn'  href="{% url 'fundcenter-allocation-add' %}">Fund Center Allocation</a>
@@ -109,7 +114,7 @@
           <a class='btn'  href="{% url 'bmt-screening-report' %}">BMT Screening</a>
           <a class='btn'  href="{% url 'costcenter-monthly-allocation' %}">Cost Center Allocation</a>
           <a class='btn'  href="{% url 'costcenter-monthly-forecast-adjustment' %}">Cost Center Forecast Adjustment</a>
-          <a class='btn'  href="{% url 'costcenter-monthly-forecast-line-item' %}">Cost Center Forecast LIne Items</a>
+          <a class='btn'  href="{% url 'costcenter-monthly-forecast-line-item' %}">Cost Center Forecast LIne Item</a>
           <a class='btn'  href="{% url 'costcenter-monthly-encumbrance' %}">Cost Center Encumbrance</a>
           <a class='btn'  href="{% url 'costcenter-monthly-plan' %}">Cost Center Plan</a>
 
@@ -117,11 +122,11 @@
           <a class='btn'  href="{% url 'costcenter-in-year-encumbrance' %}">Cost Center In Year Encumbrance</a>
 
           <div class="form__header--title">Capital</div>
-          <a class='btn'  href="{% url 'capital-forecasting-estimates' %}">Forecasting Estimates</a>
-          <a class='btn'  href="{% url 'capital-forecasting-ye-ratios' %}">Forecasting YE Ratios</a>
-          <a class='btn'  href="{% url 'capital-historical-outlook' %}">Historical Outlook</a>
-          <a class='btn'  href="{% url 'capital-forecasting-fears' %}">forecasting FEARS</a>
+          <a class='btn'  href="{% url 'capital-forecasting-estimates' %}">Forecasting Estimate</a>
+          <a class='btn'  href="{% url 'capital-forecasting-ye-ratios' %}">Forecasting YE Ratio</a>
+          <a class='btn'  href="{% url 'capital-forecasting-fears' %}">Forecasting FEARS</a>
           <a class='btn'  href="{% url 'capital-forecasting-dashboard' %}">Forecasting Dashboard</a>
+          <a class='btn'  href="{% url 'capital-historical-outlook' %}">Historical Outlook</a>
           <div class="form__header--title">Allocation</div>
           <a class='btn'  href="{% url 'allocation-status-report' %}">Allocation Status</a>
           <div class="form__header--title">Exports</div>
