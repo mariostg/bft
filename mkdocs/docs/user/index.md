@@ -2,7 +2,7 @@
 
 ## Registering new User
 
-Users who need access to the BFT can submit a request by filling the form as shown below.  Upon submission, the request will be evaluated and access will be granted according to the nature of the business required by the user.  User maybe contacted to clarify the needs.
+Users who need access to the BFT can submit an online request by filling the form as shown below.  Upon submission, the request will be evaluated and access will be granted according to the nature of the business required by the user.  User maybe contacted to clarify the needs.
 
 <figure markdown>
 
@@ -12,7 +12,7 @@ Users who need access to the BFT can submit a request by filling the form as sho
 
 ## Viewing users
 
-Given the privileges, some BFT users are mandated to manage the aspects of the BFT user community.  This is achieve using the User Table View as show below.
+Given the privileges, some BFT users are mandated to manage the aspects of the BFT user community.  This is achieved by using the User Table View as show below.
 
 <figure markdown>
 
@@ -22,7 +22,7 @@ Given the privileges, some BFT users are mandated to manage the aspects of the B
 
 ## Create user
 
-An administrator can register a new user by completing the BFT User Form as shown below.  Once created, the administrator mus transmit the password to the user.  This form is also use to modify the user related information.
+An administrator can register a new user by completing the BFT User Form as shown below.  Once created, the administrator mus transmit the password to the user.  This form is also used to modify the user related information.
 
 <figure markdown>
 
