@@ -109,3 +109,56 @@ And there are more potential messages.
 !!! warning "The source file contains duplicate cost center - fund pair."
 
     Saving cost center allocation {'costcenter': , 'fund': , 'fy': 2023, 'quarter': 2, 'amount': 20000.0, 'note': 'Note related to allocation 2184XA', 'owner': >} generates UNIQUE constraint failed: costcenter_costcenterallocation.fund_id, costcenter_costcenterallocation.costcenter_id, costcenter_costcenterallocation.quarter, costcenter_costcenterallocation.fy.
+
+## Uploading Fund Center Allocations
+
+!!! note
+
+    This operation requires administration privileges.
+
+### Source file
+
+The required csv file must contains 6 columns as shown in the sample below.
+The quarter column must be a number between 1 and 4. The amount numbers must not contain any separator other than the dot decimal separator. The note entries are not mandatory. The text must be surrounded by double quotes.
+
+<figure markdown>
+<figcaption>
+Sample fund center allocation CSV file
+</figcaption>
+![](images/allocation-fundcenter-csv-sample.png)
+</figure>
+
+
+The first row contains the header and the name of the elements in the header must be exactly as shown here. If this is not respected, a warning message will be displayed to notify the user and the operation will abort.
+
+### fund center allocation upload form
+
+The user select the file containing the fund centers to upload by using the ==fund center allocation upload form==
+
+<figure markdown>
+
+![](images/allocation-costcenter-upload-form.png)
+</figure>
+
+### Fund Center Upload Messages
+
+!!! Warning "Fund center allocation upload by admin, Invalid columns header"
+    Supplying a file that contains invalid column header yields this message
+
+!!! warning "Error allocation upload by admin, Quarter data does not match request (2 does not match 1)"
+    Indicating a quarter that does not match the quarter indicated in the file.
+
+!!! warning "FY request does not match dataset"
+    The FY provided in the upload form does not match the FY from the dataset
+
+!!! warning "Quarters not all matching. admin, 2023, 2"
+    The source file contains more that one quarter.  Upload can be done only if the quarter column contains the save values.
+
+!!! Warning "Fund(s) not found during check fund ['C222']"
+    The source file contains a fund that does not exist in the database.
+
+!!! Warning "Fund centers not found during check fund centers ['2184Z6']"
+    the source file contains a fund center that does not exist in the database.
+
+!!! Warning "Saving fund center allocation 2184DA - DAEME - C113 - Basement Procurement - 2023Q1 10.0 generates UNIQUE constraint failed: bft_fundcenterallocation.fund_id, bft_fundcenterallocation.fundcenter_id, bft_fundcenterallocation.quarter, bft_fundcenterallocation.fy"
+    You are trying to save an allocation that already exist in the database for the given fund center, FY, quarter and fund.
