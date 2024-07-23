@@ -24,6 +24,7 @@ Visit to the specific section that explains in details how to upload in the BFT 
 [Upload Cost Centers](docs/costcenter/index.md#upload-cost-center)  
 [Upload Cost Center Allocations](docs/allocation/index.md#uploading-cost-center-allocations)  
 [Upload Funds](docs/fund/index.md#uploading-funds)  
+[Upload Fund Centers](docs/fundcenter/index.md#upload-fund-center)  
 [Upload Line Items for Cost Center](docs/line-items/index.md#upload-line-items-for-cost-center)  
 [Upload Source](docs/source/index.md#uploading-sources)  
 
