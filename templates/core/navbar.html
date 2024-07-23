@@ -13,18 +13,7 @@
 
 <nav class="container site-nav">
 
-    {% comment %} <input type="checkbox" id="responsive-menu" />
-    <label for="responsive-menu" class="toggle-menu">
-      <span>Menu</span>
-      <div class="toggle-menu__lines"></div>
-    </label> {% endcomment %}
-
-  <div class="block block--spaced">
-    <a class="btn btn--link" href="{% url 'fundcenter-table' %}">Fund Centers</a>
-    <a class="btn btn--link" href="{% url 'capital-project-table' %}">Capital Projects</a>
-    <a class="btn btn--link" href="{% url 'costcenter-table' %}">Cost Centers</a>
-    <a class="btn btn--link" href="{% url 'lineitem-page' %}">Line Items</a>
-    <a class="btn btn--link" href="{% url 'forecast-adjustment-table' %}">Forecast Adjustments</a>
+  <div class="block">
     {% if user.is_authenticated %}
       <a class="btn btn--link" href="/logout/" class="btn btn--sub">Logout &nbsp; <span class="username"> {{user.get_full_name}}</span></a>
       <a class="btn btn--link" href="/user-profile/" class="btn btn--sub">My Profile</a>
