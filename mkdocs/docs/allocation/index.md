@@ -94,6 +94,9 @@ And there are more potential messages.
 !!! warning "Quarters not all matching. admin, 2023, 2"
     The source file contains more that one quarter. Upload can be done only if the quarter column contains the save values.
 
+!!! Warning "Invalid quarter 5, expected one of ('0', '1', '2', '3', '4')."
+    In the upload form, you supplied an invalid quarter value
+
 !!! warning "Fund(s) not found during check fund ['C11']"
     The source file contains a fund that does not exist in the database.
 
@@ -143,6 +146,9 @@ The user select the file containing the fund centers to upload by using the ==fu
 !!! warning "FY request does not match dataset"
     The FY provided in the upload form does not match the FY from the dataset
 
+!!! Warning "Invalid quarter 5, expected one of ('0', '1', '2', '3', '4')."
+    In the upload form, you supplied an invalid quarter value
+    
 !!! warning "Quarters not all matching. admin, 2023, 2"
     The source file contains more that one quarter.  Upload can be done only if the quarter column contains the save values.
 
