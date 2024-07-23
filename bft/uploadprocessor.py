@@ -199,7 +199,7 @@ class FundCenterAllocationProcessor(AllocationProcessor):
                 counter += 1
                 logger.info(f"Uploaded fund center allocation {alloc.fundcenter} - ${alloc.amount}.")
             except IntegrityError as err:
-                msg = f"Saving fund center allocation {item} generates {err}"
+                msg = f"Saving fund center allocation {alloc} generates {err}"
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
