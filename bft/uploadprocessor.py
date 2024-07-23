@@ -262,7 +262,7 @@ class CostCenterAllocationProcessor(AllocationProcessor):
                 counter += 1
                 logger.info(f"Uploaded cost center allocation {alloc.costcenter} - ${alloc.amount}.")
             except IntegrityError as err:
-                msg = f"Saving cost center allocation {item} generates {err}."
+                msg = f"Saving cost center allocation {alloc} generates {err}."
                 logger.warn(msg)
                 if request:
                     messages.error(request, msg)
