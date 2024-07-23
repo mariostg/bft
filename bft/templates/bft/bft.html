@@ -88,7 +88,7 @@
           <div class="form__header--title">Planning</div>
 
           {%if perms.costcenter.add_costcenter_allocation%}
-          <a class='btn'  href="{% url 'costcenter-allocation-add' %}">Cost Center Allocation</a>
+            <a class='btn'  href="{% url 'costcenter-allocation-add' %}">Cost Center Allocation</a>
           {% endif %}
           {%if perms.costcenter.add_forecast_adjustment%}
             <a class='btn'  href="{% url 'forecast-adjustment-add' %}">Forecast Adjustment</a>
