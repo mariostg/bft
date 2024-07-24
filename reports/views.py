@@ -648,45 +648,47 @@ def cost_center_charge_table(request, cc: str, fy: int, period: int):
     return render(request, "costcenter-monthly-charge-data.html", {"table": table})
 
 
+def capital_forecasting_set_initial(request):
+    initial = {
+        "capital_project": "",
+        "fund": "",
+        "fy": BftStatusManager().fy(),
+    }
+    if not len(request.GET):
+        return initial
+
+    initial["capital_project"] = CapitalProjectManager().get_request(request)
+    initial["fund"] = FundManager().get_request(request)
+    initial["fy"] = set_fy(request)
+
+    return initial
+
+
 def capital_forecasting_estimates(request):
-    fund = capital_project = fy = data = table = ""
-    form_filter = True
-    action_url = "capital-forecasting-estimates"
+    initial = capital_forecasting_set_initial(request)
+    form = SearchCapitalEstimatesForm(initial=initial)
+
+    context = {
+        **initial,
+        "title": f"{initial['capital_project']} Capital Forecasting Estimates",
+        "action": "capital-forecasting-estimates",
+        "form_filter": True,
+        "form": form,
+        "table": "All fields are mandatory.",
+    }
+
     if len(request.GET):
-        fund = FundManager().get_request(request)
-        capital_project = CapitalProjectManager().get_request(request)
-        fy = set_fy(request)
-        estimates = capitalforecasting.EstimateReport(fund, fy, capital_project)
+        estimates = capitalforecasting.EstimateReport(initial["fund"], initial["fy"], initial["capital_project"])
         estimates.dataframe()
         if estimates.df.size:
             estimates.df.quarter = "Q" + estimates.df.quarter
             data = estimates.df.to_json(orient="records")
-            table = estimates.to_html()
+            context["data"] = data
+            context["table"] = estimates.to_html()
         else:
             messages.warning(request, "Capital forecasting estimate is empty")
-    else:
-        fy = BftStatus.current.fy()
-
-    initial = {
-        "action_url": action_url,
-        "fund": fund,
-        "capital_project": capital_project,
-        "fy": fy,
-        data: data,
-    }
-    form = SearchCapitalEstimatesForm(initial=initial)
-
-    return render(
-        request,
-        "capital-forecasting-estimates.html",
-        {
-            **initial,
-            "table": table,
-            "form": form,
-            "form_filter": form_filter,
-            "data": data,
-        },
-    )
+    print("CONTEXT:", context)
+    return render(request, "capital-forecasting-estimates.html", context)
 
 
 def capital_forecasting_fears(request):

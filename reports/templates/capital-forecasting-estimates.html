@@ -3,15 +3,14 @@
 {% block title %}Search Capital Forecasting Estimates{% endblock title %}
 {% block content %}
   <main class='block block--centered'>
-    <h1>Capital Forecasting Estimates</h1>
+    <h1>{{capital_project}} Forecasting Estimates {{fund}} FY {{fy}}</h1>
     {% if form_filter %}
       {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
 
     {% if data|length > 2 %}
       {{data|json_script:"json_data"}}
-      <div id="chart_estimates"><div class="chart__title">Capital Forecasting Estimates {{capital_project}} {{fund}} FY {{fy}}</div></div>
-      {{table|safe}}
+      <div id="chart_estimates"><div class="chart__title">{{capital_project}} Forecasting Estimates {{fund}} FY {{fy}}</div></div>
       <script type="module">
         import { Chart,ChartHandler } from "/static/js/barchart.js";
         const data=JSON.parse(JSON.parse(document.getElementById('json_data').textContent))
@@ -27,6 +26,7 @@
         Chart("chart_estimates", data_estimates, config);
         ChartHandler.ajust_chart_width()
       </script>
-    {% endif %}
+      {% endif %}
+      {{table|safe}}
   </main>
 {% endblock content %}
