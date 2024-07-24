@@ -1,16 +1,16 @@
 {% extends 'core/base.html' %}
 {% load humanize %}
-{% block title %}Capital Historical Outlook{% endblock title %}
+{% block title %}{{capital_project}} Capital Historical Outlook{% endblock title %}
 {% block content %}
   <main class='block block--centered'>
-    <h1>Capital Historical Outlook</h1>
+    <h1>{{capital_project}} Capital Historical Outlook</h1>
     {% if form_filter %}
       {% include "core/capital-forecasting-filter.html" %}
     {% endif %}
 
     {% if data|length > 2 %}
       {{data|json_script:"json_data"}}
-      <div id="chart_outlook"><div class="chart__title">Historical Outlook {{capital_project}} {{fund}} FY {{fy}}</div></div>
+      <div id="chart_outlook"><div class="chart__title">{{capital_project}} Historical Outlook {{fund}} FY {{fy}}</div></div>
       {{table|safe}}
       <script type="module">
         import { Chart, ChartHandler } from "/static/js/barchart.js";

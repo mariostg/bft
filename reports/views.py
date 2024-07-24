@@ -697,7 +697,7 @@ def capital_forecasting_fears(request):
 
     context = {
         **initial,
-        "title": f"{initial['capital_project']} Capital Forecasting Estimates",
+        "title": f"{initial['capital_project']} Capital FEAR Estimates",
         "action": "capital-forecasting-fears",
         "form_filter": True,
         "form": form,
@@ -718,42 +718,30 @@ def capital_forecasting_fears(request):
 
 
 def capital_historical_outlook(request):
-    fund = capital_project = fy = data = table = ""
-    form_filter = True
-    action_url = "capital-historical-outlook"
+    initial = capital_forecasting_set_initial(request)
+    form = SearchCapitalHistoricalForm(initial=initial)
+
+    context = {
+        **initial,
+        "title": f"{initial['capital_project']} Capital Historical Outlook",
+        "action": "capital-historical-outlook",
+        "form_filter": True,
+        "form": form,
+        "table": "All fields are mandatory.",
+    }
+
     if len(request.GET):
-        fund = FundManager().get_request(request)
-        capital_project = CapitalProjectManager().get_request(request)
-        fy = set_fy(request)
-        outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
+        outlook = capitalforecasting.HistoricalOutlookReport(
+            initial["fund"], initial["fy"], initial["capital_project"]
+        )
         outlook.dataframe()
         if outlook.df.size:
-            data = outlook.df.to_json(orient="records")
-            table = outlook.to_html()
+            context["data"] = outlook.df.to_json(orient="records")
+            context["table"] = outlook.to_html()
         else:
             messages.warning(request, "Capital forecasting historical outlook is empty")
 
-    else:
-        fy = BftStatus.current.fy()
-
-    initial = {
-        "action_url": action_url,
-        "fund": fund,
-        "capital_project": capital_project,
-        "fy": fy,
-    }
-    form = SearchCapitalHistoricalForm(initial=initial)
-    return render(
-        request,
-        "capital-historical-outlook.html",
-        {
-            **initial,
-            "table": table,
-            "form": form,
-            "form_filter": form_filter,
-            "data": data,
-        },
-    )
+    return render(request, "capital-historical-outlook.html", context)
 
 
 def capital_forecasting_ye_ratios(request):
