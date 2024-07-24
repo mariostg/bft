@@ -692,44 +692,29 @@ def capital_forecasting_estimates(request):
 
 
 def capital_forecasting_fears(request):
-    fund = capital_project = fy = data = table = ""
-    form_filter = True
-    action_url = "capital-forecasting-fears"
+    initial = capital_forecasting_set_initial(request)
+    form = SearchCapitalFearsForm(initial=initial)
+
+    context = {
+        **initial,
+        "title": f"{initial['capital_project']} Capital Forecasting Estimates",
+        "action": "capital-forecasting-fears",
+        "form_filter": True,
+        "form": form,
+        "table": "All fields are mandatory.",
+    }
+
     if len(request.GET):
-        fund = FundManager().get_request(request)
-        capital_project = CapitalProjectManager().get_request(request)
-        fy = set_fy(request)
-        quarterly = capitalforecasting.FEARStatusReport(fund, fy, capital_project)
+        quarterly = capitalforecasting.FEARStatusReport(initial["fund"], initial["fy"], initial["capital_project"])
         quarterly.dataframe()
         if quarterly.df.size:
             quarterly.df.Quarters = "Q" + quarterly.df.Quarters
-            data = quarterly.df.to_json(orient="records")
-            table = quarterly.to_html()
+            context["data"] = quarterly.df.to_json(orient="records")
+            context["table"] = quarterly.to_html()
         else:
             messages.warning(request, "Capital forecasting FEARS is empty")
 
-    else:
-        fy = BftStatus.current.fy()
-
-    initial = {
-        "action_url": action_url,
-        "fund": fund,
-        "capital_project": capital_project,
-        "fy": fy,
-    }
-    form = SearchCapitalFearsForm(initial=initial)
-
-    return render(
-        request,
-        "capital-forecasting-fears.html",
-        {
-            **initial,
-            "table": table,
-            "form": form,
-            "form_filter": form_filter,
-            "data": data,
-        },
-    )
+    return render(request, "capital-forecasting-fears.html", context)
 
 
 def capital_historical_outlook(request):
