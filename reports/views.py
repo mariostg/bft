@@ -757,10 +757,9 @@ def capital_forecasting_ye_ratios(request):
         "table": "All fields are mandatory.",
     }
     if len(request.GET):
-        fund = FundManager().get_request(request)
-        capital_project = CapitalProjectManager().get_request(request)
-        fy = set_fy(request)
-        outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
+        outlook = capitalforecasting.HistoricalOutlookReport(
+            initial["fund"], initial["fy"], initial["capital_project"]
+        )
         outlook.dataframe()
         context["data"] = outlook.df.to_json(orient="records")
         context["table"] = outlook.to_html()
