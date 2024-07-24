@@ -72,7 +72,6 @@ class SearchCapitalForecastingDashboardForm(forms.Form):
     capital_project = forms.CharField(required=True)
     fund = forms.CharField(required=True)
     fy = forms.CharField(required=True)
-    quarter = forms.CharField(required=False)
 
 
 class SearchCapitalEstimatesForm(forms.Form):

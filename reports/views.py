@@ -772,20 +772,26 @@ def capital_forecasting_dashboard(request):
     fund = capital_project = ""
     source_estimates = source_quarterly = source_outlook = 0
     form_filter = True
+
+    initial = capital_forecasting_set_initial(request)
+    form = SearchCapitalForecastingDashboardForm(initial=initial)
+
+    context = {
+        **initial,
+        "title": f"{initial['capital_project']} Capital Forecasting Year End Ratios",
+        "action": "capital-forecasting-ye-ratios",
+        "form_filter": True,
+        "form": form,
+        "table": "All fields are mandatory.",
+    }
+
     if len(request.GET):
-        fund = FundManager().get_request(request)
-        capital_project = CapitalProjectManager().get_request(request)
-        quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
-        fy = set_fy(request)
-
-        if not conf.is_quarter(quarter):
-            messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
-
+        fund, fy, capital_project = initial["fund"], initial["fy"], initial["capital_project"]
         estimates = capitalforecasting.EstimateReport(fund, fy, capital_project)
         estimates.dataframe()
         if estimates.df.size:
             estimates.df.quarter = "Q" + estimates.df.quarter
-            source_estimates = estimates.df.to_json(orient="records")
+            context["source_estimates"] = estimates.df.to_json(orient="records")
         else:
             messages.warning(request, "Capital forecasting estimate is empty")
 
@@ -793,38 +799,15 @@ def capital_forecasting_dashboard(request):
         quarterly.dataframe()
         if quarterly.df.size:
             quarterly.df.Quarters = "Q" + quarterly.df.Quarters
-            source_quarterly = quarterly.df.to_json(orient="records")
+            context["source_quarterly"] = quarterly.df.to_json(orient="records")
         else:
             messages.warning(request, "Capital forecasting FEARS is empty")
 
         outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
         outlook.dataframe()
         if outlook.df.size:
-            source_outlook = outlook.df.to_json(orient="records")
+            context["source_outlook"] = outlook.df.to_json(orient="records")
         else:
             messages.warning(request, "Capital forecasting historical outlook is empty")
 
-    else:
-        fy = BftStatus.current.fy()
-        quarter = BftStatus.current.quarter()
-
-    initial = {
-        "fund": fund,
-        "capital_project": capital_project,
-        "fy": fy,
-        "quarter": quarter,
-    }
-    form = SearchCapitalForecastingDashboardForm(initial=initial)
-
-    return render(
-        request,
-        "capital-forecasting-dashboard.html",
-        {
-            "table": " ",
-            "form": form,
-            "form_filter": form_filter,
-            "source_estimates": source_estimates,
-            "source_quarterly": source_quarterly,
-            "source_outlook": source_outlook,
-        },
-    )
+    return render(request, "capital-forecasting-dashboard.html", context)
