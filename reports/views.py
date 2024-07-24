@@ -745,39 +745,27 @@ def capital_historical_outlook(request):
 
 
 def capital_forecasting_ye_ratios(request):
-    fund = capital_project = fy = data = table = ""
-    form_filter = True
-    action_url = "capital-forecasting-ye-ratios"
+    initial = capital_forecasting_set_initial(request)
+    form = SearchCapitalYeRatiosForm(initial=initial)
+
+    context = {
+        **initial,
+        "title": f"{initial['capital_project']} Capital Forecasting Year End Ratios",
+        "action": "capital-forecasting-ye-ratios",
+        "form_filter": True,
+        "form": form,
+        "table": "All fields are mandatory.",
+    }
     if len(request.GET):
         fund = FundManager().get_request(request)
         capital_project = CapitalProjectManager().get_request(request)
         fy = set_fy(request)
         outlook = capitalforecasting.HistoricalOutlookReport(fund, fy, capital_project)
         outlook.dataframe()
-        data = outlook.df.to_json(orient="records")
-        table = outlook.to_html()
-    else:
-        fy = BftStatus.current.fy()
+        context["data"] = outlook.df.to_json(orient="records")
+        context["table"] = outlook.to_html()
 
-    initial = {
-        "action_url": action_url,
-        "fund": fund,
-        "capital_project": capital_project,
-        "fy": fy,
-    }
-    form = SearchCapitalYeRatiosForm(initial=initial)
-    return render(
-        request,
-        "capital-forecasting-ye-ratios.html",
-        {
-            **initial,
-            # "action_url": action_url,
-            "table": table,
-            "form": form,
-            "form_filter": form_filter,
-            "data": data,
-        },
-    )
+    return render(request, "capital-forecasting-ye-ratios.html", context)
 
 
 def capital_forecasting_dashboard(request):
