@@ -24,9 +24,6 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    path("costcenter/", costcenter.fund_page, name="fund-table"),
-]
-urlpatterns += [
     path("fund/fund-table/", costcenter.fund_page, name="fund-table"),
     path("fund/fund-add/", costcenter.fund_add, name="fund-add"),
     path("fund/fund-update/<int:pk>/", costcenter.fund_update, name="fund-update"),
