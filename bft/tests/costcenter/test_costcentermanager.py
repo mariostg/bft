@@ -30,11 +30,6 @@ class TestCostCenterManager:
         hnd = populate.Command()
         hnd.handle()
 
-    @pytest.fixture
-    def upload(self):
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
-
     # Cost Center Tests
     def test_a_given_cost_center_exists(self, setup):
         assert True == CostCenterManager().exists("8484ZZ")

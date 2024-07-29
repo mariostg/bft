@@ -48,14 +48,14 @@ class TestLineItemImport:
         hnd = populate.Command()
         hnd.handle()
 
-    def test_insert_line_item_from_encumbrance_line(self, setup):
+    def test_insert_line_item_from_encumbrance_line(self, setup, upload):
         obj = LineItem()
         enc = LineItemImport.objects.first()
         retval = obj.insert_line_item(enc)
 
         assert 8 == retval
 
-    def test_update_line_item_from_encumbrance_line(self, setup):
+    def test_update_line_item_from_encumbrance_line(self, setup, upload):
         obj = LineItem()
         enc = LineItemImport.objects.first()
         retval = obj.insert_line_item(enc)
@@ -66,9 +66,9 @@ class TestLineItemImport:
         li = LineItem.objects.get(pk=retval)
         updated = obj.update_line_item(li, enc)
 
-        self.assertEqual(enc.workingplan, updated.workingplan)
+        assert enc.workingplan == updated.workingplan
 
-    def test_update_line_item_bogus_cost_center(self):
+    def test_update_line_item_bogus_cost_center(self, setup, upload):
         obj = LineItem()
         enc = LineItemImport.objects.first()
         retval = obj.insert_line_item(enc)
@@ -78,9 +78,9 @@ class TestLineItemImport:
 
         updated = obj.update_line_item(li, enc)
 
-        self.assertEqual(None, updated)
+        assert updated is None
 
-    def test_line_items_have_orphans(self):
+    def test_line_items_have_orphans(self, setup, upload):
         # bring lines in
         li = LineItem()
         li.import_lines()
@@ -93,8 +93,8 @@ class TestLineItemImport:
 
         # check it out
         orphan = li.get_orphan_lines()
-        self.assertIn(("999999", "123"), orphan)
-        self.assertIsInstance(orphan, set)
+        assert ("999999", "123") in orphan
+        assert isinstance(orphan, set)
 
     def test_line_items_no_orphans(self):
         # bring lines in
@@ -103,10 +103,10 @@ class TestLineItemImport:
 
         # check it out
         orphan = li.get_orphan_lines()
-        self.assertEqual(0, len(orphan))
-        self.assertIsInstance(orphan, set)
+        assert 0 == len(orphan)
+        assert isinstance(orphan, set)
 
-    def test_mark_line_orphan(self):
+    def test_mark_line_orphan(self, setup, upload):
         # bring lines in
         li = LineItem()
         li.import_lines()
@@ -119,10 +119,10 @@ class TestLineItemImport:
         orphan = li.get_orphan_lines()
         li.mark_orphan_lines(orphan)
         li = LineItem.objects.get(docno="999999", lineno="123")
-        self.assertEqual(0, li.workingplan)
-        self.assertEqual(0, li.spent)
-        self.assertEqual(0, li.balance)
-        self.assertEqual("orphan", li.status)
+        assert 0 == li.workingplan
+        assert 0 == li.spent
+        assert 0 == li.balance
+        assert "orphan" == li.status
 
 
 class TestLineItemManagementTest:
@@ -217,7 +217,7 @@ class TestLineForecastModel:
             ("12382523", 150000),  # "12382523" has one line, spent == 0
         ],
     )
-    def test_forecast_line_by_docno(self, setup, docno, target_forecast):
+    def test_forecast_line_by_docno(self, setup, upload, docno, target_forecast):
         LineForecast().forecast_line_by_docno(docno, target_forecast)
 
         forecast = LineForecast.objects.filter(lineitem__docno=docno).aggregate(Sum("forecastamount"))[

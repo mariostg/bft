@@ -17,11 +17,6 @@ class TestDataFrame:
         hnd = populate.Command()
         hnd.handle()
 
-    @pytest.fixture
-    def upload(self):
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
-
     def test_dataframe_without_params(self):
         with pytest.raises(TypeError):
             BFTDataFrame()
