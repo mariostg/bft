@@ -1,7 +1,7 @@
 import pytest
 
 from bft.exceptions import ParentDoesNotExistError
-from bft.management.commands import populate, uploadcsv
+from bft.management.commands import populate
 from bft.models import (CostCenter, CostCenterManager,
                         FinancialStructureManager, FundCenter,
                         FundCenterManager, FundManager, SourceManager)

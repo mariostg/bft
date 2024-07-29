@@ -1,7 +1,7 @@
 import pytest
 from django.db.models import Sum
 
-from bft.management.commands import populate, uploadcsv
+from bft.management.commands import populate
 from bft.models import (CostCenterAllocation, CostCenterManager, Fund,
                         FundCenterAllocation, FundCenterManager, FundManager)
 

@@ -4,7 +4,7 @@ import pytest
 from django.db.models import Sum
 from django.test import TestCase
 
-from bft.management.commands import populate, uploadcsv
+from bft.management.commands import populate
 from bft.models import (CostCenterManager, LineForecast, LineForecastManager,
                         LineItem, LineItemImport)
 from bft.uploadprocessor import LineItemProcessor
@@ -244,7 +244,7 @@ class TestLineForecastModel:
         assert abs(target_forecast - forecast) <= 0.01
 
 
-class TestLineItemImport(TestCase):
+class TestLineItemImportStructure(TestCase):
     GOODFILE = os.path.join(BASE_DIR, "test-data/encumbrance_small.txt")
     WRONGFC = os.path.join(BASE_DIR, "test-data/encumbrance_wrong_fc.txt")
     WRONGFY = os.path.join(BASE_DIR, "test-data/encumbrance_wrong_fy.txt")

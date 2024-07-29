@@ -1,6 +1,6 @@
 import pytest
 
-from bft.management.commands import populate, uploadcsv
+from bft.management.commands import populate
 from reports.utils import CostCenterMonthlyForecastLineItemReport
 
 

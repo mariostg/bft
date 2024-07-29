@@ -2,7 +2,6 @@ import pytest
 from django.test import Client
 
 import bft.management.commands.populate as populate
-from bft.management.commands.uploadcsv import Command
 from bft.models import CostCenter
 
 

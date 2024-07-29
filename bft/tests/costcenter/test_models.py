@@ -553,7 +553,6 @@ class TestCostCenterAllocation:
         hnd = populate.Command()
         hnd.handle()
 
-
     def test_string_representation(self, populate):
         cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C113")

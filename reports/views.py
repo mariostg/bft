@@ -687,7 +687,6 @@ def capital_forecasting_estimates(request):
             context["table"] = estimates.to_html()
         else:
             messages.warning(request, "Capital forecasting estimate is empty")
-    print("CONTEXT:", context)
     return render(request, "capital-forecasting-estimates.html", context)
 
 
@@ -769,8 +768,6 @@ def capital_forecasting_ye_ratios(request):
 
 def capital_forecasting_dashboard(request):
     fund = capital_project = ""
-    source_estimates = source_quarterly = source_outlook = 0
-    form_filter = True
 
     initial = capital_forecasting_set_initial(request)
     form = SearchCapitalForecastingDashboardForm(initial=initial)
