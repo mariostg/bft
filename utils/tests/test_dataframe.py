@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 from bft.exceptions import BFTDataFrameExceptionError
-from bft.management.commands import populate, uploadcsv
+from bft.management.commands import populate
 from bft.models import CostCenter, Fund, FundCenter, LineItem
 from utils.dataframe import BFTDataFrame
 

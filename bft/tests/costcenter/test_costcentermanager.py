@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from bft.management.commands import populate, uploadcsv
+from bft.management.commands import populate
 from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         ForecastAdjustment, Fund, FundCenter, Source)
 

@@ -3,19 +3,12 @@ from django.db import IntegrityError
 from django.db.models import RestrictedError
 from django.test import Client
 
-from bft.exceptions import InvalidAllocationException, InvalidFiscalYearException, InvalidOptionException
-from bft.management.commands import populate, uploadcsv
-from bft.models import (
-    CostCenter,
-    CostCenterAllocation,
-    CostCenterManager,
-    FinancialStructureManager,
-    ForecastAdjustment,
-    Fund,
-    FundCenter,
-    FundManager,
-    Source,
-)
+from bft.exceptions import (InvalidAllocationException,
+                            InvalidFiscalYearException, InvalidOptionException)
+from bft.management.commands import populate
+from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
+                        FinancialStructureManager, ForecastAdjustment, Fund,
+                        FundCenter, FundManager, Source)
 
 FUND_C113 = {"fund": "C113", "name": "National Procurement", "vote": "1"}
 SOURCE_1 = {"source": "Basement"}
