@@ -15,10 +15,6 @@ class TestFinancialStructureManager:
         hnd = populate.Command()
         hnd.handle()
 
-    def upload(self):
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
-
     def test_cost_center_is_child_of(self, populate):
         parent = FundCenterManager().fundcenter(fundcenter="2184A3")
         child = CostCenterManager().cost_center(costcenter="8484WA")

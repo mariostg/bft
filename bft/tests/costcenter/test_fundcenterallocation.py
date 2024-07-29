@@ -62,11 +62,6 @@ class TestFundCenterAllocationManager:
         hnd = populate.Command()
         hnd.handle()
 
-    @pytest.fixture
-    def upload(self):
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
-
     # Fund Allocations
     def test_fund_allocation_when_fund_valid_and_allocation_exists(self, populate):
         allocation = self.FCA.objects.fund("c113")
@@ -142,11 +137,6 @@ class TestCostCenterAllocationManager:
         self.FCA = CostCenterAllocation
         hnd = populate.Command()
         hnd.handle()
-
-    @pytest.fixture
-    def upload(self):
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
     # Fund Allocations
     def test_fundcenter_allocation_when_fund_valid_and_allocation_exists(self, populate):

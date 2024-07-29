@@ -553,10 +553,6 @@ class TestCostCenterAllocation:
         hnd = populate.Command()
         hnd.handle()
 
-    @pytest.fixture
-    def upload(self):
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
 
     def test_string_representation(self, populate):
         cc = CostCenterManager().cost_center("8484WA")
