@@ -17,10 +17,8 @@ class TestLineItemManager:
     def setup(self):
         hnd = populate.Command()
         hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
-    def test_get_line_items_when_cost_center_exists(self, setup):
+    def test_get_line_items_when_cost_center_exists(self, setup, upload):
         li = LineItem.objects.cost_center("8484WA")
         assert li.count() > 0
 
@@ -29,36 +27,35 @@ class TestLineItemManager:
         assert li is None
 
 
-class LineItemModelTest(TestCase):
+class TestLineItemModel:
     def test_string_representation(self):
         str_repr = LineItem(docno="4510XX45", lineno="45", enctype="Purchase Order")
-        self.assertEqual(str(str_repr), "Purchase Order 4510XX45-45")
+        assert str(str_repr) == "Purchase Order 4510XX45-45"
 
     def test_verbose_name_plural(self):
-        self.assertEqual(str(LineItem._meta.verbose_name_plural), "Line Items")
+        assert str(LineItem._meta.verbose_name_plural) == "Line Items"
 
     def test_number_of_fields(self):
         obj = LineItem()
         c = obj._meta.get_fields()
-        self.assertEqual(23, len(c))
+        assert 23 == len(c)
 
 
-class LineItemImportTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        filldata = populate.Command()
-        filldata.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
+@pytest.mark.django_db
+class TestLineItemImport:
+    @pytest.fixture
+    def setup(self):
+        hnd = populate.Command()
+        hnd.handle()
 
-    def test_insert_line_item_from_encumbrance_line(self):
+    def test_insert_line_item_from_encumbrance_line(self, setup):
         obj = LineItem()
         enc = LineItemImport.objects.first()
         retval = obj.insert_line_item(enc)
 
-        self.assertEqual(8, retval)
+        assert 8 == retval
 
-    def test_update_line_item_from_encumbrance_line(self):
+    def test_update_line_item_from_encumbrance_line(self, setup):
         obj = LineItem()
         enc = LineItemImport.objects.first()
         retval = obj.insert_line_item(enc)
@@ -128,15 +125,13 @@ class LineItemImportTest(TestCase):
         self.assertEqual("orphan", li.status)
 
 
-class LineItemManagementTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
+class TestLineItemManagementTest:
+    @pytest.fixture
+    def setup():
         filldata = populate.Command()
         filldata.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
-    def test_line_item_fund_center_wrong(self):
+    def test_line_item_fund_center_wrong(self, setup, upload):
         # bring lines in and assign a bogus fund center
         li = LineItem()
         li.import_lines()
@@ -145,7 +140,7 @@ class LineItemManagementTest(TestCase):
         li.save()
 
         li.set_fund_center_integrity()
-        self.assertEqual(1, LineItem.objects.filter(fcintegrity=False).count())
+        assert 1 == LineItem.objects.filter(fcintegrity=False).count()
 
 
 @pytest.mark.django_db
@@ -154,10 +149,8 @@ class TestLineForecastModel:
     def setup(self):
         hnd = populate.Command()
         hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
-    def test_create_forecast_higher_than_wp(self, setup):
+    def test_create_forecast_higher_than_wp(self, setup, upload):
         li = LineItem.objects.all().first()
         fcst = LineForecast.objects.get(lineitem=li)
 
@@ -167,7 +160,7 @@ class TestLineForecastModel:
         fcst = LineForecastManager().get_line_forecast(li)
         assert fcst.forecastamount == li.workingplan
 
-    def test_create_forecast_smaller_than_spent(self, setup):
+    def test_create_forecast_smaller_than_spent(self, setup, upload):
         li = LineItem.objects.filter(spent__gt=0).first()
         new_fcst = float(li.spent) * 0.1
 
@@ -178,7 +171,7 @@ class TestLineForecastModel:
         fcst = LineForecastManager().get_line_forecast(li)
         assert fcst.forecastamount == new_fcst
 
-    def test_forecast_document_number_to_working_plan(self, setup):
+    def test_forecast_document_number_to_working_plan(self, setup, upload):
         # each line item will have a forecast equivalent to its own working plan
         docno = "12663089"
 
@@ -194,13 +187,9 @@ class TestLineForecastModel:
         )["fcst__forecastamount__sum"]
         assert applied_forecast == target_forecast
 
-    def test_forecast_document_number_to_zero(self):
+    def test_forecast_document_number_to_zero(self, setup, upload):
         # When setting document forecast to 0, forecast will consider spent and assign this value or 0.
-        hnd = populate.Command()
-        hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="drmis_data/encumbrance_2184a3.txt")
-        docno = "11111111"
+        docno = "11111110"
 
         lf = LineForecast
         target_forecast = 0
@@ -212,6 +201,7 @@ class TestLineForecastModel:
         applied_forecast = LineItem.objects.filter(docno=docno).aggregate(
             Sum("fcst__forecastamount")
         )["fcst__forecastamount__sum"]
+        assert total_spent is not None
         assert applied_forecast == total_spent
 
     def test_create_forecast_no_lines(self, setup):
@@ -243,7 +233,7 @@ class TestLineForecastModel:
             ("8484wa", 300000),
         ],
     )
-    def test_forecast_line_by_costcenter(self, setup, costcenter, target_forecast):
+    def test_forecast_line_by_costcenter(self, setup, upload, costcenter, target_forecast):
         LineForecast().forecast_costcenter_lines(costcenter, target_forecast)
 
         costcenter = CostCenterManager().cost_center(costcenter)

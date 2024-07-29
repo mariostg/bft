@@ -1,6 +1,6 @@
 import pytest
 
-from bft.management.commands import populate, uploadcsv
+from bft.management.commands import populate
 from bft.models import LineItem, LineItemManager
 
 
@@ -10,11 +10,6 @@ class TestLineItemManager:
     def populate(self):
         hnd = populate.Command()
         hnd.handle()
-
-    @pytest.fixture
-    def upload(self):
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
     # Line Items tests
     def test_line_item_dataframe_no_line_items(self):
