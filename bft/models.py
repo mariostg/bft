@@ -173,6 +173,18 @@ class BftUser(AbstractUser):
         )
 
 
+class BftUserFavoriteManager(models.Manager):
+    pass
+
+
+class BftUserFavorite(models.Model):
+    bftuser = models.ForeignKey(BftUser, on_delete=models.CASCADE, default="", verbose_name="User Favorite")
+    favorite_name = models.CharField(max_length=30)
+    favorite_link = models.CharField(max_length=125)
+
+    objects = BftUserFavoriteManager()
+
+
 class FundManager(models.Manager):
     def fund(self, fund: str):
         try:

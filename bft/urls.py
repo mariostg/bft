@@ -343,3 +343,5 @@ urlpatterns += [
         name="user-password-reset",
     ),
 ]
+
+urlpatterns += [path("favorite/add/<str:link>")]
