@@ -10,10 +10,8 @@ class TestCostCenterMonthlyForecastLineItemReport:
     def setup(self):
         hnd = populate.Command()
         hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
-    def test_sum_line_items(self, setup):
+    def test_sum_line_items(self, setup, upload):
         report = CostCenterMonthlyForecastLineItemReport(fy=2023, period=1)
         results = report.sum_forecast_line_item()[0]
         assert 245000 == results["line_item_forecast"]

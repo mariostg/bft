@@ -10,19 +10,17 @@ class TestCostCenterMonthlyReport:
     def setup(self):
         hnd = populate.Command()
         hnd.handle()
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
     def test_period_out_of_range(self):
         cm = CostCenterMonthlyEncumbranceReport(2023, 19, "8484WA", "C113")
         assert cm.period is None
 
-    def test_sum_line_items(self, setup):
+    def test_sum_line_items(self, setup, upload):
         cm = CostCenterMonthlyEncumbranceReport(2023, 1, "8484WA", "C113")
         lines = cm.sum_line_items()
         assert 2 == len(lines)
 
-    def test_line_item_columns(self, setup):
+    def test_line_item_columns(self, setup, upload):
         cm = CostCenterMonthlyEncumbranceReport(2023, 1, "8484WA", "C113")
         lines = cm.sum_line_items()
         assert {
@@ -39,7 +37,7 @@ class TestCostCenterMonthlyReport:
             "source",
         } == lines[0].keys()
 
-    def test_insert_line_items(self, setup):
+    def test_insert_line_items(self, setup, upload):
         cm = CostCenterMonthlyEncumbranceReport(2023, 1, "8484WA", "C113")
         lines = cm.sum_line_items()
         inserted = cm.insert_line_items(lines)

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from bft.management.commands import populate, uploadcsv
+from bft.management.commands import populate
 from reports.utils import CostCenterScreeningReport
 
 
@@ -23,11 +23,6 @@ class TestCostCenterScreeningReport:
             "Allocation",
             "Type",
         )
-
-    @pytest.fixture
-    def upload(self):
-        up = uploadcsv.Command()
-        up.handle(encumbrancefile="test-data/encumbrance_2184A3.txt")
 
     def test_cost_element_allocation(self, populate, upload):
         r = CostCenterScreeningReport()
