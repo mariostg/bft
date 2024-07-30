@@ -1,9 +1,7 @@
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from bft.forms import (CostCenterLineItemUploadForm,
-                       FundCenterLineItemUploadForm)
-from bft.management.commands import populate
+from bft.forms import CostCenterLineItemUploadForm, FundCenterLineItemUploadForm
 
 
 @pytest.mark.django_db
@@ -20,12 +18,7 @@ class TestCostCenterLineItemUpload:
             )
         }
 
-    @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
-
-    def test_form_is_valid(self, setup, populate):
+    def test_form_is_valid(self, setup, populatedata):
         data = {
             "fundcenter": "2184a3",
             "costcenter": "8484wa",
@@ -33,7 +26,7 @@ class TestCostCenterLineItemUpload:
         f = CostCenterLineItemUploadForm(data=data, files=self.files)
         assert f.is_valid()
 
-    def test_form_costcenter_not_the_child(self, setup, populate):
+    def test_form_costcenter_not_the_child(self, setup, populatedata):
         data = {
             "fundcenter": "2184DA",
             "costcenter": "8484wa",
@@ -41,7 +34,7 @@ class TestCostCenterLineItemUpload:
         f = CostCenterLineItemUploadForm(data=data, files=self.files)
         assert "is not a direct descendant of" in f.errors["__all__"][0]
 
-    def test_form_invalid_fund_center(self, setup, populate):
+    def test_form_invalid_fund_center(self, setup, populatedata):
         self.data = {
             "fundcenter": "2184XA",
             "costcenter": "8484wa",
@@ -50,7 +43,7 @@ class TestCostCenterLineItemUpload:
         assert "Fund Center 2184XA does not exist" in f.errors["fundcenter"]
         assert f.is_valid() == False
 
-    def test_form_invalid_cost_center(self, setup, populate):
+    def test_form_invalid_cost_center(self, setup, populatedata):
         self.data = {
             "fundcenter": "2184DA",
             "costcenter": "8484UU",
@@ -73,16 +66,11 @@ class TestFundCenterLineItemUpload:
             )
         }
 
-    @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
-
-    def test_form_is_valid(self, setup, populate):
+    def test_form_is_valid(self, setup, populatedata):
         f = FundCenterLineItemUploadForm(data=self.data, files=self.files)
         assert f.is_valid()
 
-    def test_form_invalid_fund_center(self, setup, populate):
+    def test_form_invalid_fund_center(self, setup, populatedata):
         self.data = {
             "fundcenter": "2184XA",
         }
