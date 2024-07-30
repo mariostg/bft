@@ -51,7 +51,7 @@ class TestFundCenterAllocationManager:
 
     # Fund Allocations
     def test_fund_allocation_when_fund_valid_and_allocation_exists(self, populatedata):
-        allocation = FundCenterAllocation().objects.fund("c113")
+        allocation = FundCenterAllocation.objects.fund("c113")
         assert 3 == allocation.count()
 
     def test_fund_allocation_when_fund_valid_and_no_allocation(self, populatedata):
