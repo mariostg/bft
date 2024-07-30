@@ -4,7 +4,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client
 from django.urls import reverse
 
-from bft.management.commands import populate
 from bft.models import CostCenter, FundCenter, FundManager, SourceManager
 from bft.uploadprocessor import CostCenterLineItemProcessor, LineItemProcessor
 
@@ -20,11 +19,6 @@ DND Cost Center Encumbrance Report
 Funds Center :     2184JA and all subordinates
 Base Fiscal Year : 2024
 """
-
-    @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
 
     def test_no_file_path_provided(self):
         with pytest.raises(ValueError) as r:
@@ -54,7 +48,7 @@ Base Fiscal Year : 2024
         p = LineItemProcessor(self.source_file)
         assert "2020" == p.find_base_fy("Base Fiscal Year : 2020")
 
-    def test_report_does_not_match_post_request(self, setup, populate):
+    def test_report_does_not_match_post_request(self, setup, populatedata):
         c = Client()
         source_file = SimpleUploadedFile("file.txt", self.file_content, content_type="text/plain")
         c.post(reverse("fundcenter-lineitem-upload"), {"fundcenter": "2184DA", "source_file": source_file})
@@ -62,7 +56,7 @@ Base Fiscal Year : 2024
             lastline = list(f)[-1]
         assert "does not match report found in dataset:" in lastline
 
-    def test_not_a_dnd_costcenter_encumbrance_report(self, setup, populate):
+    def test_not_a_dnd_costcenter_encumbrance_report(self, setup, populatedata):
         c = Client()
         content = b"""
 DND Some Other Report
@@ -84,11 +78,6 @@ class TestCostCenterLineItemProcessor:
         self.source_file = f"{settings.BASE_DIR}/test-data/8486jm.txt"
 
     @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
-
-    @pytest.fixture
     def create_costcenter(self):
         fund = FundManager().fund("C113")
         source = SourceManager().source("Common")
@@ -104,7 +93,7 @@ class TestCostCenterLineItemProcessor:
             }
         ).save()
 
-    def test_source_file_has_more_than_one_costcenter(self, setup, populate, create_costcenter):
+    def test_source_file_has_more_than_one_costcenter(self, setup, populatedata, create_costcenter):
         self.source_file = f"{settings.BASE_DIR}/test-data/8486jm-with-extra-cc.txt"
         c = CostCenterLineItemProcessor(self.source_file, "8486JM", "2184JA")
         c.main()
@@ -112,6 +101,6 @@ class TestCostCenterLineItemProcessor:
             lastline = list(f)[-1]
         assert "There are more that one cost center in the report" in lastline
 
-    def test_init(self, setup, populate, create_costcenter):
+    def test_init(self, setup, populatedata, create_costcenter):
         c = CostCenterLineItemProcessor(self.source_file, "8486JM", "2184JA")
         c.main()
