@@ -1,18 +1,13 @@
 import pytest
 from django.contrib.auth import get_user_model
 
-from bft.management.commands import populate
 from bft.models import CostCenter, LineForecast, LineForecastManager, LineItem
 
 
 @pytest.mark.django_db
 class TestLineForecastManager:
-    @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
 
-    def test_line_forecast_dataframe(self, populate, upload):
+    def test_line_forecast_dataframe(self, populatedata, upload):
         li = LineItem.objects.all().first()
 
         fcst = LineForecast.objects.get(lineitem=li)
@@ -25,7 +20,7 @@ class TestLineForecastManager:
         assert True == ("Delivery Date" in li_df.columns)
         assert "int" == li_df.dtypes.Forecast
 
-    def test_change_line_items_procurement_officer(self, populate, upload):
+    def test_change_line_items_procurement_officer(self, populatedata, upload):
         mgr = LineForecastManager()
         costcenter = CostCenter.objects.get(costcenter="8484WA")
 
