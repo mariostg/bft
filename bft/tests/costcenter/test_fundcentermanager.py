@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 
-from bft.management.commands import populate
 from bft.models import Fund, FundCenter, FundCenterManager
 
 
@@ -14,11 +13,6 @@ class TestFundCenterManager:
         fund = {"fund": "C113"}
         Fund.objects.create(**fund)
 
-    @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
-
     def test_fundcenter(self, setup):
         assert "1111AA" == FundCenterManager().fundcenter("1111aa").fundcenter
 
@@ -28,7 +22,7 @@ class TestFundCenterManager:
     def test_sequence_exists(self, setup):
         assert True == FundCenterManager().sequence_exist("1")
 
-    def test_sequence_does_not_exists(self, setup):
+    def test_sequence_does_not_exists(self):
         assert False == FundCenterManager().sequence_exist("11")
 
     def test_get_by_fund_center(self, setup):
@@ -43,7 +37,7 @@ class TestFundCenterManager:
         r = FundCenter
         assert 0 == len(r.objects.fund_center_dataframe(r.objects))
 
-    def test_a_given_fund_center_does_not_exists(self, setup):
+    def test_a_given_fund_center_does_not_exists(self):
         assert False == FundCenterManager().exists("9999aa")
 
     def test_fund_center_has_data(self, setup):
@@ -51,9 +45,7 @@ class TestFundCenterManager:
         assert True == FundCenterManager().exists()
 
     # Fund Center Tests
-    def test_fund_center_dataframe(self):
-        hnd = populate.Command()
-        hnd.handle()
+    def test_fund_center_dataframe(self, populatedata):
         fc = FundCenter
         r = FundCenterManager().fund_center_dataframe(fc.objects.all())
 
@@ -72,19 +64,15 @@ class TestFundCenterManager:
         match = (columns == expected_columns).all()
         assert True == match
 
-    def test_get_direct_descendants(self):
-        hnd = populate.Command()
-        hnd.handle()
+    def test_get_direct_descendants(self, populatedata):
         parent = FundCenterManager().fundcenter(fundcenter="2184DA")
         descendants = FundCenterManager().get_direct_descendants(parent)
         assert 3 == len(descendants)
 
-    def test_get_direct_descendants_empty(self, setup):
+    def test_get_direct_descendants_empty(self):
         parent = FundCenterManager().fundcenter(fundcenter="2222BB")
         descendants = FundCenterManager().get_direct_descendants(parent)
         assert 0 == len(descendants)
 
-    def test_get_direct_descendants_wrong_string(self, setup):
-        hnd = populate.Command()
-        hnd.handle()
+    def test_get_direct_descendants_wrong_string(self, populatedata):
         assert FundCenterManager().get_direct_descendants("2222zz") is None
