@@ -1,47 +1,52 @@
-from django.test import TestCase
+import pytest
+from django.test import Client
 from django.urls import reverse
+from pytest_django.asserts import assertTemplateUsed
 
 
-class CostCenterPageTest(TestCase):
+@pytest.mark.django_db
+class TestCostCenterPageTest:
     def test_url_is_good(self):
-        response = self.client.get("/costcenter/costcenter-table/")
-        self.assertEqual(200, response.status_code)
+        response = Client().get("/costcenter/costcenter-table/")
+        assert 200 == response.status_code
 
     def test_url_by_name(self):
-        response = self.client.get(reverse("costcenter-table"))
-        self.assertEqual(200, response.status_code)
+        response = Client().get(reverse("costcenter-table"))
+        assert 200 == response.status_code
 
     def test_view_uses_correct_template(self):
-        response = self.client.get("/costcenter/costcenter-table/")
-        self.assertTemplateUsed(response, "costcenter/costcenter-table.html")
+        response = Client().get("/costcenter/costcenter-table/")
+        assertTemplateUsed(response, "costcenter/costcenter-table.html")
 
 
-class CostCenterAddTest(TestCase):
+@pytest.mark.django_db
+class TestCostCenterAdd:
     def test_url_is_good(self):
-        response = self.client.get("/costcenter/costcenter-add/")
-        self.assertEqual(200, response.status_code)
+        response = Client().get("/costcenter/costcenter-add/")
+        assert 200 == response.status_code
 
     def test_url_by_name(self):
-        response = self.client.get(reverse("costcenter-add"))
-        self.assertEqual(200, response.status_code)
+        response = Client().get(reverse("costcenter-add"))
+        assert 200 == response.status_code
 
     def test_view_uses_correct_template(self):
-        response = self.client.get(reverse("costcenter-add"))
-        self.assertTemplateUsed(response, "costcenter/costcenter-form.html")
+        response = Client().get(reverse("costcenter-add"))
+        assertTemplateUsed(response, "costcenter/costcenter-form.html")
 
 
-class CostCenterUpdateTest(TestCase):
+@pytest.mark.django_db
+class TestCostCenterUpdate:
     def test_url_is_good(self):
-        response = self.client.get("/costcenter/costcenter-update/1")
-        self.assertEqual(200, response.status_code)
+        response = Client().get("/costcenter/costcenter-update/1")
+        assert 200, response.status_code
 
     def test_url_by_name(self):
-        response = self.client.get(reverse("costcenter-update", args=[1]))
-        self.assertEqual(200, response.status_code)
+        response = Client().get(reverse("costcenter-update", args=[1]))
+        assert 200 == response.status_code
 
     def test_view_uses_correct_template(self):
-        response = self.client.get(reverse("costcenter-table"))
-        self.assertTemplateUsed(response, "costcenter/costcenter-table.html")
+        response = Client().get(reverse("costcenter-table"))
+        assertTemplateUsed(response, "costcenter/costcenter-table.html")
 
 
 """
@@ -49,57 +54,61 @@ Testing Source urls and templates.
 """
 
 
-class SourcePageTest(TestCase):
+@pytest.mark.django_db
+class TestSourcePage:
     def test_url_is_good(self):
-        response = self.client.get("/source/source-table/")
-        self.assertEqual(200, response.status_code)
+        response = Client().get("/source/source-table/")
+        assert 200 == response.status_code
 
     def test_url_by_name(self):
-        response = self.client.get(reverse("source-table"))
-        self.assertEqual(200, response.status_code)
+        response = Client().get(reverse("source-table"))
+        assert 200 == response.status_code
 
     def test_view_uses_correct_template(self):
-        response = self.client.get(reverse("source-table"))
-        self.assertTemplateUsed(response, "costcenter/source-table.html")
+        response = Client().get(reverse("source-table"))
+        assertTemplateUsed(response, "costcenter/source-table.html")
 
 
-class SourceAddTest(TestCase):
+@pytest.mark.django_db
+class TestSourceAdd:
     def test_url_is_good(self):
-        response = self.client.get("/source/source-add/")
-        self.assertEqual(200, response.status_code)
+        response = Client().get("/source/source-add/")
+        assert 200 == response.status_code
 
     def test_url_by_name(self):
-        response = self.client.get(reverse("source-add"))
-        self.assertEqual(200, response.status_code)
+        response = Client().get(reverse("source-add"))
+        assert 200 == response.status_code
 
     def test_view_uses_correct_template(self):
-        response = self.client.get(reverse("source-add"))
-        self.assertTemplateUsed(response, "costcenter/source-form.html")
+        response = Client().get(reverse("source-add"))
+        assertTemplateUsed(response, "costcenter/source-form.html")
 
 
-class SourceUpdateTest(TestCase):
+@pytest.mark.django_db
+class TestSourceUpdate:
     def test_url_is_good(self):
-        response = self.client.get("/source/source-update/1/")
-        self.assertEqual(200, response.status_code)
+        response = Client().get("/source/source-update/1/")
+        assert 200 == response.status_code
 
     def test_url_by_name(self):
-        response = self.client.get(reverse("source-update", args=[1]))
-        self.assertEqual(200, response.status_code)
+        response = Client().get(reverse("source-update", args=[1]))
+        assert 200 == response.status_code
 
     def test_view_uses_correct_template(self):
-        response = self.client.get(reverse("source-update", args=[1]))
-        self.assertTemplateUsed(response, "costcenter/source-form.html")
+        response = Client().get(reverse("source-update", args=[1]))
+        assertTemplateUsed(response, "costcenter/source-form.html")
 
 
-class SourceDeleteTest(TestCase):
+@pytest.mark.django_db
+class TestSourceDelete:
     def test_url_is_good(self):
-        response = self.client.get("/source/source-delete/1/")
-        self.assertEqual(200, response.status_code)
+        response = Client().get("/source/source-delete/1/")
+        assert 200 == response.status_code
 
     def test_url_by_name(self):
-        response = self.client.get(reverse("source-delete", args=[1]))
-        self.assertEqual(200, response.status_code)
+        response = Client().get(reverse("source-delete", args=[1]))
+        assert 200 == response.status_code
 
     def test_view_uses_correct_template(self):
-        response = self.client.get(reverse("source-delete", args=[1]))
-        self.assertTemplateUsed(response, "core/delete-object.html")
+        response = Client().get(reverse("source-delete", args=[1]))
+        assertTemplateUsed(response, "core/delete-object.html")
