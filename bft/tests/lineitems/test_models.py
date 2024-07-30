@@ -13,16 +13,12 @@ from main.settings import BASE_DIR
 
 @pytest.mark.django_db
 class TestLineItemManager:
-    @pytest.fixture
-    def setup(self):
-        hnd = populate.Command()
-        hnd.handle()
 
-    def test_get_line_items_when_cost_center_exists(self, setup, upload):
+    def test_get_line_items_when_cost_center_exists(self, populatedata, upload):
         li = LineItem.objects.cost_center("8484WA")
         assert li.count() > 0
 
-    def test_get_line_items_when_cost_center_not_exists(self, setup):
+    def test_get_line_items_when_cost_center_not_exists(self, populatedata):
         li = LineItem.objects.cost_center("0000C1")
         assert li is None
 
@@ -43,19 +39,15 @@ class TestLineItemModel:
 
 @pytest.mark.django_db
 class TestLineItemImport:
-    @pytest.fixture
-    def setup(self):
-        hnd = populate.Command()
-        hnd.handle()
 
-    def test_insert_line_item_from_encumbrance_line(self, setup, upload):
+    def test_insert_line_item_from_encumbrance_line(self, populatedata, upload):
         obj = LineItem()
         enc = LineItemImport.objects.first()
         retval = obj.insert_line_item(enc)
 
         assert 8 == retval
 
-    def test_update_line_item_from_encumbrance_line(self, setup, upload):
+    def test_update_line_item_from_encumbrance_line(self, populatedata, upload):
         obj = LineItem()
         enc = LineItemImport.objects.first()
         retval = obj.insert_line_item(enc)
@@ -68,7 +60,7 @@ class TestLineItemImport:
 
         assert enc.workingplan == updated.workingplan
 
-    def test_update_line_item_bogus_cost_center(self, setup, upload):
+    def test_update_line_item_bogus_cost_center(self, populatedata, upload):
         obj = LineItem()
         enc = LineItemImport.objects.first()
         retval = obj.insert_line_item(enc)
@@ -80,7 +72,7 @@ class TestLineItemImport:
 
         assert updated is None
 
-    def test_line_items_have_orphans(self, setup, upload):
+    def test_line_items_have_orphans(self, populatedata, upload):
         # bring lines in
         li = LineItem()
         li.import_lines()
@@ -106,7 +98,7 @@ class TestLineItemImport:
         assert 0 == len(orphan)
         assert isinstance(orphan, set)
 
-    def test_mark_line_orphan(self, setup, upload):
+    def test_mark_line_orphan(self, populatedata, upload):
         # bring lines in
         li = LineItem()
         li.import_lines()
@@ -125,13 +117,10 @@ class TestLineItemImport:
         assert "orphan" == li.status
 
 
+@pytest.mark.django_db
 class TestLineItemManagementTest:
-    @pytest.fixture
-    def setup():
-        filldata = populate.Command()
-        filldata.handle()
 
-    def test_line_item_fund_center_wrong(self, setup, upload):
+    def test_line_item_fund_center_wrong(self, populatedata, upload):
         # bring lines in and assign a bogus fund center
         li = LineItem()
         li.import_lines()
@@ -145,12 +134,8 @@ class TestLineItemManagementTest:
 
 @pytest.mark.django_db
 class TestLineForecastModel:
-    @pytest.fixture
-    def setup(self):
-        hnd = populate.Command()
-        hnd.handle()
 
-    def test_create_forecast_higher_than_wp(self, setup, upload):
+    def test_create_forecast_higher_than_wp(self, populatedata, upload):
         li = LineItem.objects.all().first()
         fcst = LineForecast.objects.get(lineitem=li)
 
@@ -160,7 +145,7 @@ class TestLineForecastModel:
         fcst = LineForecastManager().get_line_forecast(li)
         assert fcst.forecastamount == li.workingplan
 
-    def test_create_forecast_smaller_than_spent(self, setup, upload):
+    def test_create_forecast_smaller_than_spent(self, populatedata, upload):
         li = LineItem.objects.filter(spent__gt=0).first()
         new_fcst = float(li.spent) * 0.1
 
@@ -171,7 +156,7 @@ class TestLineForecastModel:
         fcst = LineForecastManager().get_line_forecast(li)
         assert fcst.forecastamount == new_fcst
 
-    def test_forecast_document_number_to_working_plan(self, setup, upload):
+    def test_forecast_document_number_to_working_plan(self, populatedata, upload):
         # each line item will have a forecast equivalent to its own working plan
         docno = "12663089"
 
@@ -187,7 +172,7 @@ class TestLineForecastModel:
         )["fcst__forecastamount__sum"]
         assert applied_forecast == target_forecast
 
-    def test_forecast_document_number_to_zero(self, setup, upload):
+    def test_forecast_document_number_to_zero(self, populatedata, upload):
         # When setting document forecast to 0, forecast will consider spent and assign this value or 0.
         docno = "11111110"
 
@@ -204,7 +189,7 @@ class TestLineForecastModel:
         assert total_spent is not None
         assert applied_forecast == total_spent
 
-    def test_create_forecast_no_lines(self, setup):
+    def test_create_forecast_no_lines(self, populatedata):
         docno = "XXXX"
         lf = LineForecast()
         assert 0 == lf.forecast_line_by_docno(docno, 1000)
@@ -217,7 +202,7 @@ class TestLineForecastModel:
             ("12382523", 150000),  # "12382523" has one line, spent == 0
         ],
     )
-    def test_forecast_line_by_docno(self, setup, upload, docno, target_forecast):
+    def test_forecast_line_by_docno(self, populatedata, upload, docno, target_forecast):
         LineForecast().forecast_line_by_docno(docno, target_forecast)
 
         forecast = LineForecast.objects.filter(lineitem__docno=docno).aggregate(Sum("forecastamount"))[
@@ -233,7 +218,7 @@ class TestLineForecastModel:
             ("8484wa", 300000),
         ],
     )
-    def test_forecast_line_by_costcenter(self, setup, upload, costcenter, target_forecast):
+    def test_forecast_line_by_costcenter(self, populatedata, upload, costcenter, target_forecast):
         LineForecast().forecast_costcenter_lines(costcenter, target_forecast)
 
         costcenter = CostCenterManager().cost_center(costcenter)
