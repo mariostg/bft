@@ -1,6 +1,6 @@
 import pytest
 
-from bft.management.commands import uploadcsv, populate
+from bft.management.commands import populate, uploadcsv
 
 
 @pytest.fixture

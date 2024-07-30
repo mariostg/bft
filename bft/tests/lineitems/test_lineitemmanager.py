@@ -1,6 +1,5 @@
 import pytest
 
-from bft.management.commands import populate
 from bft.models import LineItem, LineItemManager
 
 

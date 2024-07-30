@@ -1,7 +1,6 @@
 import pytest
 from django.db.models import Sum
 
-from bft.management.commands import populate
 from bft.models import (BftStatusManager, CostCenterAllocation,
                         CostCenterManager, FundManager)
 from reports.models import CostCenterMonthlyAllocation

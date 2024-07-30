@@ -2,9 +2,7 @@ import os
 
 import pytest
 from django.db.models import Sum
-from django.test import TestCase
 
-from bft.management.commands import populate
 from bft.models import (CostCenterManager, LineForecast, LineForecastManager,
                         LineItem, LineItemImport)
 from bft.uploadprocessor import LineItemProcessor

@@ -1,7 +1,8 @@
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from bft.forms import CostCenterLineItemUploadForm, FundCenterLineItemUploadForm
+from bft.forms import (CostCenterLineItemUploadForm,
+                       FundCenterLineItemUploadForm)
 
 
 @pytest.mark.django_db
