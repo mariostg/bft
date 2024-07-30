@@ -1,7 +1,6 @@
 import pytest
 
 from bft.exceptions import ParentDoesNotExistError
-from bft.management.commands import populate
 from bft.models import (CostCenter, CostCenterManager,
                         FinancialStructureManager, FundCenter,
                         FundCenterManager, FundManager, SourceManager)
@@ -9,45 +8,40 @@ from bft.models import (CostCenter, CostCenterManager,
 
 @pytest.mark.django_db
 class TestFinancialStructureManager:
-    @pytest.fixture
-    def populate(self):
-        self.fsm = FinancialStructureManager()
-        hnd = populate.Command()
-        hnd.handle()
 
-    def test_cost_center_is_child_of(self, populate):
+    def test_cost_center_is_child_of(self, populatedata):
         parent = FundCenterManager().fundcenter(fundcenter="2184A3")
         child = CostCenterManager().cost_center(costcenter="8484WA")
-        assert True == self.fsm.is_child_of(parent, child)
+        assert True == FinancialStructureManager().is_child_of(parent, child)
 
-    def test_cost_center_is_not_child_of(self, populate):
+    def test_cost_center_is_not_child_of(self, populatedata):
         parent = FundCenterManager().fundcenter(fundcenter="2184AA")
         child = CostCenterManager().cost_center(costcenter="8484WA")
-        assert False == self.fsm.is_child_of(parent, child)
+        assert False == FinancialStructureManager().is_child_of(parent, child)
 
-    def test_fund_center_is_child_of(self, populate):
+    def test_fund_center_is_child_of(self, populatedata):
         parent = FundCenterManager().fundcenter(fundcenter="2184DA")
         child = FundCenterManager().fundcenter(fundcenter="2184A3")
 
-        assert True == self.fsm.is_child_of(parent, child)
+        assert True == FinancialStructureManager().is_child_of(parent, child)
 
-    def test_fund_center_is_not_child_of(self, populate):
+    def test_fund_center_is_not_child_of(self, populatedata):
         parent = FundCenterManager().fundcenter(fundcenter="2184A3")
         child = FundCenterManager().fundcenter(fundcenter="1111AC")
 
-        assert False == self.fsm.is_child_of(parent, child)
+        assert False == FinancialStructureManager().is_child_of(parent, child)
 
-    def test_fund_center_is_descendant_of(self, populate):
+    def test_fund_center_is_descendant_of(self, populatedata):
         parent = FundCenterManager().fundcenter(fundcenter="2184AA")
         child = FundCenterManager().fundcenter(fundcenter="2184A3")
 
-        assert True == self.fsm.is_descendant_of(parent, child)
+        assert True == FinancialStructureManager().is_descendant_of(parent, child)
 
-    def test_fund_center_is_not_descendant_of(self, populate):
+    def test_fund_center_is_not_descendant_of(self, populatedata):
         parent = FundCenterManager().fundcenter(fundcenter="2184BE")
         child = FundCenterManager().fundcenter(fundcenter="2184DA")
 
-        assert False == self.fsm.is_descendant_of(parent, child)
+        assert False == FinancialStructureManager().is_descendant_of(parent, child)
 
     def test_is_sequence_child_of(self):
         fsm = FinancialStructureManager()
@@ -70,17 +64,17 @@ class TestFinancialStructureManager:
         with pytest.raises(AttributeError):
             fsm.is_sequence_descendant_of("1.0", "1.0.1.1")
 
-    def test_get_fund_center_cost_centers(self, populate):
+    def test_get_fund_center_cost_centers(self, populatedata):
         parent = FundCenterManager().fundcenter(fundcenter="2184A3")
-        cc = self.fsm.get_fund_center_cost_centers(parent)
+        cc = FinancialStructureManager().get_fund_center_cost_centers(parent)
         assert 3 == cc.count()
 
-    def test_get_fund_center_cost_centers_none(self, populate):
+    def test_get_fund_center_cost_centers_none(self, populatedata):
         parent = FundCenterManager().fundcenter(fundcenter="1111AA")
-        cc = self.fsm.get_fund_center_cost_centers(parent)
+        cc = FinancialStructureManager().get_fund_center_cost_centers(parent)
         assert 0 == cc.count()
 
-    def test_get_sequence_direct_descendants(self, populate):
+    def test_get_sequence_direct_descendants(self, populatedata):
         parent = "1"
         assert 1 == len(
             FinancialStructureManager().get_sequence_direct_descendants(parent)
@@ -104,25 +98,25 @@ class TestFinancialStructureManager:
         sequence = FinancialStructureManager().set_parent()
         assert "1" == sequence
 
-    def test_create_child_of_root(self, populate):
+    def test_create_child_of_root(self, populatedata):
         root = FinancialStructureManager().FundCenters(fundcenter="0162ND").first()
         child = FinancialStructureManager().set_parent(root)
         assert "1.2" == child  # 1.1 alreadey set
 
-    def test_create_child_using_parent(self, populate):
-        parent_obj = self.fsm.FundCenters(fundcenter="2184A3").first()
-        new_seqno = self.fsm.create_child(parent_obj.fundcenter)
+    def test_create_child_using_parent(self, populatedata):
+        parent_obj = FinancialStructureManager().FundCenters(fundcenter="2184A3").first()
+        new_seqno = FinancialStructureManager().create_child(parent_obj.fundcenter)
         assert parent_obj.sequence + ".1" == new_seqno
 
-    def test_move_fundcenter_to_another_one(self, populate):
-        family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
+    def test_move_fundcenter_to_another_one(self, populatedata):
+        family = list(FinancialStructureManager().FundCenters().values_list("sequence", flat=True))
 
         # create a fundcenter and assign it to 2184DA
         parent = FundCenter.objects.get(fundcenter="2184A3")
         new_fc = FundCenter.objects.create(
             fundcenter="0000AA", shortname="AA", fundcenter_parent=parent
         )
-        family = list(self.fsm.FundCenters().values_list("sequence", flat=True))
+        family = list(FinancialStructureManager().FundCenters().values_list("sequence", flat=True))
         assert new_fc.sequence in family
 
         # move fund center from 1.1.1.12.2 to 1.1.2
@@ -133,12 +127,12 @@ class TestFinancialStructureManager:
         saved_fc = FundCenter.objects.get(fundcenter="0000AA")
         assert fc.sequence == saved_fc.sequence
 
-    def test_set_parent(self, populate):
-        parent = self.fsm.FundCenters(fundcenter="2184AA").first()
-        p = self.fsm.set_parent(fundcenter_parent=parent)
+    def test_set_parent(self, populatedata):
+        parent = FinancialStructureManager().FundCenters(fundcenter="2184AA").first()
+        p = FinancialStructureManager().set_parent(fundcenter_parent=parent)
         assert parent.sequence + ".3" == p
 
-    def test_set_parent_of_cost_center(self, populate):
+    def test_set_parent_of_cost_center(self, populatedata):
         parent = FundCenterManager().fundcenter("2184A3")
         cc = CostCenterManager().cost_center("8484WA")
         cc.costcenter_parent = parent
@@ -148,7 +142,7 @@ class TestFinancialStructureManager:
             == CostCenterManager().cost_center("8484WA").sequence
         )
 
-    def test_sequence_on_create_cost_center_under_level_2(self, populate):
+    def test_sequence_on_create_cost_center_under_level_2(self, populatedata):
         parent = FundCenterManager().fundcenter("2184AA")
         fund = FundManager().fund("C113")
         source = SourceManager().source("Basement")
@@ -162,22 +156,18 @@ class TestFinancialStructureManager:
         assert "1.1.1.0.1" == costcenter.sequence
 
     def test_last_root_with_no_root_element(self):
-        fsm = FinancialStructureManager()
-
-        assert fsm.last_root() is None
+        assert FinancialStructureManager().last_root() is None
 
     def test_last_root_with_one_root_element(self):
         fc = {"fundcenter": "1111AA", "shortname": "root 1", "fundcenter_parent": None}
         FundCenter.objects.create(**fc)
-        fsm = FinancialStructureManager()
 
-        assert "1" == fsm.last_root()
+        assert "1" == FinancialStructureManager().last_root()
 
     def test_last_root_with_two_roots_element(self):
         fc = {"fundcenter": "1111AA", "shortname": "root 1", "fundcenter_parent": None}
         FundCenter.objects.create(**fc)
         fc = {"fundcenter": "2184A3", "shortname": "root 2", "fundcenter_parent": None}
         FundCenter.objects.create(**fc)
-        fsm = FinancialStructureManager()
 
-        assert "2" == fsm.last_root()
+        assert "2" == FinancialStructureManager().last_root()
