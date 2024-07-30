@@ -33,12 +33,6 @@ class TestCostCenterMonthlyModel:
         "working_plan": 4000,
     }
 
-    @pytest.fixture
-    def setup(self):
-        # Will probably need a Command.handle() or something later to
-        # populate monthly data
-        pass
-
     def test_insert_single_row(self):
         md = CostCenterMonthlyEncumbrance(**self.m1)
         md.save()

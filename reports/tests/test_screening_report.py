@@ -7,24 +7,8 @@ from reports.utils import CostCenterScreeningReport
 
 @pytest.mark.django_db
 class TestCostCenterScreeningReport:
-    @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
-        self.expected_keys = (
-            "Cost Element",
-            "Cost Element Name",
-            "Fund Center ID",
-            "Parent ID",
-            "Fund",
-            "Path",
-            "Parent Path",
-            "Parent Fund Center",
-            "Allocation",
-            "Type",
-        )
 
-    def test_cost_element_allocation(self, populate, upload):
+    def test_cost_element_allocation(self, populatedata, upload):
         r = CostCenterScreeningReport()
         expected_ce = {"2184A3", "8484WA", "8484YA"}
         data = r.cost_element_allocations("2184a3", "c113", 2023, 1)
@@ -32,12 +16,12 @@ class TestCostCenterScreeningReport:
         assert 3 == len(data)
         assert expected_ce == ce
 
-    def test_cost_element_allocation_non_existing_fund(self, populate, upload):
+    def test_cost_element_allocation_non_existing_fund(self, populatedata, upload):
         r = CostCenterScreeningReport()
         data = r.cost_element_allocations("2184a3", "c999", 2023, 1)
         assert 0 == len(data)
 
-    def test_cost_element_line_item_using_fund_center(self, populate, upload):
+    def test_cost_element_line_item_using_fund_center(self, populatedata, upload):
         r = CostCenterScreeningReport()
         data = r.cost_element_line_items("2184a3", "c113")
         assert 1 == len(data)

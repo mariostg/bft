@@ -11,10 +11,7 @@ from reports.utils import CostCenterMonthlyAllocationReport
 @pytest.mark.django_db
 class TestCostCenterMonthlyAllocationReport:
     @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
-
+    def setup(self):
         bftm = BftStatusManager()
         self.fy = bftm.fy()
         self.period = bftm.period()
@@ -23,12 +20,12 @@ class TestCostCenterMonthlyAllocationReport:
         self.costcenter = CostCenterManager().cost_center(self.cc_str)
         self.fund = FundManager().fund("c113")
 
-    def test_populate_allocation(self, populate):
+    def test_populate_allocation(self, populatedata, setup):
         """Check our test data has expected allocation"""
         alloc_sum = CostCenterAllocation.objects.aggregate(Sum("amount"))
         assert 120000.99 == float(alloc_sum["amount__sum"])
 
-    def test_costcenter_monthly_allocation_on_insert_allocation(self, populate):
+    def test_costcenter_monthly_allocation_on_insert_allocation(self, populatedata, setup):
         """After populate, 8484WA C113 has allocation of 10.  Insert 1000 allocation."""
         new_alloc = CostCenterAllocation()
         new_alloc.amount = 1000
@@ -48,7 +45,7 @@ class TestCostCenterMonthlyAllocationReport:
         cc_alloc = CostCenterMonthlyAllocation.objects.filter(costcenter=self.cc_str).aggregate(Sum("allocation"))
         assert 101000 == float(cc_alloc["allocation__sum"])
 
-    def test_costcenter_monthly_allocation_on_update_allocation(self, populate):
+    def test_costcenter_monthly_allocation_on_update_allocation(self, populatedata, setup):
         """After populate, 8484WA C113 has allocation of 10000.  Let's update to 2000."""
         update_alloc = CostCenterAllocation.objects.get(
             costcenter=self.costcenter,
@@ -70,7 +67,7 @@ class TestCostCenterMonthlyAllocationReport:
         cc_alloc = CostCenterMonthlyAllocation.objects.filter(costcenter=self.cc_str).aggregate(Sum("allocation"))
         assert 2000 == float(cc_alloc["allocation__sum"])
 
-    def test_costcenter_monthly_allocation_on_delete_allocation(self, populate):
+    def test_costcenter_monthly_allocation_on_delete_allocation(self, populatedata, setup):
         """After populate, 8484WA C113 has allocation of 10.  Let's delete the allocation."""
         update_alloc = CostCenterAllocation.objects.get(
             costcenter=self.costcenter,

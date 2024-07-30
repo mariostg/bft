@@ -6,12 +6,8 @@ from reports import capitalforecasting
 
 @pytest.mark.django_db
 class TestCapitalForecasting:
-    @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
 
-    def test_setparams_with_fy(self, populate):
+    def test_setparams_with_fy(self, populatedata):
         self.cf = capitalforecasting.CapitalReport("c113", "C.999999", 2024)
         assert "C113" == self.cf.fund.fund
         assert "C.999999" == self.cf.capital_project.project_no
@@ -33,7 +29,7 @@ class TestCapitalForecastingFEARStatus:
         hnd = populate.Command()
         hnd.handle()
 
-    def test_dataframe(self, populate):
+    def test_dataframe(self, populatedata):
         cf = capitalforecasting.FEARStatusReport(
             "c113",
             2021,

@@ -1,6 +1,12 @@
 import pytest
 
-from bft.management.commands import uploadcsv
+from bft.management.commands import uploadcsv, populate
+
+
+@pytest.fixture
+def populatedata():
+    hnd = populate.Command()
+    hnd.handle()
 
 
 @pytest.fixture
