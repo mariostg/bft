@@ -1,57 +1,58 @@
-from django.test import TestCase
-
+import pytest
 from bft.models import CostCenter, Fund, FundCenter, Source
 
 
-class CostCenterManagerTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
+@pytest.mark.django_db
+class TestCostCenterManager:
+    @pytest.fixture
+    def setup(self):
         fc = FundCenter.objects.create(fundcenter="2184QQ", fundcenter_parent=None)
         fund = Fund.objects.create(fund="C111", name="Big fund", vote=1, download=True)
         s = Source.objects.create(source="La source")
         obj = CostCenter.objects.create(
             costcenter="8486AA", fund=fund, costcenter_parent=fc, source=s
         )
-        cls.pk = obj.pk
+        self.pk = obj.pk
 
-    def test_get_by_costcenter(self):
+    def test_get_by_costcenter(self, setup):
         obj = CostCenter.objects.cost_center("8486AA")
-        self.assertEqual("8486AA", obj.costcenter)
+        assert "8486AA" == obj.costcenter
 
-    def test_get_by_pk(self):
+    def test_get_by_pk(self, setup):
         obj = CostCenter.objects.pk(self.pk)
 
-        self.assertEqual(obj.pk, self.pk)
+        assert obj.pk == self.pk
 
 
-class FundManagerTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
+@pytest.mark.django_db
+class TestFundManager:
+    @pytest.fixture
+    def setup(self):
         obj = Fund.objects.create(fund="C111", name="Big fund", vote=1, download=True)
-        cls.pk = obj.pk
+        self.pk = obj.pk
 
-    def test_get_by_name(self):
+    def test_get_by_name(self, setup):
         obj = Fund.objects.fund("C111")
-        self.assertEqual("C111", obj.fund)
+        assert "C111" == obj.fund
 
-    def test_get_by_pk(self):
+    def test_get_by_pk(self, setup):
         obj = Fund.objects.pk(self.pk)
+        assert obj.pk == self.pk
 
-        self.assertEqual(obj.pk, self.pk)
 
-
-class SourceManagerTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
+@pytest.mark.django_db
+class TestSourceManager:
+    @pytest.fixture
+    def setup(self):
         s = Source.objects.create(source="La source")
-        cls.pk = s.pk
+        self.pk = s.pk
 
-    def test_get_by_name(self):
+    def test_get_by_name(self, setup):
         s = Source.objects.source("La source")
 
-        self.assertEqual("La source", s.source)
+        assert "La source" == s.source
 
-    def test_get_by_pk(self):
+    def test_get_by_pk(self, setup):
         s = Source.objects.pk(self.pk)
 
-        self.assertEqual(s.pk, self.pk)
+        assert s.pk == self.pk
