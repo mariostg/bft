@@ -3,7 +3,8 @@ from django.db import IntegrityError
 from django.db.models import RestrictedError
 from django.test import Client
 
-from bft.exceptions import InvalidAllocationException, InvalidFiscalYearException, InvalidOptionException
+from bft.exceptions import (InvalidAllocationException,
+                            InvalidFiscalYearException, InvalidOptionException)
 from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         FinancialStructureManager, ForecastAdjustment, Fund,
                         FundCenter, FundManager, Source)
