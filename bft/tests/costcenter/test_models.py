@@ -3,9 +3,7 @@ from django.db import IntegrityError
 from django.db.models import RestrictedError
 from django.test import Client
 
-from bft.exceptions import (InvalidAllocationException,
-                            InvalidFiscalYearException, InvalidOptionException)
-from bft.management.commands import populate
+from bft.exceptions import InvalidAllocationException, InvalidFiscalYearException, InvalidOptionException
 from bft.models import (CostCenter, CostCenterAllocation, CostCenterManager,
                         FinancialStructureManager, ForecastAdjustment, Fund,
                         FundCenter, FundManager, Source)
@@ -393,10 +391,6 @@ class TestFundCenterModel:
 
 @pytest.mark.django_db
 class TestCostCenterModel:
-    @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
 
     def test_string_representation(self):
         obj = CostCenter(**CC_1234FF)
@@ -500,7 +494,7 @@ class TestCostCenterModel:
 
         assert 0 == CostCenter.objects.count()
 
-    def test_parent_cannot_be_cost_center(self, populate):
+    def test_parent_cannot_be_cost_center(self, populatedata):
         cc = CostCenterManager().cost_center("8484WA")
 
         parent = CostCenterManager().cost_center("8484XA")
@@ -513,11 +507,6 @@ class TestCostCenterModel:
 @pytest.mark.django_db
 class TestForecastAdjustmentModel:
 
-    @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
-
     def test_string_representation(self):
         fund = Fund(fund="C113", name="NP", vote=1)
         cc = CostCenter(costcenter="8484WA", shortname="Basement", fund=fund)
@@ -527,7 +516,7 @@ class TestForecastAdjustmentModel:
     def test_verbose_name_plural(self):
         assert str(ForecastAdjustment._meta.verbose_name_plural) == "Forecast Adjustments"
 
-    def test_can_save_and_retreive_forecast_adjustment(self, populate, upload):
+    def test_can_save_and_retreive_forecast_adjustment(self, populatedata, upload):
         cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C113")
         fa = ForecastAdjustment()
@@ -543,12 +532,8 @@ class TestForecastAdjustmentModel:
 
 @pytest.mark.django_db
 class TestCostCenterAllocation:
-    @pytest.fixture
-    def populate(self):
-        hnd = populate.Command()
-        hnd.handle()
 
-    def test_string_representation(self, populate):
+    def test_string_representation(self, populatedata):
         cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C113")
         allocation = CostCenterAllocation.objects.get(costcenter=cc, fund=fund, fy=2023, quarter=1)
@@ -557,7 +542,7 @@ class TestCostCenterAllocation:
     def test_verbose_name_plural(self):
         assert str(ForecastAdjustment._meta.verbose_name_plural) == "Forecast Adjustments"
 
-    def test_save_and_retreive_allocation(self, populate):
+    def test_save_and_retreive_allocation(self, populatedata):
         cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C523")
 
@@ -567,7 +552,7 @@ class TestCostCenterAllocation:
         saved = CostCenterAllocation.objects.get(costcenter=cc, fund=fund, fy=2025, quarter=1)
         assert 100 == saved.amount
 
-    def test_save_with_invalid_quarter(self, populate):
+    def test_save_with_invalid_quarter(self, populatedata):
         cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C523")
 
@@ -575,7 +560,7 @@ class TestCostCenterAllocation:
         with pytest.raises(InvalidOptionException):
             allocation.save()
 
-    def test_save_with_negative_allocation(self, populate):
+    def test_save_with_negative_allocation(self, populatedata):
         cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C523")
 
@@ -583,7 +568,7 @@ class TestCostCenterAllocation:
         with pytest.raises(InvalidAllocationException):
             allocation.save()
 
-    def test_save_with_invalid_year(self, populate):
+    def test_save_with_invalid_year(self, populatedata):
         cc = CostCenterManager().cost_center("8484WA")
         fund = FundManager().fund("C523")
 
