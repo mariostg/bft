@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import IntegrityError, models
@@ -124,8 +125,8 @@ class BftUserManager(BaseUserManager):
             raise ValueError(_("The Email must be set"))  # noqa
         email = self.normalize_email(email)
         username, _ = email.strip().rsplit("@", 1)  # noqa
-
-        user = self.model(username=username, email=email, **extra_fields)
+        user_model = get_user_model()
+        user = user_model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save()
         return user
@@ -173,16 +174,24 @@ class BftUser(AbstractUser):
         )
 
 
-class BftUserFavoriteManager(models.Manager):
-    pass
+class BookmarkQuerySet(models.QuerySet):
+    def owner(self, owner: BftUser | str) -> QuerySet | None:
+        if not owner:
+            return self
+        if isinstance(owner, str):
+            try:
+                owner = BftUser.objects.get(username=owner)
+            except owner.DoesNotExist:
+                return None
+        return self.filter(owner=owner)
 
 
-class BftUserFavorite(models.Model):
-    bftuser = models.ForeignKey(BftUser, on_delete=models.CASCADE, default="", verbose_name="User Favorite")
-    favorite_name = models.CharField(max_length=30)
-    favorite_link = models.CharField(max_length=125)
+class Bookmark(models.Model):
+    owner = models.ForeignKey(BftUser, on_delete=models.CASCADE, default="", verbose_name="Owner's Favorite")
+    bookmark_name = models.CharField(max_length=30)
+    bookmark_link = models.CharField(max_length=125)
 
-    objects = BftUserFavoriteManager()
+    search = BookmarkQuerySet.as_manager()
 
 
 class FundManager(models.Manager):

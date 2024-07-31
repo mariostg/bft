@@ -6,7 +6,7 @@ from django.db import IntegrityError
 from django.shortcuts import redirect, render
 
 from bft.forms import BftUserForm, PasswordResetForm, UserSelfRegisterForm
-from bft.models import BftUser, BftUserManager
+from bft.models import BftUser, BftUserManager, Bookmark
 
 logger = logging.getLogger("django")
 
@@ -139,3 +139,12 @@ def user_password_reset(request, pk):
         "users/user-password-reset-form.html",
         {"form": form, "username": _user.username},
     )
+
+
+def favorite_add(request):
+    if request.method == "POST":
+        favmgr = Bookmark()
+        favmgr.create(
+            request,
+        )
+        return redirect("favorite_link")  # TODO
