@@ -568,7 +568,8 @@ def capital_forecasting_in_year_table(request):
             "data": paginator.get_page(page_number),
             "status": status,
             "has_filter": has_filter,
-            "reset": "capital-forecasting-in-year-table",
+            "url_name": "capital-forecasting-in-year-table",
+            "title": "Capital Forecasting In Year",
         },
     )
 

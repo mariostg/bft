@@ -1,17 +1,18 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% block title %}Capital Forecasting In Year Table{% endblock title %}
+{% block title %}{{title}} Table{% endblock title %}
 {% block content %}
   {% include "core/form-filter.html" %}
   <main class="block block--centered">
     <div class="container">
       <header class=''>
-        <h2>Capital In Year Table</h2>
+        <h2>{{title}} Table</h2>
       </header>
       {% if user.is_authenticated %}
         <div class=''>
           <div class="action-bar block">
             <a class='btn btn-add' href="{% url 'capital-forecasting-in-year-add' %}"></a>
+            {% include 'core/bookmark.html' %}
           </div>
         </div>
       {% endif %}
