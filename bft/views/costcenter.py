@@ -111,7 +111,12 @@ def fund_upload(request):
 
 def source_page(request):
     data = Source.objects.all()
-    return render(request, "costcenter/source-table.html", context={"sources": data})
+    context = {
+        "sources": data,
+        "url_name": "source-table",
+        "title": "Sources",
+    }
+    return render(request, "costcenter/source-table.html", context)
 
 
 def source_add(request):
@@ -190,7 +195,8 @@ def fundcenter_page(request):
         {
             "filter": search_filter,
             "has_filter": has_filter,
-            "reset": "fundcenter-table",
+            "url_name": "fundcenter-table",
+            "title": "Fund Centers",
         },
     )
 
@@ -484,7 +490,8 @@ def capital_forecasting_new_year_table(request):
             "data": paginator.get_page(page_number),
             "status": status,
             "has_filter": has_filter,
-            "reset": "capital-forecasting-new-year-table",
+            "url_name": "capital-forecasting-new-year-table",
+            "title": "Capital Forecasting New Year",
         },
     )
 
