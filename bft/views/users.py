@@ -149,7 +149,10 @@ def bookmark_add(request, bm_page: str):
             if form.is_valid():
                 bm = form.save(commit=False)
                 bm.owner = request.user
-                bm.save()
+                try:
+                    bm.save()
+                except IntegrityError:
+                    messages.error(request, f"{bm.bookmark_link} bookmark already exists for {bm.owner}")
                 return redirect("bookmark-show")
         except ValueError as e:
             messages.error(request, e)
