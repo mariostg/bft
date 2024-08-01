@@ -296,7 +296,11 @@ def fundcenter_allocation_page(request):
     return render(
         request,
         "costcenter/fundcenter-allocation-table.html",
-        {"filter": search_filter},
+        {
+            "filter": search_filter,
+            "url_name": "fundcenter-allocation-table",
+            "title": "Fund Centers Allocation Table",
+        },
     )
 
 
@@ -883,7 +887,11 @@ def costcenter_allocation_page(request):
     return render(
         request,
         "costcenter/costcenter-allocation-table.html",
-        {"filter": search_filter},
+        {
+            "filter": search_filter,
+            "url_name": "costcenter-allocation-table",
+            "title": "Cost Centers Allocation Table",
+        },
     )
 
 
@@ -973,7 +981,11 @@ def forecast_adjustment_page(request):
     data = ForecastAdjustment.objects.all()
     if data.count() == 0:
         messages.info(request, "There are no forecast adjustment.")
-    context = {"data": data}
+    context = {
+        "data": data,
+        "url_name": "forecast-adjustment-table",
+        "title": "Cost Centers Forecast Adjustment Table",
+    }
     return render(request, "costcenter/forecast-adjustment-table.html", context)
 
 

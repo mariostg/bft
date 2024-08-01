@@ -11,7 +11,7 @@
     <script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js'%}" ></script>
     <script type="text/javascript" src="{% static '/js/d3.v7.min.js'%}" ></script>
     <title>
-      {% block title %}Business Forecasting Tool{% endblock title %}
+      {% block title %}{{title|default:'Business Forecasting Tool'}}{% endblock title %}
     </title>
   </head>
   {% include 'core/navbar.html' %}

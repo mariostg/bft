@@ -1,15 +1,15 @@
 {% extends 'core/base.html' %}
-{% block title %}Forecast Adjustments{% endblock title %}
 {% comment %} {% load static %} {% endcomment %}
 {% block content %}
   <main class="block block--centered">
     <header class='block'>
-      <h2>Forecast Ajustments</h2>
+      <h2>{{title}}</h2>
     </header>
     {% if user.is_authenticated %}
       <div class=''>
         <div class="action-bar block">
           <a class='btn btn-add' href="{% url 'forecast-adjustment-add' %}"></a>
+          {% include 'core/bookmark.html' %}
         </div>
       </div>
     {% endif %}

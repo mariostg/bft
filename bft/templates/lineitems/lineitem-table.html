@@ -3,16 +3,16 @@
 {% load humanize %}
 {% load bft_tags %}
 
-{% block title %}Line Items Table{% endblock title %}
 {% block content %}
   {% include "core/form-filter.html" %}
   <main class="block block--centered">
 
     <section class='container lineitems'>
-      <h1>Line Items</h1>
+      <h1>{{title}}</h1>
       {% if not data %}
         <div>No lines associated to cost center</div>
       {% endif %}
+      {% include 'core/bookmark.html' %}
 
       {% include 'paginator.html' %}
       <button id='comment-toggler'>Toggle long text view</button>

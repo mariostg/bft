@@ -50,7 +50,12 @@ def lineitem_page(request, ccpk=None):
     return render(
         request,
         "lineitems/lineitem-table.html",
-        {"filter": search_filter, "has_filter": has_filter, "reset": "lineitem-page"},
+        {
+            "filter": search_filter,
+            "has_filter": has_filter,
+            "url_name": "lineitem-page",
+            "title": "Line Items Table",
+        },
     )
 
 

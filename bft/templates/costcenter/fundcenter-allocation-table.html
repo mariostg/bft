@@ -1,18 +1,18 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% block title %}Fund Center Allocation Table{% endblock title %}
 {% block content %}
   {% include "core/form-filter.html" %}
   <main class="block block--centered">
     <div>
 
       <header class='frame'>
-        <h2>Fund Centers Allocations</h2>
+        <h2>{{title}}</h2>
       </header>
       {% if user.is_authenticated %}
         <div class="block">
           <div class="block action-bar">
             <a class='btn btn-add'  href="{% url 'fundcenter-allocation-add' %}"></a>
+            {% include 'core/bookmark.html' %}
           </div>
         </div>
       {% endif %}
