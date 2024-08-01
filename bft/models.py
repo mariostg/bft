@@ -185,12 +185,21 @@ class BookmarkQuerySet(models.QuerySet):
                 return None
         return self.filter(owner=owner)
 
+    def user_bookmark(self, request):
+        try:
+            owner = BftUser.objects.get(username=request.user)
+            bm = Bookmark.objects.filter(owner=owner)
+        except BftUser.DoesNotExist:
+            bm = None
+        return bm
+
 
 class Bookmark(models.Model):
     owner = models.ForeignKey(BftUser, on_delete=models.CASCADE, default="", verbose_name="Owner's Favorite")
     bookmark_name = models.CharField(max_length=30)
     bookmark_link = models.CharField(max_length=125, unique=True)
 
+    objects = models.Manager()
     search = BookmarkQuerySet.as_manager()
 
     def __str__(self):

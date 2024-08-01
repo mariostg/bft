@@ -7,7 +7,7 @@ from django.shortcuts import redirect, render
 
 from bft.forms import (BftBookmarkForm, BftUserForm, PasswordResetForm,
                        UserSelfRegisterForm)
-from bft.models import BftUser, BftUserManager
+from bft.models import BftUser, BftUserManager, Bookmark
 
 logger = logging.getLogger("django")
 
@@ -156,3 +156,9 @@ def bookmark_add(request, bm_page: str):
     else:
         form = BftBookmarkForm(initial={"bookmark_link": bm_page})
     return render(request, "core/form-bookmark.html", {"form": form, "back": bm_page})
+
+
+def bookmark_show(request):
+    bm = Bookmark.search.user_bookmark(request)
+    context = {"bookmarks": bm, "title": f"{request.user} Bookmarks"}
+    return render(request, "users/user-bookmarks.html", context)
