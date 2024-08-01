@@ -39,7 +39,12 @@ from reports.utils import (CostCenterMonthlyAllocationReport,
 
 def fund_page(request):
     data = Fund.objects.all()
-    return render(request, "costcenter/fund-table.html", context={"data": data})
+    context = {
+        "data": data,
+        "url_name": "fund-table",
+        "title": "Funds",
+    }
+    return render(request, "costcenter/fund-table.html", context)
 
 
 def fund_add(request):
