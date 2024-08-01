@@ -23,6 +23,8 @@ class BftStatusForm(forms.ModelForm):
 
 
 class BftBookmarkForm(forms.ModelForm):
+    bookmark_link = forms.CharField(widget=forms.HiddenInput())
+
     class Meta:
         model = Bookmark
         fields = ["bookmark_link", "bookmark_name"]

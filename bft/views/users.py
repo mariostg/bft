@@ -168,6 +168,26 @@ def bookmark_delete(request, pk):
     bm = Bookmark.objects.get(pk=pk)
     if bm.owner == request.user:
         bm.delete()
-        return redirect("bookmark-show")
     else:
         messages.error(request, "This bookmark is not yours, it cannot be deleted.")
+    return redirect("bookmark-show")
+
+
+def bookmark_rename(request, pk):
+    bm = Bookmark.objects.get(pk=pk)
+    if bm.owner != request.user:
+        messages.error(request, "This bookmark is not yours, it cannot modify.")
+        return redirect("bookmark-show")
+
+    form = BftBookmarkForm(instance=bm)
+
+    if request.method == "POST":
+        form = BftBookmarkForm(request.POST, instance=bm)
+        try:
+            if form.is_valid():
+                form.save()
+                return redirect("bookmark-show")
+        except ValueError as e:
+            messages.error(request, e)
+
+    return render(request, "core/form-bookmark.html", {"form": form, "back": bm.bookmark_link})

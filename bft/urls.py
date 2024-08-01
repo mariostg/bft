@@ -348,4 +348,5 @@ urlpatterns += [
     path("bookmark/add/<str:bm_page>", users.bookmark_add, name="bookmark-add"),
     path("bookmark/show/", users.bookmark_show, name="bookmark-show"),
     path("bookmark/delete/<int:pk>", users.bookmark_delete, name="bookmark-delete"),
+    path("bookmark/rename/<int:pk>", users.bookmark_rename, name="bookmark-rename"),
 ]
