@@ -150,7 +150,7 @@ def bookmark_add(request, bm_page: str):
                 bm = form.save(commit=False)
                 bm.owner = request.user
                 bm.save()
-        # return redirect("bookmark_link")  # TODO
+                return redirect("bookmark-show")
         except ValueError as e:
             messages.error(request, e)
     else:

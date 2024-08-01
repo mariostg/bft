@@ -197,13 +197,24 @@ class BookmarkQuerySet(models.QuerySet):
 class Bookmark(models.Model):
     owner = models.ForeignKey(BftUser, on_delete=models.CASCADE, default="", verbose_name="Owner's Favorite")
     bookmark_name = models.CharField(max_length=30)
-    bookmark_link = models.CharField(max_length=125, unique=True)
+    bookmark_link = models.CharField(max_length=125)
 
     objects = models.Manager()
     search = BookmarkQuerySet.as_manager()
 
     def __str__(self):
         return f"{self.owner} - {self.bookmark_name} - {self.bookmark_link}"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "bookmark_link",
+                    "owner",
+                ),
+                name="%(app_label)s_%(class)s_is_unique",
+            )
+        ]
 
 
 class FundManager(models.Manager):
