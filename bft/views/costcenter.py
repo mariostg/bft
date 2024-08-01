@@ -379,7 +379,8 @@ def capital_project_page(request):
             "data": paginator.get_page(page_number),
             "status": status,
             "has_filter": has_filter,
-            "reset": "capital-project-table",
+            "url_name": "capital-project-table",
+            "title": "Capital Projects",
         },
     )
 

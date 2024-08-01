@@ -1,18 +1,18 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% block title %}Capital Project Table{% endblock title %}
+{% block title %}{{title}}{% endblock title %}
 {% block content %}
   {% include "core/form-filter.html" %}
   <main class="block block--centered">
     <div class="container">
       <header class=''>
-        <h2>Capital Projects</h2>
+        <h2>{{title}}</h2>
       </header>
       {% if user.is_authenticated %}
         <div class=''>
           <div class="action-bar block">
             <a class='btn btn-add' href="{% url 'capital-project-add' %}"></a>
-            <a href="{% url 'bookmark-add' bm_page='capital-project-table'%}">Bookmark me</a>
+            {% include 'core/bookmark.html' %}
           </div>
         </div>
       {% endif %}
