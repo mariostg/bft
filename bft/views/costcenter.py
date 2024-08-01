@@ -770,7 +770,8 @@ def costcenter_page(request):
             "data": paginator.get_page(page_number),
             "status": status,
             "has_filter": has_filter,
-            "reset": "costcenter-table",
+            "url_name": "costcenter-table",
+            "title": "Cost Centers",
         },
     )
 

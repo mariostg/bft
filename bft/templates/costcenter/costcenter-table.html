@@ -1,17 +1,18 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% block title %}Cost Centers Table{% endblock title %}
+{% block title %}{{title}} Table{% endblock title %}
 {% block content %}
   {% include "core/form-filter.html" %}
   <main class="block block--centered">
     <div class="container">
       <header class=''>
-        <h2>Cost Centers</h2>
+        <h2>{{title}}</h2>
       </header>
       {% if user.is_authenticated %}
         <div class=''>
           <div class="action-bar block">
             <a class='btn btn-add' href="{% url 'costcenter-add' %}"></a>
+            {% include 'core/bookmark.html' %}
           </div>
         </div>
       {% endif %}
