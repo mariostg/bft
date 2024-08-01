@@ -5,9 +5,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 
-from bft.models import (BftStatus, BftUser, CapitalInYear, CapitalNewYear,
-                        CapitalProject, CapitalYearEnd, CostCenter,
-                        CostCenterAllocation, CostCenterManager,
+from bft.models import (BftStatus, BftUser, Bookmark, CapitalInYear,
+                        CapitalNewYear, CapitalProject, CapitalYearEnd,
+                        CostCenter, CostCenterAllocation, CostCenterManager,
                         FinancialStructureManager, ForecastAdjustment, Fund,
                         FundCenter, FundCenterAllocation, FundCenterManager,
                         LineForecast, Source)
@@ -20,6 +20,12 @@ class BftStatusForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(BftStatusForm, self).__init__(*args, **kwargs)
+
+
+class BftBookmarkForm(forms.ModelForm):
+    class Meta:
+        model = Bookmark
+        fields = ["bookmark_link", "bookmark_name"]
 
 
 class UploadForm(forms.Form):

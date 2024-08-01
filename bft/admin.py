@@ -1,11 +1,15 @@
 from django.contrib import admin
 
-from bft.models import (BftUser, CapitalInYear, CapitalNewYear, CapitalYearEnd,
-                        CostCenter, CostCenterAllocation,
+from bft.models import (BftUser, Bookmark, CapitalInYear, CapitalNewYear,
+                        CapitalYearEnd, CostCenter, CostCenterAllocation,
                         CostCenterChargeImport, CostCenterChargeMonthly, Fund,
                         FundCenter, Source)
 
 from . import models
+
+
+class BookmarkAdmin(admin.ModelAdmin):
+    list_display = ("owner", "bookmark_name", "bookmark_link")
 
 
 class BftUserAdmin(admin.ModelAdmin):
@@ -119,6 +123,7 @@ class CostCenterChargeMonthlyAdmin(admin.ModelAdmin):
 
 
 # Register your models here.'
+admin.site.register(Bookmark)
 admin.site.register(BftUser, BftUserAdmin)
 admin.site.register(models.LineItem, LineItemAdmin)
 admin.site.register(models.LineForecast, LineForecastAdmin)

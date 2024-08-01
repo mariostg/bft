@@ -5,8 +5,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.shortcuts import redirect, render
 
-from bft.forms import BftUserForm, PasswordResetForm, UserSelfRegisterForm
-from bft.models import BftUser, BftUserManager, Bookmark
+from bft.forms import (BftBookmarkForm, BftUserForm, PasswordResetForm,
+                       UserSelfRegisterForm)
+from bft.models import BftUser, BftUserManager
 
 logger = logging.getLogger("django")
 
@@ -141,10 +142,17 @@ def user_password_reset(request, pk):
     )
 
 
-def favorite_add(request):
+def bookmark_add(request, bm_page: str):
     if request.method == "POST":
-        favmgr = Bookmark()
-        favmgr.create(
-            request,
-        )
-        return redirect("favorite_link")  # TODO
+        form = BftBookmarkForm(request.POST)
+        try:
+            if form.is_valid():
+                bm = form.save(commit=False)
+                bm.owner = request.user
+                bm.save()
+        # return redirect("bookmark_link")  # TODO
+        except ValueError as e:
+            messages.error(request, e)
+    else:
+        form = BftBookmarkForm(initial={"bookmark_link": bm_page})
+    return render(request, "core/form-bookmark.html", {"form": form, "back": bm_page})

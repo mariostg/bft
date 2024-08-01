@@ -344,4 +344,4 @@ urlpatterns += [
     ),
 ]
 
-urlpatterns += [path("bookmark/add/", users.favorite_add, name="bookmark-add")]
+urlpatterns += [path("bookmark/add/<str:bm_page>", users.bookmark_add, name="bookmark-add")]
