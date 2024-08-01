@@ -306,6 +306,7 @@ textarea {
 
 .site-nav,
 .action-bar {
+    display: flex;
     background-color: #a3b09c;
 }
 
