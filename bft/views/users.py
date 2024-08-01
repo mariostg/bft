@@ -162,3 +162,12 @@ def bookmark_show(request):
     bm = Bookmark.search.user_bookmark(request)
     context = {"bookmarks": bm, "title": f"{request.user} Bookmarks"}
     return render(request, "users/user-bookmarks.html", context)
+
+
+def bookmark_delete(request, pk):
+    bm = Bookmark.objects.get(pk=pk)
+    if bm.owner == request.user:
+        bm.delete()
+        return redirect("bookmark-show")
+    else:
+        messages.error(request, "This bookmark is not yours, it cannot be deleted.")

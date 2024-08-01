@@ -21,7 +21,7 @@
         {% if user.is_authenticated %}
           {% for bm in bookmarks %}
             <tr>
-              <td><a href="{% url bm.bookmark_link%}">{{bm.bookmark_name}}</a></td>
+              <td><a href="{% url bm.bookmark_link%}">{{bm.bookmark_name}}</a></td><td><a href="{% url 'bookmark-delete' bm.pk%}">Delete</a></td>
             </tr>
           {% endfor %}
         {% endif %}
