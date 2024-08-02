@@ -86,6 +86,7 @@ def bmt_screening_report(request):
         "fy": BftStatus.current.fy(),
         "url_name": "bmt-screening-report",
         "title": "BMT Screening Report",
+        "query_string": request.GET.urlencode(),
     }
     return render(request, "bmt-screening-report.html", context)
 
@@ -338,6 +339,7 @@ def costcenter_monthly_allocation(request):
 
         context["table"] = df
         context["form"] = form
+        context["query_string"] = request.GET.urlencode()
 
     return render(request, "costcenter-monthly-data.html", context)
 
@@ -357,7 +359,6 @@ def costcenter_monthly_plan(request):
     if len(request.GET):
         if "" in [initial["costcenter"], initial["fund"]]:
             form.initial = initial
-            # context["form"] = form
             return render(request, "costcenter-monthly-data.html", context)
 
         form.initial = initial
@@ -394,7 +395,7 @@ def costcenter_monthly_plan(request):
 
         context["table"] = df
         context["form"] = form
-
+        context["query_string"] = request.GET.urlencode()
     return render(request, "costcenter-monthly-data.html", context)
 
 
@@ -405,6 +406,7 @@ def costcenter_monthly_encumbrance(request):
     context = {
         "title": f"{initial['costcenter_name']} Monthly Encumbrance",
         "url_name": "costcenter-monthly-encumbrance",
+        "query_string": "",
         "form_filter": True,
         "form": form,
         "table": "FY and period are mandatory fields.",
@@ -446,6 +448,7 @@ def costcenter_monthly_encumbrance(request):
 
         context["table"] = df
         context["form"] = form
+        context["query_string"] = request.GET.urlencode()
     return render(request, "costcenter-monthly-data.html", context)
 
 

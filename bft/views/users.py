@@ -145,7 +145,7 @@ def user_password_reset(request, pk):
     )
 
 
-def bookmark_add(request, bm_page: str):
+def bookmark_add(request, bm_page: str, query_string: str = None):
     if request.method == "POST":
         form = BftBookmarkForm(request.POST)
         try:
@@ -160,7 +160,7 @@ def bookmark_add(request, bm_page: str):
         except ValueError as e:
             messages.error(request, e)
     else:
-        form = BftBookmarkForm(initial={"bookmark_link": bm_page})
+        form = BftBookmarkForm(initial={"bookmark_link": bm_page, "bookmark_query_string": query_string})
     return render(request, "core/form-bookmark.html", {"form": form, "back": bm_page})
 
 

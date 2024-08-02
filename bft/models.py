@@ -198,7 +198,7 @@ class Bookmark(models.Model):
     owner = models.ForeignKey(BftUser, on_delete=models.CASCADE, default="", verbose_name="Owner's Favorite")
     bookmark_name = models.CharField(max_length=30)
     bookmark_link = models.CharField(max_length=125)
-
+    bookmark_query_string = models.CharField(max_length=255, null=True)
     objects = models.Manager()
     search = BookmarkQuerySet.as_manager()
 
@@ -210,6 +210,7 @@ class Bookmark(models.Model):
             models.UniqueConstraint(
                 fields=(
                     "bookmark_link",
+                    "bookmark_query_string",
                     "owner",
                 ),
                 name="%(app_label)s_%(class)s_is_unique",

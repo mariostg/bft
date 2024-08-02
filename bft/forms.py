@@ -24,10 +24,11 @@ class BftStatusForm(forms.ModelForm):
 
 class BftBookmarkForm(forms.ModelForm):
     bookmark_link = forms.CharField(widget=forms.HiddenInput())
+    bookmark_query_string = forms.CharField(widget=forms.HiddenInput())
 
     class Meta:
         model = Bookmark
-        fields = ["bookmark_link", "bookmark_name"]
+        fields = ["bookmark_link", "bookmark_name", "bookmark_query_string"]
 
 
 class UploadForm(forms.Form):
