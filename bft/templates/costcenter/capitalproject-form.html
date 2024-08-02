@@ -1,10 +1,9 @@
 {% extends 'core/base.html' %}
-{% block title %}Capital Project Form{% endblock title %}
 {% block content %}
   <main class="block block--centered">
     <section class="form">
       <form method="POST">
-        <header class='form__header'>Capital Project</header>
+        <header class='form__header'>{{title}}</header>
         {% csrf_token %}
         {% include 'core/form-fields.html'%}
         <div class="block block--spaced">

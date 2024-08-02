@@ -1,11 +1,10 @@
 {% extends 'core/base.html' %}
-{% block title %}Forecast Adjustment Form{% endblock title %}
 {% block content %}
   <main class="block block--centered">
     <section class="form">
       <form method="POST">
         {% csrf_token %}
-        <header class='form__header'>Forecast Adjustment</header>
+        <header class='form__header'>{{title}}</header>
         {% include 'core/form-fields.html'%}
         <div class="block block--spaced">
           <button class="btn">Save</button>

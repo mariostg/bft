@@ -56,7 +56,15 @@ def fund_add(request):
     else:
         form = FundForm
 
-    return render(request, "costcenter/fund-form.html", {"form": form})
+    return render(
+        request,
+        "costcenter/fund-form.html",
+        {
+            "form": form,
+            "title": "Create Fund",
+            "url_name": "fund-add",
+        },
+    )
 
 
 def fund_update(request, pk):
@@ -129,7 +137,9 @@ def source_add(request):
     else:
         form = SourceForm
 
-    return render(request, "costcenter/source-form.html", {"form": form})
+    return render(
+        request, "costcenter/source-form.html", {"form": form, "title": "Create Source", "url_name": "source-add"}
+    )
 
 
 def source_update(request, pk):
@@ -320,7 +330,15 @@ def fundcenter_allocation_add(request):
     else:
         form = FundCenterAllocationForm
 
-    return render(request, "costcenter/fundcenter-allocation-form.html", {"form": form})
+    return render(
+        request,
+        "costcenter/fundcenter-allocation-form.html",
+        {
+            "form": form,
+            "title": "Fund Center Allocation Create",
+            "url_name": "fundcenter-allocation-add",
+        },
+    )
 
 
 def fundcenter_allocation_update(request, pk):
@@ -429,7 +447,11 @@ def capital_project_add(request):
     else:
         form = CapitalProjectForm
 
-    return render(request, "costcenter/capitalproject-form.html", {"form": form})
+    return render(
+        request,
+        "costcenter/capitalproject-form.html",
+        {"form": form, "title": "Create Capital Project", "url_name": "capital-project-add"},
+    )
 
 
 def capital_project_update(request, pk):
@@ -837,7 +859,15 @@ def costcenter_add(request):
     else:
         form = CostCenterForm
 
-    return render(request, "costcenter/costcenter-form.html", {"form": form})
+    return render(
+        request,
+        "costcenter/costcenter-form.html",
+        {
+            "form": form,
+            "title": "Create Cost Center",
+            "url_name": "costcenter-add",
+        },
+    )
 
 
 def costcenter_update(request, pk):
@@ -938,7 +968,15 @@ def costcenter_allocation_add(request):
     else:
         form = CostCenterAllocationForm
 
-    return render(request, "costcenter/costcenter-allocation-form.html", {"form": form})
+    return render(
+        request,
+        "costcenter/costcenter-allocation-form.html",
+        {
+            "form": form,
+            "title": "Create Cost Center Allocation",
+            "url_name": "costcenter-allocation-add",
+        },
+    )
 
 
 def costcenter_allocation_update(request, pk):
@@ -1036,7 +1074,15 @@ def forecast_adjustment_add(request):
     else:
         form = ForecastadjustmentForm
 
-    return render(request, "costcenter/forecast-adjustment-form.html", {"form": form})
+    return render(
+        request,
+        "costcenter/forecast-adjustment-form.html",
+        {
+            "form": form,
+            "title": "Create Forecast Adjustment",
+            "url_name": "forecast-adjustment-add",
+        },
+    )
 
 
 # @login_required

@@ -93,7 +93,7 @@ def user_add(request):
     else:
         form = BftUserForm
 
-    return render(request, "users/user-form.html", {"form": form})
+    return render(request, "users/user-form.html", {"form": form, "title": "Create BFT User", "url_name": "user-add"})
 
 
 def user_update(request, pk):

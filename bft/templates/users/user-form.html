@@ -1,12 +1,11 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% block title %}BFT Users Form{% endblock title %}
 
 {% block content %}
   <main class="block block--centered">
     <section class="form">
       <form method="POST">
-        <header class='form__header'>BFT User</header>
+        <header class='form__header'>{{title}}</header>
         {% csrf_token %}
         {% include 'core/form-fields.html'%}
         <div class="block block--spaced">
@@ -14,7 +13,6 @@
           <button class="btn btn-back"><a href="{% url 'user-table' %}" style='text-decoration:none;'>Users</a></button>
         </div>
       </form>
-      <footer class='form__footer'>Last edited by Mario St-Gelais, 8 Feb 2022</footer>
     </section>
   </main>
   </body>
