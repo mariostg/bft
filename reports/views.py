@@ -626,7 +626,15 @@ def financial_structure_report(request):
     else:
         messages.info(request, "No data")
         data = ""
-    return render(request, "financial-structure-report.html", {"table": data})
+    return render(
+        request,
+        "financial-structure-report.html",
+        {
+            "table": data,
+            "title": "Financial Structure Report",
+            "url_name": "financial-structure-report",
+        },
+    )
 
 
 """
