@@ -84,6 +84,8 @@ def bmt_screening_report(request):
         "initial": initial,
         "table": table,
         "fy": BftStatus.current.fy(),
+        "url_name": "bmt-screening-report",
+        "title": "BMT Screening Report",
     }
     return render(request, "bmt-screening-report.html", context)
 
@@ -137,6 +139,8 @@ def allocation_status_report(request):
         "form": form,
         "form_filter": form_filter,
         "table": table,
+        "title": "Allocation Status Report",
+        "url_name": "allocation-status-report",
     }
     return render(request, "allocation-status-report.html", context)
 
@@ -147,7 +151,7 @@ def costcenter_monthly_forecast_line_item(request):
 
     context = {
         "title": f"{initial['costcenter_name']} Monthly Forecast Line Item",
-        "action": "costcenter-monthly-forecast-line-item",
+        "url_name": "costcenter-monthly-forecast-line-item",
         "form_filter": True,
         "form": form,
         "table": "FY and period are mandatory fields.",
@@ -300,7 +304,7 @@ def costcenter_monthly_allocation(request):
 
     context = {
         "title": f"{initial['costcenter_name']} Monthly Allocation",
-        "action": "costcenter-monthly-allocation",
+        "url_name": "costcenter-monthly-allocation",
         "form_filter": True,
         "form": form,
         "table": "FY and period are mandatory fields.",
@@ -344,7 +348,7 @@ def costcenter_monthly_plan(request):
 
     context = {
         "title": f"{initial['costcenter_name']} Monthly Plan",
-        "action": "costcenter-monthly-plan",
+        "url_name": "costcenter-monthly-plan",
         "form_filter": True,
         "form": form,
         "table": "FY and period are mandatory fields.",
@@ -400,7 +404,7 @@ def costcenter_monthly_encumbrance(request):
 
     context = {
         "title": f"{initial['costcenter_name']} Monthly Encumbrance",
-        "action": "costcenter-monthly-encumbrance",
+        "url_name": "costcenter-monthly-encumbrance",
         "form_filter": True,
         "form": form,
         "table": "FY and period are mandatory fields.",
@@ -451,7 +455,7 @@ def costcenter_monthly_forecast_adjustment(request):
 
     context = {
         "title": f"{initial['costcenter_name']} Monthly Forecast Adjustment",
-        "action": "costcenter-monthly-forecast-adjustment",
+        "url_name": "costcenter-monthly-forecast-adjustment",
         "form_filter": True,
         "form": form,
         "table": "FY and period are mandatory fields.",
@@ -522,7 +526,7 @@ def costcenter_in_year_fear(request):
 
     context = {
         "title": f"{initial['costcenter_name']} In Year FEARS",
-        "action": "costcenter-in-year-encumbrance",
+        "url_name": "costcenter-in-year-encumbrance",
         "form_filter": True,
         "form": form,
         "table": "FY and period are mandatory fields.",
@@ -613,7 +617,11 @@ def line_items(request):
     )
     paginator = Paginator(data, 25)
     page_number = request.GET.get("page")
-    context = {"data": paginator.get_page(page_number)}
+    context = {
+        "data": paginator.get_page(page_number),
+        "title": "Line Items Export to CSV",
+        "url_name": "lineitem-report",
+    }
     return render(request, "lineitem-report.html", context)
 
 
@@ -698,7 +706,7 @@ def capital_forecasting_estimates(request):
     context = {
         **initial,
         "title": f"{initial['capital_project']} Capital Forecasting Estimates",
-        "action": "capital-forecasting-estimates",
+        "url_name": "capital-forecasting-estimates",
         "form_filter": True,
         "form": form,
         "table": "All fields are mandatory.",
@@ -724,7 +732,7 @@ def capital_forecasting_fears(request):
     context = {
         **initial,
         "title": f"{initial['capital_project']} Capital FEAR Estimates",
-        "action": "capital-forecasting-fears",
+        "url_name": "capital-forecasting-fears",
         "form_filter": True,
         "form": form,
         "table": "All fields are mandatory.",
@@ -750,7 +758,7 @@ def capital_historical_outlook(request):
     context = {
         **initial,
         "title": f"{initial['capital_project']} Capital Historical Outlook",
-        "action": "capital-historical-outlook",
+        "url_name": "capital-historical-outlook",
         "form_filter": True,
         "form": form,
         "table": "All fields are mandatory.",
@@ -777,7 +785,7 @@ def capital_forecasting_ye_ratios(request):
     context = {
         **initial,
         "title": f"{initial['capital_project']} Capital Forecasting Year End Ratios",
-        "action": "capital-forecasting-ye-ratios",
+        "url_name": "capital-forecasting-ye-ratios",
         "form_filter": True,
         "form": form,
         "table": "All fields are mandatory.",
@@ -802,7 +810,7 @@ def capital_forecasting_dashboard(request):
     context = {
         **initial,
         "title": f"{initial['capital_project']} Capital Forecasting Year End Ratios",
-        "action": "capital-forecasting-ye-ratios",
+        "url_name": "capital-forecasting-ye-ratios",
         "form_filter": True,
         "form": form,
         "table": "All fields are mandatory.",

@@ -1,6 +1,5 @@
 {% extends 'core/base.html' %}
 {% load humanize %}
-{% block title %}Allocation Status Report{% endblock title %}
 {% block content %}
   <main class='block'>
     {% if form_filter %}
@@ -8,7 +7,7 @@
     {% endif %}
     <div>
       <header class="frame">
-        <h2>Allocation Status Report</h2>
+        <h2>{{title}}</h2>
       </header>
       <section class="summary block--spaced">
         {{table|safe}}
