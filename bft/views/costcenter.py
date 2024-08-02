@@ -90,11 +90,12 @@ def fund_delete(request, pk):
 
 
 def fund_upload(request):
+    url_name = "fund-upload"
     if request.method == "POST":
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/fund-upload-{user}.txt"
+            filepath = f"{UPLOADS}/{url_name}-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -105,7 +106,7 @@ def fund_upload(request):
     return render(
         request,
         "core/form-upload.html",
-        {"form": form, "form_title": "Fund Upload", "back": "bft"},
+        {"form": form, "title": "Fund Upload", "back": "bft", "url_name": url_name},
     )
 
 
@@ -162,11 +163,12 @@ def source_delete(request, pk):
 
 
 def source_upload(request):
+    url_name = "source-upload"
     if request.method == "POST":
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/source-upload-{user}.txt"
+            filepath = f"{UPLOADS}/{url_name}-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -177,7 +179,7 @@ def source_upload(request):
     return render(
         request,
         "core/form-upload.html",
-        {"form": form, "form_title": "Source Upload", "back": "bft"},
+        {"form": form, "title": "Source Upload", "back": "bft", "url_name": url_name},
     )
 
 
@@ -353,6 +355,7 @@ def fundcenter_allocation_upload(request):
         request (HttpRequest): _description_
 
     """
+    url_name = "fundcenter-allocation-upload"
     if request.method == "POST":
         form = FundCenterAllocationUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -360,7 +363,7 @@ def fundcenter_allocation_upload(request):
             fy = data["fy"]
             quarter = data["quarter"]
             user = request.user
-            filepath = f"{UPLOADS}/fund-center-upload-{user}.txt"
+            filepath = f"{UPLOADS}/{url_name}-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -371,7 +374,12 @@ def fundcenter_allocation_upload(request):
     return render(
         request,
         "core/form-upload.html",
-        {"form": form, "form_title": "Fund Centers Allocation Upload", "back": "bft"},
+        {
+            "form": form,
+            "title": "Fund Centers Allocation Upload",
+            "back": "bft",
+            "url_name": url_name,
+        },
     )
 
 
@@ -471,7 +479,7 @@ def capital_project_upload(request):
     return render(
         request,
         "core/form-upload.html",
-        {"form": form, "form_title": "Capital Project Upload", "back": "bft"},
+        {"form": form, "title": "Capital Project Upload", "back": "bft", "url_name": "capital-project-upload"},
     )
 
 
@@ -710,11 +718,12 @@ def capital_forecasting_year_end_delete(request, pk):
 
 
 def capital_forecasting_new_year_upload(request):
+    url_name = "capital-forecasting-new-year-upload"
     if request.method == "POST":
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/capital-forecasting-new-year-upload-{user}.txt"
+            filepath = f"{UPLOADS}/{url_name}-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -725,16 +734,22 @@ def capital_forecasting_new_year_upload(request):
     return render(
         request,
         "core/form-upload.html",
-        {"form": form, "form_title": "Capital Project New Year Upload", "back": "bft"},
+        {
+            "form": form,
+            "title": "Capital Forecasting New Year Upload",
+            "back": "bft",
+            "url_name": url_name,
+        },
     )
 
 
 def capital_forecasting_in_year_upload(request):
+    url_name = "capital-forecasting-in-year-upload"
     if request.method == "POST":
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/capital-forecasting-in-year-upload-{user}.txt"
+            filepath = f"{UPLOADS}/{url_name}-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -745,16 +760,22 @@ def capital_forecasting_in_year_upload(request):
     return render(
         request,
         "core/form-upload.html",
-        {"form": form, "form_title": "Capital Project In Year Upload", "back": "bft"},
+        {
+            "form": form,
+            "title": "Capital Forecasting In Year Upload",
+            "back": "bft",
+            "url_name": url_name,
+        },
     )
 
 
 def capital_forecasting_year_end_upload(request):
+    url_name = "capital-forecasting-year-end-upload"
     if request.method == "POST":
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/capital-forecasting-year-end-upload-{user}.txt"
+            filepath = f"{UPLOADS}/{url_name}-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -765,7 +786,7 @@ def capital_forecasting_year_end_upload(request):
     return render(
         request,
         "core/form-upload.html",
-        {"form": form, "form_title": "Capital Project Year End Upload", "back": "bft"},
+        {"form": form, "title": "Capital Project Year End Upload", "back": "bft", "url_name": url_name},
     )
 
 
@@ -859,11 +880,12 @@ def costcenter_delete(request, pk):
 
 
 def costcenter_upload(request):
+    url_name = "costcenter-upload"
     if request.method == "POST":
         form = UploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/costcenter-upload-{user}.txt"
+            filepath = f"{UPLOADS}/{url_name}-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -874,7 +896,7 @@ def costcenter_upload(request):
     return render(
         request,
         "core/form-upload.html",
-        {"form": form, "form_title": "Cost Center Upload", "back": "bft"},
+        {"form": form, "title": "Cost Center Upload", "back": "bft", "url_name": url_name},
     )
 
 
@@ -955,6 +977,7 @@ def costcenter_allocation_upload(request):
         request (HttpRequest): _description_
 
     """
+    url_name = "cost-center-allocation-upload"
     if request.method == "POST":
         form = CostCenterAllocationUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -962,7 +985,7 @@ def costcenter_allocation_upload(request):
             fy = data["fy"]
             quarter = data["quarter"]
             user = request.user
-            filepath = f"{UPLOADS}/cost-center-upload-{user}.txt"
+            filepath = f"{UPLOADS}/{url_name}-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -973,7 +996,12 @@ def costcenter_allocation_upload(request):
     return render(
         request,
         "core/form-upload.html",
-        {"form": form, "form_title": "Cost Center Allocation Upload", "back": "bft"},
+        {
+            "form": form,
+            "title": "Cost Center Allocation Upload",
+            "back": "bft",
+            "url_name": url_name,
+        },
     )
 
 

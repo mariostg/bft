@@ -66,5 +66,12 @@ def cost_center_charge_upload(request: "HttpRequest"):
     else:
         form = ChargeUploadForm
     return render(
-        request, "charges/charges-cc-upload-form.html", {"form": form, "back": "bft"}
+        request,
+        "charges/charges-cc-upload-form.html",
+        {
+            "form": form,
+            "back": "bft",
+            "url_name": "cc_charge_upload",
+            "title": "Cost Center Charges Upload",
+        },
     )

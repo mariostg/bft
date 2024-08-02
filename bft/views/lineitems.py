@@ -245,11 +245,12 @@ def line_item_delete(request, pk):
 
 
 def fundcenter_lineitem_upload(request):
+    url_name = "fundcenter-lineitem-upload"
     if request.method == "POST":
         form = FundCenterLineItemUploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            filepath = f"{UPLOADS}/lineitem-upload-{user}.txt"
+            filepath = f"{UPLOADS}/{url_name}-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -263,20 +264,21 @@ def fundcenter_lineitem_upload(request):
         form = FundCenterLineItemUploadForm
     return render(
         request,
-        "lineitems/fundcenter-lineitem-upload-form.html",
-        {"form": form, "form_title": "Fund Upload"},
+        f"lineitems/{url_name}-form.html",
+        {"form": form, "title": "Fund Center Line Item Upload", "url_name": url_name},
     )
 
 
 def costcenter_lineitem_upload(request):
     """This function handles the uploading of line items for a given cost center.  This means that the encumbrance must contain only one cost center and one fund center."""
+    url_name = "costcenter-lineitem-upload"
     if request.method == "POST":
         form = CostCenterLineItemUploadForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
             fundcenter = request.POST.get("fundcenter")
             costcenter = request.POST.get("costcenter")
-            filepath = f"{UPLOADS}/lineitem-upload-{user}.txt"
+            filepath = f"{UPLOADS}/{url_name}-{user}.txt"
             with open(filepath, "wb+") as destination:
                 for chunk in request.FILES["source_file"].chunks():
                     destination.write(chunk)
@@ -288,8 +290,12 @@ def costcenter_lineitem_upload(request):
         form = CostCenterLineItemUploadForm
     return render(
         request,
-        "lineitems/costcenter-lineitem-upload-form.html",
-        {"form": form, "form_title": "Fund Upload"},
+        f"lineitems/{url_name}-form.html",
+        {
+            "form": form,
+            "title": "Fund Upload",
+            "url_name": url_name,
+        },
     )
 
 
