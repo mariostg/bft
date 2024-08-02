@@ -12,6 +12,7 @@ class HomeView(TemplateView):
 
 
 def bft_status(request):
+    url_name = "bft-status"
     status = BftStatus.current
     fy = status.fy()
     try:
@@ -24,7 +25,9 @@ def bft_status(request):
         period = None
 
     return render(
-        request, "bft/bft-status.html", {"fy": fy, "quarter": quarter, "period": period}
+        request,
+        f"bft/{url_name}.html",
+        {"fy": fy, "quarter": quarter, "period": period, "url_name": url_name, "title": "BFT Status"},
     )
 
 

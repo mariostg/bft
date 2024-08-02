@@ -18,6 +18,9 @@
       <a class="btn btn--link" href="/logout/" class="btn btn--sub">Logout &nbsp; <span class="username"> {{user.get_full_name|default:user}}</span></a>
       <a class="btn btn--link" href="/user-profile/" class="btn btn--sub">My Profile</a>
       <a class="btn btn--link" href="{% url 'bookmark-show' %}" class="btn btn--sub">My Bookmarks</a>
+      {% if url_name %}
+        <a class='btn' href="{% url 'bookmark-add' bm_page=url_name %}">Bookmark {{title}}</a>
+      {% endif %}
     {% else %}
       <a class="btn btn--link" href="/login/">Login</a>
       <a class="btn btn--link" href="/register/">Register</a>

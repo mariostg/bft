@@ -66,8 +66,11 @@ def register_new_user(request):
 
 
 def user_page(request):
+    url_name = "user-table"
     users = BftUser.objects.all()
-    return render(request, "users/user-table.html", context={"users": users})
+    return render(
+        request, f"users/{url_name}.html", context={"users": users, "url_name": url_name, "title": "BFT Users Table"}
+    )
 
 
 def user_add(request):

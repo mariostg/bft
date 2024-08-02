@@ -232,11 +232,16 @@ def costcenter_monthly_allocation_update(request):
             period = request.POST.get("period")
             c = utils.CostCenterMonthlyAllocationReport(fy, period, quarter=quarter)
             c.insert_grouped_allocation(c.sum_allocation_cost_center())
-    context = {"form": form}
+    context = {
+        "form": form,
+        "url_name": "costcenter-monthly-allocation-update",
+        "title": "CC Monthly Allocation Update",
+    }
     return render(request, "costcenter-monthly-allocation-update-form.html", context)
 
 
 def costcenter_monthly_forecast_adjustment_update(request):
+    url_name = "costcenter-monthly-forecast-adjustment-update"
     form = UpdateCostCenterForecastAdjustmentMonthlyForm()
     if request.method == "POST":
         form = UpdateCostCenterForecastAdjustmentMonthlyForm(request.POST)
@@ -245,11 +250,16 @@ def costcenter_monthly_forecast_adjustment_update(request):
             period = request.POST.get("period")
             c = utils.CostCenterMonthlyForecastAdjustmentReport(fy, period)
             c.insert_grouped_forecast_adjustment(c.sum_forecast_adjustments())
-    context = {"form": form}
-    return render(request, "costcenter-monthly-forecast-adjustment-update-form.html", context)
+    context = {
+        "form": form,
+        "url_name": url_name,
+        "title": "Cost Center Monthly Forecast Adjustment Update",
+    }
+    return render(request, f"{url_name}-form.html", context)
 
 
 def costcenter_monthly_forecast_line_item_update(request):
+    url_name = "costcenter-monthly-forecast-line-item-update"
     form = UpdateCostCenterForecastLineItemMonthlyForm()
     if request.method == "POST":
         form = UpdateCostCenterForecastLineItemMonthlyForm(request.POST)
@@ -258,11 +268,16 @@ def costcenter_monthly_forecast_line_item_update(request):
             period = request.POST.get("period")
             c = utils.CostCenterMonthlyForecastLineItemReport(fy, period)
             c.insert_grouped_forecast_line_item(c.sum_forecast_line_item())
-    context = {"form": form}
-    return render(request, "costcenter-monthly-forecast-line-item-update-form.html", context)
+    context = {
+        "form": form,
+        "url_name": url_name,
+        "title": "Cost Center Monthly Forecast Adjustment Update",
+    }
+    return render(request, f"{url_name}-form.html", context)
 
 
 def costcenter_monthly_encumbrance_update(request):
+    url_name = "costcenter-monthly-encumbrance-update"
     form = UpdateCostCenterEncumbranceMonthlyForm()
     if request.method == "POST":
         form = UpdateCostCenterEncumbranceMonthlyForm(request.POST)
@@ -271,8 +286,12 @@ def costcenter_monthly_encumbrance_update(request):
             period = request.POST.get("period")
             c = utils.CostCenterMonthlyEncumbranceReport(fy, period)
             c.insert_line_items(c.sum_line_items())
-    context = {"form": form}
-    return render(request, "costcenter-monthly-encumbrance-update-form.html", context)
+    context = {
+        "form": form,
+        "url_name": url_name,
+        "title": "Cost Center Monthly Forecast Adjustment Update",
+    }
+    return render(request, f"{url_name}-form.html", context)
 
 
 def costcenter_monthly_allocation(request):
