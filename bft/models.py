@@ -726,16 +726,32 @@ class FinancialStructureManager(models.Manager):
                 "Fundcenter_parent_ID_x",
                 "Fundcenter_parent_ID_y",
                 "Costcenter_ID",
+                "CC Path",
                 "Fund_ID",
                 "Source_ID",
                 "Costcenter_parent_ID",
                 "Level_y",
+                "first name",
+                "last name",
+                "superuser status",
+                "Password",
+                "active",
+                "date joined",
+                "active",
+                "email address",
+                "staff status",
+                "Default_fc_ID",
+                "Default_cc_ID",
+                "Bftuser_ID",
+                "last login",
+                "procurement officer",
+                "Procurement_officer_ID",
             ],
             axis=1,
             inplace=True,
         )
         merged.sort_values(by=["FC Path"], inplace=True)
-        merged.rename(columns={"Level_x": "Level"}, inplace=True)
+        merged.rename(columns={"Level_x": "Level", "Username": "Procurement Officer"}, inplace=True)
         return merged
 
     def financial_structure_styler(self, data: pd.DataFrame):
@@ -867,6 +883,7 @@ class CostCenterManager(models.Manager):
             return pd.DataFrame()
         df = BFTDataFrame(CostCenter).build(data)
         fc_df = BFTDataFrame(FundCenter).build(FundCenter.objects.all())
+        proco_df = BFTDataFrame(BftUser).build(BftUser.objects.filter(procurement_officer=True))
         df = pd.merge(
             df,
             fc_df,
@@ -874,6 +891,7 @@ class CostCenterManager(models.Manager):
             left_on="Costcenter_parent_ID",
             right_on="Fundcenter_ID",
         )
+        df = pd.merge(df, proco_df, how="left", left_on="Procurement_officer_ID", right_on="Bftuser_ID")
         return df
 
     def allocation_dataframe(
