@@ -1,10 +1,28 @@
 # BFT Reports
 
-All reports available in the BFT are displayed in HTML format within the BFT web interface itself.  All reports are read-only.
+All reports available in the BFT are displayed in HTML format within the BFT web interface itself.  All reports are read-only and available to users that are logged in.
 
+## Fundamental Reports
 [Financial Structure](financial-structure.md)  
+
+## National Procurement Reports
+### Monthly Reports
 [BMT Screening Report](bmt-screening.md)  
-[Cost Center Allocation](costcenter-allocation.md)  
+[Cost Center Monthly Allocation](costcenter-monthly-allocation.md)  
+[Cost Center Monthly Forecast Adjustment](costcenter-monthly-forecast-adjustment.md)  
+[Cost Center Monthly Forecast Line Item Report](costcenter-monthly-forecast-line-item.md)  
+[Cost Center Monthly Encumbrance](costcenter-monthly-encumbrance.md)  
+[Cost Center Monthly Plan](costcenter-monthly-plan.md)  
+
+### In Year Report
+[Cost Center In Year Encumbrance]()  
+
+## Capital Reports
+
+[Forecasting Estimates]()  
+[Forecasting Year End Ratio]()  
+[Forecasting FEAR]()  
+[Historical Dashboard]()  
 
 ## Warning Messages
 
