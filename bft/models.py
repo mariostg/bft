@@ -729,12 +729,13 @@ class FinancialStructureManager(models.Manager):
                 "Fund_ID",
                 "Source_ID",
                 "Costcenter_parent_ID",
+                "Level_y",
             ],
             axis=1,
             inplace=True,
         )
         merged.sort_values(by=["FC Path"], inplace=True)
-
+        merged.rename(columns={"Level_x": "Level"}, inplace=True)
         return merged
 
     def financial_structure_styler(self, data: pd.DataFrame):
