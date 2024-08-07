@@ -14,6 +14,7 @@ nav:
     - Line Items: docs/line-items/index.md
     - Sources: docs/source/index.md
     - Users: docs/user/index.md
+    - Reports: docs/reports/index.md
 theme:
     name: material
     logo: docs/images/logo.png
