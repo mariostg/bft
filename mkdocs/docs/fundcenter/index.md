@@ -33,7 +33,7 @@ A confirmation dialog will appear before proceding with a delete action.
 *Confirm the Fund Center deletion*
 ![](images/fundcenter-delete.png)
 
-## Warning message
+### Warning message
 
 When an attempt to delete a fund center which has subordinate elements,
 the request will fail and an error message will be displayed similar to
