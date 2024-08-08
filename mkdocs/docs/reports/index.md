@@ -8,22 +8,22 @@ All reports available in the BFT are displayed in HTML format within the BFT web
 ## National Procurement Reports
 ### Monthly Reports
 [BMT Screening Report](bmt-screening.md)  
-[Cost Center Monthly Allocation](costcenter-monthly-allocation.md)  
-[Cost Center Monthly Forecast Adjustment](costcenter-monthly-forecast-adjustment.md)  
+[Cost Center Monthly Allocation Report](costcenter-monthly-allocation.md)  
+[Cost Center Monthly Forecast Adjustment Report](costcenter-monthly-forecast-adjustment.md)  
 [Cost Center Monthly Forecast Line Item Report](costcenter-monthly-forecast-line-item.md)  
-[Cost Center Monthly Encumbrance](costcenter-monthly-encumbrance.md)  
-[Cost Center Monthly Plan](costcenter-monthly-plan.md)  
+[Cost Center Monthly Encumbrance Report](costcenter-monthly-encumbrance.md)  
+[Cost Center Monthly Plan Report](costcenter-monthly-plan.md)  
 
 ### In Year Report
-[Cost Center In Year Encumbrance]()  
+[Cost Center In Year Encumbrance Report]()  
 
 ## Capital Reports
 
-[Forecasting Estimates](capital-forecasting-estimate.md)  
-[Forecasting Year End Ratio](./capital-forecasting-year-end-ratio.md)  
-[Forecasting FEAR](capital-forecasting-fear.md)  
-[Forecasting Historical Outlook](capital-forecasting-historical-outlook.md)  
-[Forecasting Dashboard](capital-forecasting-dashboard.md)  
+[Forecasting Estimates Report](capital-forecasting-estimate.md)  
+[Forecasting Year End Ratio Report](./capital-forecasting-year-end-ratio.md)  
+[Forecasting FEAR Status Report](capital-forecasting-fear.md)  
+[Forecasting Historical Outlook Report](capital-forecasting-historical-outlook.md)  
+[Forecasting Dashboard Report](capital-forecasting-dashboard.md)  
 
 ## Warning Messages
 
