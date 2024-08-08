@@ -21,7 +21,7 @@ All reports available in the BFT are displayed in HTML format within the BFT web
 
 [Forecasting Estimates](capital-forecasting-estimate.md)  
 [Forecasting Year End Ratio](./capital-forecasting-year-end-ratio.md)  
-[Forecasting FEAR]()  
+[Forecasting FEAR](capital-forecasting-fear.md)  
 [Historical Dashboard]()  
 
 ## Warning Messages
