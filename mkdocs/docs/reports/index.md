@@ -36,3 +36,6 @@ When using the reports, the system attempts to provide as much as possible feedb
 
 !!! Info "There are no data to display"
     Given the selection criteria, no data was found.  This will obviously happen if say the fund center does not exist or there are no data yet for the given quarter.
+
+!!! Info "19 is not a valid period. Expected value is one of 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14"
+    Acceptable period values are between 1 and 14.
