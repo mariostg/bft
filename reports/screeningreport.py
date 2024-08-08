@@ -184,7 +184,9 @@ class ScreeningReport:
             raise LineItemsDoNotExistError("No Line to report")
         self.cc_allocations = self.get_cost_center_allocations()
         self.fc_allocations = self.get_fundcenter_allocations()
-        self.fcst_adj = self.get_forecast_adjustments()
+        self.fcst_adj = (
+            self.get_forecast_adjustments().groupby(["costcenter", "fund", "fundcenter", "sequence"])["fcst adj"].sum()
+        )
         # merge allocations with encumbrance
         self.line_item_with_allocations = self.report_lines.merge(
             self.cc_allocations,
