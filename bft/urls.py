@@ -4,6 +4,7 @@ from bft.views import bft, charges, costcenter, lineitems, users
 
 urlpatterns = [path("", bft.HomeView.as_view(), name="bft")]
 
+# BFT Status
 urlpatterns += [
     path("bft-status", bft.bft_status, name="bft-status"),
     path("bft-fy-update", bft.bft_fy_update, name="bft-fy-update"),
@@ -11,7 +12,7 @@ urlpatterns += [
     path("bft-period-update", bft.bft_period_update, name="bft-period-update"),
 ]
 
-
+# Cost Center Charges
 urlpatterns += [
     path(
         "charges", charges.cost_center_charge_upload, name="cost-center-charges-upload"
@@ -23,6 +24,7 @@ urlpatterns += [
     ),
 ]
 
+# Fund
 urlpatterns += [
     path("fund/fund-table/", costcenter.fund_page, name="fund-table"),
     path("fund/fund-add/", costcenter.fund_add, name="fund-add"),
@@ -31,6 +33,7 @@ urlpatterns += [
     path("fund/fund-upload", costcenter.fund_upload, name="fund-upload"),
 ]
 
+# Source
 urlpatterns += [
     path("source/source-table/", costcenter.source_page, name="source-table"),
     path("source/source-add/", costcenter.source_add, name="source-add"),
@@ -43,6 +46,7 @@ urlpatterns += [
     path("source/source-upload", costcenter.source_upload, name="source-upload"),
 ]
 
+# Fund center
 urlpatterns += [
     path(
         "fundcenter/fundcenter-table/",
@@ -67,6 +71,7 @@ urlpatterns += [
     ),
 ]
 
+# Fund center allocation
 urlpatterns += [
     path(
         "fundcenter/fundcenter-allocation-table/",
@@ -95,6 +100,7 @@ urlpatterns += [
     ),
 ]
 
+# Cost Center
 urlpatterns += [
     path(
         "costcenter/costcenter-table/",
@@ -121,6 +127,7 @@ urlpatterns += [
     ),
 ]
 
+# Cost Center allocation
 urlpatterns += [
     path(
         "costcenter/costcenter-allocation-table/",
@@ -149,6 +156,7 @@ urlpatterns += [
     ),
 ]
 
+# Forecast adjustments
 urlpatterns += [
     path(
         "costcenter/forecast-adjustment-table",
@@ -172,6 +180,7 @@ urlpatterns += [
     ),
 ]
 
+# Capital projects & forecasting
 urlpatterns += [
     path(
         "capital-project-table/",
@@ -275,6 +284,7 @@ urlpatterns += [
     ),
 ]
 
+# Lineitem
 urlpatterns += [
     path("", lineitems.lineitem_page, name="lineitem-page"),
     path("lineitem/", lineitems.lineitem_page, name="lineitem-page"),
@@ -327,7 +337,7 @@ urlpatterns += [
     ),
 ]
 
-
+# User
 urlpatterns += [
     path("login/", users.user_login, name="login"),
     path("logout/", users.user_logout, name="logout"),
@@ -344,6 +354,7 @@ urlpatterns += [
     ),
 ]
 
+# Bookmark
 urlpatterns += [
     path("bookmark/add/<str:bm_page>/", users.bookmark_add, name="bookmark-add"),
     path("bookmark/add/<str:bm_page>/<str:query_string>/", users.bookmark_add, name="bookmark-add"),
