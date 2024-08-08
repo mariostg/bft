@@ -42,7 +42,7 @@ class TestFundCreatePage:
         response = fund_add(request)
         html = strip_white_space(response.content.decode("utf8"))
         assert html.startswith("<!DOCTYPE html>")
-        assert "<header class='form__header'>Fund Entry Form</header>" in html
+        assert "<header class='form__header'>Create Fund</header>" in html
 
 
 @pytest.mark.django_db
