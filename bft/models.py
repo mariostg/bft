@@ -891,7 +891,8 @@ class CostCenterManager(models.Manager):
             left_on="Costcenter_parent_ID",
             right_on="Fundcenter_ID",
         )
-        df = pd.merge(df, proco_df, how="left", left_on="Procurement_officer_ID", right_on="Bftuser_ID")
+        if not proco_df.empty:
+            df = pd.merge(df, proco_df, how="left", left_on="Procurement_officer_ID", right_on="Bftuser_ID")
         return df
 
     def allocation_dataframe(
