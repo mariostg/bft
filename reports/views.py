@@ -563,8 +563,7 @@ def costcenter_in_year_fear(request):
             chart_df = table_df[df_columns]
             chart_df = chart_df.groupby(["Fund", "Period"]).sum().reset_index()
 
-            if initial["costcenter"] is None:
-                df_columns = ["Cost Center"] + df_columns
+            df_columns = ["Cost Center"] + df_columns
             table_df = table_df[df_columns].sort_values("Cost Center")
             table_df = table_df.style.format(thousands=",", precision=0)
             table_df = table_df.to_html()
