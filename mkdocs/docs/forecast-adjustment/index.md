@@ -31,7 +31,7 @@ deleted. FY and Period are mandatory fields.
 Creating a forecast adjustment requires the cost center, the fund and the amount of the adjustment.
 The amount can be either positive or negative.  The note is also mendatory.
 
-It is possible to create more than one forecast adjustment for a given cost center and fund.
+!!! Note "It is possible to create more than one forecast adjustment for a given cost center, fund, FY and period."
 !!! warning "It is not possible to create a forecast adjustment if the selected cost center does not have line items."
 
 <figure markdown>
