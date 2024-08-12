@@ -28,6 +28,9 @@ All reports available in the BFT are displayed in HTML format within the BFT web
 ## Allocation Reports
 
 [Allocation Status](allocation-status.md)
+
+## Exports
+[Line Items report and export](line-item.md)
 ## Warning Messages
 
 When using the reports, the system attempts to provide as much as possible feedback to the user.  Typical messages will be displayed to inform the user when something goes wrong.
