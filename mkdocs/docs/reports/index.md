@@ -25,6 +25,9 @@ All reports available in the BFT are displayed in HTML format within the BFT web
 [Forecasting Historical Outlook Report](capital-forecasting-historical-outlook.md)  
 [Forecasting Dashboard Report](capital-forecasting-dashboard.md)  
 
+## Allocation Reports
+
+[Allocation Status](allocation-status.md)
 ## Warning Messages
 
 When using the reports, the system attempts to provide as much as possible feedback to the user.  Typical messages will be displayed to inform the user when something goes wrong.
