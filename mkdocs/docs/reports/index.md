@@ -29,6 +29,9 @@ All reports available in the BFT are displayed in HTML format within the BFT web
 
 When using the reports, the system attempts to provide as much as possible feedback to the user.  Typical messages will be displayed to inform the user when something goes wrong.
 
+!!! Info "Cost Center YYYYYY does not exist."
+    You provided a cost center that is not recorded in the database
+
 !!! Info "Fund Center 2134AA does not exist."
     You provided a fund center that is not recorded in the database
 
