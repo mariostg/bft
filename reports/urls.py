@@ -33,7 +33,7 @@ urlpatterns = [
     path(
         "costcenter_in_year_fear",
         views.costcenter_in_year_fear,
-        name="costcenter-in-year-encumbrance",
+        name="costcenter-in-year-fear",
     ),
     path("charges/<str:cc>/<int:fy>/<int:period>/", views.cost_center_charge_table, name="costcenter-charges"),
 ]

@@ -529,7 +529,7 @@ def costcenter_in_year_fear(request):
 
     context = {
         "title": f"{initial['costcenter_name']} In Year FEARS",
-        "url_name": "costcenter-in-year-encumbrance",
+        "url_name": "costcenter-in-year-fear",
         "form_filter": True,
         "form": form,
         "table": "FY and period are mandatory fields.",
