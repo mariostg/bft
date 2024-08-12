@@ -155,7 +155,7 @@ def bookmark_add(request, bm_page: str, query_string: str = None):
                 try:
                     bm.save()
                 except IntegrityError:
-                    messages.error(request, f"{bm.bookmark_link} bookmark already exists for {bm.owner}")
+                    messages.error(request, f"{bm.bookmark_link} bookmark already exists for username {bm.owner}")
                 return redirect("bookmark-show")
         except ValueError as e:
             messages.error(request, e)
