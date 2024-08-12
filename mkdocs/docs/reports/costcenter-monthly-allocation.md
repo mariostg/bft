@@ -5,5 +5,5 @@ The Cost Center Monthly Allocation Report provides a tabular view of all allocat
 <figure markdown>
 <figcaption>BFT Cost Center Allocations with input form and table</figcaption>
 
-![](images/report-cost-center-allocation.png)
+![](images/report-costcenter-allocation.png)
 </figure>
