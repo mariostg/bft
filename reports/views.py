@@ -294,7 +294,7 @@ def costcenter_monthly_encumbrance_update(request):
     context = {
         "form": form,
         "url_name": url_name,
-        "title": "Cost Center Monthly Forecast Adjustment Update",
+        "title": "Cost Center Monthly Encumbrance Update",
     }
     return render(request, f"{url_name}-form.html", context)
 
