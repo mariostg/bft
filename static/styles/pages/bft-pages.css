@@ -7,6 +7,8 @@ aside {
     position: fixed;
     height: auto;
     z-index: 1000;
+    margin-left: -492px;
+      /**remove this to show form by default**/
 }
 
 .lineitems {
