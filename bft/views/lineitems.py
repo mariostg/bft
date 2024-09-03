@@ -147,7 +147,11 @@ def line_forecast_update(request, pk):
     return render(
         request,
         "lineitems/line-forecast-form.html",
-        {"form": form, "lineitem": target.lineitem},
+        {
+            "form": form,
+            "lineitem": target.lineitem,
+            "back": "lineitem-page",
+        },
     )
 
 
