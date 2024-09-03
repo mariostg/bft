@@ -1787,7 +1787,7 @@ class LineForecast(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.forecastable():
-            raise exceptions.BFTCostCenterNotForecastable(self.lineitem.costcenter.costcenter)
+            self.forecastamount = self.lineitem.fcst.forecastamount
         if self.forecastamount > self.lineitem.workingplan:
             self.forecastamount = self.lineitem.workingplan
         if self.forecastamount < self.lineitem.spent:

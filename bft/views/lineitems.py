@@ -100,25 +100,32 @@ def line_forecast_add(request, pk):
 
 def line_forecast_update(request, pk):
     target = get_object_or_404(LineForecast, pk=pk)
+    can_forecast = target.lineitem.costcenter.isforecastable
     working_plan = target.lineitem.workingplan
     spent = target.lineitem.spent
     form = LineForecastForm(instance=target)
+
     if request.method == "POST":
+        old_forecast = target.forecastamount
         form: LineForecast = LineForecastForm(request.POST, instance=target)
         if form.is_valid():
             form = form.save(commit=False)
-            if not target.lineitem.costcenter.isforecastable:
-                messages.warning(request, "This cost center is not forecastable.")
-                return redirect(reverse("lineitem-page") + f"?costcenter={target.lineitem.costcenter.pk}")
+            if not can_forecast:
+                form.forecastamount = old_forecast
+                messages.warning(
+                    request,
+                    f"This cost center is not forecastable, it will remain at {old_forecast}, but you can modify text fields.",
+                )
+                # return redirect(reverse("lineitem-page") + f"?costcenter={target.lineitem.costcenter.pk}")
 
             forecast_amount = form.forecastamount
-            if form.forecastamount < spent:
+            if can_forecast and form.forecastamount < spent:
                 messages.warning(
                     request,
                     f"Forecast {forecast_amount}  cannot be lower than Spent {spent}. Forecast set to {spent}",
                 )
                 form.forecastamount = spent
-            elif form.forecastamount > working_plan:
+            elif can_forecast and form.forecastamount > working_plan:
                 messages.warning(
                     request,
                     f"Forecast {forecast_amount} cannot be higher than working plan {working_plan}.  Forecast set to {working_plan}.",
