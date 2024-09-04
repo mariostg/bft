@@ -7,8 +7,10 @@
         {% csrf_token %}
         {% include 'core/form-fields.html'%}
         <div class="block block--spaced">
-          <button class="btn">Save</button>
-          <button class="btn btn-back">Back</button>
+          <div class="block block--spaced">
+            <a class='btn btn-back' href="{% url back %}" style='text-decoration:none;'>Retour</a>
+            <input class='btn' type="submit" value="Confirm" />
+          </div>
         </div>
       </form>
     </section>

@@ -467,7 +467,7 @@ def capital_project_update(request, pk):
                 messages.error(request, "Duplicate entry cannot be saved")
             return redirect("capital-project-table")
 
-    return render(request, "costcenter/capitalproject-form.html", {"form": form})
+    return render(request, "costcenter/capitalproject-form.html", {"form": form, "back": "capital-project-table"})
 
 
 def capital_project_delete(request, pk):
