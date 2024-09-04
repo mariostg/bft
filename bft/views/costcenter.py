@@ -77,7 +77,15 @@ def fund_update(request, pk):
             form.save()
             return redirect("fund-table")
 
-    return render(request, "costcenter/fund-form.html", {"form": form})
+    return render(
+        request,
+        "costcenter/fund-form.html",
+        {
+            "form": form,
+            "title": "Fund Update",
+            "back": "fund-table",
+        },
+    )
 
 
 def fund_delete(request, pk):
@@ -890,8 +898,12 @@ def costcenter_update(request, pk):
             except IntegrityError:
                 messages.error(request, "Duplicate entry cannot be saved")
             return redirect("costcenter-table")
-
-    return render(request, "costcenter/costcenter-form.html", {"form": form, "back": "costcenter-table"})
+    context = {
+        "form": form,
+        "back": "costcenter-table",
+        "title": "Cost Center Update",
+    }
+    return render(request, "costcenter/costcenter-form.html", context)
 
 
 def costcenter_delete(request, pk):
