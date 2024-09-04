@@ -435,9 +435,15 @@ def capital_project_page(request):
 
 
 def capital_project_add(request):
+    context = {
+        "title": "Capital Projects",
+        "back": "capital-project-table",
+    }
+
     if request.method == "POST":
         form = CapitalProjectForm(request.POST)
         if form.is_valid():
+            context["form"] = form
             obj = form.save(commit=False)
             obj.project_no = obj.project_no.upper()
             if obj.shortname:
@@ -449,16 +455,19 @@ def capital_project_add(request):
                     request, f"{e}.  Capital Project {obj.project_no} exists"
                 )
                 return render(
-                    request, "costcenter/capitalproject-form.html", {"form": form}
+                    request,
+                    "costcenter/capitalproject-form.html",
+                    context,
                 )
             return redirect("capital-project-table")
     else:
         form = CapitalProjectForm
+        context["form"] = form
 
     return render(
         request,
         "costcenter/capitalproject-form.html",
-        {"form": form, "title": "Create Capital Project", "url_name": "capital-project-add"},
+        context,
     )
 
 
