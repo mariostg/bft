@@ -891,7 +891,7 @@ def costcenter_update(request, pk):
                 messages.error(request, "Duplicate entry cannot be saved")
             return redirect("costcenter-table")
 
-    return render(request, "costcenter/costcenter-form.html", {"form": form})
+    return render(request, "costcenter/costcenter-form.html", {"form": form, "back": "costcenter-table"})
 
 
 def costcenter_delete(request, pk):

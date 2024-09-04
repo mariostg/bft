@@ -6,12 +6,7 @@
         <header class='form__header'>{{title}}</header>
         {% csrf_token %}
         {% include 'core/form-fields.html'%}
-        <div class="block block--spaced">
-          <div class="block block--spaced">
-            <a class='btn btn-back' href="{% url back %}" style='text-decoration:none;'>Retour</a>
-            <input class='btn' type="submit" value="Confirm" />
-          </div>
-        </div>
+        {% include 'core/form-buttons.html' %}
       </form>
     </section>
   </main>
