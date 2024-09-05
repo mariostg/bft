@@ -855,9 +855,15 @@ def costcenter_page(request):
 
 
 def costcenter_add(request):
+    context = {
+        "title": "Create Cost Center",
+        "back": "costcenter-table",
+        "url_name": "costcenter-add",
+    }
     if request.method == "POST":
         form = CostCenterForm(request.POST)
         if form.is_valid():
+            context["form"] = form
             obj = form.save(commit=False)
             obj.sequence = FinancialStructureManager().set_parent(
                 fundcenter_parent=obj.costcenter_parent, costcenter_child=True
@@ -870,20 +876,18 @@ def costcenter_add(request):
             except IntegrityError as e:
                 messages.error(request, f"{e}.  Cost center {obj.costcenter} exists")
                 return render(
-                    request, "costcenter/costcenter-form.html", {"form": form}
+                    request,
+                    "costcenter/costcenter-form.html",
+                    context,
                 )
             return redirect("costcenter-table")
     else:
-        form = CostCenterForm
+        context["form"] = CostCenterForm
 
     return render(
         request,
         "costcenter/costcenter-form.html",
-        {
-            "form": form,
-            "title": "Create Cost Center",
-            "url_name": "costcenter-add",
-        },
+        context,
     )
 
 
