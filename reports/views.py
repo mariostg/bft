@@ -532,7 +532,7 @@ def costcenter_in_year_fear(request):
         "url_name": "costcenter-in-year-fear",
         "form_filter": True,
         "form": form,
-        "table": "FY and period are mandatory fields.",
+        "table": "Cost Center and Fund are mandatory fields.",
     }
     if len(request.GET):
         if "" in [initial["costcenter"], initial["fund"]]:
