@@ -27,3 +27,6 @@ requirements.txt
 
 #ignore static files since collecstatic is run at upload
 static-root/*
+
+*.dot
+*.pdf
