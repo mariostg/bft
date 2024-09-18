@@ -226,7 +226,9 @@ class Bookmark(models.Model):
 
 
 class FundManager(models.Manager):
+    """A manager for Fund object"""
     def fund(self, fund: str):
+        """Get a fund object given the fund string"""
         try:
             obj = Fund.objects.get(fund__iexact=fund)
         except Fund.DoesNotExist:
@@ -234,6 +236,7 @@ class FundManager(models.Manager):
         return obj
 
     def pk(self, pk: int):
+        """Get a fund object given the primary key"""
         try:
             obj = Fund.objects.get(pk=pk)
         except Fund.DoesNotExist:
@@ -241,9 +244,11 @@ class FundManager(models.Manager):
         return obj
 
     def exists(self, fund: str) -> bool:
+        """Check the existance of a fund given the string"""
         return Fund.objects.filter(fund=fund).exists()
 
     def get_request(self, request) -> str | None:
+        """Handle get request for fund specified in request"""
         fund = request.GET.get("fund")
         if fund:
             fund = fund.upper()
@@ -256,6 +261,8 @@ class FundManager(models.Manager):
 
 
 class Fund(models.Model):
+    """This model represents a fund such as C113, C523, etc.  The download field indicates if line items matching
+    field should be downloaded during DRMIS download process.  When False, line item will be skipped.BB"""
     fund = models.CharField(max_length=4, unique=True)
     name = models.CharField(max_length=30)
     vote = models.CharField(max_length=1)
