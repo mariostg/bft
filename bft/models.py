@@ -178,7 +178,9 @@ class BftUser(AbstractUser):
 
 
 class BookmarkQuerySet(models.QuerySet):
+    """A database lookup class for bookmark object"""
     def owner(self, owner: BftUser | str) -> QuerySet | None:
+        """Get the bookmarks for the specified user."""
         if not owner:
             return self
         if isinstance(owner, str):
@@ -189,6 +191,7 @@ class BookmarkQuerySet(models.QuerySet):
         return self.filter(owner=owner)
 
     def user_bookmark(self, request):
+        """Get the bookmarks for the current user."""
         try:
             owner = BftUser.objects.get(username=request.user)
             bm = Bookmark.objects.filter(owner=owner)
@@ -198,6 +201,7 @@ class BookmarkQuerySet(models.QuerySet):
 
 
 class Bookmark(models.Model):
+    """Class model that describes the bookmarks assigned to BFT users."""
     owner = models.ForeignKey(BftUser, on_delete=models.CASCADE, default="", verbose_name="Owner's Favorite")
     bookmark_name = models.CharField(max_length=30)
     bookmark_link = models.CharField(max_length=125)
