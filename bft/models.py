@@ -23,8 +23,8 @@ np.set_printoptions(suppress=True)
 logger = logging.getLogger("uploadcsv")
 
 
-# Create your models here.
 class BftStatusManager(models.Manager):
+    """A class to access current fiscal year, quarter and period"""
     def fy(self) -> str | None:
         try:
             return BftStatus.objects.get(status="FY").value
@@ -45,6 +45,7 @@ class BftStatusManager(models.Manager):
 
 
 class BftStatus(models.Model):
+    """A class to assign key-value applicable to the BFT.  Typical and mandatory keys are fiscal year, quarter and period."""
     status = models.CharField("Status", max_length=30, unique=True, choices=STATUS)
     value = models.CharField("Value", max_length=30)
 
@@ -76,12 +77,13 @@ class BftStatus(models.Model):
 
 class BftUserManager(BaseUserManager):
     """
-    Bft user model manager where userbane is the unique identifiers and is derived from the email address
+    Bft user model manager where usernane is the unique identifiers and is derived from the email address
     for authentication.  email address domain must be @forces.gc.ca
     """
 
     @classmethod
     def normalize_user(cls, obj: "BftUser"):
+        """A class method to make upper case the first letter of both first and last name from the BFTUser"""
         obj.first_name = obj.first_name.capitalize()
         obj.last_name = obj.last_name.capitalize()
         return obj
