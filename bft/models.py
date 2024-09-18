@@ -152,6 +152,7 @@ class BftUserManager(BaseUserManager):
 
 
 class BftUser(AbstractUser):
+    """A class that extends AbstractUser base class.  The model has additional fields to satisfy the BFT needs"""
     default_fc = models.OneToOneField(
         "FundCenter",
         on_delete=models.RESTRICT,
