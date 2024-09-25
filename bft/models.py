@@ -1259,6 +1259,7 @@ class ForecastAdjustment(models.Model):
 
 
 class AllocationQuerySet(models.QuerySet):
+    """A lookup class for allocation object"""
     def fund(self, fund: Fund | str) -> QuerySet | None:
         if not fund:
             return self
@@ -1325,6 +1326,7 @@ class AllocationQuerySet(models.QuerySet):
 
 
 class Allocation(models.Model):
+    """An abstract class that defines the common allocation related fields"""
     fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     fy = models.PositiveSmallIntegerField(
