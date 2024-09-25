@@ -30,3 +30,4 @@ static-root/*
 
 *.dot
 *.pdf
+*.sql
