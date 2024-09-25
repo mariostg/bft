@@ -319,8 +319,10 @@ class FundCenterManager(models.Manager):
     def fundcenter(self, fundcenter: str) -> "FundCenter | None":
         fundcenter = fundcenter.upper()
         try:
-            obj = FundCenter.objects.get(fundcenter__iexact=fundcenter)
+            obj = FundCenter.objects.filter(fundcenter__iexact=fundcenter)[0]
         except FundCenter.DoesNotExist:
+            return None
+        except IndexError:
             return None
         return obj
 
@@ -493,14 +495,16 @@ class FinancialStructureManager(models.Manager):
         """
         if isinstance(child, FundCenter):
             try:
-                _parent = FundCenter.objects.get(fundcenter=parent.fundcenter)
+                _parent = FundCenter.objects.filter(fundcenter=parent.fundcenter)[:-1]
             except FundCenter.DoesNotExist:
+                return False
+            except ValueError:
                 return False
             try:
-                _child = FundCenter.objects.get(fundcenter=child.fundcenter)
+                _child = FundCenter.objects.filter(fundcenter=child.fundcenter)[:1]
             except FundCenter.DoesNotExist:
                 return False
-            return self.is_sequence_child_of(_parent.sequence, _child.sequence)
+            return self.is_sequence_child_of(_parent.sequence, _child[0].sequence)
         elif isinstance(child, CostCenter):
             try:
                 _parent = FundCenter.objects.get(fundcenter=parent.fundcenter)
@@ -795,11 +799,11 @@ class FinancialStructureManager(models.Manager):
 
 
 class FundCenter(models.Model):
-    fundcenter = models.CharField("Fund Center", max_length=6, unique=True)
+    fundcenter = models.CharField("Fund Center", max_length=6)
     shortname = models.CharField(
         "Fund Center Name", max_length=25, null=True, blank=True
     )
-    sequence = models.CharField("FC Path", max_length=25, unique=True)
+    sequence = models.CharField("FC Path", max_length=25)
     level = models.SmallIntegerField("Level", default=0)
     fundcenter_parent = models.ForeignKey(
         "self",
@@ -821,6 +825,16 @@ class FundCenter(models.Model):
     class Meta:
         ordering = ["fundcenter"]
         verbose_name_plural = "Fund Centers"
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "fundcenter",
+                    "fundcenter_parent",
+                ),
+                name="%(app_label)s_%(class)s_is_unique",
+            )
+        ]
 
     def save(self, *args, **kwargs):
         if self.fundcenter_parent is None:
