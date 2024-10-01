@@ -375,8 +375,10 @@ class FundCenterProcessor(UploadProcessor):
         self.header = "fundcenter_parent,fundcenter,shortname\n"
 
     def _find_duplicate_fundcenters(self, fundcenters: pd.DataFrame) -> pd.DataFrame:
-        fundcenters["fundcenter"] = fundcenters["fundcenter"].str.lower()
-        duplicates = fundcenters[fundcenters.duplicated(subset=["fundcenter"], keep=False) == True]
+        # fundcenters["fundcenter"] = fundcenters["fundcenter"].str.lower()
+        duplicates = fundcenters[
+            fundcenters.duplicated(subset=["fundcenter_parent", "fundcenter"], keep=False) == True
+        ]
         if duplicates.empty:
             return pd.DataFrame
         else:
@@ -675,7 +677,9 @@ class CostCenterProcessor(UploadProcessor):
 
     def _find_duplicate_costcenters(self, costcenters: pd.DataFrame) -> pd.DataFrame:
         costcenters["costcenter"] = costcenters["costcenter"].str.lower()
-        duplicates = costcenters[costcenters.duplicated(subset=["costcenter"], keep=False) == True]
+        duplicates = costcenters[
+            costcenters.duplicated(subset=["costcenter", "costcenter_parent"], keep=False) == True
+        ]
         if duplicates.empty:
             return pd.DataFrame
         else:

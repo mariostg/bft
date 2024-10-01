@@ -1009,7 +1009,7 @@ class CostCenterManager(models.Manager):
 
 
 class CostCenter(models.Model):
-    costcenter = models.CharField("Cost Center", max_length=6, unique=True)
+    costcenter = models.CharField("Cost Center", max_length=6)
     shortname = models.CharField(
         "Cost Center Name", max_length=35, blank=True, null=True
     )
@@ -1046,6 +1046,16 @@ class CostCenter(models.Model):
         ordering = ["costcenter"]
         verbose_name_plural = "Cost Centers"
         indexes = [models.Index(fields=["costcenter"])]
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=(
+                    "costcenter",
+                    "costcenter_parent",
+                ),
+                name="%(app_label)s_%(class)s_is_unique",
+            )
+        ]
 
     def save(self, *args, **kwargs):
         if not FinancialStructureManager().is_child_of(self.costcenter_parent, self):
