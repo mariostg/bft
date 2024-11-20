@@ -62,7 +62,7 @@ def fund_add(request):
         {
             "form": form,
             "title": "Create Fund",
-            "url_name": "fund-add",
+            "url_name": "bft",
         },
     )
 
@@ -83,7 +83,7 @@ def fund_update(request, pk):
         {
             "form": form,
             "title": "Fund Update",
-            "back": "fund-table",
+            "url_name": "fund-table",
         },
     )
 
@@ -437,7 +437,7 @@ def capital_project_page(request):
 def capital_project_add(request):
     context = {
         "title": "Capital Projects",
-        "back": "capital-project-table",
+        "url_name": "capital-project-table",
     }
 
     if request.method == "POST":
@@ -913,7 +913,7 @@ def costcenter_update(request, pk):
             return redirect("costcenter-table")
     context = {
         "form": form,
-        "back": "costcenter-table",
+        "url_name": "costcenter-table",
         "title": "Cost Center Update",
     }
     return render(request, "costcenter/costcenter-form.html", context)
