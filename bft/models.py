@@ -818,8 +818,13 @@ class FundCenter(models.Model):
     objects = FundCenterManager()
 
     def __str__(self):
+        sn = "No Short name"
+        fc = "XXXX"
         if self.fundcenter:
-            return f"{self.fundcenter.upper()} - {self.shortname.upper()}"
+            fc = self.fundcenter.upper()
+        if self.shortname:
+            sn = self.shortname.upper()
+            return f"{fc} - {sn}"
         return ""
 
     class Meta:
