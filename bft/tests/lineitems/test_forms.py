@@ -37,11 +37,11 @@ class TestCostCenterLineItemUpload:
 
     def test_form_invalid_fund_center(self, setup, populatedata):
         self.data = {
-            "fundcenter": "2184XA",
+            "fundcenter": "2184XX",
             "costcenter": "8484wa",
         }
         f = CostCenterLineItemUploadForm(data=self.data, files=self.files)
-        assert "Fund Center 2184XA does not exist" in f.errors["fundcenter"]
+        assert f"Fund Center {self.data['fundcenter']} does not exist" in f.errors["fundcenter"]
         assert f.is_valid() == False
 
     def test_form_invalid_cost_center(self, setup, populatedata):
@@ -73,8 +73,8 @@ class TestFundCenterLineItemUpload:
 
     def test_form_invalid_fund_center(self, setup, populatedata):
         self.data = {
-            "fundcenter": "2184XA",
+            "fundcenter": "2184XX",
         }
         f = FundCenterLineItemUploadForm(data=self.data, files=self.files)
-        assert "Fund Center 2184XA does not exist" in f.errors["fundcenter"]
+        assert f"Fund Center {self.data['fundcenter']} does not exist" in f.errors["fundcenter"]
         assert f.is_valid() == False
