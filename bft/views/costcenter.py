@@ -146,7 +146,7 @@ def source_add(request):
         form = SourceForm
 
     return render(
-        request, "costcenter/source-form.html", {"form": form, "title": "Create Source", "url_name": "source-add"}
+        request, "costcenter/source-form.html", {"form": form, "title": "Create Source", "url_name": "source-table"}
     )
 
 

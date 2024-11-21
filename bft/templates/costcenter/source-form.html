@@ -6,11 +6,7 @@
       <form method="POST">
         {% csrf_token %}
         {% include 'core/form-fields.html'%}
-        <div class="block block--spaced">
-          <button class="btn">Save</button>
-          <button class='btn btn-back'><a href="{% url 'source-table' %}" style='text-decoration:none;'>Go Back</a></button>
-        </div>
-
+        {% include 'core/form-buttons.html' %}
       </form>
       <footer class='form__footer'>Last edited by Mario St-Gelais, 8 Feb 2022</footer>
     </section>
