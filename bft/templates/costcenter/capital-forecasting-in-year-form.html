@@ -7,14 +7,12 @@
         <header class='form__header'>{{title}}</header>
         {% csrf_token %}
         {% include 'core/form-fields.html'%}
-        <div class="block block--spaced">
-          <button class="btn">Save</button>
-          <button class="btn btn-back">Back</button>
-        </div>
+        {% include 'core/form-buttons.html'%}
       </form>
     </section>
   </main>
   </body>
+  </html>
   </html>
 
 {% endblock content %}

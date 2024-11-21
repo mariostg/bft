@@ -7,10 +7,7 @@
         <header class='form__header'>{{title}}</header>
         {% csrf_token %}
         {% include 'core/form-fields.html'%}
-        <div class="block block--spaced">
-          <button class="btn">Save</button>
-          <a href="{% url 'fundcenter-allocation-table' %}" class="btn btn-back" href="#" >Back</a >
-        </div>
+        {% include 'core/form-buttons.html'%}
       </form>
       <footer class='form__footer'>Created on {{form.instance.created}}. Last edited by {{form.instance.owner}} on  {{form.instance.updated}}</footer>
     </section>
