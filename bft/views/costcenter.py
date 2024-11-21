@@ -48,23 +48,20 @@ def fund_page(request):
 
 
 def fund_add(request):
+    context = {
+        "title": "Create Fund",
+        "url_name": "fund-table",
+    }
     if request.method == "POST":
         form = FundForm(request.POST)
         if form.is_valid():
+            context["form"] = form
             form.save()
             return redirect("fund-table")
     else:
-        form = FundForm
+        context["form"] = FundForm
 
-    return render(
-        request,
-        "costcenter/fund-form.html",
-        {
-            "form": form,
-            "title": "Create Fund",
-            "url_name": "bft",
-        },
-    )
+    return render(request, "costcenter/fund-form.html", context)
 
 
 def fund_update(request, pk):
@@ -137,16 +134,21 @@ def source_page(request):
 
 
 def source_add(request):
+    context = {
+        "title": "Create Source",
+        "url_name": "source-table",
+    }
     if request.method == "POST":
         form = SourceForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect("source-table")
     else:
-        form = SourceForm
-
+        context["form"] = SourceForm
     return render(
-        request, "costcenter/source-form.html", {"form": form, "title": "Create Source", "url_name": "source-table"}
+        request,
+        "costcenter/source-form.html",
+        context,
     )
 
 
@@ -159,8 +161,13 @@ def source_update(request, pk):
         if form.is_valid():
             form.save()
             return redirect("source-table")
+    context = {
+        "form": form,
+        "title": "Create Update",
+        "url_name": "source-table",
+    }
 
-    return render(request, "costcenter/source-form.html", {"form": form})
+    return render(request, "costcenter/source-form.html", context)
 
 
 def source_delete(request, pk):
@@ -222,9 +229,14 @@ def fundcenter_page(request):
 
 
 def fundcenter_add(request):
+    context = {
+        "title": "Create Fund Center",
+        "url_name": "fundcenter-table",
+    }
     if request.method == "POST":
         form = FundCenterForm(request.POST)
         if form.is_valid():
+            context["form"] = form
             obj = form.save(commit=False)
             obj.sequence = FinancialStructureManager().set_parent(
                 fundcenter_parent=obj.fundcenter_parent
@@ -234,14 +246,20 @@ def fundcenter_add(request):
             except IntegrityError:
                 messages.error(request, f"Fund center {obj.fundcenter} exists.")
                 return render(
-                    request, "costcenter/fundcenter-form.html", {"form": form, "url_name": "fundcenter-table"}
+                    request,
+                    "costcenter/fundcenter-form.html",
+                    context,
                 )
 
             return redirect("fundcenter-table")
     else:
-        form = FundCenterForm
+        context["form"] = FundCenterForm
 
-    return render(request, "costcenter/fundcenter-form.html", {"form": form, "url_name": "fundcenter-table"})
+    return render(
+        request,
+        "costcenter/fundcenter-form.html",
+        context,
+    )
 
 
 def fundcenter_update(request, pk):
@@ -262,7 +280,12 @@ def fundcenter_update(request, pk):
             except IntegrityError:
                 messages.error(request, "Duplicate entry cannot be saved")
             return redirect("fundcenter-table")
-    return render(request, "costcenter/fundcenter-form.html", {"form": form})
+    context = {
+        "form": form,
+        "url_name": "fundcenter-table",
+        "title": "Fund Center Update",
+    }
+    return render(request, "costcenter/fundcenter-form.html", context)
 
 
 def fundcenter_delete(request, pk):
@@ -461,8 +484,7 @@ def capital_project_add(request):
                 )
             return redirect("capital-project-table")
     else:
-        form = CapitalProjectForm
-        context["form"] = form
+        context["form"] = CapitalProjectForm
 
     return render(
         request,
@@ -483,8 +505,12 @@ def capital_project_update(request, pk):
             except IntegrityError:
                 messages.error(request, "Duplicate entry cannot be saved")
             return redirect("capital-project-table")
-
-    return render(request, "costcenter/capitalproject-form.html", {"form": form, "back": "capital-project-table"})
+    context = {
+        "form": form,
+        "title": "Capital Project Update",
+        "url_name": "capital-project-table",
+    }
+    return render(request, "costcenter/capitalproject-form.html", context)
 
 
 def capital_project_delete(request, pk):
@@ -857,8 +883,7 @@ def costcenter_page(request):
 def costcenter_add(request):
     context = {
         "title": "Create Cost Center",
-        "back": "costcenter-table",
-        "url_name": "costcenter-add",
+        "url_name": "costcenter-table",
     }
     if request.method == "POST":
         form = CostCenterForm(request.POST)
