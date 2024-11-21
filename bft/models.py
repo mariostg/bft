@@ -931,7 +931,10 @@ class CostCenterManager(models.Manager):
             right_on="Fundcenter_ID",
         )
         if not proco_df.empty:
-            df = pd.merge(df, proco_df, how="left", left_on="Procurement_officer_ID", right_on="Bftuser_ID")
+            try:
+                df = pd.merge(df, proco_df, how="left", left_on="Procurement_officer_ID", right_on="Bftuser_ID")
+            except ValueError:
+                logger.error("DID not merge cost center dataframe with procurement officer")
         return df
 
     def allocation_dataframe(
