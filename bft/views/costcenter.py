@@ -234,14 +234,14 @@ def fundcenter_add(request):
             except IntegrityError:
                 messages.error(request, f"Fund center {obj.fundcenter} exists.")
                 return render(
-                    request, "costcenter/fundcenter-form.html", {"form": form}
+                    request, "costcenter/fundcenter-form.html", {"form": form, "url_name": "fundcenter-table"}
                 )
 
             return redirect("fundcenter-table")
     else:
         form = FundCenterForm
 
-    return render(request, "costcenter/fundcenter-form.html", {"form": form})
+    return render(request, "costcenter/fundcenter-form.html", {"form": form, "url_name": "fundcenter-table"})
 
 
 def fundcenter_update(request, pk):
