@@ -495,16 +495,16 @@ class FinancialStructureManager(models.Manager):
         """
         if isinstance(child, FundCenter):
             try:
-                _parent = FundCenter.objects.filter(fundcenter=parent.fundcenter)[:-1]
+                _parent = FundCenter.objects.get(fundcenter=parent.fundcenter)
             except FundCenter.DoesNotExist:
                 return False
             except ValueError:
                 return False
             try:
-                _child = FundCenter.objects.filter(fundcenter=child.fundcenter)[:1]
+                _child = FundCenter.objects.get(fundcenter=child.fundcenter)
             except FundCenter.DoesNotExist:
                 return False
-            return self.is_sequence_child_of(_parent.sequence, _child[0].sequence)
+            return self.is_sequence_child_of(_parent.sequence, _child.sequence)
         elif isinstance(child, CostCenter):
             try:
                 _parent = FundCenter.objects.get(fundcenter=parent.fundcenter)
