@@ -1,11 +1,12 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% block title %}{{title}}{% endblock title %}
 {% block content %}
   {% include "core/form-filter.html" %}
   <main class="block block--centered">
     <div class="container">
       <header class=''>
-        <h2>Capital New Year Table</h2>
+        <h2>{{title}} Table</h2>
       </header>
       {% if user.is_authenticated %}
         <div class=''>

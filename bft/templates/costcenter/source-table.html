@@ -1,11 +1,12 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% block title %}{{title}}{% endblock title %}
 {% block content %}
   <main class="block block--centered">
 
     <div class="container">
       <header class=''>
-        <h2>Sources</h2>
+        <h2>{{title}}</h2>
       </header>
       {% if user.is_authenticated %}
         <div class=''>
