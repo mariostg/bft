@@ -1,4 +1,4 @@
 costcenter_parent,costcenter,shortname,isforecastable,isupdatable,source,fund
-2184A3,8484WA,Basement,True,True,Basement,C113
-2184A3,8484XA,Kitchen,True,True,Basement,C113
-2184A3,8484YA,cellar,False,True,Basement,C113
+2184A3,8484WA,Basement Procurement,True,True,Basement,C113
+2184A3,8484XA,Kitchen Procurement,True,True,Basement,C113
+2184A3,8484YA,cellar Procurement,False,True,Basement,C113
