@@ -737,37 +737,43 @@ class FinancialStructureManager(models.Manager):
             ],
             inplace=True,
         )
-        merged.drop(
-            [
-                "Fundcenter_ID_x",
-                "Fundcenter_ID_y",
-                "Fundcenter_parent_ID_x",
-                "Fundcenter_parent_ID_y",
-                "Costcenter_ID",
-                "CC Path",
-                "Fund_ID",
-                "Source_ID",
-                "Costcenter_parent_ID",
-                "Level_y",
-                "first name",
-                "last name",
-                "superuser status",
-                "Password",
-                "active",
-                "date joined",
-                "active",
-                "email address",
-                "staff status",
-                "Default_fc_ID",
-                "Default_cc_ID",
-                "Bftuser_ID",
-                "last login",
-                "procurement officer",
-                "Procurement_officer_ID",
-            ],
-            axis=1,
-            inplace=True,
-        )
+        unwanted_columns = [
+            "Fundcenter_ID_x",
+            "Fundcenter_ID_y",
+            "Fundcenter_parent_ID_x",
+            "Fundcenter_parent_ID_y",
+            "Costcenter_ID",
+            "CC Path",
+            "Fund_ID",
+            "Source_ID",
+            "Costcenter_parent_ID",
+            "Level_y",
+            "first name",
+            "last name",
+            "superuser status",
+            "Password",
+            "active",
+            "date joined",
+            "active",
+            "email address",
+            "staff status",
+            "Default_fc_ID",
+            "Default_cc_ID",
+            "Bftuser_ID",
+            "last login",
+            "procurement officer",
+            "Procurement_officer_ID",
+        ]
+        for col in unwanted_columns:
+            try:
+                merged.drop(
+                    col,
+                    axis=1,
+                    inplace=True,
+                )
+            except KeyError:
+                pass
+
         merged.sort_values(by=["FC Path"], inplace=True)
         merged.rename(columns={"Level_x": "Level", "Username": "Procurement Officer"}, inplace=True)
         return merged
