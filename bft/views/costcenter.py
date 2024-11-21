@@ -348,6 +348,10 @@ def fundcenter_allocation_page(request):
 
 
 def fundcenter_allocation_add(request):
+    context = {
+        "title": "Fund Center Allocation Create",
+        "url_name": "fundcenter-allocation-table",
+    }
     if request.method == "POST":
         form = FundCenterAllocationForm(request.POST)
         if form.is_valid():
@@ -359,16 +363,12 @@ def fundcenter_allocation_add(request):
             err = form.errors.get_json_data()["__all__"][0]["message"]
             messages.warning(request, err)
     else:
-        form = FundCenterAllocationForm
+        context["form"] = FundCenterAllocationForm
 
     return render(
         request,
         "costcenter/fundcenter-allocation-form.html",
-        {
-            "form": form,
-            "title": "Fund Center Allocation Create",
-            "url_name": "fundcenter-allocation-add",
-        },
+        context,
     )
 
 
@@ -385,7 +385,16 @@ def fundcenter_allocation_update(request, pk):
         else:
             err = form.errors.get_json_data()["__all__"][0]["message"]
             messages.warning(request, err)
-    return render(request, "costcenter/fundcenter-allocation-form.html", {"form": form})
+    context = {
+        "form": form,
+        "title": "Fund Center Allocation Update",
+        "url_name": "fundcenter-allocation-table",
+    }
+    return render(
+        request,
+        "costcenter/fundcenter-allocation-form.html",
+        context,
+    )
 
 
 def fundcenter_allocation_delete(request, pk):
@@ -574,6 +583,10 @@ def capital_forecasting_new_year_table(request):
 
 
 def capital_forecasting_new_year_add(request):
+    context = {
+        "title": "Create Capital Forecasting New Year",
+        "url_name": "capital-forecasting-new-year-table",
+    }
     if request.method == "POST":
         form = CapitalForecastingNewYearForm(request.POST)
         if form.is_valid():
@@ -588,14 +601,16 @@ def capital_forecasting_new_year_add(request):
                 return render(
                     request,
                     "costcenter/capital-forecasting-new-year-form.html",
-                    {"form": form},
+                    context,
                 )
             return redirect("capital-forecasting-new-year-table")
     else:
-        form = CapitalForecastingNewYearForm
+        context["form"] = CapitalForecastingNewYearForm
 
     return render(
-        request, "costcenter/capital-forecasting-new-year-form.html", {"form": form}
+        request,
+        "costcenter/capital-forecasting-new-year-form.html",
+        context,
     )
 
 
@@ -611,9 +626,15 @@ def capital_forecasting_new_year_update(request, pk):
             except IntegrityError:
                 messages.error(request, "Duplicate entry cannot be saved")
             return redirect("capital-forecasting-new-year-table")
-
+    context = {
+        "form": form,
+        "url_name": "capital-forecasting-new-year-table",
+        "title": "Update Capital Forecasting New Year",
+    }
     return render(
-        request, "costcenter/capital-forecasting-new-year-form.html", {"form": form}
+        request,
+        "costcenter/capital-forecasting-new-year-form.html",
+        context,
     )
 
 
@@ -652,6 +673,10 @@ def capital_forecasting_in_year_table(request):
 
 
 def capital_forecasting_in_year_add(request):
+    context = {
+        "title": "Create Capital Forecasting In Year",
+        "url_name": "capital-forecasting-in-year-table",
+    }
     if request.method == "POST":
         form = CapitalForecastingInYearForm(request.POST)
         if form.is_valid():
@@ -670,10 +695,12 @@ def capital_forecasting_in_year_add(request):
                 )
             return redirect("capital-forecasting-in-year-table")
     else:
-        form = CapitalForecastingInYearForm
+        context["form"] = CapitalForecastingInYearForm
 
     return render(
-        request, "costcenter/capital-forecasting-in-year-form.html", {"form": form}
+        request,
+        "costcenter/capital-forecasting-in-year-form.html",
+        context,
     )
 
 
@@ -689,9 +716,15 @@ def capital_forecasting_in_year_update(request, pk):
             except IntegrityError:
                 messages.error(request, "Duplicate entry cannot be saved")
             return redirect("capital-forecasting-in-year-table")
-
+    context = {
+        "form": form,
+        "title": "Update Capital Forecasting In Year",
+        "url_name": "capital-forecasting-in-year-table",
+    }
     return render(
-        request, "costcenter/capital-forecasting-in-year-form.html", {"form": form}
+        request,
+        "costcenter/capital-forecasting-in-year-form.html",
+        context,
     )
 
 
@@ -730,6 +763,10 @@ def capital_forecasting_year_end_table(request):
 
 
 def capital_forecasting_year_end_add(request):
+    context = {
+        "title": "Create Capital Forecasting Year End",
+        "url_name": "capital-forecasting-year-end-table",
+    }
     if request.method == "POST":
         form = CapitalForecastingYearEndForm(request.POST)
         if form.is_valid():
@@ -748,11 +785,9 @@ def capital_forecasting_year_end_add(request):
                 )
             return redirect("capital-forecasting-year-end-table")
     else:
-        form = CapitalForecastingYearEndForm
+        context["form"] = CapitalForecastingYearEndForm
 
-    return render(
-        request, "costcenter/capital-forecasting-year-end-form.html", {"form": form}
-    )
+    return render(request, "costcenter/capital-forecasting-year-end-form.html", context)
 
 
 def capital_forecasting_year_end_update(request, pk):
@@ -768,8 +803,15 @@ def capital_forecasting_year_end_update(request, pk):
                 messages.error(request, "Duplicate entry cannot be saved")
             return redirect("capital-forecasting-year-end-table")
 
+    context = {
+        "form": form,
+        "url_name": "capital-forecasting-year-end-table",
+        "title": "Update Capital Forecasting Year End",
+    }
     return render(
-        request, "costcenter/capital-forecasting-year-end-form.html", {"form": form}
+        request,
+        "costcenter/capital-forecasting-year-end-form.html",
+        context,
     )
 
 
@@ -1107,6 +1149,10 @@ def forecast_adjustment_page(request):
 
 # @login_required
 def forecast_adjustment_add(request):
+    context = {
+        "title": "Create Forecast Adjustment",
+        "url_name": "forecast-adjustment-add",
+    }
     if request.method == "POST":
         form = ForecastadjustmentForm(request.POST)
         if form.is_valid():
@@ -1122,16 +1168,12 @@ def forecast_adjustment_add(request):
                 )
             return redirect("forecast-adjustment-table")
     else:
-        form = ForecastadjustmentForm
+        context["form"] = ForecastadjustmentForm
 
     return render(
         request,
         "costcenter/forecast-adjustment-form.html",
-        {
-            "form": form,
-            "title": "Create Forecast Adjustment",
-            "url_name": "forecast-adjustment-add",
-        },
+        context,
     )
 
 
@@ -1149,8 +1191,12 @@ def forecast_adjustment_update(request, pk):
             c = CostCenterMonthlyForecastAdjustmentReport(BftStatusManager().fy(), BftStatusManager().period())
             c.insert_grouped_forecast_adjustment(c.sum_forecast_adjustments())
             return redirect("forecast-adjustment-table")
-
-    return render(request, "costcenter/forecast-adjustment-form.html", {"form": form})
+    context = {
+        "form": form,
+        "url_name": "forecast-adjustment-table",
+        "title": "Update Forecast Adjustment",
+    }
+    return render(request, "costcenter/forecast-adjustment-form.html", context)
 
 
 # @login_required
