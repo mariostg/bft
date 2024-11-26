@@ -55,6 +55,7 @@ def lineitem_page(request, ccpk=None):
             "has_filter": has_filter,
             "url_name": "lineitem-page",
             "title": "Line Items Table",
+            "query_string": request.GET.urlencode(),
         },
     )
 
