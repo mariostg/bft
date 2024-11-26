@@ -722,6 +722,8 @@ def capital_forecasting_estimates(request):
             data = estimates.df.to_json(orient="records")
             context["data"] = data
             context["table"] = estimates.to_html()
+            context["query_string"] = request.GET.urlencode()
+
         else:
             messages.warning(request, "Capital forecasting estimate is empty")
     return render(request, "capital-forecasting-estimates.html", context)
