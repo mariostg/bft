@@ -749,6 +749,8 @@ def capital_forecasting_fears(request):
             quarterly.df.Quarters = "Q" + quarterly.df.Quarters
             context["data"] = quarterly.df.to_json(orient="records")
             context["table"] = quarterly.to_html()
+            context["query_string"] = request.GET.urlencode()
+
         else:
             messages.warning(request, "Capital forecasting FEARS is empty")
 
