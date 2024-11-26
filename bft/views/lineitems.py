@@ -70,13 +70,13 @@ def line_forecast_add(request, pk):
                 line_forecast.forecastamount = lineitem.workingplan
                 messages.info(
                     request,
-                    f"Forecast above working plan, created with amount of {lineitem.workingplan}",
+                    f"Forecast above working plan, created with amount of {lineitem.workingplan:,}",
                 )
             elif line_forecast.below_spent(request, lineitem):
                 line_forecast.forecastamount = lineitem.spent
                 messages.info(
                     request,
-                    f"Forecast below spent, created with amount of {lineitem.spent}",
+                    f"Forecast below spent, created with amount of {lineitem.spent:,}",
                 )
             else:
                 messages.success(request, "Forecast created")
@@ -114,7 +114,7 @@ def line_forecast_update(request, pk):
                 form.forecastamount = old_forecast
                 messages.warning(
                     request,
-                    f"This cost center is not forecastable, it will remain at {old_forecast}, but you can modify text fields.",
+                    f"This cost center is not forecastable, it will remain at {old_forecast:,}, but you can modify text fields.",
                 )
                 # return redirect(reverse("lineitem-page") + f"?costcenter={target.lineitem.costcenter.pk}")
 
@@ -122,13 +122,13 @@ def line_forecast_update(request, pk):
             if can_forecast and form.forecastamount < spent:
                 messages.warning(
                     request,
-                    f"Forecast {forecast_amount}  cannot be lower than Spent {spent}. Forecast set to {spent}",
+                    f"Forecast {forecast_amount:,}  cannot be lower than Spent {spent:,}. Forecast set to {spent:,}",
                 )
                 form.forecastamount = spent
             elif can_forecast and form.forecastamount > working_plan:
                 messages.warning(
                     request,
-                    f"Forecast {forecast_amount} cannot be higher than working plan {working_plan}.  Forecast set to {working_plan}.",
+                    f"Forecast {forecast_amount:,} cannot be higher than working plan {working_plan:,}.  Forecast set to {working_plan:,}.",
                 )
                 form.forecastamount = working_plan
             else:
