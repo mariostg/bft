@@ -176,6 +176,8 @@ def costcenter_monthly_forecast_line_item(request):
             df_columns = ["Fund", "Source", "Line Item Forecast"]
             if initial["costcenter"] is None:
                 df_columns = ["Cost Center"] + df_columns
+            if initial["costcenter"] is None:
+                df_columns = ["Cost Center"] + df_columns
             df = df[df_columns]
             df = df.style.format(thousands=",", precision=0)
             df = df.to_html()
@@ -194,10 +196,20 @@ def set_fy(request) -> int:
     try:
         fy_ = request.GET.get("fy")
         fy = int(fy_)
-    except ValueError as err:
-        messages.error(request, f"Invalid Fiscal Year, {fy_}<br>{err}")
-        return 0
+    except ValueError:
+        fy = BftStatusManager().fy()
     return fy
+
+
+def set_period(request) -> int | None:
+    try:
+        period = request.GET.get("period")
+        if conf.is_period(period):
+            return period
+    except ValueError:
+        msg = f"{period} is not a valid period.  Expected value is one of {(', ').join(map(str,conf.PERIODKEYS))}"
+        messages.warning(request, msg)
+        return None
 
 
 def set_initial(request):
@@ -205,8 +217,8 @@ def set_initial(request):
         "costcenter": "",
         "costcenter_name": "All Cost Centers",
         "fund": "",
-        "fy": BftStatusManager().fy(),
-        "period": BftStatusManager().period(),
+        "fy": None,
+        "period": None,
     }
     if not len(request.GET):
         return initial
@@ -214,15 +226,12 @@ def set_initial(request):
     initial["costcenter"] = CostCenterManager().get_request(request)
     if initial["costcenter"]:
         initial["costcenter_name"] = CostCenterManager().cost_center(initial["costcenter"])
+
     initial["fund"] = FundManager().get_request(request)
+
     initial["fy"] = set_fy(request)
 
-    period = int(request.GET.get("period")) if request.GET.get("period") else 1
-    if conf.is_period(period):
-        initial["period"] = period
-    else:
-        msg = f"{period} is not a valid period.  Expected value is one of {(', ').join(map(str,conf.PERIODKEYS))}"
-        messages.warning(request, msg)
+    initial["period"] = set_period(request)
 
     return initial
 
@@ -313,15 +322,6 @@ def costcenter_monthly_allocation(request):
     }
 
     if len(request.GET):
-        if "" in [initial["costcenter"], initial["fund"]]:
-            form.initial = initial
-            context["form"] = form
-            return render(request, "costcenter-monthly-data.html", context)
-
-        form.initial = initial
-        if "" in [initial["fund"], initial["costcenter"]]:
-            return render(request, "costcenter-monthly-data.html", context)
-
         r = utils.CostCenterMonthlyAllocationReport(
             fy=initial["fy"], fund=initial["fund"], costcenter=initial["costcenter"], period=initial["period"]
         )
@@ -330,6 +330,8 @@ def costcenter_monthly_allocation(request):
             df_columns = ["Fund", "Source", "Allocation"]
             if initial["costcenter"] is None:
                 df_columns = ["Cost Center"] + df_columns
+            if initial["period"] is None:
+                df_columns = ["Period"] + df_columns
             df = df[df_columns]
             df = df.style.format(thousands=",", precision=0)
             df = df.to_html()
@@ -482,6 +484,8 @@ def costcenter_monthly_forecast_adjustment(request):
             df_columns = ["Fund", "Source", "Forecast Adjustment"]
             if initial["costcenter"] is None:
                 df_columns = ["Cost Center"] + df_columns
+            if initial["period"] is None:
+                df_columns = ["Period"] + df_columns
             df = df[df_columns]
             df = df.style.format(thousands=",", precision=0)
             df = df.to_html()

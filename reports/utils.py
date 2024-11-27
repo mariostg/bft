@@ -38,8 +38,8 @@ class InYearReport:
 
 class MonthlyReport:
 
-    def __init__(self, fy, period, costcenter: str = None, fund: str = None, quarter=None):
-        fy = str(fy)
+    def __init__(self, fy: int, period, costcenter: str = None, fund: str = None, quarter=None):
+        # fy = str(fy)
         period = str(period)
         try:
             self.costcenter = costcenter.upper()
