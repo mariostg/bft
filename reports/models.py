@@ -112,4 +112,4 @@ class CostCenterInYearEncumbrance(MonthlyData):
     working_plan = models.DecimalField("Working Plan", max_digits=10, decimal_places=2, default=0, null=True)
 
     class Meta(MonthlyData.Meta):
-        verbose_name_plural = "Cost Center Monthly Encumbrance"
+        verbose_name_plural = "Cost Center In Year Encumbrance"
