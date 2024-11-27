@@ -4,7 +4,7 @@ line item forecast.  It is not meant to replace the line item forecast.
 
 Forecast adjustments can be done at the cost center level.  Creating or updating a forecast adjustment
 will update the monthly forecast adjustment for the current FY and period.  Deleting a forecast adjustment
-has no effect on the monthly forecast adjustment.
+will also adjust the monthly data.
 
 All forecast adjustments are deleted at the end of the forecasting review but historical data are kept in
 the monthly data.
