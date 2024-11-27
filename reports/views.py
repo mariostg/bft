@@ -246,6 +246,7 @@ def costcenter_monthly_allocation_update(request):
 
 
 def costcenter_monthly_forecast_adjustment_update(request):
+    """Update the monthly forecast adjustments for the selected period and fy using the current forecast adjustments."""
     url_name = "costcenter-monthly-forecast-adjustment-update"
     form = UpdateCostCenterForecastAdjustmentMonthlyForm()
     if request.method == "POST":
