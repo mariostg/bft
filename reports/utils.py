@@ -201,7 +201,6 @@ class CostCenterMonthlyForecastAdjustmentReport(MonthlyReport):
             "fund",
             "fy",
             "period",
-            "source",
             "costcenter",
         )
 
@@ -764,7 +763,7 @@ class CostCenterInYearEncumbranceReport(InYearReport):
             balance=Sum("balance"),
             working_plan=Sum("workingplan"),
             fy=Value(self.fy),
-            source=Value(""),
+            # source=Value(""),
             costcenter=F("costcenter__costcenter"),
         )
         return line_item_group.values(
@@ -776,7 +775,7 @@ class CostCenterInYearEncumbranceReport(InYearReport):
             "balance",
             "working_plan",
             "fy",
-            "source",
+            # "source",
             "costcenter",
         )
 

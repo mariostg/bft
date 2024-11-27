@@ -481,7 +481,7 @@ def costcenter_monthly_forecast_adjustment(request):
         )
         df = r.dataframe()
         if not df.empty:
-            df_columns = ["Fund", "Source", "Forecast Adjustment"]
+            df_columns = ["Fund", "Forecast Adjustment"]
             if initial["costcenter"] is None:
                 df_columns = ["Cost Center"] + df_columns
             if initial["period"] is None:
