@@ -2,8 +2,8 @@ from django.contrib import admin
 
 from bft.models import (BftUser, Bookmark, CapitalInYear, CapitalNewYear,
                         CapitalYearEnd, CostCenter, CostCenterAllocation,
-                        CostCenterChargeImport, CostCenterChargeMonthly, Fund,
-                        FundCenter, Source)
+                        CostCenterChargeImport, CostCenterChargeMonthly,
+                        ForecastAdjustment, Fund, FundCenter, Source)
 
 from . import models
 
@@ -136,6 +136,7 @@ admin.site.register(CapitalInYear)
 admin.site.register(CapitalNewYear)
 admin.site.register(FundCenter, FundCenterAdmin)
 admin.site.register(CostCenterAllocation, CostCenterAllocationAdmin)
+admin.site.register(ForecastAdjustment)
 
 
 admin.site.register(CostCenterChargeImport, CostCenterChargeImportAdmin)
