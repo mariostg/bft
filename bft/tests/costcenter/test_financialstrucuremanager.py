@@ -153,7 +153,7 @@ class TestFinancialStructureManager:
             "costcenter_parent": parent,
         }
         costcenter = CostCenter.objects.create(**cc)
-        assert "1.1.1.0.1" == costcenter.sequence
+        assert "1.1.1.1.0.1" == costcenter.sequence
 
     def test_last_root_with_no_root_element(self):
         assert FinancialStructureManager().last_root() is None

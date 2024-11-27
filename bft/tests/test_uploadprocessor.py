@@ -81,7 +81,7 @@ class TestCostCenterLineItemProcessor:
     def create_costcenter(self):
         fund = FundManager().fund("C113")
         source = SourceManager().source("Common")
-        parent = FundCenter.objects.create(**{"fundcenter": "2184JA"})
+        parent = FundCenter.objects.create(**{"fundcenter": "2184JZ", "shortname": "JA NAME"})
         CostCenter(
             **{
                 "costcenter": "8486JM",
@@ -95,12 +95,12 @@ class TestCostCenterLineItemProcessor:
 
     def test_source_file_has_more_than_one_costcenter(self, setup, populatedata, create_costcenter):
         self.source_file = f"{settings.BASE_DIR}/test-data/8486jm-with-extra-cc.txt"
-        c = CostCenterLineItemProcessor(self.source_file, "8486JM", "2184JA")
+        c = CostCenterLineItemProcessor(self.source_file, "8486JM", "2184JZ")
         c.main()
         with open(settings.UPLOAD_LOG, "r") as f:
             lastline = list(f)[-1]
         assert "There are more that one cost center in the report" in lastline
 
     def test_init(self, setup, populatedata, create_costcenter):
-        c = CostCenterLineItemProcessor(self.source_file, "8486JM", "2184JA")
+        c = CostCenterLineItemProcessor(self.source_file, "8486JM", "2184JZ")
         c.main()
