@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load humanize %}
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
   {% include "core/form-filter.html" %}
@@ -26,7 +27,7 @@
             <span>{{item.quarter}}</span>
           </div>
           <div class="summary__body">
-            <span>{{item.amount}}</span>
+            <span>{{item.amount|intcomma}}</span>
             <span>{{item.note|linebreaksbr}}</span>
           </div>
           <div class="footnote">

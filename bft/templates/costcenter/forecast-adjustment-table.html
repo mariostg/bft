@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load humanize %}
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
   <main class="block block--centered">
@@ -22,7 +23,7 @@
         <span>{{item.costcenter.source}}</span>
       </div>
       <div class="summary__body">
-        <span>{{item.amount}}</span>
+        <span>{{item.amount|intcomma}}</span>
         <span>{{item.note|linebreaksbr}}</span>
       </div>
       <div class="footnote">

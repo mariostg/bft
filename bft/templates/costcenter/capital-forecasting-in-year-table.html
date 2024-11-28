@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load humanize %}
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
   {% include "core/form-filter.html" %}
@@ -26,14 +27,14 @@
           <span>Q{{elem.quarter}}</span>
         </div>
         <div class="summary__body">
-          <span>Allocation:{{elem.allocation}}</span>
-          <span>LE:{{elem.le}}</span>
-          <span>MLE:{{elem.mle}}</span>
-          <span>HE:{{elem.he}}</span>
-          <span>Spent:{{elem.spent}}</span>
-          <span>CO:{{elem.co}}</span>
-          <span>PC:{{elem.pc}}</span>
-          <span>FR:{{elem.fr}}</span>
+          <span>Allocation:{{elem.allocation|intcomma}}</span>
+          <span>LE:{{elem.le|intcomma}}</span>
+          <span>MLE:{{elem.mle|intcomma}}</span>
+          <span>HE:{{elem.he|intcomma}}</span>
+          <span>Spent:{{elem.spent|intcomma}}</span>
+          <span>CO:{{elem.co|intcomma}}</span>
+          <span>PC:{{elem.pc|intcomma}}</span>
+          <span>FR:{{elem.fr|intcomma}}</span>
           {{elem.notes|linebreaksbr}}
         </div>
         <div class="summary__footer">

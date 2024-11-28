@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load humanize %}
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
   {% include "core/form-filter.html" %}
@@ -25,7 +26,7 @@
           <span>FY{{elem.fy|stringformat:'s'}}</span>
         </div>
         <div class="summary__body">
-          <span>Initial Allocation:{{elem.initial_allocation}}</span>
+          <span>Initial Allocation:{{elem.initial_allocation|intcomma}}</span>
           {{elem.notes|linebreaksbr}}
         </div>
         <div class="summary__footer">
