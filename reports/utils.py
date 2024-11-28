@@ -128,7 +128,6 @@ class CostCenterMonthlyForecastLineItemReport(MonthlyReport):
             line_item_forecast=Sum("forecastamount"),
             fy=Value(self.fy),
             period=Value(self.period),
-            source=Value(""),
             costcenter=F("lineitem__costcenter__costcenter"),
             fund=F("lineitem__fund"),
         )
@@ -138,7 +137,6 @@ class CostCenterMonthlyForecastLineItemReport(MonthlyReport):
             "fund",
             "fy",
             "period",
-            "source",
             "costcenter",
         )
 

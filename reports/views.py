@@ -173,7 +173,7 @@ def costcenter_monthly_forecast_line_item(request):
         )
         df = r.dataframe()
         if not df.empty:
-            df_columns = ["Fund", "Source", "Line Item Forecast"]
+            df_columns = ["Fund", "Line Item Forecast"]
             if initial["costcenter"] is None:
                 df_columns = ["Cost Center"] + df_columns
             if initial["costcenter"] is None:
