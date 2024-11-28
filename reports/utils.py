@@ -187,7 +187,6 @@ class CostCenterMonthlyForecastAdjustmentReport(MonthlyReport):
             forecast_adjustment=Sum("amount"),
             fy=Value(self.fy),
             period=Value(self.period),
-            source=Value(""),
             costcenter=F("costcenter__costcenter"),
             fund=F("fund__fund"),
         )
@@ -247,7 +246,6 @@ class CostCenterMonthlyEncumbranceReport(MonthlyReport):
             working_plan=Sum("workingplan"),
             fy=Value(self.fy),
             period=Value(self.period),
-            source=Value(""),
             costcenter=F("costcenter__costcenter"),
         )
         return line_item_group.values(
@@ -260,7 +258,6 @@ class CostCenterMonthlyEncumbranceReport(MonthlyReport):
             "working_plan",
             "fy",
             "period",
-            "source",
             "costcenter",
         )
 
@@ -675,7 +672,6 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
 
         on_grouping = [
             "Fund",
-            "Source",
             "Cost Center",
             "FY",
             "Period",
@@ -689,7 +685,7 @@ class CostCenterMonthlyPlanReport(MonthlyReport):
             "Working Plan",
         ]
 
-        report_fields = on_grouping[0:3] + encumbrance_fields
+        report_fields = on_grouping[0:2] + encumbrance_fields
         allocation__fields = ["Allocation"]
         forecast_adjustment_fields = ["Forecast Adjustment"]
         forecast_line_item_fields = ["Line Item Forecast"]
@@ -759,7 +755,6 @@ class CostCenterInYearEncumbranceReport(InYearReport):
             balance=Sum("balance"),
             working_plan=Sum("workingplan"),
             fy=Value(self.fy),
-            # source=Value(""),
             costcenter=F("costcenter__costcenter"),
         )
         return line_item_group.values(
@@ -771,7 +766,6 @@ class CostCenterInYearEncumbranceReport(InYearReport):
             "balance",
             "working_plan",
             "fy",
-            # "source",
             "costcenter",
         )
 
