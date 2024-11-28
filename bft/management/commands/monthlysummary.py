@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     """
 
-    help = "Update and show monthly allocation."
+    help = "Update and show monthly summary."
 
     def add_arguments(self, parser):
         parser.add_argument(
