@@ -327,7 +327,7 @@ def costcenter_monthly_allocation(request):
         )
         df = r.dataframe()
         if not df.empty:
-            df_columns = ["Fund", "Source", "Allocation"]
+            df_columns = ["Fund", "Allocation"]
             if initial["costcenter"] is None:
                 df_columns = ["Cost Center"] + df_columns
             if initial["period"] is None:

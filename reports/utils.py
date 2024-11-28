@@ -74,7 +74,6 @@ class CostCenterMonthlyAllocationReport(MonthlyReport):
                 allocation=Sum("amount"),
                 fy=Value(self.fy),
                 period=Value(self.period),
-                source=Value(""),
                 costcenter=F("costcenter__costcenter"),
                 fund=F("fund__fund"),
             )
@@ -84,7 +83,6 @@ class CostCenterMonthlyAllocationReport(MonthlyReport):
             "fund",
             "fy",
             "period",
-            "source",
             "costcenter",
         )
 
