@@ -1149,6 +1149,9 @@ def forecast_adjustment_page(request):
 
 # @login_required
 def forecast_adjustment_add(request):
+    """Create a forecast adjustment for the specified cost center and fund.
+    The adjustment will be reflected in the monthly data of the current period.
+    """
     context = {
         "title": "Create Forecast Adjustment",
         "url_name": "forecast-adjustment-add",
