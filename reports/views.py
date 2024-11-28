@@ -431,7 +431,6 @@ def costcenter_monthly_encumbrance(request):
         if not df.empty:
             df_columns = [
                 "Fund",
-                "Source",
                 "Spent",
                 "Commitment",
                 "Pre Commitment",
