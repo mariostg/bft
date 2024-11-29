@@ -565,7 +565,6 @@ def costcenter_in_year_fear(request):
             df_columns = [
                 "Period",
                 "Fund",
-                "Source",
                 "Spent",
                 "Commitment",
                 "Pre Commitment",
@@ -582,12 +581,16 @@ def costcenter_in_year_fear(request):
             table_df = table_df.to_html()
 
             context["data"] = chart_df.to_json(orient="records")  # json data for chart.  To be worked on
+
             # CC allocation for given cc, fund, quarter and period.  For chart threshold line
             mgr = CostCenterManager()
             cc_df = mgr.allocation_dataframe(
                 costcenter=initial["costcenter"], fund=initial["fund"], fy=initial["fy"], quarter=1
             )
-            context["allocation"] = cc_df.Allocation.to_json(orient="records")
+            if not cc_df.empty:
+                context["allocation"] = cc_df.Allocation.to_json(orient="records")
+            else:
+                messages.warning(request, "There are no allocations recorded")
 
             # CC forecast adjustment for given CC, period and fund.  For chart threshold line
             fcst_adj = utils.CostCenterMonthlyForecastAdjustmentReport(
