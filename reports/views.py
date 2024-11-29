@@ -28,16 +28,19 @@ from reports.forms import (SearchAllocationAnalysisForm,
                            UpdateCostCenterEncumbranceMonthlyForm,
                            UpdateCostCenterForecastAdjustmentMonthlyForm,
                            UpdateCostCenterForecastLineItemMonthlyForm)
-from utils.getrequestfilter import set_query_string
 
 
 def bmt_screening_report(request):
-    fundcenter = fund = ""
-    fy = BftStatus.current.fy()
-    quarter = BftStatus.current.quarter()
+    initial = {
+        "fundcenter": None,
+        "fund": None,
+        "fy": BftStatus.current.fy(),
+        "quarter": BftStatus.current.quarter(),
+    }
+
     query_string = None
     table = None
-    form_filter = True
+    form_filter = True  # Display the filter form
     context = {}
 
     has_cc_allocation = CostCenterAllocation.objects.exists()
@@ -48,26 +51,32 @@ def bmt_screening_report(request):
         form_filter = False
 
     if len(request.GET):
-        fundcenter = FundCenterManager().get_request(request)
-        fund = FundManager().get_request(request)
-        quarter = int(request.GET.get("quarter")) if request.GET.get("quarter") else 0
-        fy = set_fy(request)
 
+        fundcenter = FundCenterManager().get_request(request)
+        if not fundcenter:
+            messages.warning(request, "Fund Center is mandatory")
+        else:
+            initial["fundcenter"] = fundcenter
+            fundcenter = FundCenterManager().fundcenter(fundcenter)
+
+        fund = FundManager().get_request(request)
+        if not fund:
+            messages.warning(request, "Fund is Mandatory")
+        else:
+            initial["fund"] = fund
+            fund = FundManager().fund(fund)
+
+        quarter = request.GET.get("quarter")
         if str(quarter) not in QUARTERKEYS:
             messages.warning(request, "Quarter is invalid.  Either value is missing or outside range")
-        if fundcenter and fund and quarter and fy:
-            query_string = set_query_string(fundcenter=fundcenter, fund=fund, fy=fy, quarter=quarter)
+        else:
+            initial["quarter"] = quarter
 
-    initial = {
-        "fundcenter": fundcenter,
-        "fund": fund,
-        "fy": fy,
-        "quarter": quarter,
-    }
+        fy = set_fy(request)
+        initial["fy"] = fy
 
-    if query_string and (has_cc_allocation or has_fc_allocation):
-        fund = FundManager().fund(fund)
-        fundcenter = FundCenterManager().fundcenter(fundcenter)
+        query_string = request.GET.urlencode()
+
     if fundcenter and fund:
         sr = screeningreport.ScreeningReport(fundcenter, fund, fy, quarter)
         try:
@@ -86,7 +95,7 @@ def bmt_screening_report(request):
         "fy": BftStatus.current.fy(),
         "url_name": "bmt-screening-report",
         "title": "BMT Screening Report",
-        "query_string": request.GET.urlencode(),
+        "query_string": query_string,
     }
     return render(request, "bmt-screening-report.html", context)
 
