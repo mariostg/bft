@@ -577,8 +577,6 @@ def costcenter_in_year_fear(request):
 
             df_columns = ["Cost Center"] + df_columns
             table_df = table_df[df_columns].sort_values("Cost Center")
-            table_df = table_df.style.format(thousands=",", precision=0)
-            table_df = table_df.to_html()
 
             context["data"] = chart_df.to_json(orient="records")  # json data for chart.  To be worked on
 
@@ -589,6 +587,8 @@ def costcenter_in_year_fear(request):
             )
             if not cc_df.empty:
                 context["allocation"] = cc_df.Allocation.to_json(orient="records")
+                table_df = table_df.merge(cc_df, how="left", on=["Cost Center", "Fund"])
+                table_df = table_df[df_columns + ["Allocation"]]
             else:
                 messages.warning(request, "There are no allocations recorded")
 
@@ -617,12 +617,15 @@ def costcenter_in_year_fear(request):
             elif not fcst_adj_df.empty:
                 context["fcst"] = fcst_adj_df["Forecast Adjustment"].to_json(orient="records")
 
-        elif len(request.GET):
-            table_df = "There are no data to report using the given parameters."
-        else:
-            table_df = ""
+            table_html = table_df.style.format(thousands=",", precision=0)
+            table_html = table_df.to_html()
 
-        context["table"] = table_df
+        elif len(request.GET):
+            table_html = "There are no data to report using the given parameters."
+        else:
+            table_html = ""
+
+        context["table"] = table_html
         context["form"] = form
     return render(request, "costcenter-in-year-data.html", context)
 
