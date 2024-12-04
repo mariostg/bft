@@ -543,6 +543,7 @@ def costcenter_in_year_fear(request):
     context = {
         "title": f"{initial['costcenter_name']} In Year FEARS",
         "url_name": "costcenter-in-year-fear",
+        "query_String": "",
         "form_filter": True,
         "form": form,
         "table": "Cost Center and Fund are mandatory fields.",
@@ -627,6 +628,7 @@ def costcenter_in_year_fear(request):
 
         context["table"] = table_html
         context["form"] = form
+        context["query_string"] = request.GET.urlencode()
     return render(request, "costcenter-in-year-data.html", context)
 
 
