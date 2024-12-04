@@ -185,8 +185,8 @@ def costcenter_monthly_forecast_line_item(request):
             df_columns = ["Fund", "Line Item Forecast"]
             if initial["costcenter"] is None:
                 df_columns = ["Cost Center"] + df_columns
-            if initial["costcenter"] is None:
-                df_columns = ["Cost Center"] + df_columns
+            if initial["period"] is None:
+                df_columns = ["Period"] + df_columns
             df = df[df_columns]
             df = df.style.format(thousands=",", precision=0)
             df = df.to_html()
@@ -449,6 +449,8 @@ def costcenter_monthly_encumbrance(request):
             ]
             if initial["costcenter"] is None:
                 df_columns = ["Cost Center"] + df_columns
+            if initial["period"] is None:
+                df_columns = ["Period"] + df_columns
             df = df[df_columns]
             df = df.style.format(thousands=",", precision=0)
             df = df.to_html()
