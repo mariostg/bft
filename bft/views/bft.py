@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.generic.base import TemplateView
 
@@ -29,6 +30,14 @@ def bft_status(request):
         f"bft/{url_name}.html",
         {"fy": fy, "quarter": quarter, "period": period, "url_name": url_name, "title": "BFT Status"},
     )
+
+
+def ajax_status_request(request):
+    status = BftStatus.current
+    fy = status.fy()
+    # Data
+    d = {"Fy": fy, "period": status.period(), "quarter": status.quarter()}
+    return JsonResponse(d)
 
 
 def _bft_status_update(request, status):
