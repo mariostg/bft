@@ -29,7 +29,6 @@ class TestCostCenterMonthlyReport:
             "working_plan",
             "fy",
             "period",
-            "source",
         } == lines[0].keys()
 
     def test_insert_line_items(self, populatedata, upload):

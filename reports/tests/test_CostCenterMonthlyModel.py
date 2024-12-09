@@ -9,7 +9,6 @@ class TestCostCenterMonthlyModel:
     m1 = {
         "fund": "C113",
         "costcenter": "8484WA",
-        "source": "Army",
         "fy": "2023",
         "period": "1",
         "spent": 3000,
@@ -22,7 +21,6 @@ class TestCostCenterMonthlyModel:
     duplicate = {
         "fund": "C113",
         "costcenter": "8484WA",
-        "source": "Army",
         "fy": "2023",
         "period": "1",
         "spent": 3000,
