@@ -98,6 +98,13 @@ class TestSourceUpdate:
         response = Client().get(reverse("source-update", args=[1]))
         assertTemplateUsed(response, "costcenter/source-form.html")
 
+    def test_add_source(self):
+        c = Client()
+        response = c.post("/source/source-add/", {"source": "AAAA"})
+        assert 302 == response.status_code
+        response = c.post("/source/source-add/", {"source": "AAAA"})
+        assert "Source Aaaa" in str(response.content)
+
 
 @pytest.mark.django_db
 class TestSourceDelete:

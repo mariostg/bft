@@ -308,11 +308,8 @@ class Source(models.Model):
         verbose_name_plural = "Sources"
 
     def save(self, *args, **kwargs):
-        if not self.source.isupper():
-            self.source = self.source.capitalize()
+        self.source = self.source.capitalize()
         super(Source, self).save(*args, **kwargs)
-
-    objects = SourceManager()
 
 
 class FundCenterManager(models.Manager):
