@@ -83,6 +83,13 @@ class TestSourceAdd:
         response = Client().get(reverse("source-add"))
         assertTemplateUsed(response, "costcenter/source-form.html")
 
+    def test_add_source(self):
+        c = Client()
+        response = c.post("/source/source-add/", {"source": "AAAA"})
+        assert 302 == response.status_code
+        response = c.post("/source/source-add/", {"source": "AAAA"})
+        assert "Source Aaaa" in str(response.content)
+
 
 @pytest.mark.django_db
 class TestSourceUpdate:
@@ -97,13 +104,6 @@ class TestSourceUpdate:
     def test_view_uses_correct_template(self):
         response = Client().get(reverse("source-update", args=[1]))
         assertTemplateUsed(response, "costcenter/source-form.html")
-
-    def test_add_source(self):
-        c = Client()
-        response = c.post("/source/source-add/", {"source": "AAAA"})
-        assert 302 == response.status_code
-        response = c.post("/source/source-add/", {"source": "AAAA"})
-        assert "Source Aaaa" in str(response.content)
 
 
 @pytest.mark.django_db
