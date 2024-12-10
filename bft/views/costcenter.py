@@ -141,6 +141,7 @@ def source_add(request):
     if request.method == "POST":
         form = SourceForm(request.POST)
         if form.is_valid():
+            context["form"] = form
             obj = form.save(commit=False)
             try:
                 form.save()
