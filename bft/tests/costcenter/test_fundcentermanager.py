@@ -10,7 +10,7 @@ class TestFundCenterManager:
     def setup(self):
         fc = {"fundcenter": "1111aa", "shortname": "bedroom", "sequence": "1"}
         self.current = FundCenter.objects.create(**fc)
-        fund = {"fund": "C113"}
+        fund = {"fund": "C113", "vote": "1"}
         Fund.objects.create(**fund)
 
     def test_fundcenter(self, setup):

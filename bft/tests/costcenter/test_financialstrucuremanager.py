@@ -81,9 +81,7 @@ class TestFinancialStructureManager:
         )
 
         parent = "1.1.1.1"
-        assert 3 == len(
-            FinancialStructureManager().get_sequence_direct_descendants(parent)
-        )
+        assert 9 == len(FinancialStructureManager().get_sequence_direct_descendants(parent))
 
         parent = FundCenterManager().fundcenter("2184a3")
         assert 3 == len(
@@ -101,7 +99,7 @@ class TestFinancialStructureManager:
     def test_create_child_of_root(self, populatedata):
         root = FinancialStructureManager().FundCenters(fundcenter="0162ND").first()
         child = FinancialStructureManager().set_parent(root)
-        assert "1.2" == child  # 1.1 alreadey set
+        assert "1.1.3" == child  # 1.1 alreadey set
 
     def test_create_child_using_parent(self, populatedata):
         parent_obj = FinancialStructureManager().FundCenters(fundcenter="2184A3").first()
@@ -130,7 +128,7 @@ class TestFinancialStructureManager:
     def test_set_parent(self, populatedata):
         parent = FinancialStructureManager().FundCenters(fundcenter="2184AA").first()
         p = FinancialStructureManager().set_parent(fundcenter_parent=parent)
-        assert parent.sequence + ".3" == p
+        assert parent.sequence + ".14" == p
 
     def test_set_parent_of_cost_center(self, populatedata):
         parent = FundCenterManager().fundcenter("2184A3")

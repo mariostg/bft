@@ -11,7 +11,7 @@ class TestCostCenterManager:
     def setup(self):
         fc = {"fundcenter": "1111aa", "shortname": "bedroom", "sequence": "1"}
         parent = FundCenter.objects.create(**fc)
-        fund = {"fund": "C113"}
+        fund = {"fund": "C113", "vote": "1"}
         fund = Fund.objects.create(**fund)
         source = Source.objects.create(**{"source": "Basement"})
         cc = {

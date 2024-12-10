@@ -276,10 +276,13 @@ class Fund(models.Model):
         verbose_name_plural = "Funds"
 
     def clean_vote(self):
-        if self.vote != "1" and self.vote != "5":
-            raise ValueError("Vote must be 1 or 5")
+        self.vote = str(self.vote)
+        if self.vote != "1" and self.vote != "5" and self.vote != "0":
+            raise ValueError(f"Vote must be 1 or 5, you provided [{self.vote}]")
 
     def clean_fund(self):
+        if self.fund == "----":
+            return
         if not self.fund[0].isalpha():
             raise ValueError("Fund must begin with a letter")
         if len(self.fund) != 4:
@@ -322,6 +325,8 @@ class Source(models.Model):
     def save(self, *args, **kwargs):
         self.source = self.source.capitalize()
         super(Source, self).save(*args, **kwargs)
+
+    objects = SourceManager()
 
 
 class FundCenterManager(models.Manager):

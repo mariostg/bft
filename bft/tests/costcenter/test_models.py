@@ -116,13 +116,13 @@ class TestFundModel:
         f1 = Fund.objects.filter(fund="C113").first()
         f1.fund = "X999"
         f1.name = "New Name"
-        f1.vote = 4
+        f1.vote = "1"
         f1.save()
 
         f2 = Fund.objects.filter(pk=f1.pk).first()
         assert "X999" == f2.fund
         assert "New Name" == f2.name
-        assert "4" == f2.vote
+        assert "1" == f2.vote
 
     def test_can_delete_fund(self):
         f0 = Fund(**FUND_C113)
