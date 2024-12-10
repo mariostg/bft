@@ -46,24 +46,6 @@ class FundForm(forms.ModelForm):
         model = Fund
         fields = ["fund", "name", "vote", "download"]
 
-    def clean_vote(self):
-        vote = self.cleaned_data["vote"]
-        if not vote:
-            return vote
-        if vote != "1" and vote != "5":
-            self.add_error("vote", "Vote must be 1 or 5")
-        return vote
-
-    def clean_fund(self):
-        fund = self.cleaned_data["fund"].upper()
-        if not fund:
-            return fund
-        if not fund[0].isalpha():
-            self.add_error("fund", "Fund must begin with a letter")
-        if len(fund) != 4:
-            self.add_error("fund", "Fund must be 4 characters long.")
-        return fund
-
     def __init__(self, *args, **kwargs):
         super(FundForm, self).__init__(*args, **kwargs)
 

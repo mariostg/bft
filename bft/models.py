@@ -275,8 +275,20 @@ class Fund(models.Model):
         ordering = ["-download", "fund"]
         verbose_name_plural = "Funds"
 
+    def clean_vote(self):
+        if self.vote != "1" and self.vote != "5":
+            raise ValueError("Vote must be 1 or 5")
+
+    def clean_fund(self):
+        if not self.fund[0].isalpha():
+            raise ValueError("Fund must begin with a letter")
+        if len(self.fund) != 4:
+            raise ValueError("Fund must be 4 characters long.")
+
     def save(self, *args, **kwargs):
         self.fund = self.fund.upper()
+        self.clean_fund()
+        self.clean_vote()
         super(Fund, self).save(*args, **kwargs)
 
     objects = FundManager()

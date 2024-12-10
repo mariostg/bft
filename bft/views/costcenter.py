@@ -56,8 +56,24 @@ def fund_add(request):
         form = FundForm(request.POST)
         if form.is_valid():
             context["form"] = form
-            form.save()
-            return redirect("fund-table")
+            obj = form.save(commit=False)
+            try:
+                form.save()
+            except IntegrityError:
+                messages.error(request, f"Fund {obj.fund} exists.")
+                return render(
+                    request,
+                    "costcenter/fund-form.html",
+                    context,
+                )
+            except ValueError as e:
+                messages.error(request, e)
+                return render(
+                    request,
+                    "costcenter/fund-form.html",
+                    context,
+                )
+        return redirect("fund-table")
     else:
         context["form"] = FundForm
 

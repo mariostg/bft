@@ -49,6 +49,38 @@ class TestCostCenterUpdate:
         assertTemplateUsed(response, "costcenter/costcenter-table.html")
 
 
+@pytest.mark.django_db
+class TestFundAdd:
+    def test_add_fund(self):
+        c = Client()
+        response = c.post(
+            "/fund/fund-add/",
+            {"fund": "c113", "name": "the name", "vote": "1"},
+        )
+        assert 302 == response.status_code
+        response = c.post(
+            "/fund/fund-add/",
+            {"fund": "c113", "name": "the name", "vote": "1"},
+        )
+        assert "Fund C113" in str(response.content)
+
+    def test_invalid_fund(self):
+        c = Client()
+        response = c.post(
+            "/fund/fund-add/",
+            {"fund": "113", "name": "the name", "vote": "1"},
+        )
+        assert "Fund must begin with a letter" in str(response.content)
+
+    def test_invalid_vote(self):
+        c = Client()
+        response = c.post(
+            "/fund/fund-add/",
+            {"fund": "C114", "name": "the name", "vote": "8"},
+        )
+        assert "Vote must be 1 or 5" in str(response.content)
+
+
 """
 Testing Source urls and templates.
 """
