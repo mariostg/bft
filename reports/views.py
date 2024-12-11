@@ -77,7 +77,7 @@ def bmt_screening_report(request):
 
         query_string = request.GET.urlencode()
 
-    if fundcenter and fund:
+    if initial["fundcenter"] and initial["fund"]:
         sr = screeningreport.ScreeningReport(fundcenter, fund, fy, quarter)
         try:
             sr.main()
