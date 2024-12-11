@@ -1180,11 +1180,12 @@ def forecast_adjustment_add(request):
     """
     context = {
         "title": "Create Forecast Adjustment",
-        "url_name": "forecast-adjustment-add",
+        "url_name": "forecast-adjustment-table",
     }
     if request.method == "POST":
         form = ForecastadjustmentForm(request.POST)
         if form.is_valid():
+            context["form"] = form
             form = form.save(commit=False)
             form.user = request.user
             try:
