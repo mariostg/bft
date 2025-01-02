@@ -936,6 +936,17 @@ class FundCenterManager(models.Manager):
         return df
 
     def get_direct_descendants(self, fundcenter: "FundCenter|str") -> list | None:
+        """
+        Get direct descendant fund centers and cost centers of a given fund center.
+
+        Args:
+            fundcenter (Union[FundCenter, str]): Fund center object or fund center code string.
+
+        Returns:
+            Union[list, None]: List containing direct descendant fund centers and cost centers.
+                Returns empty list if fundcenter argument is empty.
+                Returns None if provided fund center string does not exist.
+        """
         if not fundcenter:
             return []
         if isinstance(fundcenter, str):
@@ -948,6 +959,24 @@ class FundCenterManager(models.Manager):
     def get_direct_descendants_dataframe(
         self, fundcenter: "FundCenter|str"
     ) -> list | None:
+        """
+        Get direct descendants of a fund center as a pandas DataFrame.
+
+        This method retrieves all direct child fund centers and cost centers for a given fund center
+        and combines them into a single DataFrame.
+
+        Args:
+            fundcenter (Union[FundCenter, str]): The fund center object or fund center code string
+
+        Returns:
+            Union[pandas.DataFrame, None]: DataFrame containing combined fund centers and cost centers data.
+            Returns None if the fund center string provided doesn't exist.
+
+        Example:
+            >>> fc = FundCenter.objects.get(fundcenter='FC001')
+            >>> descendants_df = fc.get_direct_descendants_dataframe(fc)
+        """
+
         if isinstance(fundcenter, str):
             try:
                 fundcenter = FundCenter.objects.get(fundcenter=fundcenter.upper())
@@ -958,22 +987,76 @@ class FundCenterManager(models.Manager):
         return pd.concat([fc, cc])
 
     def get_fund_centers(self, parent: "FundCenter|str") -> list:
+        """Get all fund centers under a given parent.
+
+        Args:
+            parent (Union[FundCenter, str]): Parent fund center object or fund center string equivalent
+
+        Returns:
+            list: List of fund center dictionaries containing all children fund centers under the given parent
+
+        Example:
+            >>> center = FundCenter.objects.get(id='FC001')
+            >>> get_fund_centers(center)
+            [{'id': 'FC002', 'name': 'Child Center 1'}, {'id': 'FC003', 'name': 'Child Center 2'}]
+        """
         if isinstance(parent, str):
             parent = self.fundcenter(parent)
         return list(FundCenter.objects.filter(fundcenter_parent=parent).values())
 
     def get_cost_centers(self, parent: "FundCenter|str") -> list:
+        """
+        Retrieves all cost centers associated with a specific parent fund center.
+
+        Args:
+            parent (Union[FundCenter, str]): The parent fund center object or its string equivalent.
+
+        Returns:
+            list: A list of dictionaries containing the cost center data. Each dictionary
+                  contains the field values for a cost center associated with the parent.
+
+        Example:
+            >>> fund.get_cost_centers('FC123')
+            [{'id': 'CC100', 'name': 'Cost Center 1', ...}, {'id': 'CC101', 'name': 'Cost Center 2', ...}]
+        """
         if isinstance(parent, str):
             parent = self.fundcenter(parent)
         return list(CostCenter.objects.filter(costcenter_parent=parent).values())
 
     def exists(self, fundcenter: str = None) -> bool:
+        """Check if one or all FundCenter(s) exists.
+
+        This method checks whether a specific fund center exists when a fundcenter parameter is provided,
+        or if any fund centers exist in the database when no parameter is provided.
+
+        Args:
+            fundcenter (str, optional): The fund center code to check for existence.
+                                       Defaults to None.
+
+        Returns:
+            bool: True if the specified fund center exists (when fundcenter is provided)
+                  or if any fund centers exist (when fundcenter is None),
+                  False otherwise.
+        """
         if fundcenter:
             return FundCenter.objects.filter(fundcenter=fundcenter.upper()).exists()
         else:
             return FundCenter.objects.count() > 0
 
     def get_request(self, request) -> str | None:
+        """Get fund center string from request if it exists.
+
+        This method extracts the fund center from the GET parameters of the request,
+        converts it to uppercase, validates its existence and returns it.
+        If no fund center is provided, returns None.
+
+        Args:
+            request: The HTTP request object containing GET parameters.
+
+        Returns:
+            str | None: The uppercase fund center string if it exists in request,
+                        None otherwise.
+        """
         fundcenter = request.GET.get("fundcenter")
         if fundcenter:
             fundcenter = fundcenter.upper()
