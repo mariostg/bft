@@ -24,7 +24,25 @@ logger = logging.getLogger("uploadcsv")
 
 
 class BftStatusManager(models.Manager):
-    """A class to access current fiscal year, quarter and period"""
+    """BftStatusManager is a custom model manager for handling BftStatus objects.
+
+    This manager provides methods to retrieve specific status values from the BftStatus model,
+    focusing on fiscal year (FY), quarter, and period information.
+
+    Methods:
+        fy() -> str | None:
+            Retrieves the value associated with the "FY" status.
+            Returns None if the status does not exist.
+
+        quarter() -> str | None:
+            Retrieves the value associated with the "QUARTER" status.
+            Returns None if the status does not exist.
+
+        period() -> str | None:
+            Retrieves the value associated with the "PERIOD" status.
+            Returns None if the status does not exist.
+    """
+
     def fy(self) -> str | None:
         try:
             return BftStatus.objects.get(status="FY").value
@@ -45,7 +63,30 @@ class BftStatusManager(models.Manager):
 
 
 class BftStatus(models.Model):
-    """A class to assign key-value applicable to the BFT.  Typical and mandatory keys are fiscal year, quarter and period."""
+    """A model representing the status of BFT (Business Forecasting Tool).
+
+    This model stores and manages different statuses and their corresponding values,
+    with built-in validation for quarters and periods.
+
+    Attributes:
+        status (CharField): The status identifier, must be one of predefined STATUS choices.
+        value (CharField): The value associated with the status.
+        objects (Manager): Default model manager.
+        current (BftStatusManager): Custom manager for status-specific operations.
+
+    Methods:
+        __str__(): Returns a string representation in format "status:value".
+        save(*args, **kwargs): Custom save method with validation logic for status and values.
+
+    Raises:
+        AttributeError: If the status is not one of the predefined STATUS choices.
+        ValueError: If the value is invalid for QUARTER or PERIOD status types.
+
+    Example:
+        status = BftStatus(status='QUARTER', value='Q1')
+        status.save()  # Will validate before saving
+    """
+
     status = models.CharField("Status", max_length=30, unique=True, choices=STATUS)
     value = models.CharField("Value", max_length=30)
 
@@ -76,35 +117,96 @@ class BftStatus(models.Model):
 
 
 class BftUserManager(BaseUserManager):
-    """
-    Bft user model manager where usernane is the unique identifiers and is derived from the email address
-    for authentication.  email address domain must be @forces.gc.ca
+    """BftUserManager class for managing BFT user accounts.
+
+    This class extends Django's BaseUserManager to provide custom user management
+    functionality specifically for the BFT application. It handles user creation,
+    normalization of user data, and email validation specifically for forces.gc.ca domain.
+
+    Methods:
+        normalize_user(obj: BftUser) -> BftUser:
+            Normalizes user's first and last names by capitalizing them.
+
+        make_username(email: str) -> str:
+            Extracts and returns username from email address.
+
+        normalize_email(email: str) -> str:
+            Normalizes email and validates it belongs to forces.gc.ca domain.
+
+        create_user(email: str, password: str, **extra_fields) -> BftUser:
+            Creates and saves a new user with the given email and password.
+
+        create_superuser(email: str, password: str, **extra_fields) -> BftUser:
+            Creates and saves a new superuser with the given email and password.
+
+    Raises:
+        ValueError: If email is empty, domain is not forces.gc.ca, or superuser flags are invalid.
     """
 
     @classmethod
     def normalize_user(cls, obj: "BftUser"):
-        """A class method to make upper case the first letter of both first and last name from the BFTUser"""
+        """Normalizes a BftUser object by capitalizing first and last names.
+
+        Args:
+            obj (BftUser): User object to be normalized.
+
+        Returns:
+            BftUser: The normalized user object with capitalized names.
+
+        Example:
+            >>> user = BftUser(first_name="john", last_name="doe")
+            >>> normalized = BftUser.normalize_user(user)
+            >>> print(normalized.first_name, normalized.last_name)
+            John Doe
+        """
+
         obj.first_name = obj.first_name.capitalize()
         obj.last_name = obj.last_name.capitalize()
         return obj
 
     @classmethod
     def make_username(cls, email) -> str:
-        """Create username by extracting the username part of the email address
+        """Create a username from an email address.
+
+        This method extracts the username portion from an email address by removing
+        the domain part (everything after '@') and converting it to lowercase.
 
         Args:
-            email (_type_): Email address
+            email (str): The email address to extract username from.
+
         Returns:
-            str: Username
+            str: The extracted username in lowercase.
+
+        Example:
+            >>> make_username("User.Name@example.com")
+            "user.name"
         """
+
         username, _ = email.strip().rsplit("@", 1)
         return username.lower()
 
     @classmethod
     def normalize_email(cls, email):
         """
-        Normalize the email address by lowercasing both the domain and username part of the email address.  No need to call super()
+        Normalize an email address by converting to lowercase and validating domain.
+
+        This method processes an email address by splitting it into local and domain parts,
+        converting both to lowercase, and ensuring the domain is 'forces.gc.ca'.
+
+        Args:
+            email (str): The email address to normalize.
+
+        Returns:
+            str: The normalized email address.
+
+        Raises:
+            ValueError: If the domain part is not 'forces.gc.ca'.
+
+        Example:
+            >>> normalize_email("User.Name@FORCES.GC.CA")
+            'user.name@forces.gc.ca'
         """
+
         email = email or ""
         try:
             email_name, domain_part = email.strip().rsplit("@", 1)
@@ -121,12 +223,28 @@ class BftUserManager(BaseUserManager):
 
     def create_user(self, email, password, **extra_fields):
         """
-        Create and save a user with the given email and password.
+        Create a new user with the specified email and password.
+
+        Args:
+            email (str): The email address for the new user. Required.
+            password (str): The password for the new user. Required.
+            **extra_fields: Additional fields to be set on the user model.
+
+        Returns:
+            User: The newly created user instance.
+
+        Raises:
+            ValueError: If email is not provided.
+
+        Note:
+            The username is automatically generated from the email address by taking
+            the part before the @ symbol.
         """
+
         if not email:
-            raise ValueError(_("The Email must be set"))  # noqa
+            raise ValueError(_("The Email must be set"))
         email = self.normalize_email(email)
-        username, _ = email.strip().rsplit("@", 1)  # noqa
+        username, _ = email.strip().rsplit("@", 1)
         user_model = get_user_model()
         user = user_model(username=username, email=email, **extra_fields)
         user.set_password(password)
@@ -135,15 +253,32 @@ class BftUserManager(BaseUserManager):
 
     def create_superuser(self, email, password, **extra_fields):
         """
-        Create and save a SuperUser with the given email and password.
+        Creates and saves a superuser with the given email and password.
+
+        Args:
+            email (str): The email address for the superuser.
+            password (str): The password for the superuser.
+            **extra_fields: Additional fields to be set for the superuser.
+
+        Returns:
+            User: The created superuser instance.
+
+        Raises:
+            ValueError: If is_staff or is_superuser is not True.
+
+        Notes:
+            - Sets is_staff, is_superuser, and is_active to True by default
+            - Removes username field if present in extra_fields
+            - Delegates actual user creation to create_user method
         """
+
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
         if extra_fields.get("is_staff") is not True:
-            raise ValueError(_("Superuser must have is_staff=True."))  # noqa
+            raise ValueError(_("Superuser must have is_staff=True."))
         if extra_fields.get("is_superuser") is not True:
-            raise ValueError(_("Superuser must have is_superuser=True."))  # noqa
+            raise ValueError(_("Superuser must have is_superuser=True."))
         try:
             extra_fields.pop("username")
         except Exception:
@@ -152,7 +287,25 @@ class BftUserManager(BaseUserManager):
 
 
 class BftUser(AbstractUser):
-    """A class that extends AbstractUser base class.  The model has additional fields to satisfy the BFT needs"""
+    """A custom user model extending Django's AbstractUser.
+
+    This model extends Django's AbstractUser to add custom fields and functionality
+    specific to the BFT (Business Financial Tool) application.
+
+    Attributes:
+        default_fc (FundCenter): The user's default fund center, if any.
+        default_cc (CostCenter): The user's default cost center, if any.
+        procurement_officer (bool): Flag indicating if user has procurement officer privileges.
+        objects (BftUserManager): Custom manager for BftUser model.
+
+    Permissions:
+        create_data: Allows user to create new data entries.
+        upload_data: Allows user to upload data files.
+
+    Note:
+        This model uses RESTRICT for foreign key deletion to prevent accidental
+        deletion of fund centers and cost centers that are set as defaults.
+    """
     default_fc = models.OneToOneField(
         "FundCenter",
         on_delete=models.RESTRICT,
@@ -178,9 +331,34 @@ class BftUser(AbstractUser):
 
 
 class BookmarkQuerySet(models.QuerySet):
-    """A database lookup class for bookmark object"""
+    """A custom QuerySet manager for Bookmark objects.
+
+    This QuerySet manager extends the default Django QuerySet to provide
+    additional methods for filtering and retrieving bookmarks based on ownership.
+
+    Methods:
+        owner(owner: BftUser | str) -> QuerySet | None:
+            Filters bookmarks by owner, accepting either a BftUser instance or username string.
+            Returns None if the specified user doesn't exist.
+
+        user_bookmark(request) -> QuerySet | None:
+            Retrieves bookmarks for the currently authenticated user from the request.
+            Returns None if the user doesn't exist.
+    """
+
     def owner(self, owner: BftUser | str) -> QuerySet | None:
-        """Get the bookmarks for the specified user."""
+        """Filter queryset by owner.
+        This method filters the queryset to only include objects owned by the specified owner.
+        Args:
+            owner (Union[BftUser, str]): The owner to filter by. Can be either a BftUser instance
+                or a username string.
+        Returns:
+            Union[QuerySet, None]: Returns filtered queryset if owner exists, None if string owner
+                not found, or original queryset if no owner specified.
+        Raises:
+            None
+        """
+
         if not owner:
             return self
         if isinstance(owner, str):
@@ -191,7 +369,22 @@ class BookmarkQuerySet(models.QuerySet):
         return self.filter(owner=owner)
 
     def user_bookmark(self, request):
-        """Get the bookmarks for the current user."""
+        """
+        Retrieve bookmarks for the authenticated user.
+
+        This method fetches all bookmarks associated with the currently logged-in user.
+        If the user doesn't exist, returns None.
+
+        Args:
+            request: HttpRequest object containing user authentication details
+
+        Returns:
+            QuerySet: Collection of Bookmark objects owned by the user if found
+            None: If the user does not exist
+
+        Raises:
+            None: Exceptions are handled internally
+        """
         try:
             owner = BftUser.objects.get(username=request.user)
             bm = Bookmark.objects.filter(owner=owner)
@@ -201,7 +394,25 @@ class BookmarkQuerySet(models.QuerySet):
 
 
 class Bookmark(models.Model):
-    """Class model that describes the bookmarks assigned to BFT users."""
+    """
+    A Django model representing a bookmark in the BFT application.
+
+    The Bookmark model allows users to save and manage their favorite links/URLs along with
+    associated query strings. Each bookmark is owned by a BftUser and must be unique for
+    that user based on the combination of link, query string and owner.
+
+    Attributes:
+        owner (ForeignKey): Reference to the BftUser who owns this bookmark
+        bookmark_name (str): Name/title of the bookmark (max 30 characters)
+        bookmark_link (str): URL/link of the bookmark (max 125 characters)
+        bookmark_query_string (str): Optional query string parameters (max 255 characters)
+        objects (Manager): Default model manager
+        search (BookmarkQuerySet): Custom queryset manager for advanced search capabilities
+
+    Note:
+        The combination of bookmark_link, bookmark_query_string and owner must be unique
+        within the application.
+    """
     owner = models.ForeignKey(BftUser, on_delete=models.CASCADE, default="", verbose_name="Owner's Favorite")
     bookmark_name = models.CharField(max_length=30)
     bookmark_link = models.CharField(max_length=125)
@@ -226,9 +437,43 @@ class Bookmark(models.Model):
 
 
 class FundManager(models.Manager):
-    """A manager for Fund object"""
+    """Fund object manager class.
+
+    This class manages Fund objects in the database, providing methods to retrieve,
+    check existence, and handle web requests related to funds.
+
+    Methods:
+        fund(fund: str) -> Fund | None:
+            Retrieves a Fund object given its fund string identifier.
+
+        pk(pk: int) -> Fund | None:
+            Retrieves a Fund object given its primary key.
+
+        exists(fund: str) -> bool:
+            Checks if a fund exists in the database.
+
+        get_request(request) -> str | None:
+            Processes an HTTP request to extract and validate a fund identifier.
+    """
     def fund(self, fund: str):
-        """Get a fund object given the fund string"""
+        """
+        Retrieves a Fund object from the database based on the provided fund name.
+
+        Args:
+            fund (str): The name of the fund to search for (case-insensitive)
+
+        Returns:
+            Fund: The matching Fund object if found
+            None: If no matching Fund is found in the database
+
+        Examples:
+            >>> fund_obj = model.fund("C113")
+            >>> if fund_obj:
+            ...     print(fund_obj.name)
+            ... else:
+            ...     print("Fund not found")
+        """
+
         try:
             obj = Fund.objects.get(fund__iexact=fund)
         except Fund.DoesNotExist:
@@ -236,7 +481,19 @@ class FundManager(models.Manager):
         return obj
 
     def pk(self, pk: int):
-        """Get a fund object given the primary key"""
+        """Get a fund object given the primary key
+
+        Args:
+            pk (int): Primary key identifier of the fund
+
+        Returns:
+            Fund | None: Fund object if found, None if fund does not exist
+
+        Examples:
+            >>> fund = Fund.pk(1)  # Returns Fund object with pk=1
+            >>> fund = Fund.pk(999)  # Returns None if fund not found
+        """
+
         try:
             obj = Fund.objects.get(pk=pk)
         except Fund.DoesNotExist:
@@ -244,11 +501,31 @@ class FundManager(models.Manager):
         return obj
 
     def exists(self, fund: str) -> bool:
-        """Check the existance of a fund given the string"""
+        """Check if a fund exists in the database.
+
+        Args:
+            fund (str): The fund identifier to check for existence.
+
+        Returns:
+            bool: True if the fund exists in the database, False otherwise.
+        """
         return Fund.objects.filter(fund=fund).exists()
 
     def get_request(self, request) -> str | None:
-        """Handle get request for fund specified in request"""
+        """
+        Extracts and validates a fund parameter from an HTTP request.
+
+        Args:
+            request: The HTTP request object containing GET parameters.
+
+        Returns:
+            str | None: The uppercase fund identifier if valid, empty string if fund doesn't exist,
+            or None if no fund parameter was provided.
+
+        Notes:
+            - The fund parameter is case-insensitive as it's converted to uppercase.
+            - Displays an info message to the user if the requested fund doesn't exist.
+        """
         fund = request.GET.get("fund")
         if fund:
             fund = fund.upper()
@@ -261,8 +538,30 @@ class FundManager(models.Manager):
 
 
 class Fund(models.Model):
-    """This model represents a fund such as C113, C523, etc.  The download field indicates if line items matching
-    field should be downloaded during DRMIS download process.  When False, line item will be skipped.BB"""
+    """A Django model representing a financial fund as defined in DRMIS.
+
+    This class represents a fund with basic information including its code, name,
+    vote status, and download flag. The fund code must be a 4-character string
+    starting with a letter, the vote must be either '0', '1' or '5'.
+
+    Attributes:
+        fund (str): A unique 4-character fund identifier code.
+        name (str): The fund's display name (up to 30 characters).
+        vote (str): A single character vote status ('0', '1', or '5').
+        download (bool): Flag indicating if the fund should be downloaded.
+
+    Methods:
+        clean_vote(): Validates the vote field.
+        clean_fund(): Validates the fund code format.
+        save(*args, **kwargs): Overrides the default save method to perform validation.
+
+    Meta:
+        ordering: Orders by download status (descending) then fund code.
+        verbose_name_plural: Sets plural name to "Funds".
+
+    Raises:
+        ValueError: If fund code or vote validation fails.
+    """
     fund = models.CharField(max_length=4, unique=True)
     name = models.CharField(max_length=30)
     vote = models.CharField(max_length=1)
@@ -276,11 +575,37 @@ class Fund(models.Model):
         verbose_name_plural = "Funds"
 
     def clean_vote(self):
+        """
+        Clean and validate the vote value.
+
+        The vote can only be "1", "5", or "0". The method converts the vote to string
+        and validates if it matches the accepted values.
+
+        Raises:
+            ValueError: If the vote is not "1", "5", or "0", with a message indicating
+                       the invalid value provided.
+        """
         self.vote = str(self.vote)
         if self.vote != "1" and self.vote != "5" and self.vote != "0":
             raise ValueError(f"Vote must be 1 or 5, you provided [{self.vote}]")
 
     def clean_fund(self):
+        """
+        Validates and cleans the fund code.
+
+        The fund code must follow these rules:
+        - Must be exactly 4 characters long
+        - Must begin with a letter
+        - Can be "----" (special case that bypasses validation)
+
+        Raises:
+            ValueError: If the fund code doesn't begin with a letter
+            ValueError: If the fund code is not exactly 4 characters long
+
+        Returns:
+            None: If fund is "----"
+            implicitly returns None if validation passes
+        """
         if self.fund == "----":
             return
         if not self.fund[0].isalpha():
@@ -289,6 +614,21 @@ class Fund(models.Model):
             raise ValueError("Fund must be 4 characters long.")
 
     def save(self, *args, **kwargs):
+        """
+        Save method for Fund model.
+
+        Performs the following operations before saving:
+        1. Converts fund name to uppercase
+        2. Cleans fund data
+        3. Cleans vote data
+
+        Args:
+            *args: Variable length argument list to pass to parent save method
+            **kwargs: Arbitrary keyword arguments to pass to parent save method
+
+        Extends:
+            django.db.models.Model.save()
+        """
         self.fund = self.fund.upper()
         self.clean_fund()
         self.clean_vote()
@@ -298,7 +638,35 @@ class Fund(models.Model):
 
 
 class SourceManager(models.Manager):
+    """A Django model manager for handling Source objects.
+
+    This manager provides methods for retrieving Source objects by their source name
+    or primary key.
+
+    Methods:
+        source(source: str) -> Optional[Source]:
+            Retrieves a Source object by its source name (case-insensitive).
+            Returns None if the source does not exist.
+
+        pk(pk: int) -> Optional[Source]:
+            Retrieves a Source object by its primary key.
+            Returns None if the source does not exist.
+    """
     def source(self, source: str):
+        """
+        Retrieve a Source object based on the source string.
+
+        Args:
+            source (str): The source string to search for (case-insensitive).
+
+        Returns:
+            Source: The matched Source object if found.
+            None: If no matching Source object is found.
+
+        Example:
+            >>> source_obj = source('example_source')
+            >>> print(source_obj)  # Returns Source object or None
+        """
         try:
             obj = Source.objects.get(source__iexact=source)
         except Source.DoesNotExist:
@@ -306,6 +674,15 @@ class SourceManager(models.Manager):
         return obj
 
     def pk(self, pk: int):
+        """
+        Retrieve a Source object by its primary key.
+
+        Args:
+            pk (int): Primary key of the Source object to retrieve.
+
+        Returns:
+            Source or None: The Source object if found, None if not found.
+        """
         try:
             obj = Source.objects.get(pk=pk)
         except Source.DoesNotExist:
@@ -314,6 +691,24 @@ class SourceManager(models.Manager):
 
 
 class Source(models.Model):
+    """A model representing a data source.  The source is used to better describe the characteristics of the cost centers.
+
+    This model stores information about different data sources in the system.
+    Each source must have a unique name that is automatically capitalized when saved.
+
+    Attributes:
+        source (CharField): The name of the source, limited to 24 characters and must be unique.
+
+    Meta:
+        verbose_name_plural (str): Specifies the plural name as "Sources" in the admin interface.
+
+    Methods:
+        __str__(): Returns a string representation of the source.
+        save(*args, **kwargs): Overrides the default save method to capitalize the source name.
+
+    Manager:
+        objects (SourceManager): Custom manager for Source model operations.
+    """
     source = models.CharField(max_length=24, unique=True)
 
     def __str__(self):
@@ -330,7 +725,65 @@ class Source(models.Model):
 
 
 class FundCenterManager(models.Manager):
+    """Manages Fund Center related database operations and data transformations.
+
+    This manager class provides methods to handle Fund Center operations, including:
+    - Fund center lookup and validation
+    - Hierarchical relationship management (parents, descendants)
+    - Data transformation to pandas DataFrames
+    - Allocation management and reporting
+
+    Methods:
+        fundcenter(fundcenter: str) -> FundCenter | None:
+            Retrieves a FundCenter object by its code (case-insensitive).
+
+        pk(pk: int) -> FundCenter | None:
+            Retrieves a FundCenter object by its primary key.
+
+        get_sub_alloc(parent_alloc: FundCenterAllocation) -> FundCenterAllocation:
+            Gets sub-allocations for a given parent allocation.
+
+        sequence_exist(sequence) -> bool:
+            Checks if a sequence exists in the database.
+
+        fund_center_dataframe(data: QuerySet) -> pd.DataFrame:
+            Converts fund center data to a pandas DataFrame.
+
+        allocation_dataframe(fundcenter, fund, fy, quarter) -> pd.DataFrame:
+            Creates a DataFrame of allocations based on provided filters.
+
+        get_direct_descendants(fundcenter: FundCenter|str) -> list | None:
+            Returns immediate child fund centers and cost centers.
+
+        get_direct_descendants_dataframe(fundcenter: FundCenter|str) -> pd.DataFrame:
+            Returns descendants as a DataFrame.
+
+        get_fund_centers(parent: FundCenter|str) -> list:
+            Returns child fund centers for a given parent.
+
+        get_cost_centers(parent: FundCenter|str) -> list:
+            Returns child cost centers for a given parent.
+
+        exists(fundcenter: str = None) -> bool:
+            Checks if a specific fund center exists.
+
+        get_request(request) -> str | None:
+            Extracts and validates fund center from HTTP request.
+    """
     def fundcenter(self, fundcenter: str) -> "FundCenter | None":
+        """
+        Retrieve a FundCenter object based on the provided fund center code.
+
+        Args:
+            fundcenter (str): The fund center code to search for.
+
+        Returns:
+            FundCenter | None: The matching FundCenter object if found, None otherwise.
+
+        Note:
+            The search is case-insensitive, but the input is converted to uppercase before querying.
+        """
+
         fundcenter = fundcenter.upper()
         try:
             obj = FundCenter.objects.filter(fundcenter__iexact=fundcenter)[0]
@@ -341,6 +794,16 @@ class FundCenterManager(models.Manager):
         return obj
 
     def pk(self, pk: int):
+        """
+        Retrieves a FundCenter object by its primary key.
+
+        Args:
+            pk (int): The primary key of the FundCenter object to retrieve.
+
+        Returns:
+            FundCenter|None: The FundCenter object if found, None otherwise.
+        """
+
         try:
             obj = FundCenter.objects.get(pk=pk)
         except FundCenter.DoesNotExist:
@@ -350,6 +813,21 @@ class FundCenterManager(models.Manager):
     def get_sub_alloc(
         self, parent_alloc: "FundCenterAllocation"
     ) -> "FundCenterAllocation":
+        """
+        Retrieves sub-allocations for a given parent fund center allocation.
+
+        This method finds all direct descendant fund centers of the parent allocation's fund center,
+        and returns their corresponding allocations that match the parent's fiscal year,
+        fund and quarter.
+
+        Args:
+            parent_alloc (FundCenterAllocation): The parent fund center allocation object
+
+        Returns:
+            QuerySet[FundCenterAllocation]: A queryset of FundCenterAllocation objects representing
+                the sub-allocations of the parent fund center for the same fiscal year,
+                fund and quarter.
+        """
         seq = [
             s["sequence"] for s in self.get_direct_descendants(parent_alloc.fundcenter)
         ]
@@ -362,15 +840,32 @@ class FundCenterManager(models.Manager):
         )
 
     def sequence_exist(self, sequence):
+        """
+        Check if a sequence already exists in the FundCenter model.
+
+        Args:
+            sequence: A sequence value to check for existence.
+
+        Returns:
+            bool: True if the sequence exists, False otherwise.
+        """
         return FundCenter.objects.filter(sequence=sequence).exists()
 
     def fund_center_dataframe(self, data: QuerySet) -> pd.DataFrame:
-        """Prepare a pandas dataframe of the fund centers as per financial structure.
-        Columns are renamed with a more friendly name.
+        """
+        Converts a QuerySet of fund centers into a pandas DataFrame.
+
+        This method processes fund center data and ensures proper formatting of the parent IDs.
+        Empty QuerySets will return an empty DataFrame.
+
+        Args:
+            data (QuerySet): A Django QuerySet containing fund center records
 
         Returns:
-            pd.DataFrame: A dataframe of fund centers.
+            pd.DataFrame: A pandas DataFrame with fund center data. The Fundcenter_parent_ID
+            column is converted to integer type with null values replaced by 0.
         """
+
         if not data.count():
             return pd.DataFrame()
         df = BFTDataFrame(FundCenter).build(data)
@@ -385,6 +880,39 @@ class FundCenterManager(models.Manager):
         fy: int = None,
         quarter: str = None,
     ) -> pd.DataFrame:
+        """
+        Retrieves fund center allocation data and returns it as a pandas DataFrame.
+
+        This method queries FundCenterAllocation objects based on the provided filters and
+        formats the data into a DataFrame with renamed columns for better readability.
+
+        Parameters
+        ----------
+        fundcenter : FundCenter or str, optional
+            Fund center object or fund center code to filter allocations
+        fund : Fund or str, optional
+            Fund object or fund code to filter allocations
+        fy : int, optional
+            Fiscal year to filter allocations
+        quarter : str, optional
+            Quarter to filter allocations
+
+        Returns
+        -------
+        pandas.DataFrame
+            DataFrame containing the allocation data with the following columns:
+            - Allocation: Amount allocated
+            - FY: Fiscal year
+            - Quarter: Quarter
+            - Fund Center: Fund center code
+            - Fund: Fund code
+
+        Examples
+        --------
+        >>> model.allocation_dataframe(fundcenter='2184BA', fy=2023, quarter='Q1')
+           Allocation   FY Quarter Fund Center  Fund
+        0     100000  2023      Q1      2184BA  F123
+        """
         data = (
             FundCenterAllocation.objects.fundcenter(fundcenter)
             .fund(fund)
