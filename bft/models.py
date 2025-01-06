@@ -2185,7 +2185,39 @@ class CostCenter(models.Model):
 
 
 class CapitalProjectManager(models.Manager):
+    """Manager class for CapitalProject model.
+
+    This class provides utility methods for managing CapitalProject objects,
+    including fetching projects, checking existence, and handling request parameters.
+
+    Methods:
+        project(capital_project: str) -> "CapitalProject | None":
+            Retrieves a capital project by its project number.
+            Returns None if project doesn't exist.
+
+        exists(capital_project: str = None) -> bool:
+            Checks if a specific capital project exists or if any projects exist.
+            If capital_project is provided, checks for that specific project.
+            If no argument provided, checks if any projects exist at all.
+
+        get_request(request) -> str | None:
+            Extracts and validates capital project number from request parameters.
+            Adds info message if project doesn't exist.
+            Returns uppercase project number or None if not provided.
+    """
     def project(self, capital_project: str) -> "CapitalProject | None":
+        """
+        Retrieve a CapitalProject object by its project number.
+
+        Args:
+            capital_project (str): The project number to search for.
+
+        Returns:
+            CapitalProject | None: The matching CapitalProject object if found, None otherwise.
+
+        The search is case-insensitive - the input string is converted to uppercase
+        before querying the database.
+        """
         capital_project = capital_project.upper()
         try:
             obj = CapitalProject.objects.get(project_no__iexact=capital_project)
@@ -2194,6 +2226,21 @@ class CapitalProjectManager(models.Manager):
         return obj
 
     def exists(self, capital_project: str = None) -> bool:
+        """Check if a specific capital project exists or if any capital projects exist.
+
+        Args:
+            capital_project (str, optional): The project number to check for.
+                If None, checks if any capital projects exist in the database.
+                Defaults to None.
+
+        Returns:
+            bool: True if the specified project exists (or any projects exist if no specific
+                project was provided), False otherwise.
+
+        Note:
+            When checking for a specific project, the project number comparison is case-insensitive
+            as the input is converted to uppercase.
+        """
         if capital_project:
             return CapitalProject.objects.filter(
                 project_no=capital_project.upper()
@@ -2202,6 +2249,16 @@ class CapitalProjectManager(models.Manager):
             return CapitalProject.objects.count() > 0
 
     def get_request(self, request) -> str | None:
+        """
+        Retrieves and validates the capital project parameter from an HTTP request.
+
+        Args:
+            request: The HTTP request object containing potential capital_project parameter.
+
+        Returns:
+            str | None: The uppercase capital project string if found and valid, None otherwise.
+                If project exists but is invalid, adds info message to request and returns project.
+        """
         capital_project = request.GET.get("capital_project")
         if capital_project:
             capital_project = capital_project.upper()
