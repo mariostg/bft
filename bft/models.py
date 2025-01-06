@@ -1614,6 +1614,31 @@ class FinancialStructureManager(models.Manager):
 
 
 class FundCenter(models.Model):
+    """A Fund Center model representing financial organizational units.
+
+    This model represents financial fund centers in a hierarchical structure, where each fund
+    center can have a parent fund center and multiple child fund centers.
+
+    Attributes:
+        fundcenter (str): A 6-character code identifying the fund center.
+        shortname (str): An optional 25-character name/description of the fund center.
+        sequence (str): A dot-separated path string representing the hierarchical structure.
+        level (int): The depth level in the hierarchy tree (default=0).
+        fundcenter_parent (ForeignKey): Reference to parent fund center, if any.
+
+    Methods:
+        __str__(): Returns a string representation in format "FUNDCENTER - SHORTNAME".
+        save(): Custom save method that:
+            - Handles sequence generation for root nodes
+            - Prevents self-referential parent assignments
+            - Updates sequence based on parent relationship
+            - Normalizes fundcenter and shortname to uppercase
+            - Calculates hierarchy level
+
+    Meta:
+        ordering: Orders by fundcenter field
+        constraints: Ensures unique combination of fundcenter and parent
+    """
     fundcenter = models.CharField("Fund Center", max_length=6)
     shortname = models.CharField(
         "Fund Center Name", max_length=25, null=True, blank=True
@@ -1657,6 +1682,25 @@ class FundCenter(models.Model):
         ]
 
     def save(self, *args, **kwargs):
+        """Saves a FundCenter instance with proper sequence and hierarchy validation.
+
+        This method handles the following operations before saving:
+        1. Assigns a new root sequence if no parent is specified
+        2. Validates parent-child relationships to prevent self-referencing
+        3. Sets the sequence based on parent if valid
+        4. Normalizes fundcenter and shortname to uppercase
+        5. Calculates hierarchical level based on sequence
+
+        Args:
+            *args: Variable length argument list passed to parent save method
+            **kwargs: Arbitrary keyword arguments passed to parent save method
+
+        Raises:
+            IntegrityError: If a fund center tries to assign itself as its own parent
+
+        Returns:
+            None
+        """
         if self.fundcenter_parent is None:
             self.sequence = FinancialStructureManager().new_root()
         elif (
@@ -1677,7 +1721,62 @@ class FundCenter(models.Model):
 
 
 class CostCenterManager(models.Manager):
+    """A manager class for handling Cost Center operations and queries in the BFT system.
+
+    This class provides methods to interact with Cost Center objects, including retrieving,
+    validating, and transforming cost center data. It handles various operations such as
+    checking updatability, generating DataFrames, and managing allocations.
+
+    Methods:
+        cost_center(costcenter: str) -> CostCenter|None:
+            Retrieves a cost center object by its code.
+
+        pk(pk: int) -> CostCenter|None:
+            Retrieves a cost center object by its primary key.
+
+        is_updatable(cc: str|CostCenter) -> bool:
+            Checks if a cost center can be updated during DRMIS download.
+
+        has_line_items(costcenter: CostCenter) -> bool:
+            Checks if a cost center has associated line items.
+
+        get_sub_alloc(fc: FundCenter|str, fund: Fund|str, fy: int, quarter: int) -> CostCenterAllocation:
+            Retrieves cost center allocations for given parameters.
+
+        cost_center_dataframe(data: QuerySet) -> pd.DataFrame:
+            Creates a DataFrame of cost centers with financial structure.
+
+        allocation_dataframe(costcenter: CostCenter|str, fund: Fund|str, fy: int, quarter: str) -> pd.DataFrame:
+            Creates a DataFrame of cost center allocations.
+
+        forecast_adjustment_dataframe() -> pd.DataFrame:
+            Creates a DataFrame of forecast adjustments.
+
+        get_sibblings(parent: FundCenter|str) -> QuerySet:
+            Retrieves all cost centers under the same parent.
+
+        exists(costcenter: str) -> bool:
+            Checks if a specific cost center or any cost centers exist.
+
+        get_request(request) -> str|None:
+            Extracts and validates cost center from an HTTP request.
+
+    Attributes:
+        None
+
+    Raises:
+        TypeError: When invalid types are provided to methods.
+    """
     def cost_center(self, costcenter: str) -> "CostCenter|None":
+        """
+        Retrieves a CostCenter instance based on the provided cost center code.
+
+        Args:
+            costcenter (str): The cost center code to look up.
+
+        Returns:
+            CostCenter|None: The matching CostCenter instance if found, None otherwise.
+        """
         costcenter = costcenter.upper()
         try:
             cc = CostCenter.objects.get(costcenter=costcenter)
@@ -1686,6 +1785,15 @@ class CostCenterManager(models.Manager):
         return cc
 
     def pk(self, pk: int):
+        """
+        Retrieves a CostCenter object by its primary key.
+
+        Args:
+            pk (int): The primary key of the CostCenter to retrieve.
+
+        Returns:
+            CostCenter|None: The CostCenter object if found, None otherwise.
+        """
         try:
             cc = CostCenter.objects.get(pk=pk)
         except CostCenter.DoesNotExist:
@@ -1693,6 +1801,26 @@ class CostCenterManager(models.Manager):
         return cc
 
     def is_updatable(self, cc: "str|CostCenter") -> bool:
+        """
+        Check if the cost center is updatable during DRMIS download process.
+        If not, the cost center will not be affected by the download.
+
+        Args:
+            cc (Union[str, CostCenter]): The cost center to check. Can be either a string
+                identifier or a CostCenter object.
+
+        Returns:
+            bool: True if the cost center is updatable, False otherwise.
+
+        Raises:
+            TypeError: If the cost center is neither a string nor a CostCenter object.
+
+        Examples:
+            >>> is_updatable("CC001")
+            True
+            >>> is_updatable(cost_center_obj)
+            False
+        """
         if isinstance(cc, str):
             cc_: CostCenter = self.cost_center(cc)
             if cc_:
@@ -1708,6 +1836,21 @@ class CostCenterManager(models.Manager):
     def get_sub_alloc(
         self, fc: FundCenter | str, fund: Fund | str, fy: int, quarter: int
     ) -> "CostCenterAllocation":
+        """
+        Retrieves a CostCenterAllocation object for a given fund center, fund, fiscal year and quarter.
+
+        Args:
+            fc (FundCenter | str): The fund center object or fund center code string
+            fund (Fund | str): The fund object or fund code string
+            fy (int): The fiscal year
+            quarter (int): The quarter number (1-4)
+
+        Returns:
+            CostCenterAllocation: QuerySet of CostCenterAllocation objects matching the criteria
+
+        Note:
+            If string inputs are provided for fc or fund, they will be converted to respective objects
+        """
         if isinstance(fc, str):
             fc = FundCenterManager().fundcenter(fc)
         if isinstance(fund, str):
@@ -1721,11 +1864,23 @@ class CostCenterManager(models.Manager):
         )
 
     def cost_center_dataframe(self, data: QuerySet) -> pd.DataFrame:
-        """Prepare a pandas dataframe of the cost centers as per financial structure.
-        Columns are renamed with a more friendly name.
+        """
+        Create a DataFrame containing cost centers enriched with related fund centers and procurement officers data.
+
+        This method merges cost centers data with fund centers and procurement officers (BftUsers) information
+        through left joins. If no cost centers exist in the database, returns an empty DataFrame.
+
+        Args:
+            data (QuerySet): QuerySet containing cost center records to process
 
         Returns:
-            pd.DataFrame: A dataframe of cost centers.
+            pd.DataFrame: DataFrame with merged cost centers, fund centers and procurement officers data.
+                         Returns empty DataFrame if no cost centers exist.
+
+        Note:
+            - Joins cost centers with fund centers on Costcenter_parent_ID = Fundcenter_ID
+            - Joins result with procurement officers on Procurement_officer_ID = Bftuser_ID
+            - Logs error if procurement officer merge fails
         """
         if not CostCenter.objects.exists():
             return pd.DataFrame()
@@ -1753,11 +1908,35 @@ class CostCenterManager(models.Manager):
         fy: int = None,
         quarter: str = None,
     ) -> pd.DataFrame:
-        """Prepare a pandas dataframe of the cost center allocations for the given FY and Quarter.
-        Columns are renamed with a more friendly name. Column names are : Fund Center, Cost Center, Fund, Allocation, FY, and Quarter.
+        """
+        Returns a DataFrame containing cost center allocation data based on specified filters.
 
-        Returns:
-            pd.DataFrame: A dataframe of cost center allocations.
+        This method queries CostCenterAllocation records and formats them into a pandas DataFrame
+        with renamed columns for better readability.
+
+        Parameters
+        ----------
+        costcenter : CostCenter or str, optional
+            Cost center to filter allocations by. Can be a CostCenter object or cost center code.
+        fund : Fund or str, optional
+            Fund to filter allocations by. Can be a Fund object or fund code.
+        fy : int, optional
+            Fiscal year to filter allocations by.
+        quarter : str, optional
+            Quarter to filter allocations by.
+
+        Returns
+        -------
+        pd.DataFrame
+            DataFrame containing allocation data with the following columns:
+            - Fund Center: The fund center code
+            - Cost Center: The cost center code
+            - Fund: The fund code
+            - Allocation: The allocated amount
+            - FY: The fiscal year
+            - Quarter: The quarter
+
+            Returns empty DataFrame if no matching records are found.
         """
         data = (
             CostCenterAllocation.objects.costcenter(costcenter)
@@ -1789,6 +1968,21 @@ class CostCenterManager(models.Manager):
         return df
 
     def forecast_adjustment_dataframe(self) -> pd.DataFrame:
+        """
+        Returns a pandas DataFrame containing forecast adjustment data.
+
+        This method retrieves forecast adjustments from the database and formats them into a DataFrame.
+        The DataFrame includes Fund Center, Cost Center, Fund and Forecast Adjustment columns.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing the following columns:
+                - Fund Center: The fund center associated with the cost center
+                - Cost Center: The cost center code
+                - Fund: The fund code
+                - Forecast Adjustment: The adjustment amount
+
+            Returns empty DataFrame if no ForecastAdjustment objects exist.
+        """
         if not ForecastAdjustment.objects.exists():
             return pd.DataFrame()
         data = list(
@@ -1808,17 +2002,68 @@ class CostCenterManager(models.Manager):
         return pd.DataFrame(data).rename(columns=columns)
 
     def get_sibblings(self, parent: FundCenter | str):
+        """
+        Get all sibling cost centers sharing the same parent fund center.
+
+        Args:
+            parent (Union[FundCenter, str]): The parent fund center, either as a FundCenter object
+                or as a string identifier.
+
+        Returns:
+            QuerySet[CostCenter]: QuerySet containing all cost centers that share the specified parent.
+
+        Example:
+            >>> fc = FundCenter.objects.get(id='FC001')
+            >>> siblings = get_sibblings(fc)
+            >>> # Or using string identifier
+            >>> siblings = get_sibblings('FC001')
+        """
         if isinstance(parent, str):
             parent = FundCenterManager().fundcenter(fundcenter=parent)
         return CostCenter.objects.filter(costcenter_parent=parent)
 
     def exists(self, costcenter: str = None) -> bool:
+        """
+        Check if a cost center exists in the database.
+
+        Args:
+            costcenter (str, optional): The cost center code to check for. Defaults to None.
+
+        Returns:
+            bool: True if the cost center exists, False otherwise.
+                  If no costcenter is provided, returns True if any cost centers exist.
+        """
         if costcenter:
             return CostCenter.objects.filter(costcenter=costcenter).exists()
         else:
             return CostCenter.objects.count() > 0
 
     def get_request(self, request) -> str | None:
+        """Extract the cost center string from the request and verifies that it exists.
+
+        This method processes a request parameter to extract and validate a cost center code.
+
+        Args:
+            request: The HTTP request object containing GET parameters.
+
+        Returns:
+            str | None: The uppercase cost center code if it exists and is valid,
+                        empty string if the cost center doesn't exist,
+                        None if no cost center was provided in the request.
+
+        Examples:
+            >>> request.GET = {'costcenter': 'abc123'}
+            >>> get_request(request)
+            'ABC123'  # if cost center exists
+
+            >>> request.GET = {'costcenter': 'invalid'}
+            >>> get_request(request)
+            ''  # if cost center doesn't exist
+
+            >>> request.GET = {}
+            >>> get_request(request)
+            None
+        """
         """Extract the cost center string from the request and verifies that it does exist."""
         costcenter = request.GET.get("costcenter")
         if costcenter:
