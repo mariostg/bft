@@ -2077,6 +2077,35 @@ class CostCenterManager(models.Manager):
 
 
 class CostCenter(models.Model):
+    """A model representing a Cost Center in the financial structure.
+
+    This class represents a Cost Center, which is a financial unit used to track and manage
+    expenses and budgets. It includes relationships with Fund and Source models, as well as
+    hierarchical relationships with other cost centers through a parent-child structure.
+
+    Attributes:
+        costcenter (str): The unique identifier for the cost center (max 6 characters).
+        shortname (str): A brief name or description of the cost center (max 35 characters).
+        fund (Fund): Foreign key to the Fund model.
+        source (Source): Foreign key to the Source model.
+        isforecastable (bool): Indicates if forecasting is allowed for this cost center.
+        isupdatable (bool): Indicates if updates are allowed for this cost center.
+        note (str): Optional text field for additional information.
+        sequence (str): Unique path identifier for the cost center hierarchy.
+        costcenter_parent (FundCenter): Foreign key to the parent FundCenter.
+        procurement_officer (User): Foreign key to the User model for the assigned officer.
+
+    Methods:
+        save(*args, **kwargs): Overrides the default save method to ensure proper hierarchy
+            and formatting of costcenter and shortname fields.
+        __str__(): Returns a string representation of the cost center.
+
+    Meta:
+        ordering: Sorts by costcenter field.
+        verbose_name_plural: "Cost Centers"
+        indexes: Index on costcenter field.
+        constraints: Unique constraint on costcenter and costcenter_parent combination.
+    """
     costcenter = models.CharField("Cost Center", max_length=6)
     shortname = models.CharField(
         "Cost Center Name", max_length=35, blank=True, null=True
@@ -2126,6 +2155,24 @@ class CostCenter(models.Model):
         ]
 
     def save(self, *args, **kwargs):
+        """
+        Overrides the default save method to handle CostCenter model saving operations.
+
+        This method performs the following operations before saving:
+        1. Verifies and sets the parent-child relationship in the financial structure
+        2. Converts the costcenter field to uppercase
+        3. Converts the shortname field to uppercase (if it exists)
+
+        Args:
+            *args: Variable length argument list passed to parent's save method
+            **kwargs: Arbitrary keyword arguments passed to parent's save method
+
+        Returns:
+            None
+
+        Raises:
+            Any exceptions from parent's save method
+        """
         if not FinancialStructureManager().is_child_of(self.costcenter_parent, self):
             self.sequence = FinancialStructureManager().set_parent(
                 self.costcenter_parent, costcenter_child=True
