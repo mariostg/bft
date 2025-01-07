@@ -2349,6 +2349,28 @@ class CapitalProject(models.Model):
 
 
 class CapitalForecasting(models.Model):
+    """A base abstract model for capital forecasting data.
+
+    This class serves as an abstract base model for tracking and managing capital forecasting
+    across different funds, fiscal years, and capital projects.
+
+    Attributes:
+        fund (Fund): Foreign key to the Fund model.
+        fy (int): Fiscal year for the forecast, defaulting to current year.
+        capital_project (CapitalProject): Foreign key to the associated capital project.
+        commit_item (int): Commitment item number, defaults to 0.
+        notes (str): Optional text field for additional notes.
+
+    Constraints:
+        - Unique constraint on combination of fund, capital_project, commit_item, and fy.
+        - Fiscal year must be one of the predefined YEAR_CHOICES.
+        - Fund cannot be null when saving.
+
+    Raises:
+        InvalidFiscalYearException: If the fiscal year is not in YEAR_CHOICES.
+        ValueError: If attempting to save without a fund assigned.
+    """
+
     fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
     fy = models.PositiveSmallIntegerField(
         "Fiscal Year", choices=YEAR_CHOICES, default=datetime.now().year
@@ -2380,6 +2402,17 @@ class CapitalForecasting(models.Model):
         return f"{self.capital_project} - {self.fy} - {self.fund.fund}"
 
     def save(self, *args, **kwargs):
+        """
+        Saves the instance to the database after validating fiscal year and fund.
+
+        Raises:
+            InvalidFiscalYearException: If the fiscal year is not one of the valid choices defined in YEAR_CHOICES.
+            ValueError: If the fund field is empty or None.
+
+        Args:
+            *args: Variable length argument list to pass to parent save method
+            **kwargs: Arbitrary keyword arguments to pass to parent save method
+        """
         if self.fy not in [v[0] for v in YEAR_CHOICES]:
             raise exceptions.InvalidFiscalYearException(
                 f"Fiscal year {self.fy} invalid, must be one of {','.join([v[1] for v in YEAR_CHOICES])}"
