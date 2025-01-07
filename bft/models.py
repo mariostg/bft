@@ -2272,6 +2272,28 @@ class CapitalProjectManager(models.Manager):
 
 
 class CapitalProject(models.Model):
+    """A Django model representing a Capital Project within the financial system.
+
+    This model stores information about capital projects including their project numbers,
+    names, fund center associations, and procurement officers.
+
+    Attributes:
+        project_no (CharField): Unique 8-character project number identifier
+        shortname (CharField): 35-character project name/description (optional)
+        isupdatable (BooleanField): Flag indicating if project can be updated during the DRMIS download
+        note (TextField): Additional notes about the project (optional)
+        fundcenter (ForeignKey): Associated Fund Center for the project
+        procurement_officer (ForeignKey): Assigned procurement officer user (optional)
+        objects (CapitalProjectManager): Custom model manager for Capital Projects
+
+    Methods:
+        __str__(): Returns string representation as "PROJECT_NO - SHORTNAME"
+        save(): Overrides default save to enforce uppercase for project_no and shortname
+
+    Meta:
+        ordering: Orders projects by project_no
+        verbose_name_plural: Sets plural name to "Capital Projects"
+    """
     project_no = models.CharField("Project No", max_length=8, unique=True)
     shortname = models.CharField("Project Name", max_length=35, blank=True)
     isupdatable = models.BooleanField("Is Updatable", default=False)
@@ -2301,8 +2323,24 @@ class CapitalProject(models.Model):
         verbose_name_plural = "Capital Projects"
 
     def save(self, *args, **kwargs):
-        # if not FinancialStructureManager().is_child_of(self.fundcenter, self):
-        # self.sequence = FinancialStructureManager().set_parent(self.fundcenter, costcenter_child=True)
+        """
+        Save method override for CapitalProject model.
+
+        This method performs the following operations before saving:
+        1. Converts project_no to uppercase
+        2. If shortname exists, converts it to uppercase
+
+        Args:
+            *args: Variable length argument list for save method
+            **kwargs: Arbitrary keyword arguments for save method
+
+        Returns:
+            None
+
+        Note:
+            This method calls the parent class's save method after performing
+            the uppercase conversions.
+        """
 
         self.project_no = self.project_no.upper()
         if self.shortname:
