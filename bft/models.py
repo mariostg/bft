@@ -2852,7 +2852,31 @@ class AllocationQuerySet(models.QuerySet):
 
 
 class Allocation(models.Model):
-    """An abstract class that defines the common allocation related fields"""
+    """An abstract class that defines the common allocation related fields
+
+    This model represents a financial allocation with common fields used across different allocation types.
+
+    Attributes:
+        fund (Fund): Foreign key to the associated Fund model.
+        amount (Decimal): The allocation amount with 2 decimal places precision.
+        fy (int): Fiscal year for the allocation.
+        quarter (str): Quarter period of the allocation ('0', '1', '2', '3', '4').
+        note (str, optional): Additional notes about the allocation.
+        owner (User, optional): User who created/owns the allocation.
+        updated (datetime): Timestamp of last update.
+        created (datetime): Timestamp of creation.
+
+    Methods:
+        save(): Validates and saves the allocation.
+            Raises:
+                InvalidOptionException: If quarter value is invalid
+                InvalidAllocationException: If amount is negative
+                InvalidFiscalYearException: If fiscal year is invalid
+                ValueError: If fund is not specified
+
+    Meta:
+    """
+
     fund = models.ForeignKey(Fund, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     fy = models.PositiveSmallIntegerField(
@@ -2875,6 +2899,23 @@ class Allocation(models.Model):
         return f"{self.fund} - {self.amount}"
 
     def save(self, *args, **kwargs):
+        """
+        Save allocation record after performing validation checks.
+
+        Validates the following conditions before saving:
+        - Quarter is valid according to QUARTERS choices
+        - Amount is not negative
+        - Fiscal year is valid according to YEAR_CHOICES
+        - Fund is assigned
+
+        Raises:
+            InvalidOptionException: If quarter is not a valid choice
+            InvalidAllocationException: If amount is negative
+            InvalidFiscalYearException: If fiscal year is not valid
+            ValueError: If fund is not assigned
+
+        """
+
         if str(self.quarter) not in list(zip(*QUARTERS))[0]:
             raise exceptions.InvalidOptionException(
                 f"Quarter {self.quarter} invalid.  Must be one of {','.join([x[0] for x in QUARTERS])}"
@@ -2893,6 +2934,25 @@ class Allocation(models.Model):
 
 
 class CostCenterAllocation(Allocation):
+    """A class representing a cost center allocation in the budget forecasting system.
+
+    This class extends the base Allocation model to include cost center specific allocations,
+    ensuring that each combination of fund, cost center, quarter, and fiscal year is unique.
+
+    Attributes:
+        costcenter (ForeignKey): Reference to a CostCenter object, cannot be null
+
+    Methods:
+        __str__(): Returns a string representation of the allocation
+        save(*args, **kwargs): Overrides the default save method to ensure costcenter is provided
+
+    Raises:
+        ValueError: If attempting to save without a cost center assigned
+
+    Meta:
+        verbose_name_plural: "Cost Center Allocations"
+        constraints: Ensures unique combination of fund, costcenter, quarter, and fy
+    """
     costcenter = models.ForeignKey(
         CostCenter, on_delete=models.CASCADE, null=True, verbose_name="Cost Center"
     )
@@ -2903,6 +2963,21 @@ class CostCenterAllocation(Allocation):
         )
 
     def save(self, *args, **kwargs):
+        """
+        Save a CostCenterAllocation instance to the database.
+
+        Overrides the default save method to ensure a cost center is assigned before saving.
+
+        Args:
+            *args: Variable length argument list to pass to parent save method
+            **kwargs: Arbitrary keyword arguments to pass to parent save method
+
+        Raises:
+            ValueError: If costcenter field is empty/None
+
+        Returns:
+            None
+        """
         if not self.costcenter:
             raise ValueError(f"Allocation cannot be saved without Cost Center {self}")
         super(CostCenterAllocation, self).save(*args, **kwargs)
@@ -2923,6 +2998,25 @@ class CostCenterAllocation(Allocation):
 
 
 class FundCenterAllocation(Allocation):
+    """A model representing fund allocations to Fund Centers.
+
+    This class extends the base Allocation model to track financial allocations
+    specifically assigned to Fund Centers. Each allocation is uniquely identified
+    by the combination of fund, fund center, fiscal quarter, and fiscal year.
+
+    Attributes:
+        fundcenter (FundCenter): Foreign key to the FundCenter model representing
+            the fund center receiving the allocation.
+
+    Example:
+        >>> allocation = FundCenterAllocation(
+        ...     fundcenter=some_fundcenter,
+        ...     fund=some_fund,
+        ...     fy=2023,
+        ...     quarter=1,
+        ...     amount=1000.00
+        ... )
+    """
     fundcenter = models.ForeignKey(
         FundCenter, on_delete=models.CASCADE, null=True, verbose_name="Fund Center"
     )
