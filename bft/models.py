@@ -2423,14 +2423,51 @@ class CapitalForecasting(models.Model):
 
 
 class CapitalYearEnd(CapitalForecasting):
+    """Class representing capital spending at the end of the year.
+
+    A subclass of CapitalForecasting that tracks the actual amount spent
+    on capital expenses at year end.
+
+    Attributes:
+        ye_spent (PositiveIntegerField): The total amount of capital spent at year end.
+                                        Defaults to 0.
+    """
     ye_spent = models.PositiveIntegerField(default=0)
 
 
 class CapitalNewYear(CapitalForecasting):
+    """A model representing financial capital starting point at beginning of new year.
+
+    Inherits from CapitalForecasting model and adds initial allocation tracking.
+
+    Attributes:
+        initial_allocation (PositiveIntegerField): The starting capital amount allocated
+            for the new year period. Defaults to 0.
+    """
     initial_allocation = models.PositiveIntegerField("Initial allocation", default=0)
 
 
 class CapitalInYear(CapitalForecasting):
+    """A class representing capital allocations and expenditures within a specific fiscal year and quarter.
+
+    This model extends CapitalForecasting to track detailed capital planning information
+    including quarterly allocations, spending, and various commitment categories.
+
+    Attributes:
+        quarter (str): The quarter designation (0-4), with 0 being the default
+        allocation (int): The allocated budget amount for the period
+        spent (int): The amount spent from the allocation
+        co (int): Construction amount
+        pc (int): Pre-construction amount
+        fr (int): Furniture amount
+        le (int): Labor external amount
+        mle (int): Misc labor external amount
+        he (int): Hourly employee amount
+
+    Note:
+        The combination of fund, capital_project, commit_item, fiscal year and quarter
+        must be unique per database constraint.
+    """
     quarter = models.CharField(max_length=1, choices=QUARTERS, default="0")
     allocation = models.PositiveIntegerField(default=0)
     spent = models.PositiveIntegerField(default=0)
