@@ -3042,7 +3042,36 @@ class FundCenterAllocation(Allocation):
 
 
 class LineItemManager(models.Manager):
+    """A custom manager for LineItem model that provides additional query functionality and data transformation methods.
+
+    This manager extends Django's base manager to provide specialized querying and data manipulation
+    for LineItem objects, particularly focused on cost center operations and DataFrame conversions.
+
+    Methods:
+        cost_center(costcenter: str) -> QuerySet:
+            Retrieves line items for a specific cost center.
+
+        has_line_items(costcenter: CostCenter) -> bool:
+            Checks if there are any line items associated with a given cost center.
+
+        line_item_dataframe(fund: str = None, doctype: str = None) -> pd.DataFrame:
+            Converts line items to a pandas DataFrame with optional filtering by fund and document type.
+
+        line_item_detailed_dataframe(fund: str = None, doctype: str = None) -> pd.DataFrame:
+            Creates a detailed DataFrame merging line items with forecast data and cost center information.
+    """
+
     def cost_center(self, costcenter: str):
+        """
+        Filter queryset by cost center code.
+
+        Args:
+            costcenter (str): The cost center code to filter by. Case insensitive.
+
+        Returns:
+            QuerySet: Filtered queryset containing only records matching the cost center.
+            None: If the cost center does not exist.
+        """
         costcenter = costcenter.upper()
         try:
             cc = CostCenter.objects.get(costcenter=costcenter)
@@ -3051,16 +3080,34 @@ class LineItemManager(models.Manager):
         return self.filter(costcenter=cc)
 
     def has_line_items(self, costcenter: "CostCenter") -> bool:
-        return LineItem.objects.filter(costcenter=costcenter).exists()
+        """
+        Checks if any line items exist for a given cost center.
 
-    def line_item_dataframe(
-        self, fund: str = None, doctype: str = None
-    ) -> pd.DataFrame:
-        """Prepare a pandas dataframe of the DRMIS line items.  Columns are renamed
-        with a more friendly name.
+        Args:
+            costcenter (CostCenter): The cost center to check for line items.
 
         Returns:
-            pd.DataFrame: A dataframe of DRMIS line items
+            bool: True if line items exist for the cost center, False otherwise.
+        """
+        return LineItem.objects.filter(costcenter=costcenter).exists()
+
+    def line_item_dataframe(self, fund: str = None, doctype: str = None) -> pd.DataFrame:
+        """Retrieves line items from database and converts them to a pandas DataFrame.
+
+        This method filters line items by fund and document type if provided, then
+        creates a DataFrame with separate columns for different document type balances.
+
+        Args:
+            fund (str, optional): Fund code to filter by. Will be converted to uppercase.
+            doctype (str, optional): Document type to filter by. Will be converted to uppercase.
+
+        Returns:
+            pd.DataFrame: DataFrame containing line items with the following columns:
+                - Original line item fields
+                - CO: Balance amount if doctype is CO, else 0
+                - PC: Balance amount if doctype is PC, else 0
+                - FR: Balance amount if doctype is FR, else 0
+                Returns empty DataFrame if no data found.
         """
         data = LineItem.objects.all()
         if fund:
@@ -3078,10 +3125,31 @@ class LineItemManager(models.Manager):
 
     def line_item_detailed_dataframe(self, fund=None, doctype=None) -> pd.DataFrame:
         """
-        Prepare a pandas dataframe of merged line items, forecast line items and cost center.
+        Returns a detailed DataFrame containing line item information merged with forecast and cost center data.
 
-        Returns:
-            pd.DataFrame : A dataframe of line items including forecast.
+        This method enhances the basic line item DataFrame by joining it with forecast and cost center
+        information. It performs the following operations:
+        1. Retrieves the base line item DataFrame
+        2. Merges forecast data if available (defaults to 0 if no forecasts exist)
+        3. Merges cost center information
+
+        Parameters
+        ----------
+        fund : str, optional
+            Filter results by fund identifier
+        doctype : str, optional
+            Filter results by document type
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame containing line item details with additional forecast and cost center information.
+            Returns empty DataFrame if no line items match the filter criteria.
+
+        Notes
+        -----
+        - Forecast values are converted to integer type
+        - Left joins are used to preserve all line items even if no matching forecast/cost center exists
         """
         li_df = self.line_item_dataframe(fund=fund, doctype=doctype)
         if li_df.empty:
@@ -3101,6 +3169,49 @@ class LineItemManager(models.Manager):
 
 
 class LineItem(models.Model):
+    """A Django model class representing a line item in a financial system.
+
+    This model stores detailed information about financial transactions, including document numbers,
+    line numbers, amounts, and various financial codes and references.
+
+    Attributes:
+        docno (CharField): Document number, max 10 characters
+        lineno (CharField): Line number/account assignment number, max 7 characters
+        spent (DecimalField): Amount spent, max 10 digits with 2 decimal places
+        balance (DecimalField): Current balance, max 10 digits with 2 decimal places
+        workingplan (DecimalField): Working plan amount, max 10 digits with 2 decimal places
+        fundcenter (CharField): Fund center code, max 6 characters
+        fund (CharField): Fund code, max 4 characters
+        costcenter (ForeignKey): Reference to CostCenter model
+        internalorder (CharField): Internal order number, max 7 characters, optional
+        doctype (CharField): Document type code, max 2 characters, optional
+        enctype (CharField): Encumbrance type, max 21 characters
+        linetext (CharField): Line item description, max 50 characters, optional
+        predecessordocno (CharField): Previous document number reference, max 20 characters, optional
+        predecessorlineno (CharField): Previous line number reference, max 3 characters, optional
+        reference (CharField): Reference number, max 16 characters, optional
+        gl (CharField): General ledger code, max 5 characters
+        duedate (DateField): Due date for the line item, optional
+        vendor (CharField): Vendor name/information, max 50 characters, optional
+        createdby (CharField): Creator's identifier, max 50 characters, optional
+        status (CharField): Current status of the line item, max 10 characters, optional
+        fcintegrity (BooleanField): Fund center integrity check flag
+
+    Methods:
+        get_orphan_lines(costcenter): Returns lines that exist in line items but not in encumbrances
+        mark_orphan_lines(orphans): Marks specified lines as orphaned and zeros their amounts
+        insert_line_item(ei): Creates a new line item from an import record
+        update_line_item(li, ei): Updates an existing line item with import data
+        import_lines(): Imports and updates lines from the encumbrance import table
+        set_fund_center_integrity(): Validates and sets fund center integrity flags
+        set_doctype(): Sets document types based on encumbrance types
+        __str__(): Returns string representation of the line item
+
+    Meta:
+        ordering: Ordered by document number (descending) and line number
+        verbose_name_plural: "Line Items"
+    """
+
     docno = models.CharField(max_length=10)
     lineno = models.CharField(max_length=7)  # lineno : acctassno
     spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -3139,10 +3250,29 @@ class LineItem(models.Model):
         verbose_name_plural = "Line Items"
 
     def get_orphan_lines(self, costcenter: str | CostCenter = None):
+        """Return orphaned line items.
+
+        This method identifies line items that exist in LineItem but not in LineItemImport.
+        An orphan line is one where the combination of document number and line number exists
+        in LineItem but does not have a corresponding entry in LineItemImport.
+
+        Args:
+            costcenter (Union[str, CostCenter], optional): Cost center to filter lines by.
+                Can be either a string cost center code or CostCenter object.
+                If None, checks all cost centers. Defaults to None.
+
+        Returns:
+            Set[Tuple[str, str]] | None: Set of tuples containing (docno, lineno) for orphaned lines.
+                Returns None if specified cost center string doesn't exist.
+                Returns empty set if no orphans found.
+
+        Example:
+            >>> model.get_orphan_lines('CC001')  # Get orphans for specific cost center
+            {('DOC1', '1'), ('DOC2', '3')}
+            >>> model.get_orphan_lines()  # Get orphans across all cost centers
+            {('DOC1', '1'), ('DOC2', '3'), ('DOC3', '2')}
         """
-        Compare the docno and lineno combination in both line item table and
-        encumbrance table.  When specifying costcenter, only the lines of the specified cost center will be considered.
-        """
+
         if costcenter:
             if isinstance(costcenter, str):
                 try:
@@ -3172,11 +3302,25 @@ class LineItem(models.Model):
         return orphans
 
     def mark_orphan_lines(self, orphans: set):
-        """Set the status of the line item to orphan.  Because these lines are orphans, their forecast amount is also set to 0 leaving comments and description unaffected.
 
-        Args:
-            orphans (set): Lines that need to have their status updated to orphan.
-        """
+        def mark_orphan_lines(self, orphans: set) -> None:
+            """
+            Marks specified lines as orphan and updates their financial values to zero.
+
+            This method processes a set of docno/lineno tuples, setting their status to 'orphan'
+            and zeroing out their financial fields (spent, workingplan, balance).
+            It also updates any associated line forecasts to zero.
+
+            Args:
+                orphans (set): A set of tuples containing (docno, lineno) pairs to be marked as orphans
+
+            Returns:
+                None
+
+            Example:
+                >>> mark_orphan_lines({('DOC123', 1), ('DOC124', 2)})
+            """
+
         logger.info("Begin marking orphan lines")
         for o in orphans:
             docno, lineno = o
@@ -3193,9 +3337,25 @@ class LineItem(models.Model):
 
     def insert_line_item(self, ei: "LineItemImport"):
         """
-        Insert the encumbrance line in line item table.  Such line is set as new in the
-        status field.
+        Insert a new line item into the database based on a LineItemImport object.
+
+        Args:
+            ei (LineItemImport): The line item import object containing data to be inserted.
+
+        Returns:
+            int: The ID of the newly created line item.
+
+        Raises:
+            CostCenter.DoesNotExist: If the cost center specified in ei.costcenter does not exist.
+
+        Note:
+            The method performs the following operations:
+            1. Retrieves the CostCenter object based on the import data
+            2. Converts the import object to a dictionary
+            3. Creates a new LineItem with 'New' status
+            4. Saves the line item to the database
         """
+
         cc = CostCenter.objects.get(costcenter=ei.costcenter)
         di = model_to_dict(ei)
         di["costcenter"] = cc
@@ -3207,8 +3367,26 @@ class LineItem(models.Model):
 
     def update_line_item(self, li: "LineItem", ei: "LineItemImport"):
         """
-        Update line items fields using values from encumbrance line.
+        Updates a line item with data from a line item import.
+
+        Args:
+            li (LineItem): The line item to update.
+            ei (LineItemImport): The line item import containing new data.
+
+        Returns:
+            LineItem: The updated line item if the cost center exists.
+            None: If the cost center does not exist.
+
+        Updates the following fields if cost center exists:
+            - costcenter
+            - fundcenter
+            - spent
+            - workingplan
+            - balance
+            - fund
+            - status (set to "Updated")
         """
+
         cc = None
         try:
             cc = CostCenter.objects.get(costcenter=ei.costcenter)
@@ -3231,9 +3409,22 @@ class LineItem(models.Model):
 
     def import_lines(self):
         """
-        import_line function relies on content of encumbrance_import.  It is
-        responsible to import new lines, update current ones and zero out lines
-        no longer in DRMIS
+        Import and update line items from LineItemImport table to LineItem table.
+
+        First marks all existing LineItem records as "old" status. Then processes each LineItemImport record:
+        - Skips lines with cost centers marked as not updatable
+        - Updates existing LineItem records that match on docno and lineno
+        - Creates new LineItem records for lines that don't exist
+
+        Updates are logged using the logger.
+
+        Returns:
+            None
+
+        Side Effects:
+            - Updates status field of all existing LineItem records to "old"
+            - Creates or updates LineItem records based on LineItemImport data
+            - Logs import progress and counts
         """
 
         count = LineItem.objects.all().update(status="old")
@@ -3253,10 +3444,22 @@ class LineItem(models.Model):
 
     def set_fund_center_integrity(self):
         """
-        Compare all line items cost center - fund center pair with
-        cost center - fund center pair from cost center table.  When comparison
-        match for a given line, set its fcintegrity to True.  All fcintegrity are
-        set to False to start with.
+        Validates and updates fund center integrity for line items based on cost center relationships.
+
+        This method performs the following operations:
+        1. Creates a set of valid (cost center, fund center) pairs from CostCenter objects
+        2. Resets fund center integrity flag to False for all LineItem objects
+        3. Updates fund center integrity flag to True for LineItems where cost center and fund center match valid pairs
+
+        The fund center integrity is considered valid when a line item's cost center and fund center combination
+        exists in the established cost center hierarchy relationships.
+
+        Returns
+            None
+
+        Side Effects:
+            - Updates fcintegrity field in LineItem table
+            - Logs process start and completion via logger
         """
         logger.info("Fund center integrity check begins.")
         cc = CostCenter.objects.select_related()
@@ -3275,6 +3478,21 @@ class LineItem(models.Model):
         logger.info("Fund center integrity check completed.")
 
     def set_doctype(self):
+        """Sets document type for line items based on encoding type.
+
+        This method maps specific encoding types to their corresponding document types
+        and updates the LineItem records in the database accordingly.
+
+        The mapping is as follows:
+            - Funds Commitment -> CO
+            - Funds Precommitment -> PC
+            - Funds Reservation -> FR
+            - Purchase Order -> CO
+            - Purchase Requisitions -> PC
+
+        Returns:
+            None
+        """
         logger.info("Set doctype begins")
         types = [
             {"enctype": "Funds Commitment", "doctype": "CO"},
