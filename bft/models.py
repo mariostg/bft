@@ -4084,12 +4084,25 @@ class CostCenterChargeMonthlyManager(models.Manager):
 
         Returns:
             int: Number of records deleted from the database
-
         """
+
         res = CostCenterChargeMonthly.objects.filter(fy=fy, period=period).delete()
         return res[0]
 
     def insert_current(self, fy, period) -> int:
+        """
+        Insert cost center charges into monthly table for given fiscal year and period.
+
+        This method aggregates cost center charge imports up to the specified period and
+        creates monthly summary records.
+
+        Args:
+            fy (int): Fiscal year to process
+            period (int): Period number within fiscal year (1-12)
+
+        Returns:
+            int: Number of records inserted into cost_center_charge_monthly table
+        """
         current = (
             CostCenterChargeImport.objects.filter(fy=fy, period__lte=period)
             .values("costcenter", "fund", "fy")
@@ -4104,7 +4117,18 @@ class CostCenterChargeMonthlyManager(models.Manager):
 
 
 class CostCenterChargeMonthly(models.Model):
-    """This class defines the model that represents the cost center charges summarized by fy and period."""
+    """A Django model representing monthly charges for cost centers.
+    This model stores the monthly financial charges associated with specific cost centers,
+    including fund information, cost center details, charge amounts, and fiscal period data.
+    Attributes:
+        fund (CharField): A 4-character field representing the fund code.
+        costcenter (CharField): A 6-character field representing the cost center identifier.
+        amount (DecimalField): The monetary amount charged, with up to 10 digits and 2 decimal places.
+        period (CharField): A 2-character field representing the period (typically month).
+        fy (PositiveSmallIntegerField): The fiscal year associated with the charge.
+    Meta:
+        verbose_name_plural: "Cost Center charges monthly"
+    """
 
     fund = models.CharField(max_length=4)
     costcenter = models.CharField("Cost Center", max_length=6)
@@ -4122,13 +4146,31 @@ class CostCenterChargeMonthly(models.Model):
 
 
 class CostCenterChargeProcessor:
-    """
-    CostCenterChargeProcessor class processes the Charges against cost center report.  It
-    creates a csv file and populate the table using EncumbranceImport class.
+    """Process and manage cost center charges from CSV files and database operations.
+
+    This class handles the processing of cost center charges, including CSV file operations,
+    database imports, and monthly charge management.
+
+    Attributes:
+        csv_file (str): Path to the charges CSV file in the uploads directory.
+        fy (str): Current fiscal year obtained from BftStatusManager.
+
+    Methods:
+        to_csv(source_file: str, period: str):
+            Processes a source CSV file with cost center charges and saves it in a standardized format.
+            Performs data cleaning, format validation and period checking.
+
+        csv2cost_center_charge_import_table(fy: str, period: str):
+            Imports processed CSV data into the CostCenterChargeImport database table.
+            Deletes existing records for the given fiscal year and period before import.
+
+        monthly_charges(fy: str, period: str) -> int:
+            Manages monthly charges using CostCenterChargeMonthlyManager.
+            Flushes existing monthly data and inserts current period charges.
+            Returns the number of processed records.
 
     Raises:
-        ValueError: If no encumbrance file name is provided.
-        FileNotFoundError: If the encumbrance file is not found
+        ValueError: If period validation fails during CSV processing.
     """
 
     def __init__(self):
@@ -4136,14 +4178,35 @@ class CostCenterChargeProcessor:
         self.fy = BftStatusManager().fy()
 
     def to_csv(self, source_file: str, period: str):
-        """Process the raw DRMIS Cost Center Charges report and save it as a csv file.
+        """
+        Converts a BFT source file to CSV format with specific data transformations.
+
+        This method reads a BFT source file, performs various data cleansing and formatting operations,
+        and saves the result as a CSV file. The process includes:
+        - Reading the source file with specific column datatypes and formatting
+        - Removing empty rows
+        - Stripping whitespace from all columns
+        - Formatting dates
+        - Handling currency values and negative signs
+        - Adding fiscal year information
+        - Validating period consistency
 
         Args:
-            source_file (str): Full path of the DRMIS report
+            source_file (str): Path to the source BFT file to be converted
+            period (str): The accounting period to validate against the file contents
 
         Raises:
-            ValueError: If columm Period has values that are not the same or period passed as argument does not match period in data file
+            ValueError: If multiple periods are found in the file or if the specified period
+                       doesn't match the period in the file
+
+        Returns:
+            None: The processed data is saved to self.csv_file
+
+        Note:
+            The source file is expected to be pipe-delimited (|) with specific column structure
+            and the output will be saved to the location specified in self.csv_file
         """
+
         df = pd.read_csv(
             source_file,
             dtype={2: object, 3: object, 8: object},
@@ -4195,7 +4258,26 @@ class CostCenterChargeProcessor:
         df.to_csv(self.csv_file, index=False)
 
     def csv2cost_center_charge_import_table(self, fy, period):
-        """Process the csv file that contains cost center charges and upload them in the destination table.ß"""
+        """
+        Import cost center charges from a CSV file into the CostCenterChargeImport table.
+
+        First deletes any existing records for the given fiscal year and period, then reads the CSV file
+        line by line to create new CostCenterChargeImport records.
+
+        The CSV file must have the following columns in order:
+        fund, costcenter, gl, ref_doc_no, aux_acct_asmnt, amount, doc_type, posting_date, period, fy
+
+        Args:
+            fy (str): Fiscal year for the imported charges
+            period (str): Period for the imported charges
+
+        Note:
+            The CSV file must be previously set as self.csv_file
+            The first row of the CSV file is assumed to be a header and is skipped
+
+        Returns:
+            None
+        """
         CostCenterChargeImport.objects.filter(fy=fy, period=period).delete()
         with open(self.csv_file) as file:
             next(file)  # skip the header row
@@ -4216,6 +4298,22 @@ class CostCenterChargeProcessor:
                 charge_line.save()
 
     def monthly_charges(self, fy, period) -> int:
+        """
+        Generate and insert monthly charges for a specific fiscal year and period.
+
+        This method flushes existing monthly charges and inserts new ones using
+        the CostCenterChargeMonthlyManager.
+
+        Args:
+            fy (int): Fiscal year for the charges
+            period (int): Period number within the fiscal year (1-12)
+
+        Returns:
+            int: Number of monthly charge records inserted
+
+        Raises:
+            None
+        """
         m = CostCenterChargeMonthlyManager()
         m.flush_monthly(fy, period)
         return m.insert_current(fy, period)
