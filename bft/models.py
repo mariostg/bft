@@ -3946,9 +3946,31 @@ class LineForecast(models.Model):
 
 class LineItemImport(models.Model):
     """
-    LineItemImport class defines the model that represents the DND cost
-    center encumbrance report single line item.  Each line read from the
-    encumbrance report during the uploadcsv command must match this model
+    A Django model representing a line item import in a financial system.
+
+    This model stores detailed information about financial transactions including
+    document numbers, spending, balances, accounting codes, and related metadata.
+
+    Attributes:
+        docno (str): Document number, max length 10 characters
+        lineno (str): Line number/account assignment number, max length 7 characters
+        spent (Decimal): Amount spent, with 2 decimal places
+        balance (Decimal): Current balance, with 2 decimal places
+        workingplan (Decimal): Working plan amount, with 2 decimal places
+        fundcenter (str): Fund center code, max length 6 characters
+        fund (str): Fund code, max length 4 characters
+        costcenter (str): Cost center code, max length 6 characters
+        internalorder (str): Internal order number, max length 7 characters, optional
+        doctype (str): Document type code, max length 2 characters, optional
+        enctype (str): Encumbrance type, max length 21 characters
+        linetext (str): Line item description, max length 50 characters, optional
+        predecessordocno (str): Previous document number, max length 20 characters, optional
+        predecessorlineno (str): Previous line number, max length 3 characters, optional
+        reference (str): Reference number, max length 16 characters, optional
+        gl (str): General ledger code, max length 5 characters
+        duedate (Date): Due date of the transaction, optional
+        vendor (str): Vendor name, max length 50 characters, optional
+        createdby (str): Creator's identifier, max length 50 characters, optional
     """
 
     docno = models.CharField(max_length=10)
@@ -3978,10 +4000,24 @@ class LineItemImport(models.Model):
 
 
 class CostCenterChargeImport(models.Model):
-    """This class defines the model that represents the DND Actual Listings, Cost Center Transaction Listing report.  Historically, we call it Charges against cost center.  Each line read from the
-    report during the uploadcsv command must match this model.
+    """This class defines the model that represents the DND Actual Listings, Cost Center Transaction Listing report.
+    Historically known as Charges against cost center. Each line read from the report during the uploadcsv command must match this model.
 
-    This table contains the charges for the current fiscal year only.  Its content is to be deleted when moving to a new FY.
+    This table contains charges for the current fiscal year only. Its content is to be deleted when moving to a new FY.
+
+    Sample report format:
+
+    Attributes:
+        fund (CharField): Fund code, max 4 chars
+        costcenter (CharField): Cost center code, max 6 chars
+        gl (CharField): General ledger code, max 5 chars
+        ref_doc_no (CharField): Reference document number, max 10 chars
+        aux_acct_asmnt (CharField): Auxiliary account assessment, max 20 chars
+        amount (DecimalField): Transaction amount with 2 decimal places
+        doc_type (CharField): Document type code, max 2 chars, optional
+        posting_date (DateField): Date when transaction was posted
+        period (CharField): Accounting period, max 2 chars
+        fy (PositiveSmallIntegerField): Fiscal year of the transaction
 
     Here is a sample report with its header and ons single line:
     |Fund|Cost Ctr|Cost Elem.|RefDocNo  |AuxAcctAsmnt_1  |    ValCOArCur|DocTyp|Postg Date|Per|
