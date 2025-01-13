@@ -3682,7 +3682,7 @@ class LineForecastManager(models.Manager):
         if counter == maxlines:
             logger.info(f"Encumbrance history set for {counter} out of {maxlines}")
         else:
-            logger.warn(f"Encumbrance history set for {counter} out of {maxlines}")
+            logger.warning(f"Encumbrance history set for {counter} out of {maxlines}")
         return counter
 
 

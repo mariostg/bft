@@ -183,7 +183,7 @@ class FundCenterAllocationProcessor(AllocationProcessor):
             try:
                 item["check"](item["param"])
             except ValueError as err:
-                logger.warn(err)
+                logger.warning(err)
                 if request:
                     messages.error(request, err)
                 return
@@ -200,7 +200,7 @@ class FundCenterAllocationProcessor(AllocationProcessor):
                 logger.info(f"Uploaded fund center allocation {alloc.fundcenter} - ${alloc.amount}.")
             except IntegrityError as err:
                 msg = f"Saving fund center allocation {alloc} generates {err}"
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
         if counter:
@@ -246,7 +246,7 @@ class CostCenterAllocationProcessor(AllocationProcessor):
             try:
                 item["check"](item["param"])
             except ValueError as err:
-                logger.warn(err)
+                logger.warning(err)
                 if request:
                     messages.error(request, err)
                 return
@@ -263,7 +263,7 @@ class CostCenterAllocationProcessor(AllocationProcessor):
                 logger.info(f"Uploaded cost center allocation {alloc.costcenter} - ${alloc.amount}.")
             except IntegrityError as err:
                 msg = f"Saving cost center allocation {alloc} generates {err}."
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
         if counter:
@@ -311,7 +311,7 @@ class FundProcessor(UploadProcessor):
                 logger.info(f"Uploaded Fund {fund.fund}.")
             except IntegrityError as err:
                 msg = f"Saving fund {item} generates {err}."
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
         if counter:
@@ -358,7 +358,7 @@ class SourceProcessor(UploadProcessor):
                 logger.info(f"Uploaded Source {source.source}.")
             except IntegrityError as err:
                 msg = f"Saving source {item} generates {err}."
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
         if counter:
@@ -411,7 +411,7 @@ class FundCenterProcessor(UploadProcessor):
                 logger.info(f"Uploaded fund center {item_obj.fundcenter}.")
             except IntegrityError as err:
                 msg = f"Saving fund center {item}  generates {err}."
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
         if counter:
@@ -440,7 +440,7 @@ class CapitalProjectProcessor(UploadProcessor):
             parent = FundCenterManager().fundcenter(item["fundcenter"])
             if not parent:
                 msg = f"Capaital Project {item['project_no']} parent ({item['fundcenter']}) does not exist, no capital projects have been recorded."
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
                 return
@@ -474,7 +474,7 @@ class CapitalProjectProcessor(UploadProcessor):
                 logger.info(f"Uploaded capital project {item_obj.project_no}.")
             except IntegrityError as err:
                 msg = f"Saving capital project {item} generates {err}"
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
         if counter:
@@ -516,7 +516,7 @@ class CapitalProjectForecastProcessor(UploadProcessor):
             obj = CapitalProjectManager().project(item["capital_project"].upper())
             if not obj:
                 msg = f"Project {item['capital_project']} does not exist, no capital forecasts have been recorded."
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
                 return
@@ -528,7 +528,7 @@ class CapitalProjectForecastProcessor(UploadProcessor):
             fund = FundManager().fund(item["fund"])
             if not fund:
                 msg = f"Project {item['capital_project']} fund ({item['fund']}) does not exist, no capital Forecasts have been recorded."
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
                 return
@@ -571,7 +571,7 @@ class CapitalProjectNewYearProcessor(CapitalProjectForecastProcessor):
                 logger.info(f"Uploaded Capital Forecasting New Year {obj.fund}.")
             except IntegrityError as err:
                 msg = f"Saving New Year Capital Forecasting {obj} generates {err}."
-                logger.warn(msg)
+                logger.warning(msg)
                 if self.request:
                     messages.error(self.request, msg)
         if counter:
@@ -615,7 +615,7 @@ class CapitalProjectInYearProcessor(CapitalProjectForecastProcessor):
                 logger.info(f"Uploaded Capital Forecasting In Year {obj.fund}.")
             except IntegrityError as err:
                 msg = f"Saving In Year Capital Forecasting {obj} generates {err}."
-                logger.warn(msg)
+                logger.warning(msg)
                 if self.request:
                     messages.error(self.request, msg)
         if counter:
@@ -659,7 +659,7 @@ class CapitalProjectYearEndProcessor(CapitalProjectForecastProcessor):
                 logger.info(f"Uploaded Capital Forecasting Year End {obj.fund}.")
             except IntegrityError as err:
                 msg = f"Saving Year End Capital Forecasting {obj} generates {err}."
-                logger.warn(msg)
+                logger.warning(msg)
                 if self.request:
                     messages.error(self.request, msg)
         if counter:
@@ -690,7 +690,7 @@ class CostCenterProcessor(UploadProcessor):
             parent = FundCenterManager().fundcenter(item["costcenter_parent"])
             if not parent:
                 msg = f"Cost center {item['costcenter']} parent ({item['costcenter_parent']}) does not exist, no cost centers have been recorded."
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
                 return
@@ -702,7 +702,7 @@ class CostCenterProcessor(UploadProcessor):
             fund = FundManager().fund(item["fund"])
             if not fund:
                 msg = f"Cost center {item['costcenter']} fund ({item['fund']}) does not exist, no cost centers have been recorded."
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
                 return
@@ -714,7 +714,7 @@ class CostCenterProcessor(UploadProcessor):
             source = SourceManager().source(item["source"])
             if not source:
                 msg = f"Cost center {item['costcenter']} source ({item['source']}) does not exist, no cost centers have been recorded."
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
                 return
@@ -752,7 +752,7 @@ class CostCenterProcessor(UploadProcessor):
                 logger.info(f"Uploaded cost center {item_obj.costcenter}.")
             except IntegrityError as err:
                 msg = f"Saving cost center {item} generates {err}"
-                logger.warn(msg)
+                logger.warning(msg)
                 if request:
                     messages.error(request, msg)
         if counter:
@@ -1109,7 +1109,7 @@ class LineItemProcessor(UploadProcessor):
     def _do_preliminary_checks(self) -> bool:
         logger.info(f"Begin Upload processing by {self.user}")
         if not self._set_data():
-            logger.warn("Failed to set data.  Something is wrong with the encubrance report.")
+            logger.warning("Failed to set data.  Something is wrong with the encubrance report.")
             return False
 
         if not self._fundcenter_matches_report():
