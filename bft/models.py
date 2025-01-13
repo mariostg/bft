@@ -3510,18 +3510,52 @@ class LineItem(models.Model):
 
 
 class LineForecastManager(models.Manager):
+    """LineForecastManager handles database operations for LineForecast model.
+
+    This manager provides methods to retrieve, update and manipulate LineForecast objects,
+    including forecast calculations and history tracking.
+
+    Methods:
+        get_line_forecast(lineitem): Returns LineForecast object for given LineItem if exists
+        forecast_dataframe(): Returns pandas DataFrame containing all LineForecast data
+        update_owner(costcenter, new_owner, old_owner): Updates forecast owner for given cost center
+        set_underforecasted(costcenter): Adjusts forecasts that are lower than actual spent
+        set_overforecasted(costcenter): Adjusts forecasts that exceed working plan
+        set_encumbrance_history_record(costcenter): Creates initial forecast records for new line items
+
+    Inherits from:
+        django.db.models.Manager
+    """
+
     def get_line_forecast(self, lineitem: LineItem) -> "LineForecast | None":
+        """
+        Retrieves the line forecast associated with a given line item.
+
+        Args:
+            lineitem (LineItem): The line item object to get the forecast for.
+
+        Returns:
+            LineForecast | None: The associated LineForecast object if it exists,
+                                None if the line item has no forecast.
+        """
         if hasattr(lineitem, "fcst"):
             return LineForecast.objects.get(lineitem_id=lineitem.id)
         else:
             return None
 
     def forecast_dataframe(self) -> pd.DataFrame:
-        """Prepare a pandas dataframe of the forecast line items.  Columns are renamed
-        with a more friendly name.
+        """
+        Returns a pandas DataFrame containing line forecast data.
+
+        The method retrieves all LineForecast objects from the database and converts them
+        to a DataFrame format. If no LineForecast objects exist, returns an empty DataFrame.
 
         Returns:
-            pd.DataFrame: A dataframe of forecast lines
+            pd.DataFrame: DataFrame containing line forecast data, or empty DataFrame if no data exists
+
+        Example:
+            >>> model.forecast_dataframe()
+            # Returns DataFrame with LineForecast data
         """
         if not LineForecast.objects.exists():
             return pd.DataFrame()
@@ -3529,18 +3563,19 @@ class LineForecastManager(models.Manager):
         df = BFTDataFrame(LineForecast).build(data)
         return df
 
-    def update_owner(
-        self, costcenter: CostCenter, new_owner: BftUser, old_owner: BftUser = None
-    ) -> int:
-        """This function allows for transfer ownership of forecasted lines for a given cost center and optionally the loosing owner.
+    def update_owner(self, costcenter: CostCenter, new_owner: BftUser, old_owner: BftUser = None) -> int:
+        """Updates the owner of all line forecasts associated with a specific cost center.
+
+        This method finds all LineForecast objects linked to the given cost center and updates
+        their owner to the new specified user.
 
         Args:
-            costcenter (CostCenter): Cost center of choice for which lines will be moved
-            new_owner (BftUser): Bft User that will be assigned the lines.
-            old_owner (BftUser, optional): Bft User whose lines will be transfered. Defaults to None.. Defaults to None.
+            costcenter (CostCenter): The cost center to update line forecast owners for
+            new_owner (BftUser): The new user to set as owner
+            old_owner (BftUser, optional): The previous owner (not currently used). Defaults to None.
 
         Returns:
-            int: Number of lines transfered.
+            int: The number of line forecasts that were updated
         """
 
         lines = LineForecast.objects.filter(lineitem__costcenter=costcenter)
@@ -3548,7 +3583,22 @@ class LineForecastManager(models.Manager):
             return lines.update(owner=new_owner)
 
     def set_underforecasted(self, costcenter: CostCenter = None) -> int:
-        """Adjust the forecast of line items to match the spent if the forecast is lower than the spent"""
+        """Updates forecast amounts for lines where actual spent exceeds forecast amount.
+
+        This method finds all line items where the actual spent amount is greater than
+        the forecasted amount and updates the forecast to match the spent amount.
+
+        Args:
+            costcenter (CostCenter, optional): If provided, only updates lines for the specified
+                cost center. If None, updates lines across all cost centers. Defaults to None.
+
+        Returns:
+            int: Number of line items that were successfully updated.
+
+        Example:
+            >>> budget.set_underforecasted()  # Updates all underforecasted lines
+            >>> budget.set_underforecasted(cost_center_obj)  # Updates only specified cost center
+        """
         lines = LineForecast.objects.filter(lineitem__spent__gt=F("forecastamount"))
         if costcenter:
             lines = lines.filter(lineitem__costcenter=costcenter)
@@ -3561,7 +3611,25 @@ class LineForecastManager(models.Manager):
         return affected
 
     def set_overforecasted(self, costcenter: CostCenter | str = None) -> int:
-        """Adjust the forecast of line items to match the working plan if the forecast is highr than the working plan"""
+        """Sets forecast amount equal to working plan for overforecasted lines.
+
+        This method identifies line forecasts where the working plan is less than the forecast
+        amount (overforecasted) and adjusts the forecast amount to match the working plan.
+
+        Args:
+            costcenter (Union[CostCenter, str], optional): Cost center to filter lines by.
+                If None, all overforecasted lines are processed. Defaults to None.
+
+        Returns:
+            int: Number of line forecasts that were successfully updated.
+
+        Example:
+            >>> model.set_overforecasted()  # Update all overforecasted lines
+            >>> model.set_overforecasted("CC001")  # Update only lines for cost center CC001
+
+        Note:
+            Uses bulk_update for efficient database operations.
+        """
         lines = LineForecast.objects.filter(
             lineitem__workingplan__lt=F("forecastamount")
         )
@@ -3576,10 +3644,22 @@ class LineForecastManager(models.Manager):
         return affected
 
     def set_encumbrance_history_record(self, costcenter: CostCenter = None) -> int:
-        """Primarily used during line import, set the working plans, spent and balance values in the LineForecast model for historical purpose.  These will remain uneditable.
+        """Sets encumbrance history record for line items with 'New' status.
+
+        This method creates LineForecast records for eligible line items that are in 'New' status.
+        Only line items with forecastable cost centers are processed.
+
+        Args:
+            costcenter (CostCenter, optional): If provided, only process line items for this cost center.
+                Defaults to None which processes all eligible line items.
 
         Returns:
-            int: Number of lines affected.
+            int: Number of line items for which encumbrance history was successfully set.
+
+        Note:
+            - Only processes line items where costcenter.isforecastable is True
+            - Logs information about number of records processed
+            - Creates LineForecast entries with initial spent, workingplan and balance values
         """
         lines = LineItem.objects.filter(status="New")
         if costcenter:
