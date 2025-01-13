@@ -4038,24 +4038,58 @@ class CostCenterChargeImport(models.Model):
 
 
 class CostCenterChargeMonthlyManager(models.Manager):
+    """A manager class for CostCenterChargeMonthly model operations.
+
+    This manager handles monthly cost center charge operations including flushing
+    and inserting records for specified fiscal years and periods.
+
+    Methods:
+        flush_current() -> int:
+            Deletes all records for the current fiscal year and period.
+            Returns number of deleted records.
+
+        flush_monthly(fy: int, period: str) -> int:
+            Deletes all records for a specified fiscal year and period.
+            Args:
+                fy: Fiscal year
+                period: Period string
+            Returns number of deleted records.
+
+        insert_current(fy, period) -> int:
+            Inserts aggregated records from CostCenterChargeImport into monthly table.
+            Args:
+                fy: Fiscal year
+                period: Period to aggregate up to
+            Returns number of inserted records.
+    """
     def flush_current(self) -> int:
-        """Delete from the database the charges against cost center for the current FY and Period as defined by the BftStatusManager"""
+        """
+        Deletes all CostCenterChargeMonthly records for the current fiscal year and period.
+
+        Returns:
+            int: Number of records deleted
+        """
         fy = BftStatusManager().fy()
         period = BftStatusManager().period()
         res = CostCenterChargeMonthly.objects.filter(fy=fy, period=period).delete()
         return res[0]
 
     def flush_monthly(self, fy: int, period: str) -> int:
-        """Delete from the database the charges against cost center for the given fy and period"""
+        """
+        Deletes all monthly cost center charges for a specific fiscal year and period.
+
+        Args:
+            fy (int): The fiscal year to flush charges for
+            period (str): The period (month) to flush charges for
+
+        Returns:
+            int: Number of records deleted from the database
+
+        """
         res = CostCenterChargeMonthly.objects.filter(fy=fy, period=period).delete()
         return res[0]
 
     def insert_current(self, fy, period) -> int:
-        """Insert in the monthly cost center charges table lines taken from charges import.  Insert selection is executed based on the provided fy and period equals to or less than provided period.  This is to ensure there is a rollup of charges on a monthly basis.
-
-        Returns:
-            int: Number of lines inserted
-        """
         current = (
             CostCenterChargeImport.objects.filter(fy=fy, period__lte=period)
             .values("costcenter", "fund", "fy")
