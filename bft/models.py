@@ -3687,6 +3687,36 @@ class LineForecastManager(models.Manager):
 
 
 class LineForecast(models.Model):
+    """
+    A Django model representing forecasting data for line items in a financial system.
+
+    This class manages forecast amounts, tracking of delivery status, and ownership information
+    for individual line items. It includes methods for forecast validation and calculation.
+
+    Attributes:
+        forecastamount (DecimalField): The forecasted amount for the line item
+        spent_initial (DecimalField): Initial spent amount
+        balance_initial (DecimalField): Initial balance amount
+        workingplan_initial (DecimalField): Initial working plan amount
+        description (CharField): Optional description text
+        comment (CharField): Optional comment text
+        deliverydate (DateField): Expected delivery date
+        delivered (BooleanField): Indicates if item has been delivered
+        lineitem (OneToOneField): Reference to associated LineItem
+        buyer (CharField): PWGSC buyer identifier
+        owner (ForeignKey): Reference to BftUser who owns this forecast
+        updated (DateTimeField): Last update timestamp
+        created (DateTimeField): Creation timestamp
+
+    Methods:
+        save(): Validates and saves forecast amounts within allowed bounds
+        forecastable(): Checks if the line item can be forecasted
+        below_spent(request, lineitem): Validates forecast is not below spent amount
+        above_working_plan(request, lineitem): Validates forecast is not above working plan
+        forecast_lines(lines, ratio): Forecasts multiple lines using given ratio
+        forecast_line_by_docno(docno, forecast): Forecasts lines for a document number
+        forecast_costcenter_lines(costcenter, forecast): Forecasts lines for a cost center
+    """
     forecastamount = models.DecimalField(
         "Forecast", max_digits=10, decimal_places=2, default=0
     )
@@ -3720,6 +3750,23 @@ class LineForecast(models.Model):
         return str(text)
 
     def save(self, *args, **kwargs):
+        """
+        Save method for LineForecast model.
+
+        This method ensures forecast amounts are properly constrained before saving:
+        - If not forecastable, uses the lineitem's current forecast amount
+        - Cannot exceed the working plan amount
+        - Cannot be less than the spent amount
+
+        Overrides the default model save method.
+
+        Args:
+            *args: Variable length argument list to pass to parent save
+            **kwargs: Arbitrary keyword arguments to pass to parent save
+
+        Returns:
+            None
+        """
         if not self.forecastable():
             self.forecastamount = self.lineitem.fcst.forecastamount
         if self.forecastamount > self.lineitem.workingplan:
@@ -3729,9 +3776,28 @@ class LineForecast(models.Model):
         super(LineForecast, self).save(*args, **kwargs)
 
     def forecastable(self) -> bool:
+        """
+        Property that indicates whether a line item is forecastable.
+
+        Returns:
+            bool: True if the associated cost center is forecastable, False otherwise.
+        """
         return self.lineitem.costcenter.isforecastable
 
     def below_spent(self, request, lineitem: LineItem) -> bool:
+        """
+        Check if the forecast amount is below the spent amount.
+
+        This method compares the forecast amount against the spent amount of a line item
+        and shows a warning message if the forecast is smaller than what was spent.
+
+        Args:
+            request: The HTTP request object used for displaying messages
+            lineitem (LineItem): The line item object containing the spent amount
+
+        Returns:
+            bool: True if forecast amount is below spent amount, False otherwise
+        """
         if self.forecastamount < lineitem.spent:
             messages.warning(
                 request,
@@ -3741,6 +3807,16 @@ class LineForecast(models.Model):
         return False
 
     def above_working_plan(self, request, lineitem: LineItem) -> bool:
+        """
+        Check if forecast amount exceeds working plan and display warning message.
+
+        Args:
+            request: The HTTP request object
+            lineitem (LineItem): The line item object containing working plan amount
+
+        Returns:
+            bool: True if forecast amount is above working plan, False otherwise
+        """
         if self.forecastamount > lineitem.workingplan:
             messages.warning(
                 request,
@@ -3750,6 +3826,21 @@ class LineForecast(models.Model):
         return False
 
     def forecast_lines(self, lines: QuerySet[LineItem], ratio):
+        """
+        Updates or creates forecast lines for a given set of line items based on a ratio.
+
+        Args:
+            lines (QuerySet[LineItem]): A queryset of LineItem objects to forecast.
+            ratio (float): The multiplier to apply to the working plan amount.
+
+        The method performs the following:
+        - For existing line forecasts: updates the forecast amount
+        - For new line items: creates a new line forecast
+        - Forecast amount is calculated as workingplan * ratio
+
+        Note:
+            LineForecast objects are saved to the database in both cases.
+        """
         for li in lines:
             if hasattr(li, "fcst"):
                 li_fcst = LineForecastManager().get_line_forecast(li)
@@ -3760,6 +3851,25 @@ class LineForecast(models.Model):
                 li_fcst.save()
 
     def forecast_line_by_docno(self, docno: str, forecast: float) -> int:
+        """
+        Forecasts line items for a given document number by distributing the forecast amount proportionally.
+
+        This method splits the forecast between lines with spent amounts and those without,
+        maintaining the proportional distribution of the working plan while accounting for
+        already spent amounts.
+
+        Args:
+            docno (str): The document number to identify relevant line items
+            forecast (float): The total forecast amount to be distributed
+
+        Returns:
+            int: The total number of line items processed
+
+        Note:
+            - Lines with spent amounts are forecasted first
+            - Remaining forecast amount is distributed among lines with no spent amounts
+            - If there are no lines for the given docno, returns 0
+        """
         lines = LineItem.objects.filter(docno=docno)
         if not lines:
             return 0
@@ -3784,6 +3894,27 @@ class LineForecast(models.Model):
         return len(lines)
 
     def forecast_costcenter_lines(self, costcenter: str, forecast: float) -> int:
+        """
+        Forecast the cost center lines based on the given cost center and forecast amount.
+
+        This method calculates and updates forecast amounts for all line items under a cost center,
+        handling both lines with spent amounts and unspent lines differently.
+
+        Args:
+            costcenter (str): The cost center identifier to forecast
+            forecast (float): The total forecast amount to be distributed
+
+        Returns:
+            int: The number of line items processed for the cost center.
+                Returns 0 if the cost center doesn't exist or has no lines.
+
+        The method:
+        1. Separates lines into those with spent amounts and those without
+        2. Calculates ratios based on working plan amounts
+        3. Distributes forecast amount proportionally:
+           - First to lines with existing spent amounts
+           - Then remaining forecast to unspent lines
+        """
         costcenter = CostCenterManager().cost_center(costcenter)
         if not costcenter:
             return 0
