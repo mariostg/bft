@@ -395,7 +395,7 @@ def fundcenter_upload(request):
     return render(
         request,
         "core/form-upload.html",
-        {"form": form, "form_title": "Fund Center Upload", "back": "bft"},
+        {"form": form, "title": "Fund Center Upload", "back": "bft"},
     )
 
 
