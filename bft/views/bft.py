@@ -13,23 +13,44 @@ class HomeView(TemplateView):
 
 
 def bft_status(request):
+    """View that displays the BFT (Business Forecasating Tool) status page.
+
+    This view retrieves the current BFT status and renders it with fiscal year,
+    quarter and period information.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        HttpResponse: A rendered response containing the BFT status template with
+        context including:
+            - fy: Current fiscal year
+            - quarter: Current quarter description
+            - period: Current period description
+            - url_name: Name of the URL pattern
+            - title: Page title
+
+    Helper Functions:
+        get_safe_value: Safely retrieves a value from a mapping with optional offset
+    """
     url_name = "bft-status"
     status = BftStatus.current
-    fy = status.fy()
-    try:
-        quarter = QUARTERS[int(status.quarter())][1]
-    except TypeError:
-        quarter = None
-    try:
-        period = PERIODS[int(status.period()) - 1][1]
-    except TypeError:
-        period = None
 
-    return render(
-        request,
-        f"bft/{url_name}.html",
-        {"fy": fy, "quarter": quarter, "period": period, "url_name": url_name, "title": "BFT Status"},
-    )
+    def get_safe_value(mapping, key, offset=0):
+        try:
+            return mapping[int(key) - offset][1] if key is not None else None
+        except (TypeError, IndexError):
+            return None
+
+    context = {
+        "fy": status.fy(),
+        "quarter": get_safe_value(QUARTERS, status.quarter()),
+        "period": get_safe_value(PERIODS, status.period(), offset=1),
+        "url_name": url_name,
+        "title": "BFT Status",
+    }
+
+    return render(request, f"bft/{url_name}.html", context)
 
 
 def ajax_status_request(request):
