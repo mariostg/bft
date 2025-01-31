@@ -38,13 +38,35 @@ from reports.utils import (CostCenterMonthlyAllocationReport,
 
 
 def fund_page(request):
-    data = Fund.objects.all()
-    context = {
-        "data": data,
-        "url_name": "fund-table",
-        "title": "Funds",
-    }
-    return render(request, "costcenter/fund-table.html", context)
+    """Display the fund table view.
+
+    Args:
+        request: The HTTP request object
+
+    Returns:
+        Rendered template with fund data, pagination and sorting
+    """
+    try:
+        # Get all funds sorted by fund code
+        data = Fund.objects.all().order_by("fund")
+
+        # Add pagination
+        paginator = Paginator(data, 15)  # Show 25 funds per page
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+
+        context = {
+            "data": page_obj,
+            "page_obj": page_obj,
+            "url_name": "fund-table",
+            "title": "Funds",
+        }
+
+        return render(request, "costcenter/fund-table.html", context)
+
+    except Exception as e:
+        messages.error(request, f"Error loading funds: {str(e)}")
+        return redirect("home")
 
 
 def fund_add(request):
