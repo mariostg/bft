@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 from django.contrib import messages
 from django.db import IntegrityError
+from django.core.exceptions import MultipleObjectsReturned
 
 from bft.conf import QUARTERKEYS
 from bft.models import (BftUser, CapitalInYear, CapitalNewYear, CapitalProject,
@@ -409,6 +410,11 @@ class FundCenterProcessor(UploadProcessor):
                 item_obj.save()
                 counter += 1
                 logger.info(f"Uploaded fund center {item_obj.fundcenter}.")
+            except MultipleObjectsReturned as err:
+                msg = f"Saving fund center {item} generates {err}."
+                logger.warning(msg)
+                if request:
+                    messages.error(request, msg)
             except IntegrityError as err:
                 msg = f"Saving fund center {item}  generates {err}."
                 logger.warning(msg)
