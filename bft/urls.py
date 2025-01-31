@@ -10,7 +10,7 @@ urlpatterns += [
     path("bft-fy-update", bft.bft_fy_update, name="bft-fy-update"),
     path("bft-quarter-update", bft.bft_quarter_update, name="bft-quarter-update"),
     path("bft-period-update", bft.bft_period_update, name="bft-period-update"),
-    path("ajax-status-request", bft.ajax_status_request, name="ajax-status-request"),
+    path("get-status-json", bft.get_status_json, name="get-status-json"),
 ]
 
 # Cost Center Charges

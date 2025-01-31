@@ -44,7 +44,7 @@
   }
 </script>
 <script>
-  fetch('{% url "ajax-status-request" %}', {
+  fetch('{% url "get-status-json" %}', {
     method: "GET",
     headers: {
       "X-Requested-With": "XMLHttpRequest",

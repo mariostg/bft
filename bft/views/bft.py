@@ -53,12 +53,22 @@ def bft_status(request):
     return render(request, f"bft/{url_name}.html", context)
 
 
-def ajax_status_request(request):
+def get_status_json(request):
+    """Returns current BFT status as JSON.
+
+    Args:
+        request: The HTTP request object.
+
+    Returns:
+        JsonResponse: Contains fiscal year, period and quarter information
+    """
     status = BftStatus.current
-    fy = status.fy()
-    # Data
-    d = {"Fy": fy, "period": status.period(), "quarter": status.quarter()}
-    return JsonResponse(d)
+    data = {
+        "FY": status.fy(),
+        "period": status.period(),
+        "quarter": status.quarter(),
+    }
+    return JsonResponse(data)
 
 
 def _bft_status_update(request, status):
