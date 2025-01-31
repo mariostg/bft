@@ -4,6 +4,7 @@
 {% block content %}
   {% include "core/form-filter.html" %}
   <main class="block block--centered">
+    {% include "core/paginator.html" %}
     <div class="container">
       <header class=''>
         <h2>{{title}}</h2>
@@ -18,7 +19,7 @@
     </div>
     {% include 'paginator.html' %}
     <div class="container">
-      {% for elem in data  %}
+      {% for elem in page_obj  %}
         <section class='summary'>
           <div class='summary__header'>
             <span><strong>{{elem.costcenter}} </strong>- {{elem.shortname}} - {{elem.costcenter_parent}}</span>

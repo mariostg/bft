@@ -986,23 +986,37 @@ def capital_forecasting_year_end_upload(request):
 
 
 def costcenter_page(request):
+    """Display the cost center table view with filtering and pagination.
+
+    Args:
+        request: The HTTP request object
+
+    Returns:
+        Rendered template with cost center data, filter, pagination
+    """
     has_filter = False
-    status = {"fy": BftStatusManager().fy(), "period": BftStatusManager().period}
     if not request.GET:
         data = None
     else:
-        data = CostCenter.objects.all()
+        data = CostCenter.objects.all().order_by("costcenter")
         has_filter = True
     search_filter = CostCenterFilter(request.GET, queryset=data)
-    paginator = Paginator(search_filter.qs, 25)
+    paginator = Paginator(search_filter.qs, 5)  # Show 25 items per page
+    print(paginator)
     page_number = request.GET.get("page")
+
+    try:
+        page_obj = paginator.get_page(page_number)
+    except:
+        messages.error(request, "Error loading cost centers")
+        return redirect("home")
+
     return render(
         request,
         "costcenter/costcenter-table.html",
         {
             "filter": search_filter,
-            "data": paginator.get_page(page_number),
-            "status": status,
+            "page_obj": page_obj,
             "has_filter": has_filter,
             "url_name": "costcenter-table",
             "title": "Cost Centers",
