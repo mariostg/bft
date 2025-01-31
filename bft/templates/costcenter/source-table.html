@@ -3,7 +3,7 @@
 {% block title %}{{title}}{% endblock title %}
 {% block content %}
   <main class="block block--centered">
-
+    {% include "core/paginator.html" %}
     <div class="container">
       <header class=''>
         <h2>{{title}}</h2>
@@ -27,7 +27,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for source in sources %}
+        {% for source in page_obj %}
           <tr>
             <td>{{source.source}}</td>
             {% if user.is_authenticated %}

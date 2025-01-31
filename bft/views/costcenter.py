@@ -162,13 +162,34 @@ def fund_upload(request):
 
 
 def source_page(request):
-    data = Source.objects.all()
-    context = {
-        "sources": data,
-        "url_name": "source-table",
-        "title": "Sources",
-    }
-    return render(request, "costcenter/source-table.html", context)
+    """Display the source table view.
+
+    Args:
+        request: The HTTP request object
+
+    Returns:
+        Rendered template with source data, pagination and sorting
+    """
+    try:
+        # Get all sources sorted by source code
+        data = Source.objects.all().order_by("source")
+
+        # Add pagination
+        paginator = Paginator(data, 15)  # Show 15 sources per page
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+
+        context = {
+            "page_obj": page_obj,
+            "url_name": "source-table",
+            "title": "Sources",
+        }
+
+        return render(request, "costcenter/source-table.html", context)
+
+    except Exception as e:
+        messages.error(request, f"Error loading sources: {str(e)}")
+        return redirect("home")
 
 
 def source_add(request):
