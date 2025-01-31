@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.generic.base import TemplateView
-
+import django.http
 from bft.conf import PERIODS, QUARTERS
 from bft.forms import BftStatusForm
 from bft.models import BftStatus
@@ -71,25 +71,38 @@ def get_status_json(request):
     return JsonResponse(data)
 
 
-def _bft_status_update(request, status):
+def _bft_status_update(request, status: str) -> django.http.HttpResponse:
+    """Update BFT status value.
+
+    Args:
+        request: The HTTP request object
+        status: Status type to update (FY, QUARTER, or PERIOD)
+
+    Returns:
+        HttpResponse: Redirects to status page on success or renders form with errors
+    """
     try:
-        data = BftStatus.objects.get(status=status)
-    except BftStatus.DoesNotExist:
-        data = BftStatus(status=status, value=None)
-    form = BftStatusForm(instance=data)
+        data = BftStatus.objects.get_or_create(status=status, defaults={"value": None})[0]
+    except Exception as e:
+        messages.error(request, f"Database error: {str(e)}")
+        return redirect("bft-status")
 
     if request.method == "POST":
         form = BftStatusForm(request.POST, instance=data)
         if form.is_valid():
             try:
                 form.save()
+                messages.success(request, f"{status} updated successfully")
                 return redirect("bft-status")
             except ValueError as err:
-                messages.warning(request, err)
-                return render(
-                    request, f"bft/{status.lower()}-form.html", {"form": form}
-                )
-    return render(request, f"bft/{status.lower()}-form.html", {"form": form})
+                messages.warning(request, f"Invalid value: {err}")
+        else:
+            messages.error(request, "Please correct the errors below")
+    else:
+        form = BftStatusForm(instance=data)
+
+    template = f"bft/{status.lower()}-form.html"
+    return render(request, template, {"form": form, "status_type": status})
 
 
 def bft_fy_update(request):
