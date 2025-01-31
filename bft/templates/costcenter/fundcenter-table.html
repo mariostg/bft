@@ -4,6 +4,7 @@
 {% block content %}
   {% include "core/form-filter.html" %}
   <main class="block block--centered">
+    {% include "core/paginator.html" %}
     <div class="container">
       <header class=''>
         <h2>{{title}}</h2>
@@ -30,7 +31,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for elem in filter.qs %}
+        {% for elem in page_obj %}
           <tr class="level{{elem.level}}">
             <td>{{ forloop.counter }}</td>
             <td>{{elem.sequence}}</td><td>{{elem.fundcenter}}</td><td>{{elem.shortname}}</td><td>{{elem.fundcenter_parent}}</td>
