@@ -3,6 +3,7 @@
 {% load static %}
 {% block content %}
   <main class="block block--centered">
+{% include "core/paginator.html" %}
 
     <div class="container">
       <header class=''>
@@ -28,7 +29,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for fund in data %}
+        {% for fund in page_obj %}
           <tr>
             <td>{{fund.fund}}</td><td>{{fund.name}}<td>{{fund.vote}}</td>
               <td class={% if fund.download %} "yes" {% else %} "no" {% endif %}></td>

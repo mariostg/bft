@@ -187,3 +187,27 @@ table table td {
     gap: 30px;
     justify-content: center;
 }
+
+nav.paginator {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.page-item a,
+.page-item.active span {
+  padding: 0.5rem 1rem;
+  border: 1px solid #4b5544;
+  border-radius: 5px;
+}
+
+.page-item a {
+  color: #4b5544;
+  text-decoration: none;
+}
+
+.page-item.active span {
+  background-color: #4b5544;
+  color: #f3f3f3;
+}
