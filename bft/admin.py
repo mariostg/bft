@@ -1,10 +1,22 @@
 from django.contrib import admin
 
-from bft.models import (BftUser, Bookmark, CapitalInYear, CapitalNewYear,
-                        CapitalYearEnd, CostCenter, CostCenterAllocation,
-                        CostCenterChargeImport, CostCenterChargeMonthly,
-                        ForecastAdjustment, Fund, FundCenter,
-                        FundCenterAllocation, Source)
+from bft.models import (
+    BftUser,
+    Bookmark,
+    CapitalInYear,
+    CapitalNewYear,
+    CapitalYearEnd,
+    CostCenter,
+    CostCenterAllocation,
+    CostCenterChargeImport,
+    CostCenterChargeMonthly,
+    ForecastAdjustment,
+    Fund,
+    FundCenter,
+    FundCenterAllocation,
+    Source,
+    CapitalProject,
+)
 
 from . import models
 
@@ -139,7 +151,7 @@ admin.site.register(FundCenter, FundCenterAdmin)
 admin.site.register(FundCenterAllocation)
 admin.site.register(CostCenterAllocation, CostCenterAllocationAdmin)
 admin.site.register(ForecastAdjustment)
-
+admin.site.register(CapitalProject)
 
 admin.site.register(CostCenterChargeImport, CostCenterChargeImportAdmin)
 admin.site.register(CostCenterChargeMonthly, CostCenterChargeMonthlyAdmin)
