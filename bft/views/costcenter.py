@@ -678,20 +678,46 @@ def capital_project_add(request):
 
 
 def capital_project_update(request, pk):
-    capital_project = CapitalProject.objects.get(pk=pk)
-    form = CapitalProjectForm(instance=capital_project)
+    """Update an existing capital project.
+
+    Args:
+        request: The HTTP request object
+        pk: Primary key of the capital project to update
+
+    Returns:
+        Rendered template with form or redirect to project table
+    """
+    try:
+        # Get capital project or return 404
+        capital_project = CapitalProject.objects.get(pk=pk)
+    except CapitalProject.DoesNotExist:
+        messages.error(request, f"Capital project with id {pk} does not exist")
+        return redirect("capital-project-table")
 
     if request.method == "POST":
         form = CapitalProjectForm(request.POST, instance=capital_project)
         if form.is_valid():
+            obj = form.save(commit=False)
+
+            # Normalize project number to uppercase
+            obj.project_no = obj.project_no.upper()
+            if obj.shortname:
+                obj.shortname = obj.shortname.upper()
+
             try:
-                form.save()
+                obj.save()
+                messages.success(request, f"Capital project {obj.project_no} updated successfully")
+                return redirect("capital-project-table")
             except IntegrityError:
-                messages.error(request, "Duplicate entry cannot be saved")
-            return redirect("capital-project-table")
+                messages.error(request, "A capital project with this number already exists")
+        else:
+            messages.error(request, "Please correct the errors below")
+    else:
+        form = CapitalProjectForm(instance=capital_project)
+
     context = {
         "form": form,
-        "title": "Capital Project Update",
+        "title": "Update Capital Project",
         "url_name": "capital-project-table",
     }
     return render(request, "costcenter/capitalproject-form.html", context)
