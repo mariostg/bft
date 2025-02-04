@@ -1114,25 +1114,57 @@ def costcenter_add(request):
 
 
 def costcenter_update(request, pk):
-    costcenter = CostCenter.objects.pk(pk=pk)
-    form = CostCenterForm(instance=costcenter)
+    """Update an existing cost center.
+
+    Args:
+        request: The HTTP request object
+        pk: Primary key of the cost center to update
+
+    Returns:
+        Rendered template with form or redirect to cost center table
+    """
+    try:
+        # Get cost center or return 404
+        costcenter = CostCenter.objects.get(id=pk)
+    except CostCenter.DoesNotExist:
+        messages.error(request, f"Cost center with id {pk} does not exist")
+        return redirect("costcenter-table")
 
     if request.method == "POST":
         form = CostCenterForm(request.POST, instance=costcenter)
         if form.is_valid():
             obj = form.save(commit=False)
+
+            # Normalize cost center codes to uppercase
+            obj.costcenter = obj.costcenter.upper()
+            if obj.shortname:
+                obj.shortname = obj.shortname.upper()
+
+            # Check if parent changed and update sequence if needed
             current = CostCenterManager().pk(obj.pk)
             if obj.costcenter_parent != current.costcenter_parent:
-                # Need to change sequence given parent change
                 fsm = FinancialStructureManager()
-                obj.sequence = fsm.set_parent(
-                    fundcenter_parent=obj.costcenter_parent, costcenter_child=obj
-                )
+                try:
+                    obj.sequence = fsm.set_parent(fundcenter_parent=obj.costcenter_parent, costcenter_child=obj)
+                except Exception as e:
+                    messages.error(request, f"Error updating parent sequence: {str(e)}")
+                    return render(
+                        request,
+                        "costcenter/costcenter-form.html",
+                        {"form": form, "url_name": "costcenter-table", "title": "Cost Center Update"},
+                    )
+
             try:
                 obj.save()
+                messages.success(request, f"Cost center {obj.costcenter} updated successfully")
+                return redirect("costcenter-table")
             except IntegrityError:
-                messages.error(request, "Duplicate entry cannot be saved")
-            return redirect("costcenter-table")
+                messages.error(request, "A cost center with this code already exists")
+        else:
+            messages.error(request, "Please correct the errors below")
+    else:
+        form = CostCenterForm(instance=costcenter)
+
     context = {
         "form": form,
         "url_name": "costcenter-table",
