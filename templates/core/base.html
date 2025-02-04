@@ -52,7 +52,7 @@
   })
     .then(response => response.json())
     .then(data => {
-      document.getElementById('current-fy').innerHTML="FY: " + data.Fy
+      document.getElementById('current-fy').innerHTML="FY: " + data.FY
       document.getElementById('current-quarter').innerHTML="Quarter: " + data.quarter
       document.getElementById('current-period').innerHTML="Period: " + data.period
       console.log(data);
