@@ -669,39 +669,46 @@ def capital_project_page(request):
 
 
 def capital_project_add(request):
+    """Create a new capital project.
+
+    Args:
+        request: HTTP request object
+
+    Returns:
+        Rendered template with form or redirect to capital project table
+    """
     context = {
-        "title": "Capital Projects",
+        "title": "Create Capital Project",  # More descriptive title
         "url_name": "capital-project-table",
+        "form": CapitalProjectForm() if request.method == "GET" else CapitalProjectForm(request.POST),
     }
 
     if request.method == "POST":
-        form = CapitalProjectForm(request.POST)
-        if form.is_valid():
-            context["form"] = form
-            obj = form.save(commit=False)
-            obj.project_no = obj.project_no.upper()
-            if obj.shortname:
-                obj.shortname = obj.shortname.upper()
+        if context["form"].is_valid():
             try:
-                obj.save()
-            except IntegrityError as e:
-                messages.error(
-                    request, f"{e}.  Capital Project {obj.project_no} exists"
-                )
-                return render(
-                    request,
-                    "costcenter/capitalproject-form.html",
-                    context,
-                )
-            return redirect("capital-project-table")
-    else:
-        context["form"] = CapitalProjectForm
+                # Prepare capital project object
+                obj = context["form"].save(commit=False)
 
-    return render(
-        request,
-        "costcenter/capitalproject-form.html",
-        context,
-    )
+                # Normalize codes to uppercase
+                obj.project_no = obj.project_no.upper()
+                if obj.shortname:
+                    obj.shortname = obj.shortname.upper()
+
+                # Save to database
+                obj.save()
+                messages.success(request, f"Capital project {obj.project_no} created successfully")
+                return redirect("capital-project-table")
+
+            except IntegrityError:
+                messages.error(request, f"Capital project {obj.project_no} already exists")
+            except ValueError as e:
+                messages.error(request, str(e))
+            except Exception as e:
+                messages.error(request, f"Error creating capital project: {str(e)}")
+        else:
+            messages.error(request, "Please correct the errors below")
+
+    return render(request, "costcenter/capitalproject-form.html", context)
 
 
 def capital_project_update(request, pk):
