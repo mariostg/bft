@@ -370,37 +370,50 @@ def fundcenter_page(request):
 
 
 def fundcenter_add(request):
+    """Create a new fund center.
+
+    Args:
+        request: HTTP request object
+
+    Returns:
+        Rendered template with form or redirect to fund center table
+    """
     context = {
         "title": "Create Fund Center",
         "url_name": "fundcenter-table",
+        "form": FundCenterForm() if request.method == "GET" else FundCenterForm(request.POST),
     }
+
     if request.method == "POST":
-        form = FundCenterForm(request.POST)
-        if form.is_valid():
-            context["form"] = form
-            obj = form.save(commit=False)
-            obj.sequence = FinancialStructureManager().set_parent(
-                fundcenter_parent=obj.fundcenter_parent
-            )
+        if context["form"].is_valid():
             try:
+                # Prepare fund center object
+                obj = context["form"].save(commit=False)
+
+                # Set sequence using financial structure manager
+                fsm = FinancialStructureManager()
+                obj.sequence = fsm.set_parent(fundcenter_parent=obj.fundcenter_parent)
+
+                # Normalize codes to uppercase
+                obj.fundcenter = obj.fundcenter.upper()
+                if obj.shortname:
+                    obj.shortname = obj.shortname.upper()
+
+                # Save to database
                 obj.save()
+                messages.success(request, f"Fund center {obj.fundcenter} created successfully")
+                return redirect("fundcenter-table")
+
             except IntegrityError:
-                messages.error(request, f"Fund center {obj.fundcenter} exists.")
-                return render(
-                    request,
-                    "costcenter/fundcenter-form.html",
-                    context,
-                )
+                messages.error(request, f"Fund center {obj.fundcenter} already exists")
+            except ValueError as e:
+                messages.error(request, str(e))
+            except Exception as e:
+                messages.error(request, f"Error creating fund center: {str(e)}")
+        else:
+            messages.error(request, "Please correct the errors below")
 
-            return redirect("fundcenter-table")
-    else:
-        context["form"] = FundCenterForm
-
-    return render(
-        request,
-        "costcenter/fundcenter-form.html",
-        context,
-    )
+    return render(request, "costcenter/fundcenter-form.html", context)
 
 
 def fundcenter_update(request, pk):
@@ -1152,39 +1165,50 @@ def costcenter_page(request):
 
 
 def costcenter_add(request):
+    """Create a new cost center.
+
+    Args:
+        request: HTTP request object
+
+    Returns:
+        Rendered template with form or redirect to cost center table
+    """
     context = {
         "title": "Create Cost Center",
         "url_name": "costcenter-table",
+        "form": CostCenterForm() if request.method == "GET" else CostCenterForm(request.POST),
     }
-    if request.method == "POST":
-        form = CostCenterForm(request.POST)
-        if form.is_valid():
-            context["form"] = form
-            obj = form.save(commit=False)
-            obj.sequence = FinancialStructureManager().set_parent(
-                fundcenter_parent=obj.costcenter_parent, costcenter_child=True
-            )
-            obj.costcenter = obj.costcenter.upper()
-            if obj.shortname:
-                obj.shortname = obj.shortname.upper()
-            try:
-                obj.save()
-            except IntegrityError as e:
-                messages.error(request, f"{e}.  Cost center {obj.costcenter} exists")
-                return render(
-                    request,
-                    "costcenter/costcenter-form.html",
-                    context,
-                )
-            return redirect("costcenter-table")
-    else:
-        context["form"] = CostCenterForm
 
-    return render(
-        request,
-        "costcenter/costcenter-form.html",
-        context,
-    )
+    if request.method == "POST":
+        if context["form"].is_valid():
+            try:
+                # Prepare cost center object
+                obj = context["form"].save(commit=False)
+
+                # Set sequence using financial structure manager
+                fsm = FinancialStructureManager()
+                obj.sequence = fsm.set_parent(fundcenter_parent=obj.costcenter_parent, costcenter_child=True)
+
+                # Normalize codes to uppercase
+                obj.costcenter = obj.costcenter.upper()
+                if obj.shortname:
+                    obj.shortname = obj.shortname.upper()
+
+                # Save to database
+                obj.save()
+                messages.success(request, f"Cost center {obj.costcenter} created successfully")
+                return redirect("costcenter-table")
+
+            except IntegrityError:
+                messages.error(request, f"Cost center {obj.costcenter} already exists")
+            except ValueError as e:
+                messages.error(request, str(e))
+            except Exception as e:
+                messages.error(request, f"Error creating cost center: {str(e)}")
+        else:
+            messages.error(request, "Please correct the errors below")
+
+    return render(request, "costcenter/costcenter-form.html", context)
 
 
 def costcenter_update(request, pk):
