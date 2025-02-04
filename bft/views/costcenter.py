@@ -70,34 +70,39 @@ def fund_page(request):
 
 
 def fund_add(request):
+    """Create a new fund.
+
+    Args:
+        request: The HTTP request object
+
+    Returns:
+        Rendered template with form or redirect to fund table
+    """
     context = {
         "title": "Create Fund",
         "url_name": "fund-table",
+        "form": FundForm() if request.method == "GET" else FundForm(request.POST),
     }
+
     if request.method == "POST":
-        form = FundForm(request.POST)
-        if form.is_valid():
-            context["form"] = form
-            obj = form.save(commit=False)
+        if context["form"].is_valid():
             try:
-                form.save()
+                # Save the form and normalize fund code to uppercase
+                fund = context["form"].save(commit=False)
+                fund.fund = fund.fund.upper()
+                if fund.shortname:
+                    fund.shortname = fund.shortname.upper()
+                fund.save()
+
+                messages.success(request, f"Fund {fund.fund} created successfully")
+                return redirect("fund-table")
+
             except IntegrityError:
-                messages.error(request, f"Fund {obj.fund} exists.")
-                return render(
-                    request,
-                    "costcenter/fund-form.html",
-                    context,
-                )
+                messages.error(request, f"Fund {fund.fund} already exists")
             except ValueError as e:
-                messages.error(request, e)
-                return render(
-                    request,
-                    "costcenter/fund-form.html",
-                    context,
-                )
-        return redirect("fund-table")
-    else:
-        context["form"] = FundForm
+                messages.error(request, str(e))
+        else:
+            messages.error(request, "Please correct the errors below")
 
     return render(request, "costcenter/fund-form.html", context)
 
@@ -211,32 +216,41 @@ def source_page(request):
 
 
 def source_add(request):
+    """Create a new source.
+
+    Args:
+        request: The HTTP request object
+
+    Returns:
+        Rendered template with form or redirect to source table
+    """
     context = {
         "title": "Create Source",
         "url_name": "source-table",
+        "form": SourceForm() if request.method == "GET" else SourceForm(request.POST),
     }
+
     if request.method == "POST":
-        form = SourceForm(request.POST)
-        if form.is_valid():
-            context["form"] = form
-            obj = form.save(commit=False)
+        if context["form"].is_valid():
             try:
-                form.save()
+                # Save form and normalize source code to uppercase
+                source = context["form"].save(commit=False)
+                source.source = source.source.upper()
+                if source.shortname:
+                    source.shortname = source.shortname.upper()
+                source.save()
+
+                messages.success(request, f"Source {source.source} created successfully")
+                return redirect("source-table")
+
             except IntegrityError:
-                messages.error(request, f"Source {obj.source} exists.")
-                return render(
-                    request,
-                    "costcenter/source-form.html",
-                    context,
-                )
-        return redirect("source-table")
-    else:
-        context["form"] = SourceForm
-    return render(
-        request,
-        "costcenter/source-form.html",
-        context,
-    )
+                messages.error(request, f"Source {source.source} already exists")
+            except ValueError as e:
+                messages.error(request, str(e))
+        else:
+            messages.error(request, "Please correct the errors below")
+
+    return render(request, "costcenter/source-form.html", context)
 
 
 def source_update(request, pk):
