@@ -390,23 +390,57 @@ def fundcenter_add(request):
 
 
 def fundcenter_update(request, pk):
-    fundcenter = FundCenter.objects.get(id=pk)
-    form = FundCenterForm(instance=fundcenter)
+    """Update an existing fund center.
+
+    Args:
+        request: The HTTP request object
+        pk: Primary key of the fund center to update
+
+    Returns:
+        Rendered template with form or redirect to fund center table
+    """
+    try:
+        # Get fund center or return 404
+        fundcenter = FundCenter.objects.get(id=pk)
+    except FundCenter.DoesNotExist:
+        messages.error(request, f"Fund center with id {pk} does not exist")
+        return redirect("fundcenter-table")
 
     if request.method == "POST":
         form = FundCenterForm(request.POST, instance=fundcenter)
         if form.is_valid():
             obj = form.save(commit=False)
+
+            # Normalize fund center codes to uppercase
+            obj.fundcenter = obj.fundcenter.upper()
+            if obj.shortname:
+                obj.shortname = obj.shortname.upper()
+
+            # Check if parent changed and update sequence if needed
             current = FundCenterManager().pk(obj.pk)
             if obj.fundcenter_parent != current.fundcenter_parent:
-                # Need to change sequence given parent change
                 fsm = FinancialStructureManager()
-                obj.sequence = fsm.set_parent(fundcenter_parent=obj.fundcenter_parent)
+                try:
+                    obj.sequence = fsm.set_parent(fundcenter_parent=obj.fundcenter_parent)
+                except Exception as e:
+                    messages.error(request, f"Error updating parent sequence: {str(e)}")
+                    return render(
+                        request,
+                        "costcenter/fundcenter-form.html",
+                        {"form": form, "url_name": "fundcenter-table", "title": "Fund Center Update"},
+                    )
+
             try:
                 obj.save()
+                messages.success(request, f"Fund center {obj.fundcenter} updated successfully")
+                return redirect("fundcenter-table")
             except IntegrityError:
-                messages.error(request, "Duplicate entry cannot be saved")
-            return redirect("fundcenter-table")
+                messages.error(request, "A fund center with this code already exists")
+        else:
+            messages.error(request, "Please correct the errors below")
+    else:
+        form = FundCenterForm(instance=fundcenter)
+
     context = {
         "form": form,
         "url_name": "fundcenter-table",
