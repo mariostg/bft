@@ -103,24 +103,42 @@ def fund_add(request):
 
 
 def fund_update(request, pk):
-    fund = Fund.objects.get(id=pk)
-    form = FundForm(instance=fund)
+    """Update an existing fund.
+
+    Args:
+        request: The HTTP request object
+        pk: Primary key of the fund to update
+
+    Returns:
+        Rendered template with form or redirect to fund table
+    """
+    try:
+        fund = Fund.objects.get(id=pk)
+    except Fund.DoesNotExist:
+        messages.error(request, f"Fund with id {pk} does not exist")
+        return redirect("fund-table")
 
     if request.method == "POST":
         form = FundForm(request.POST, instance=fund)
         if form.is_valid():
-            form.save()
-            return redirect("fund-table")
+            try:
+                form.save()
+                messages.success(request, f"Fund {fund.fund} updated successfully")
+                return redirect("fund-table")
+            except IntegrityError:
+                messages.error(request, "Fund with this code already exists")
+        else:
+            messages.error(request, "Please correct the errors below")
+    else:
+        form = FundForm(instance=fund)
 
-    return render(
-        request,
-        "costcenter/fund-form.html",
-        {
-            "form": form,
-            "title": "Fund Update",
-            "url_name": "fund-table",
-        },
-    )
+    context = {
+        "form": form,
+        "title": "Update Fund",
+        "url_name": "fund-table",
+    }
+
+    return render(request, "costcenter/fund-form.html", context)
 
 
 def fund_delete(request, pk):
@@ -222,17 +240,38 @@ def source_add(request):
 
 
 def source_update(request, pk):
-    source = Source.objects.pk(pk)
-    form = SourceForm(instance=source)
+    """Update an existing source.
+
+    Args:
+        request: The HTTP request object
+        pk: Primary key of the source to update
+
+    Returns:
+        Rendered template with form or redirect to source table
+    """
+    try:
+        source = Source.objects.get(id=pk)
+    except Source.DoesNotExist:
+        messages.error(request, f"Source with id {pk} does not exist")
+        return redirect("source-table")
 
     if request.method == "POST":
         form = SourceForm(request.POST, instance=source)
         if form.is_valid():
-            form.save()
-            return redirect("source-table")
+            try:
+                form.save()
+                messages.success(request, f"Source {source.source} updated successfully")
+                return redirect("source-table")
+            except IntegrityError:
+                messages.error(request, "Source with this code already exists")
+        else:
+            messages.error(request, "Please correct the errors below")
+    else:
+        form = SourceForm(instance=source)
+
     context = {
         "form": form,
-        "title": "Create Update",
+        "title": "Update Source",
         "url_name": "source-table",
     }
 
