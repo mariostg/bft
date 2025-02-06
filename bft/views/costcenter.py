@@ -88,10 +88,10 @@ def fund_add(request):
         if context["form"].is_valid():
             try:
                 # Save the form and normalize fund code to uppercase
-                fund = context["form"].save(commit=False)
+                fund: Fund = context["form"].save(commit=False)
                 fund.fund = fund.fund.upper()
-                if fund.shortname:
-                    fund.shortname = fund.shortname.upper()
+                if fund.name:
+                    fund.name = fund.name.upper()
                 fund.save()
 
                 messages.success(request, f"Fund {fund.fund} created successfully")
