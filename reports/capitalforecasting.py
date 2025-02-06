@@ -7,6 +7,41 @@ from bft.models import (BftStatusManager, CapitalInYear, CapitalNewYear,
 
 
 class CapitalReport:
+    """A class for generating capital project financial reports.
+
+    This class handles the creation and management of capital project reports,
+    including data processing and visualization components.
+
+    Parameters
+    ----------
+    fund : str
+        The fund identifier for the capital project
+    capital_project : str
+        The identifier for the specific capital project
+    fy : int, optional
+        The fiscal year for the report. If not provided, uses current fiscal year
+
+    Attributes
+    ----------
+    _dataset : None
+        Placeholder for dataset
+    df : pandas.DataFrame
+        Main dataframe for storing report data
+    quarters : list
+        List of fiscal quarters [1,2,3,4]
+    fy : int
+        Fiscal year for the report
+    capital_project : CapitalProject
+        The capital project object being reported on
+    fund : Fund
+        The fund object associated with the project
+    chart_width : int
+        Width in pixels for chart visualizations
+    layout_margin : dict
+        Margin settings for chart layouts
+    paper_bgcolor : str
+        Background color for charts/reports
+    """
     def __init__(self, fund: str, capital_project: str, fy: int):
         self._dataset = None
         self.df = pd.DataFrame()
@@ -24,16 +59,46 @@ class CapitalReport:
 
 
 class HistoricalOutlookReport(CapitalReport):
-    """This class handles forecasts, spent, initial allocation on annual basis."""
+    """A class for generating historical capital forecast reports.
+
+    This class handles the creation and presentation of historical capital forecast data,
+    including initial allocations, quarterly Most Likely Estimates (MLE), and year-end spent amounts
+    over a 5-year period (current fiscal year and 4 previous years).
+
+    Args:
+        fund (str): The fund identifier.
+        fy (int): The fiscal year.
+        capital_project (str): The capital project identifier.
+
+    Attributes:
+        years (list): List of fiscal years to include in report (fy-4 to fy).
+        df (pandas.DataFrame): DataFrame containing the formatted report data.
+
+    Example:
+        >>> report = HistoricalOutlookReport('FUND1', 2023, 'PROJECT1')
+        >>> report.dataframe()
+        >>> html_output = report.to_html()
+
+    Notes:
+        - Inherits from CapitalReport base class
+        - Retrieves data from CapitalInYear, CapitalYearEnd, and CapitalNewYear models
+        - Formats monetary values as integers with thousand separators in HTML output
+    """
 
     def __init__(self, fund: str, fy: int, capital_project: str):
         super().__init__(fund, capital_project, fy)
         self.years = list(range(self.fy - 4, self.fy + 1))
 
     def dataset(self) -> dict[str, QuerySet]:
-        """
-        Retrieves capital data for the given fund, project and years.
-        Returns a dictionary containing in_year, year_end, and new_year QuerySets.
+        """This method queries three different capital-related models to create a comprehensive
+        dataset of capital information based on the instance's fund, capital project, and years.
+
+        Returns:
+            dict[str, QuerySet]: A dictionary containing three QuerySets:
+                - 'in_year': CapitalInYear records with fy, quarter, and mle values
+                - 'year_end': CapitalYearEnd records with fy and ye_spent values
+                - 'new_year': CapitalNewYear records with fy and initial_allocation values
+                All QuerySets are ordered by fiscal year (and quarter where applicable)
         """
         base_filters = {"fund": self.fund, "capital_project": self.capital_project, "fy__in": self.years}
 
@@ -48,7 +113,27 @@ class HistoricalOutlookReport(CapitalReport):
         }
 
     def dataframe(self) -> int:
-        """Create a dataframe of annual data, one row per year for given project and fund"""
+        """
+        Processes and transforms capital forecasting data into a structured DataFrame.
+
+        This method combines various financial data points including quarterly MLE (Most Likely Estimate),
+        year-end spent amounts, and initial allocations into a single DataFrame.
+
+        Returns:
+            int: The size of the resulting DataFrame (number of elements).
+
+        Notes:
+            - Processes quarterly MLE data through pivot operations
+            - Handles year-end spent amounts and initial allocations through merge operations
+            - Fills missing values with zeros
+            - Updates the instance DataFrame (self.df) with the processed data
+
+        The resulting DataFrame contains the following columns when data is available:
+            - fy: Fiscal Year
+            - Q1 MLE, Q2 MLE, Q3 MLE, Q4 MLE: Quarterly Most Likely Estimates
+            - YE Spent: Year End spent amounts
+            - Initial Allocation: New year initial allocations
+        """
         data = self.dataset()
         df = pd.DataFrame()
 
@@ -81,6 +166,25 @@ class HistoricalOutlookReport(CapitalReport):
         return self.df.size
 
     def to_html(self):
+        """
+        Converts the current dataframe to an HTML representation with formatted numeric columns.
+
+        Returns:
+            str: HTML string representation of the dataframe with formatted numbers.
+                Returns "Dataframe is empty." if the dataframe has no data.
+                Numbers in specific columns are formatted with thousands separators and no decimals.
+
+        Formatted columns:
+            - Initial Allocation
+            - Q1 MLE
+            - Q2 MLE
+            - Q3 MLE
+            - Q4 MLE
+            - YE Spent
+
+        Note:
+            This method calls dataframe() internally before converting to HTML.
+        """
         self.dataframe()
         if self.df.empty:
             return "Dataframe is empty."
@@ -94,13 +198,66 @@ class HistoricalOutlookReport(CapitalReport):
 
 
 class FEARStatusReport(CapitalReport):
-    """This class handles all quarter related fields"""
+    """FEAR (Forecasting, Encumbrance, Allocation Relationship) Status report.
+
+    This class handles quarterly financial data for capital projects, generating reports with forecasting,
+    encumbrance and allocation relationships.
+
+    Args:
+        fund (str): The fund identifier
+        fy (int, optional): Fiscal year. Defaults to None.
+        capital_project (str, optional): Capital project identifier. Defaults to None.
+
+    Attributes:
+        quarters (list): List of quarters [1,2,3,4]
+        df (pandas.DataFrame): Dataframe storing the quarterly financial data
+
+    Methods:
+        dataset(): Returns a QuerySet with aggregated quarterly financial data
+        dataframe(): Creates a pandas DataFrame from the dataset
+        to_html(): Renders the dataframe as formatted HTML table
+
+    Inherits From:
+        CapitalReport
+
+    Example:
+        >>> report = FEARStatusReport('ABC123', 2023, 'PRJ01')
+        >>> report.dataframe()
+        >>> print(report.to_html())
+    """
+    """FEAR (Forecasting, Encumbrance, Allocation Relationship) Status report. This class handles all quarter related fields"""
 
     def __init__(self, fund: str, fy: int = None, capital_project: str = None):
+        """Initialize capital forecast report class.
+
+        Args:
+            fund (str): Fund identifier.
+            fy (int, optional): Fiscal year. Defaults to None.
+            capital_project (str, optional): Capital project identifier. Defaults to None.
+
+        Note:
+            Sets up quarters list [1,2,3,4] and calls parent class initialization.
+        """
         self.quarters = [1, 2, 3, 4]
         super().__init__(fund, capital_project, fy)
 
     def dataset(self) -> QuerySet:
+        """
+        Retrieves and aggregates capital forecasting data for a specific fiscal year, fund, and capital project.
+
+        Returns:
+            QuerySet: A queryset containing aggregated capital data with the following annotations:
+                - MLE: Sum of 'mle' (Most Likely Estimate)
+                - LE: Sum of 'le' (Low Estimate)
+                - HE: Sum of 'he' (High Estimate)
+                - CO: Sum of 'co' (Carry Over)
+                - PC: Sum of 'pc' (Project Completion)
+                - FR: Sum of 'fr' (Future Requirements)
+                - Spent: Sum of actual spent amounts
+                - allocation: Sum of allocated amounts
+
+            The queryset is grouped and ordered by capital_project, fund, and quarter.
+        """
         return (
             CapitalInYear.objects.filter(fy=self.fy, fund=self.fund, capital_project=self.capital_project)
             .values("capital_project", "fund", "quarter")
@@ -118,7 +275,17 @@ class FEARStatusReport(CapitalReport):
         )
 
     def dataframe(self) -> int:
-        """Create a dataframe of quarterly data, one row per quarter for given fundcenter, fund, and FY"""
+        """
+        Creates a pandas DataFrame from the dataset containing quarterly financial data.
+        The 'quarter' column is renamed to 'Quarters' in the resulting DataFrame.
+
+        Returns:
+            int: Size of the resulting DataFrame, or 0 if dataset is empty
+
+        Side Effects:
+            Sets self.df with the created pandas DataFrame
+        """
+
         ds = self.dataset()
         if not ds.count():
             return 0
@@ -127,6 +294,26 @@ class FEARStatusReport(CapitalReport):
         return self.df.size
 
     def to_html(self):
+        """Converts the capital forecast data into HTML format.
+
+        This method first generates the dataframe using the dataframe() method and then
+        converts it to HTML with specific number formatting for financial values.
+
+        Returns:
+            str: HTML representation of the dataframe with financial numbers formatted
+                 without decimals and with thousand separators.
+                 Returns "Dataframe is empty." if the dataframe has no data.
+
+        Note:
+            Applies formatting to the following columns if they exist:
+            - allocation
+            - forecast
+            - le (lower estimate)
+            - he (higher estimate)
+            - co (carry over)
+            - pc (project cost)
+            - fr (forecast)
+        """
         self.dataframe()
         if self.df.empty:
             return "Dataframe is empty."
