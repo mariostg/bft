@@ -45,49 +45,35 @@ class HistoricalOutlookReport(CapitalReport):
 
     def dataframe(self) -> int:
         """Create a dataframe of annual data, one row per year for given project and fund"""
-
         data = self.dataset()
         df = pd.DataFrame()
+
         if any(data["in_year"]):
             df_in_year = pd.DataFrame.from_dict(data["in_year"])
-            df_q1 = df_in_year[df_in_year["quarter"] == "1"]
-            df_q1 = df_q1.rename(columns={"mle": "Q1 MLE"})
-            df_q1 = df_q1[["Q1 MLE", "fy"]]
+            # Convert all quarters at once using pivot
+            df = (
+                df_in_year.pivot(index="fy", columns="quarter", values="mle")
+                .rename(columns={"1": "Q1 MLE", "2": "Q2 MLE", "3": "Q3 MLE", "4": "Q4 MLE"})
+                .reset_index()
+            )
 
-            df_q2 = df_in_year[df_in_year["quarter"] == "2"]
-            df_q2 = df_q2.rename(columns={"mle": "Q2 MLE"})
-            df_q2 = df_q2[["Q2 MLE", "fy"]]
+            # Fill NaN values with 0
+            mle_columns = ["Q1 MLE", "Q2 MLE", "Q3 MLE", "Q4 MLE"]
+            df[mle_columns] = df[mle_columns].fillna(0)
 
-            df_q3 = df_in_year[df_in_year["quarter"] == "3"]
-            df_q3 = df_q3.rename(columns={"mle": "Q3 MLE"})
-            df_q3 = df_q3[["Q3 MLE", "fy"]]
-
-            df_q4 = df_in_year[df_in_year["quarter"] == "4"]
-            df_q4 = df_q4.rename(columns={"mle": "Q4 MLE"})
-            df_q4 = df_q4[["Q4 MLE", "fy"]]
-
-            df = df_q1.merge(df_q2, how="left", on="fy")
-
-            if not df_q3.empty:
-                df = df.merge(df_q3, how="left", on="fy")
-            else:
-                df["Q3 MLE"] = 0
-            if not df_q4.empty:
-                df = df.merge(df_q4, how="left", on="fy")
-            else:
-                df["Q4 MLE"] = 0
-
-        if any(data["year_end"]):
-            df_year_end = pd.DataFrame.from_dict(data["year_end"])
-            df = df.merge(df_year_end, how="outer", on="fy")
-
-        if any(data["new_year"]):
-            df_new_year = pd.DataFrame.from_dict(data["new_year"])
-            df = df.merge(df_new_year, how="outer", on="fy")
+        # Merge year_end and new_year data
+        for key, column_map in [
+            ("year_end", {"ye_spent": "YE Spent"}),
+            ("new_year", {"initial_allocation": "Initial Allocation"}),
+        ]:
+            if any(data[key]):
+                temp_df = pd.DataFrame.from_dict(data[key])
+                df = df.merge(temp_df, how="outer", on="fy")
+                df = df.rename(columns=column_map)
 
         if not df.empty:
-            self.df = df.rename(columns={"ye_spent": "YE Spent", "initial_allocation": "Initial Allocation"})
-            self.df = self.df.fillna(0)
+            self.df = df.fillna(0)
+
         return self.df.size
 
     def to_html(self):
