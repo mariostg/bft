@@ -30,18 +30,22 @@ class HistoricalOutlookReport(CapitalReport):
         super().__init__(fund, capital_project, fy)
         self.years = list(range(self.fy - 4, self.fy + 1))
 
-    def dataset(self) -> dict[QuerySet]:
-        in_year = CapitalInYear.objects.filter(
-            fund=self.fund, capital_project=self.capital_project, fy__in=self.years
-        ).values("fy", "quarter", "mle")
-        year_end = CapitalYearEnd.objects.filter(
-            fund=self.fund, capital_project=self.capital_project, fy__in=self.years
-        ).values("fy", "ye_spent")
-        new_year = CapitalNewYear.objects.filter(
-            fund=self.fund, capital_project=self.capital_project, fy__in=self.years
-        ).values("fy", "initial_allocation")
+    def dataset(self) -> dict[str, QuerySet]:
+        """
+        Retrieves capital data for the given fund, project and years.
+        Returns a dictionary containing in_year, year_end, and new_year QuerySets.
+        """
+        base_filters = {"fund": self.fund, "capital_project": self.capital_project, "fy__in": self.years}
 
-        return {"in_year": in_year, "new_year": new_year, "year_end": year_end}
+        return {
+            "in_year": CapitalInYear.objects.filter(**base_filters)
+            .values("fy", "quarter", "mle")
+            .order_by("fy", "quarter"),
+            "year_end": CapitalYearEnd.objects.filter(**base_filters).values("fy", "ye_spent").order_by("fy"),
+            "new_year": CapitalNewYear.objects.filter(**base_filters)
+            .values("fy", "initial_allocation")
+            .order_by("fy"),
+        }
 
     def dataframe(self) -> int:
         """Create a dataframe of annual data, one row per year for given project and fund"""
