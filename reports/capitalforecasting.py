@@ -193,6 +193,47 @@ class EncumbranceStatusReport(CapitalReport):
 
 
 class EstimateReport(CapitalReport):
+    """A class to generate capital reports with Low Estimate (LE), Most Likely Estimate (MLE), and High Estimate (HE).
+
+    This class inherits from CapitalReport and handles the creation of reports containing various estimates
+    for capital forecasting purposes. It processes data from CapitalInYear objects and can output HTML formatted reports.
+
+    Parameters
+    ----------
+    fund : Fund or str
+        The fund to generate the report for
+    fy : int, optional
+        The fiscal year for the report (default is None)
+    capital_project : CapitalProject or str, optional
+        The specific capital project to report on (default is None)
+
+    Attributes
+    ----------
+    mle : list
+        Most Likely Estimate data
+    he : list
+        High Estimate data
+    le : list
+        Low Estimate data
+    df : pandas.DataFrame
+        DataFrame containing the processed report data
+
+    Methods
+    -------
+    dataset()
+        Retrieves and processes the QuerySet for capital estimates
+    dataframe()
+        Converts the dataset into a pandas DataFrame
+    to_html()
+        Generates an HTML representation of the report
+
+    Returns
+    -------
+    Various return types depending on the method called:
+        - dataset(): Django QuerySet
+        - dataframe(): int (size of DataFrame)
+        - to_html(): str (HTML formatted string)
+    """
     """This class handles the LE, MLE, and HE of for the Capital Forecasting."""
 
     def __init__(self, fund: Fund | str, fy: int = None, capital_project: CapitalProject | str = None):
@@ -201,6 +242,23 @@ class EstimateReport(CapitalReport):
         super().__init__(fund, capital_project, fy)
 
     def dataset(self) -> QuerySet:
+        """
+        Retrieves and aggregates capital project financial data for a specific fiscal year, fund, and project.
+
+        Returns:
+            QuerySet: A Django QuerySet containing aggregated financial data with the following fields:
+                - capital_project: The capital project identifier
+                - fund: The fund identifier
+                - quarter: The fiscal quarter
+                - capital_project__project_no: The project number
+                - capital_project__fundcenter__fundcenter: The fund center identifier
+                - MLE: Sum of Most Likely Estimate values
+                - LE: Sum of Low Estimate values
+                - HE: Sum of High Estimate values
+                - working_plan: Sum of spent + carried over + pre-committed + future requirements
+
+        The results are ordered by capital project, fund, quarter, project number, and fund center.
+        """
         return (
             CapitalInYear.objects.filter(fy=self.fy, fund=self.fund, capital_project=self.capital_project)
             .values(
@@ -226,6 +284,18 @@ class EstimateReport(CapitalReport):
         )
 
     def dataframe(self) -> int:
+        """
+        Creates and processes a pandas DataFrame from the dataset.
+
+        This method transforms the dataset into a DataFrame and renames specific columns
+        for better readability. The columns renamed are:
+        - 'capital_project__fundcenter__fundcenter' to 'Fund Center'
+        - 'capital_project__project_no' to 'Project No'
+        - 'working_plan' to 'Working Plan'
+
+        Returns:
+            int: The size of the resulting DataFrame, or 0 if the dataset is empty
+        """
         ds = self.dataset()
         if not ds.count():
             return 0
@@ -239,6 +309,24 @@ class EstimateReport(CapitalReport):
         return self.df.size
 
     def to_html(self):
+        """
+        Converts the capital forecasting data to an HTML representation.
+
+        This method first generates the dataframe using the dataframe() method, then
+        formats the numerical columns (MLE, HE, LE, working_plan) to display as integers
+        with thousand separators before converting to HTML.
+
+        Returns:
+            str: HTML string representation of the dataframe. If the dataframe is empty,
+                 returns the message "Dataframe is empty."
+
+        Note:
+            The following columns are formatted with thousand separators:
+            - MLE (Most Likely Estimate)
+            - HE (High Estimate)
+            - LE (Low Estimate)
+            - working_plan
+        """
         self.dataframe()
         if self.df.empty:
             return "Dataframe is empty."
