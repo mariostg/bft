@@ -140,6 +140,46 @@ class FEARStatusReport(CapitalReport):
 
 
 class EncumbranceStatusReport(CapitalReport):
+    """A Capital Report that shows encumbrance status for a given fund, fiscal year, and quarter.
+
+    This report aggregates capital spending data including commitments (CO), pre-commitments (PC),
+    funds reservations (FR) and actual spent amounts for capital projects.
+
+    Parameters
+    ----------
+    fund : Fund or str
+        The fund to generate the report for
+    fy : int
+        The fiscal year
+    quarter : int
+        The quarter (1-4)
+    capital_project : CapitalProject or str, optional
+        Specific capital project to filter by (default is None)
+
+    Attributes
+    ----------
+    spent : float
+        Total spent amount
+    co : float
+        Total commitments
+    pc : float
+        Total pre-commitments
+    fr : float
+        Total funds reservations
+    quarter : int
+        Report quarter
+    df : pandas.DataFrame
+        The report data in DataFrame format
+
+    Methods
+    -------
+    dataset()
+        Returns queryset of aggregated capital spending data
+    dataframe()
+        Converts dataset to pandas DataFrame
+    to_html()
+        Renders report as HTML table with formatted numbers
+    """
     def __init__(self, fund: Fund | str, fy: int, quarter: int, capital_project: CapitalProject | str = None):
         self.spent = self.co = self.pc = self.fr = 0
         self.quarter = quarter
@@ -147,6 +187,26 @@ class EncumbranceStatusReport(CapitalReport):
         super().__init__(fund, capital_project, fy)
 
     def dataset(self):
+        """
+        Retrieves aggregated capital forecasting data for a specific fiscal year, fund, and quarter.
+
+        The method performs a database query on CapitalInYear objects, filtering by fiscal year,
+        fund, and quarter. It groups and aggregates financial data by capital project details.
+
+        Returns:
+            QuerySet: A queryset containing dictionaries with the following structure:
+                - capital_project: The capital project identifier
+                - fund: The fund identifier
+                - quarter: The quarter number
+                - capital_project__project_no: The project number
+                - capital_project__fundcenter__fundcenter: The fund center identifier
+                - CO: Sum of carry over amounts
+                - PC: Sum of project costs
+                - FR: Sum of forecast amounts
+                - Spent: Sum of spent amounts
+
+        The results are ordered by capital project, fund, quarter, project number, and fund center.
+        """
         return (
             CapitalInYear.objects.filter(fy=self.fy, fund=self.fund, quarter=self.quarter)
             .values(
@@ -172,6 +232,14 @@ class EncumbranceStatusReport(CapitalReport):
         )
 
     def dataframe(self):
+        """
+        Converts dataset into a pandas DataFrame with column renaming.
+
+        Returns:
+            pd.DataFrame: DataFrame containing capital project data with renamed columns:
+                - 'capital_project__fundcenter__fundcenter' renamed to 'Fund Center'
+                - 'capital_project__project_no' renamed to 'Project No'
+        """
         self.df = pd.DataFrame.from_dict(self.dataset()).rename(
             columns={
                 "capital_project__fundcenter__fundcenter": "Fund Center",
@@ -180,6 +248,19 @@ class EncumbranceStatusReport(CapitalReport):
         )
 
     def to_html(self):
+        """Convert the report data to an HTML table representation.
+
+        Returns:
+            str: HTML table representation of the data. Each numeric column (CO, PC, FR, Spent)
+                 will be formatted with thousands separators and no decimal places.
+                 Returns "Dataframe is empty." if the underlying dataframe has no data.
+
+        Notes:
+            - Calls dataframe() method internally to ensure data is loaded
+            - Formats numeric columns using "{:,.0f}" format string
+            - Affected columns: CO (Carry Over), PC (Purchase Commitment),
+              FR (Fund Reservation), Spent
+        """
         self.dataframe()
         if self.df.empty:
             return "Dataframe is empty."
