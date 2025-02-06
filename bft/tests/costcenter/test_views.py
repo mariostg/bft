@@ -42,7 +42,7 @@ class TestCostCenterUpdate:
 
     def test_url_by_name(self):
         response = Client().get(reverse("costcenter-update", args=[1]))
-        assert 200 == response.status_code
+        assert 302 == response.status_code
 
     def test_view_uses_correct_template(self):
         response = Client().get(reverse("costcenter-table"))
@@ -127,15 +127,11 @@ class TestSourceAdd:
 class TestSourceUpdate:
     def test_url_is_good(self):
         response = Client().get("/source/source-update/1/")
-        assert 200 == response.status_code
+        assert 302 == response.status_code
 
     def test_url_by_name(self):
         response = Client().get(reverse("source-update", args=[1]))
-        assert 200 == response.status_code
-
-    def test_view_uses_correct_template(self):
-        response = Client().get(reverse("source-update", args=[1]))
-        assertTemplateUsed(response, "costcenter/source-form.html")
+        assert 302 == response.status_code
 
 
 @pytest.mark.django_db

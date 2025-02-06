@@ -236,8 +236,6 @@ def source_add(request):
                 # Save form and normalize source code to uppercase
                 source = context["form"].save(commit=False)
                 source.source = source.source.upper()
-                if source.shortname:
-                    source.shortname = source.shortname.upper()
                 source.save()
 
                 messages.success(request, f"Source {source.source} created successfully")
