@@ -26,6 +26,24 @@ logger = logging.getLogger("uploadcsv")
 
 
 class UploadProcessor(ABC):
+    """
+    Abstract base class for processing file uploads.
+
+    This class provides a framework for processing uploaded files, with common
+    functionality for handling file operations and data transformations.
+
+    Attributes:
+        filepath (str): Path to the uploaded file
+        user (BftUser): User who initiated the upload
+        header (str): Expected header of the file, to be set by child classes
+        request: HTTP request object (optional)
+
+    Methods:
+        header_good(): Checks if the file's first line matches the expected header
+        dataframe(): Reads the file into a pandas DataFrame
+        as_dict(df): Converts a DataFrame to a list of dictionaries
+        main(): Abstract method to be implemented by child classes for main processing logic
+    """
     class Meta:
         abstract = True
 
@@ -52,8 +70,31 @@ class UploadProcessor(ABC):
 
 
 class AllocationProcessor(UploadProcessor):
+    """Process allocation data from uploaded files.
 
-    """AllocationProcess is a utility class that allows for uploading of allocation in the BFT."""
+    This class extends UploadProcessor to handle allocation-specific data processing.
+    It provides methods to validate fiscal year, quarter, fund, and amount data
+    from uploaded CSV files.
+
+    Attributes:
+        filepath (str): Path to the uploaded file
+        fy (int): Fiscal year for the allocation
+        quarter (int): Quarter number for the allocation
+        user (BftUser): User performing the upload
+
+    Methods:
+        dataframe(): Reads CSV file into pandas DataFrame
+        as_dict(df): Converts DataFrame to dictionary records
+        _check_fund(data): Validates fund codes against database
+        _check_fy(data): Validates fiscal year consistency
+        _check_quarter(data): Validates quarter data
+        _check_amount(data): Validates allocation amounts
+
+        ValueError: If validation fails for any of the checks
+
+    Note:
+        This is an abstract base class (Meta.abstract = True)
+    """
 
     class Meta:
         abstract = True
@@ -64,12 +105,61 @@ class AllocationProcessor(UploadProcessor):
         self.quarter = quarter
 
     def dataframe(self):
+        """
+        Reads a CSV file into a pandas DataFrame and fills missing values with empty strings.
+
+        Returns:
+            pandas.DataFrame: A DataFrame containing the data from the CSV file with NaN values replaced by empty strings.
+
+        Example:
+            >>> processor = UploadProcessor('data.csv')
+            >>> df = processor.dataframe()
+        """
         return pd.read_csv(self.filepath).fillna("")
 
     def as_dict(self, df: pd.DataFrame) -> dict:
+        """Convert a pandas DataFrame to a dictionary.
+
+        This method transforms a pandas DataFrame into a list of dictionaries where each dictionary
+        represents a row in the DataFrame, with column names as keys and cell values as values.
+
+        Args:
+            df (pd.DataFrame): Input pandas DataFrame to be converted.
+
+        Returns:
+            dict: A list of dictionaries where each dictionary represents a row from the DataFrame.
+
+        Example:
+            >>> df = pd.DataFrame({'col1': [1, 2], 'col2': ['a', 'b']})
+            >>> as_dict(df)
+            [{'col1': 1, 'col2': 'a'}, {'col1': 2, 'col2': 'b'}]
+        """
         return df.to_dict("records")
 
     def _check_fund(self, data: pd.Series):
+        """
+        Validates that all fund values in the provided data exist in the database.
+
+        Parameters
+        ----------
+        data : pd.Series
+            Series containing fund values to validate
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If any fund in the provided data is not found in the database
+
+        Notes
+        -----
+        - Converts provided fund values to uppercase before comparison
+        - Logs success message if all funds are valid
+        - Logs error message with invalid funds before raising ValueError
+        """
         expected = np.array(Fund.objects.all().values_list("fund", flat=True))
         provided = data.str.upper().to_numpy()
         mask = np.isin(provided, expected, invert=True)
@@ -81,6 +171,19 @@ class AllocationProcessor(UploadProcessor):
             logger.info("Funds check success.")
 
     def _check_fy(self, data: pd.Series):
+        """Validate fiscal year data from the uploaded file.
+
+        Args:
+            data (pd.Series): Series containing fiscal year values to validate
+
+        Raises:
+            ValueError: If fiscal years are not all the same
+            ValueError: If fiscal year does not match the requested fiscal year
+
+        Notes:
+            Validates that all fiscal years in the data are identical and match
+            the fiscal year specified in the request.
+        """
         fys = data.to_numpy()
         unique = (fys[0] == fys).all()
         if not unique:
@@ -95,15 +198,28 @@ class AllocationProcessor(UploadProcessor):
             logger.info(f"Validated FY match for allocation upload, {self.fy}, {self.quarter}")
 
     def _check_quarter(self, data: pd.Series):
-        """Make sure all quarter are unique.  Make sure the quarter is in QUARTERKEYS. Make sure the unique quarter in the uploaded file matches the form request.
+        """
+        Validate quarter data in allocation upload.
 
-        Args:
-            data (pd.Series): Pandas Series of quarters to validate
+        This method checks if:
+        1. The quarter is valid (contained in QUARTERKEYS)
+        2. All quarters in the data are identical
+        3. The quarters match the expected quarter for this upload
 
-        Raises:
-            ValueError: Raised of quarter not in QUARTERKEYS.
-            ValueError: Raised if quarters are not unique.
-            ValueError: Raised if quarter does not match form request.
+        Parameters
+        ----------
+        data : pd.Series
+            Series containing quarter data to validate
+
+        Raises
+        ------
+        ValueError
+            If quarter is invalid, quarters don't match, or quarter doesn't match request
+
+        Returns
+        -------
+        None
+            Method will complete successfully if all validations pass
         """
         if self.quarter not in QUARTERKEYS:
             msg = f"Invalid quarter {self.quarter}, expected one of {QUARTERKEYS}."
@@ -124,14 +240,28 @@ class AllocationProcessor(UploadProcessor):
             logger.info(f"Validated Quarter match for allocation upload, {self.fy}, {self.quarter}")
 
     def _check_amount(self, data: pd.Series):
-        """Make sure all amounts are either int of float and that amounts are greater that zero
+        """
+        Validates the amount column in the allocation upload data.
 
-        Args:
-            data (pd.Series): Pandas Series of amounts to validate.
+        Parameters
+        ----------
+        data : pd.Series
+            Series containing allocation amounts to validate
 
-        Raises:
-            ValueError: If any amount is of invalid data type
-            ValueError: If any amount is less that or equal to zero.
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If amounts are not numeric (int64 or float64) type
+            If any amounts are less than or equal to zero
+
+        Notes
+        -----
+        Logs error and raises ValueError with descriptive message including username
+        and problematic values (up to 10 examples) when validation fails
         """
         amount = data.to_numpy()
         if amount.dtype not in ["int64", "float64"]:
