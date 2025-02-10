@@ -280,11 +280,67 @@ class AllocationProcessor(UploadProcessor):
 
 
 class FundCenterAllocationProcessor(AllocationProcessor):
+    """Process fund center allocation uploads.
+
+    This class handles the validation and upload of fund center allocations from a CSV file.
+    The file must contain the following columns: fundcenter, fund, fy, quarter, amount, note.
+
+    Args:
+        filepath (str): Path to the CSV file containing fund center allocations
+        fy (str): Fiscal year for the allocations
+        quarter (str): Quarter for the allocations
+        user (BftUser): User performing the upload
+
+    Attributes:
+        header (str): Expected CSV header format
+
+    Methods:
+        _check_fund_center: Validates that all fund centers exist in the database
+        main: Main processing method that validates and saves the allocations
+
+    Raises:
+        ValueError: If validation fails for any of the required fields
+        IntegrityError: If there are database constraints violations during save
+
+    Example CSV format:
+    fundcenter,fund,fy,quarter,amount,note
+    FC001,FUND1,2023,Q1,1000.00,Initial allocation
+    """
     def __init__(self, filepath, fy, quarter, user: BftUser):
+        """Initialize the UploadProcessor.
+
+        This processor handles fund allocation uploads and inherits from AllocationProcessor.
+
+        Args:
+            filepath (str): Path to the file being processed
+            fy (str): Fiscal year
+            quarter (str): Quarter (Q1-Q4)
+            user (BftUser): User object containing permissions and metadata
+
+        Attributes:
+            header (str): CSV header format for the upload file
+        """
         AllocationProcessor.__init__(self, filepath, fy, quarter, user)
         self.header = "fundcenter,fund,fy,quarter,amount,note\n"
 
     def _check_fund_center(self, data: pd.Series):
+        """
+        Validates fund centers in provided data against existing fund centers in the database.
+
+        Args:
+            data (pd.Series): Series containing fund center codes to validate.
+
+        Raises:
+            ValueError: If any provided fund center is not found in the database.
+
+        Returns:
+            None
+
+        Notes:
+            - Fund centers are compared in uppercase
+            - Logs error with invalid fund centers if any are found
+            - Logs success message if all fund centers are valid
+        """
         expected = np.array(FundCenter.objects.all().values_list("fundcenter", flat=True))
         provided = data.str.upper().to_numpy()
         mask = np.isin(provided, expected, invert=True)
@@ -296,6 +352,36 @@ class FundCenterAllocationProcessor(AllocationProcessor):
             logger.info("Fund centers check success.")
 
     def main(self, request=None):
+        """Process fund center allocation upload from CSV file.
+
+        This method processes a CSV file containing fund center allocations and saves them to the database.
+        It performs various checks on the input data before saving.
+
+        Args:
+            request (HttpRequest, optional): Django request object for displaying messages. Defaults to None.
+
+        Returns:
+            None: The method returns None but has side effects:
+                - Saves valid fund center allocations to database
+                - Logs info/warning/error messages
+                - Displays messages to user if request object provided
+
+        Raises:
+            ValueError: If any validation check fails on the input data
+            IntegrityError: If there are database constraint violations when saving
+
+        The CSV file must contain the following columns:
+            - fund: Fund identifier
+            - fundcenter: Fund center identifier
+            - fy: Fiscal year
+            - quarter: Quarter number
+            - amount: Allocation amount
+
+        Side Effects:
+            - Creates FundCenterAllocation records in database
+            - Logs messages at info/warning/error levels
+            - Displays Django messages if request provided
+        """
         if not self.header_good():
             msg = f"Fund center allocation upload by {self.user.username}, Invalid columns header"
             logger.error(msg)
