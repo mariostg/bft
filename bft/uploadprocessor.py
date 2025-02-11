@@ -429,11 +429,55 @@ class FundCenterAllocationProcessor(AllocationProcessor):
 
 
 class CostCenterAllocationProcessor(AllocationProcessor):
+    """Process cost center allocation file uploads.
+
+    This class handles the processing and validation of cost center allocation data from uploaded files.
+    It inherits from AllocationProcessor and implements specific validation logic for cost center
+    allocations.
+
+    Args:
+        filepath (str): Path to the uploaded file
+        fy (str): Fiscal year
+        quarter (str): Quarter
+        user (BftUser): User performing the upload
+
+    Attributes:
+        header (str): Expected CSV header format for cost center allocation files
+
+    Methods:
+        _check_cost_center(data): Validates that all cost centers exist in database
+        main(request): Main processing method that validates and saves cost center allocations
+
+    Raises:
+        ValueError: If validation fails for cost centers or other required fields
+        IntegrityError: If there are database constraint violations when saving
+
+    Example:
+        processor = CostCenterAllocationProcessor('allocations.csv', '2023', 'Q1', user)
+        processor.main(request)
+    """
     def __init__(self, filepath, fy, quarter, user: BftUser):
         AllocationProcessor.__init__(self, filepath, fy, quarter, user)
         self.header = "costcenter,fund,fy,quarter,amount,note\n"
 
     def _check_cost_center(self, data: pd.Series):
+        """
+        Validates cost center data against existing cost centers in the database.
+
+        Args:
+            data (pd.Series): Series containing cost center codes to validate
+
+        Raises:
+            ValueError: If any provided cost center is not found in the database
+
+        Returns:
+            None
+
+        Notes:
+            - Converts provided cost centers to uppercase before comparison
+            - Logs error message with invalid cost centers if validation fails
+            - Logs success message if all cost centers are valid
+        """
         expected = np.array(CostCenter.objects.all().values_list("costcenter", flat=True))
         provided = data.str.upper().to_numpy()
         mask = np.isin(provided, expected, invert=True)
@@ -445,6 +489,27 @@ class CostCenterAllocationProcessor(AllocationProcessor):
             logger.info("Cost centers check success.")
 
     def main(self, request=None):
+        """Process cost center allocation upload from file.
+
+        This method validates the uploaded file content and creates cost center allocation records
+        in the database. It performs header validation and data checks on fund, cost center,
+        fiscal year, quarter and amount fields.
+
+        Args:
+            request (HttpRequest, optional): Django request object for displaying messages.
+                Defaults to None.
+
+        Returns:
+            None: The function returns None but has side effects:
+                - Creates cost center allocation records in database if validation passes
+                - Logs info/warning/error messages
+                - Displays messages to user if request object is provided
+                - Prints summary message if request object is not provided
+
+        Raises:
+            ValueError: If any data validation check fails
+            IntegrityError: If database constraints are violated when saving allocations
+        """
         if not self.header_good():
             msg = f"Cost center allocation upload by {self.user.username}, Invalid columns header"
             logger.error(msg)
@@ -492,11 +557,40 @@ class CostCenterAllocationProcessor(AllocationProcessor):
 
 
 class FundProcessor(UploadProcessor):
+    """Process fund data uploads for the BFT system.
+
+    This class handles the processing and validation of fund data uploads, inheriting from UploadProcessor.
+    It manages fund entries with their names and votes, checking for duplicates and data integrity.
+
+    The expected CSV format should have columns: fund,name,vote
+
+    Attributes:
+        header (str): The expected CSV header string format.
+
+    Example:
+        processor = FundProcessor(filepath, user)
+        processor.main(request)
+
+    Raises:
+        IntegrityError: When attempting to save duplicate or invalid fund entries.
+    """
     def __init__(self, filepath, user: BftUser) -> None:
         UploadProcessor.__init__(self, filepath, user)
         self.header = "fund,name,vote\n"
 
     def _find_duplicate_fund(self, funds: pd.DataFrame) -> pd.DataFrame:
+        """Find duplicate fund names in a DataFrame.
+
+        This method searches for duplicate fund names in a DataFrame by converting all fund
+        names to lowercase and identifying rows where the fund name appears more than once.
+
+        Args:
+            funds (pd.DataFrame): DataFrame containing fund information with a 'fund' column.
+
+        Returns:
+            pd.DataFrame: DataFrame containing only the duplicate entries if duplicates exist,
+                         or an empty DataFrame if no duplicates are found.
+        """
         funds["fund"] = funds["fund"].str.lower()
         duplicates = funds[funds.duplicated(subset=["fund"], keep=False) == True]
         if duplicates.empty:
@@ -505,6 +599,30 @@ class FundProcessor(UploadProcessor):
             return duplicates
 
     def main(self, request=None):
+        """
+        Process fund upload from a file.
+
+        This method processes the upload of funds from a file, validating the header,
+        checking for duplicates, and saving valid funds to the database.
+
+        Args:
+            request (HttpRequest, optional): The HTTP request object. Used for displaying
+                messages to the user. If None, messages are printed to stdout.
+
+        Returns:
+            None: The method returns None but has side effects:
+                - Saves valid funds to database
+                - Logs info/warning/error messages
+                - Displays messages to user if request is provided
+
+        Raises:
+            IntegrityError: When there's a database integrity error while saving a fund
+
+        Side Effects:
+            - Creates Fund objects in database
+            - Logs messages using logger
+            - Displays messages using Django's message framework if request provided
+        """
         if not self.header_good():
             msg = f"Fund upload by {self.user.username}, Invalid columns header"
             logger.error(msg)
@@ -540,11 +658,45 @@ class FundProcessor(UploadProcessor):
 
 
 class SourceProcessor(UploadProcessor):
+    """Processes source file uploads and manages source data entries.
+
+    This class handles the processing and validation of source file uploads,
+    including checking for duplicate sources and saving valid entries to the database.
+
+    Inherits from UploadProcessor.
+
+    Attributes:
+        header (str): The expected header string for source files ("source\n")
+
+    Methods:
+        _find_duplicate_source(sources: pd.DataFrame) -> pd.DataFrame:
+            Identifies duplicate sources in the provided DataFrame.
+
+        main(request=None):
+            Main processing method that validates headers, checks for duplicates,
+            and saves valid sources to the database.
+
+    Example:
+        processor = SourceProcessor(filepath="/path/to/file", user=user)
+        processor.main(request)
+    """
     def __init__(self, filepath, user: BftUser) -> None:
         UploadProcessor.__init__(self, filepath, user)
         self.header = "source\n"
 
     def _find_duplicate_source(self, sources: pd.DataFrame) -> pd.DataFrame:
+        """Find duplicates in source DataFrame based on source column.
+
+        This method processes the 'source' column by converting all values to lowercase
+        and identifies duplicate entries.
+
+        Args:
+            sources (pd.DataFrame): DataFrame containing a 'source' column to check for duplicates.
+
+        Returns:
+            pd.DataFrame: DataFrame containing only the duplicate entries if duplicates exist,
+                         empty DataFrame if no duplicates are found.
+        """
         sources["source"] = sources["source"].str.lower()
         duplicates = sources[sources.duplicated(subset=["source"], keep=False) == True]
         if duplicates.empty:
@@ -553,6 +705,27 @@ class SourceProcessor(UploadProcessor):
             return duplicates
 
     def main(self, request=None):
+        """Process the upload of source data from a file.
+
+        This method handles the validation and saving of source data from a DataFrame.
+        It checks for header validity and duplicate sources before attempting to save.
+
+        Args:
+            request (HttpRequest, optional): Django request object for displaying messages.
+                If None, messages will be printed to stdout instead.
+
+        Returns:
+            None
+
+        Side Effects:
+            - Saves valid sources to the database
+            - Logs info/warning/error messages
+            - Displays messages to user via Django messages framework if request provided
+            - Prints messages to stdout if no request provided
+
+        Raises:
+            IntegrityError: If there are database constraints violations when saving sources
+        """
         if not self.header_good():
             msg = f"Source upload by {self.user.username}, Invalid columns header"
             logger.error(msg)
