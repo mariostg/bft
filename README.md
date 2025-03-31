@@ -40,7 +40,8 @@ Set Period to 1
 ```
 
 ## Upload encumbrance report
-This will upload a DRMIS encumbrance report aa long as the report meets the formatting conditions.
+This will upload a DRMIS encumbrance report as long as the report meets the formatting conditions.  
+Search the documentation for **Uploading Data in the BFT** to get more details.
 
 ```
 python manage.py uploadcsv test-data/encumbrance_2184A3-p1.txt
