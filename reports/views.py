@@ -836,13 +836,16 @@ def capital_forecasting_dashboard(request):
     initial = capital_forecasting_set_initial(request)
     form = SearchCapitalForecastingDashboardForm(initial=initial)
 
+    query_string = request.GET.urlencode()
+
     context = {
         **initial,
-        "title": f"{initial['capital_project']} Capital Forecasting Year End Ratios",
-        "url_name": "capital-forecasting-ye-ratios",
+        "title": f"{initial['capital_project']} Capital Forecasting Dashboard",
+        "url_name": "capital-forecasting-dashboard",
         "form_filter": True,
         "form": form,
         "table": "All fields are mandatory.",
+        "query_string": query_string,
     }
 
     if len(request.GET):
