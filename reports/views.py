@@ -31,6 +31,35 @@ from reports.forms import (SearchAllocationAnalysisForm,
 
 
 def bmt_screening_report(request):
+    """
+    Generate a BMT (Business Management Team) Screening Report based on user-defined filters.
+
+    This view function handles the generation and display of screening reports based on fund center,
+    fund, fiscal year, and quarter parameters. It processes form submissions, validates input data,
+    and renders the report in HTML format.
+
+    Args:
+        request: The HTTP request object containing GET parameters for filtering
+
+    Returns:
+        HttpResponse: Rendered template with the following context:
+            - form: SearchCostCenterScreeningReportForm instance
+            - form_filter: Boolean indicating if filter form should be displayed
+            - initial: Dictionary of initial form values
+            - table: HTML formatted screening report table
+            - fy: Current fiscal year
+            - url_name: URL name for the view
+            - title: Page title
+            - query_string: Encoded URL parameters
+
+    Raises:
+        LineItemsDoNotExistError: When no line items are found for given fund and fund center
+
+    Notes:
+        - Requires valid fund center and fund selections
+        - Displays warning messages for invalid or missing parameters
+        - Won't display filter form if no cost center or fund center allocations exist
+    """
     initial = {
         "fundcenter": None,
         "fund": None,
@@ -101,14 +130,28 @@ def bmt_screening_report(request):
 
 
 def allocation_status_report(request):
-    """This function relies on provision of fundcenter, fund, fy, quarter which are extracted from GET request.  If not
-    part of GET request, exception will be raised and displayed as a message to the user.
+    """
+    View function that generates an allocation status report based on filter parameters.
+
+    The function processes GET requests with filter parameters (fund center, fund, fiscal year,
+    and quarter) to display allocation status data. If no allocations exist in the system,
+    a warning message is displayed.
 
     Args:
-        request (HtpRequest): _description_
+        request (HttpRequest): The HTTP request object containing GET parameters
 
     Returns:
-        Content to display the Allocation Status Report
+        HttpResponse: Renders the allocation-status-report.html template with context containing:
+            - form: SearchAllocationAnalysisForm instance for filtering
+            - form_filter: Boolean indicating if form should be displayed
+            - table: HTML formatted DataFrame with allocation data
+            - title: Report title string
+            - url_name: URL name string for the report
+
+    Notes:
+        - Requires CostCenterAllocation or FundCenterAllocation objects to exist in database
+        - Validates quarter input against QUARTERKEYS
+        - Uses AllocationStatusReport utility class to generate report data
     """
 
     fundcenter = fund = fy = quarter = ""
@@ -156,6 +199,32 @@ def allocation_status_report(request):
 
 
 def costcenter_monthly_forecast_line_item(request):
+    """
+    View function that handles the cost center monthly forecast line item report.
+
+    Displays and filters cost center monthly forecast data based on provided parameters.
+    If form is submitted with valid parameters, returns filtered data in a table format.
+
+    Parameters:
+        request (HttpRequest): The HTTP request object containing GET parameters
+                             for filtering (fy, fund, costcenter, period)
+
+    Returns:
+        HttpResponse: Rendered template with:
+            - Search form for filtering data
+            - Table displaying filtered results if parameters are provided
+            - Error message if no data found for given parameters
+            - Form validation message if required fields are missing
+
+    Required Fields:
+        - FY (Fiscal Year)
+        - Period
+
+    Notes:
+        - Data is formatted with thousand separators
+        - Displays "Cost Center" column if costcenter parameter is None
+        - Displays "Period" column if period parameter is None
+    """
     initial = set_initial(request)
     form = SearchCostCenterMonthlyDataForm(initial=initial)
 
