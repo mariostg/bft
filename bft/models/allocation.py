@@ -8,6 +8,7 @@ from django.db.models import QuerySet
 from bft import exceptions
 from bft.conf import QUARTERKEYS, QUARTERS, YEAR_CHOICES
 
+
 class AllocationQuerySet(models.QuerySet):
     """QuerySet for Allocation objects providing custom lookup methods.
 
