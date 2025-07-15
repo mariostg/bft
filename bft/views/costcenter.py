@@ -1147,7 +1147,6 @@ def costcenter_page(request):
         has_filter = True
     search_filter = CostCenterFilter(request.GET, queryset=data)
     paginator = Paginator(search_filter.qs, 5)  # Show 25 items per page
-    print(paginator)
     page_number = request.GET.get("page")
 
     try:
