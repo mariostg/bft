@@ -12,6 +12,42 @@ def caster(value):
 
 
 class ScreeningReport:
+    """
+    A class to generate financial screening reports for fund centers and cost centers.
+
+    This class processes and analyzes financial data including line items, allocations,
+    and forecast adjustments to create comprehensive financial reports. It handles the
+    aggregation and calculation of various financial metrics across different organizational
+    levels.
+
+    Attributes:
+        top_fc (FundCenter): The top-level fund center for the report
+        fund (Fund): The fund to analyze
+        fy (int): Fiscal year
+        quarter (int): Quarter number
+        cc_children (QuerySet): Child cost centers filtered by top fund center sequence
+        report_lines (pd.DataFrame): Grouped line items data
+        cc_allocations (pd.DataFrame): Cost center allocations
+        fc_allocations (pd.DataFrame): Fund center allocations
+        fcst_adj (pd.DataFrame): Forecast adjustments
+        allocations_without_encumbrance (pd.DataFrame): Allocations without associated line items
+        line_item_with_allocations (pd.DataFrame): Line items merged with their allocations
+        report (pd.DataFrame): Final processed report
+        grand_total (pd.DataFrame): Summary totals by fund
+
+    Methods:
+        get_lineitems_grouping(): Returns grouped DataFrame of line items
+        get_cost_center_allocations(): Returns DataFrame of cost center allocations
+        get_fundcenter_allocations(): Returns DataFrame of fund center allocations
+        get_forecast_adjustments(): Returns DataFrame of forecast adjustments
+        grand_total_by_fund(df): Calculates grand totals grouped by fund
+        report_subtotals(df): Calculates subtotals for each organizational level
+        html(): Generates HTML representation of the report
+        main(): Main execution method to generate the complete report
+
+    Raises:
+        LineItemsDoNotExistError: When no line items exist for the specified criteria
+    """
     def __init__(self, top_fc: FundCenter, fund: Fund, fy: int, quarter: int):
         self.top_fc = top_fc
         self.fund = fund
