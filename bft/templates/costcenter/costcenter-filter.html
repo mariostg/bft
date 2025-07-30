@@ -1,0 +1,31 @@
+
+
+{% block content %}
+  <main class="block block--centered">
+    <section class="form">
+      <form method="GET">
+        <header class='form__header'>{{title}}</header>
+        {% csrf_token %}
+        <p>{{filter.form.isupdatable}}</p>
+        <!--this filter allows filtering of costcenter table by costcenter, is_updatable and is_forecastable.  is_updatable and is_forecastable arecheckbox format -->
+        <div class="form__field">
+          <label for="id_costcenter__iexact">Costcenter</label>
+                    <input type="text" name="costcenter__iexact" id="id_costcenter__iexact" value="{{filter.form.costcenter__iexact.value}}">
+        </div>
+        <div class="form__field">
+          <label for="id_isupdatable">Is Updatable</label>
+          <input type="checkbox" name="isupdatable" id="id_isupdatable" {% if filter.isupdatable %}checked{% endif %}>
+        </div>
+        <div class="form__field">
+          <label for="isforecastable">Is Forecastable</label>
+          <input type="checkbox" name="isforecastable" id="isforecastable" {% if filter.isforecastable %}checked{% endif %}>
+        </div>
+        {# this is the submit button #}
+        {% include 'core/form-buttons.html' %}
+      </form>
+    </section>
+  </main>
+  </body>
+  </html>
+
+{% endblock content %}
